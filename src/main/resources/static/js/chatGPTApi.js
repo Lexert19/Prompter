@@ -34,6 +34,7 @@ class ChatGPTApi extends ChatApi {
                     }                    
                 }
             } catch (error) {
+                this.currentMessage.text += json;
                 console.log(error);
             }
 
