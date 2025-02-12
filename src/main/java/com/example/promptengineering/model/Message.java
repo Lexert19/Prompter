@@ -6,11 +6,13 @@ import java.util.Map;
 
 import org.springframework.data.cassandra.core.mapping.CassandraType;
 
+import com.example.promptengineering.converter.ContentListConverter;
+
 
 public class Message {
     private String role;
     @CassandraType(type = CassandraType.Name.TEXT)
-    @Convert(converter = ContentListConverter.class)
+    @jakarta.persistence.Convert(converter = ContentListConverter.class)
     private List<Content> content;
     private String model;
     private String userId;

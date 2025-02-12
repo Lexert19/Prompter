@@ -78,42 +78,7 @@ class ChatGPTApi extends ChatApi {
         return normalizedMessages;
     }
 
-    // createContent(message, documents) {
-    //     let allContent = [];
-
-    //     let contentText = "";
-
-    //     documents.forEach(doc => {
-    //         if (doc.type == "text") {
-    //             contentText += `<document>${doc.content}</document>`;
-    //         }
-    //     });
-
-    //     contentText += this.prompter.getPrompts();
-    //     contentText += message;
-
-
-    //     documents.forEach(doc => {
-    //         if (doc.type == "image") {
-    //             allContent.push(
-    //                 {
-    //                     type: "image_url",
-    //                     image_url: {
-    //                         url: "data:" + doc.imageType + ";base64," + doc.content,
-
-    //                     },
-    //                 }
-    //             );
-    //         }
-    //     });
-
-    //     allContent.push({
-    //         type: "text",
-    //         text: contentText,
-    //     });
-
-    //     return allContent;
-    // }
+   
 
 
 
