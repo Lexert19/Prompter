@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.model.ChatGPTSettings;
-import com.example.promptengineering.service.ChatGPTService;
+import com.example.promptengineering.service.ChatService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import reactor.core.publisher.Flux;
@@ -19,17 +19,17 @@ import reactor.core.publisher.Flux;
 @RequestMapping("/chatgpt")
 public class ChatGPTApiRestController {
     @Autowired
-    private ChatGPTService chatGPTService;
+    private ChatService chatGPTService;
 
-    @PostMapping("/chat")
-    public Flux<String> makeRequest(
-            @AuthenticationPrincipal OAuth2User oAuth2User,
-            @RequestBody String chatgptBody) throws JsonProcessingException {
+    // @PostMapping("/chat")
+    // public Flux<String> makeRequest(
+    //         @AuthenticationPrincipal OAuth2User oAuth2User,
+    //         @RequestBody String chatgptBody) throws JsonProcessingException {
 
-        User user = (User) oAuth2User;
-        ChatGPTSettings chatGPTSettings = new ChatGPTSettings(user.getChatgptKey());
+    //     User user = (User) oAuth2User;
+    //     ChatGPTSettings chatGPTSettings = new ChatGPTSettings(user.getChatgptKey());
 
-        return chatGPTService.makeRequest(chatGPTSettings, chatgptBody);
-    }
+    //     return chatGPTService.makeRequest(chatGPTSettings, chatgptBody);
+    // }
 
 }

@@ -1,191 +1,161 @@
+
 class Message {
-    constructor() {
+    constructor(role = "", text = "", images = [], documents = []) {
+        this.role = role;
+        this.content = [];
+        this.id = Math.random().toString(36);
         this.cache = false;
-        this.role = "";
-        this.text = "";
         this.documents = [];
-        this.images = [];
-        this.createTime = [];
-    }
+        this.text = "";
 
-    getHtmlImages(){
-        let html = "";
-        this.images.forEach(img =>{
-            html  += "<img src=\""+img+"\" >"
+        this.setText(text, documents);
+        images.forEach(img => {
+            this.addBase64Image(img);
         });
-        return html;
     }
 
-    getHtmlFiles(){
-        let html = "";
-        this.documents.forEach(doc =>{
-            html  += `<p>plik: ${doc.length}</p>`;
+    setText(text, documents = [], cache = false) {
+        let textContent = "";
+        this.documents = documents;
+        this.text = text;
+        documents.forEach(doc => textContent += "<document>" + doc + "</document>");
+
+        this.content.push({
+            type: "text",
+            text: textContent + text,
+            cache: cache
         });
-        return html;
+
+        return this;
     }
 
-    getTextdocuments(text){
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = text;
-    
-        const documents = tempDiv.getElementsByTagName('document');
-        let result = [];
-    
-        for (let i = 0; i < documents.length; i++) {
-            result.push(documents[i].textContent); 
+    appendText(text) {
+        const textItem = this.content.find(item => item.type === "text");
+        if (textItem) {
+            textItem.text += text;
         }
-    
-        return result;
     }
 
-    readChatgptMessage(message){
-        this.cache = message.cache;
-        this.role = message.role;
-        this.createTime = message.createTime;
-        let rawMessage = JSON.parse(message.content);
-        this.role = rawMessage.role;
-
-
-        rawMessage.content.forEach(content =>{
-            if (content.type == "image_url") {
-                this.images.push(content.image_url.url);
-            }else if(content.type == "text"){
-                const documentRegex = /<document>(.*?)<\/document>/gs;
-                let match;
-    
-                while ((match = documentRegex.exec(content.text)) !== null) {
-                    this.documents.push(match[1].trim());
-                }
-    
-                this.text = content.text.replace(documentRegex, '').trim();
-            }
-        });
+    getText() {
+        //return this.content.find(item => item.type === "text")?.text;
+        return this.text;
     }
 
-    readClaudeMessage(message){
-        this.cache = message.cache;
-        this.createTime = message.createTime;
-        let rawMessage = JSON.parse(message.content);
-        this.role = rawMessage.role;
-
-        rawMessage.content.forEach(content =>{
-            if (content.type == "image") {
-                this.images.push("data:"+content.source.media_type+";base64,"+content.source.data);
-            }else if(content.type == "text"){
-                this.text += content.text;
-            }
+    addImageUrl(url, mediaType, cache = false) {
+        this.content.push({
+            type: "image_url",
+            url: url,
+            mediaType: mediaType,
+            cache: cache
         });
+        return this;
     }
 
-    readLlamaMessage(message){
-        this.cache = message.cache;
-        let rawMessage = JSON.parse(message.content);
-        this.createTime = message.createTime;
-        this.role = rawMessage.role;
+    addBase64Image(data, cache = false) {
+        const regex = /^data:(image\/\w+);base64,(.+)$/;
+        const matches = data.match(regex);
 
-        this.text = rawMessage.content;
+        if (matches) {
+            const mediaType = matches[1];
+            const base64Data = matches[2];
 
-        // if(this.role == "assistant"){
-        //     rawMessage.content.forEach(content =>{
-        //         if(content.type == "text"){
-        //             this.text += content.text;
-        //         }
-        //     });
-        // }else{
-        // }
-    }
-
-    toLlamaMessage(){
-        let finalText = "";
-        this.documents.forEach(doc => {
-            finalText += `<document>${doc}</document>`;
-        });
-        finalText += this.text;
-
-
-        // if(this.role == "assistant"){
-        //     let content = [];
-        //     content.push({
-        //         type: "text",
-        //         text: finalText
-        //     });
-        //     return {
-        //         role: this.role,
-        //         content: content
-        //     };
-        // }
-
-        return {
-            role: this.role,
-            content: finalText
-        };
-    }
-
-    toChatgptMessage(){
-        let content = [];
-
-        let finalText = "";
-        this.documents.forEach(doc => {
-            finalText += `<document>${doc}</document>`;
-        });
-        finalText += this.text;
-
-        this.images.forEach(img =>{
-            content.push({
-                type: "image_url",
-                image_url: {
-                    url: img
-                }
-            });
-        });
-
-        content.push({
-            type: "text",
-            text: finalText
-        });
-
-
-        return {
-            role: this.role,
-            content: content
-        };
-    }
-
-
-
-    toClaudeMessage() {
-        let content = [];
-
-        let finalText = "";
-        this.documents.forEach(doc => {
-            finalText += `<document>${doc}</document>`;
-        });
-        finalText += this.text;
-
-        this.images.forEach(img =>{
-            content.push({
+            this.content.push({
                 type: "image",
-                source: {
-                    type: "base64",
-                    media_type: getMediaType(img),
-                    data: getImageData(img)
-                },
-                ...(this.cache && { cache_control: { type: "ephemeral" } })
+                mediaType: mediaType,
+                data: base64Data,
+                cache: cache
             });
-        })
+        } else {
+            throw new Error('Invalid base64 image data');
+        }
 
-        content.push({
-            type: "text",
-            text: finalText
-        });
-
-
-        return {
-            role: this.role,
-            content: content
-        };
+        return this;
     }
 
-  
 
+
+    getHtmlImages() {
+        return this.content
+            .filter(item => ["image_url", "image"].includes(item.type))
+            .map(item => {
+                if (item.type === "image_url") {
+                    return `<img class="image" src="${item.url}" alt="Uploaded image">`;
+                }
+                return `<img class="image" src="data:${item.mediaType};base64,${item.data}" alt="Inline image">`;
+            })
+            .join("");
+    }
+
+    getHtmlFiles() {
+        let documentsText = "";
+        this.documents.forEach((document, index) => {
+            documentsText += "Dokument: " + document.length;
+        });
+        return documentsText;
+    }
+}
+
+class RequestBuilder {
+    constructor() {
+        this.provider = "OPENAI";
+        this.model = "gpt-4o-mini";
+        this.messages = [];
+        this.maxTokens = 8000;
+        this.temperature = 0.0;
+        this.stream = true;
+        this.id = Math.random().toString(36);
+        this.url = "https://api.openai.com/v1/chat/completions";
+        this.key = "";
+    }
+
+    toRequestJSON() {
+        const messagesToInclude = [...this.messages.filter(message => message.cache === true), this.messages[this.messages.length - 1]];
+
+      
+        return JSON.stringify({
+            model: this.model,
+            url: this.url,
+            provider: this.provider,
+            messages: messagesToInclude.map(message => ({
+                role: message.role,
+                content: message.content.map(content => this.mapContent(content))
+              })),
+            maxTokens: this.maxTokens,
+            temperature: this.temperature,
+            stream: this.stream,
+            key: this.key
+        });
+    }
+
+    mapContent(content) {
+        const baseContent = {
+            type: content.type,
+            text: content.text || "",
+            cache: content.cache || false
+        };
+
+        switch (content.type) {
+            case 'image_url':
+                return {
+                    ...baseContent,
+                    url: content.url,
+                    mediaType: content.mediaType
+                };
+
+            case 'image':
+                return {
+                    ...baseContent,
+                    mediaType: content.mediaType,
+                    data: content.data
+                };
+
+            default:
+                return baseContent;
+        }
+    }
+
+    addMessage(message) {
+        this.messages.push(message);
+        return this;
+    }
 }

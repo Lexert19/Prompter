@@ -25,7 +25,7 @@ public class WebClientConfig {
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .option(ChannelOption.TCP_NODELAY, true)
                 .doOnConnected(conn -> conn
-                        .addHandlerLast(new ReadTimeoutHandler(10, TimeUnit.SECONDS))
+                        .addHandlerLast(new ReadTimeoutHandler(30, TimeUnit.SECONDS))
                         .addHandlerLast(new WriteTimeoutHandler(300, TimeUnit.SECONDS)))
                 .responseTimeout(Duration.ofSeconds(300))
                 .keepAlive(true);

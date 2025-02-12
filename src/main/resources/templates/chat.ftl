@@ -9,7 +9,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js"
         integrity="sha512-6yoqbrcLAHDWAdQmiRlHG4+m0g/CT/V9AGyxabG8j7Jk8j3r3K6due7oqpiRMZqcYe9WM2gPcaNNxnl2ux+3tA=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <title>PromptEngineering</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chatgpt.js/2.9.1/chatgpt.min.js" integrity="sha512-lZHKyMwjpxV92JS9T/ZbtICk9iH1hCB/34mLdZcwJGdrP6ns/ebwVLyrZLFVKk6geIBuQCwJza65lp1gaOctjA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script type="module">
+    import claudeApi from 'https://cdn.jsdelivr.net/npm/claude-api@1.0.4/+esm'
+    </script>
+    <title>Prompter</title>
 </head>
 
 <body>
@@ -30,6 +34,8 @@
             </div>
         </div>
     </div>
+    <#include "/parts/editMessage.ftl" />
+    <script src="/static/js/editMessageView.js"></script>
     <script src="/static/js/main.js"></script>
     <script src="/static/js/account.js"></script>
     <script src="/static/js/message.js"></script>
