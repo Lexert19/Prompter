@@ -1,5 +1,7 @@
 plugins {
 	id 'java'
+	id 'org.jetbrains.kotlin.jvm' version '1.9.25'
+  	id 'org.jetbrains.kotlin.plugin.spring' version '1.9.25'
 	id 'org.springframework.boot' version '3.3.4'
 	id 'io.spring.dependency-management' version '1.1.6'
 }
@@ -42,8 +44,12 @@ dependencies {
 
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.18.0'
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-freemarker', version: '3.3.4'
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-mongodb', version: '3.4.2'
 	implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: '3.2.0'
+
+	implementation 'org.jetbrains.kotlin:kotlin-reflect'
+	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-reactor"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core"
+    implementation "io.projectreactor:reactor-core"
 
 }
 
@@ -51,7 +57,13 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
+kotlin {
+  compilerOptions {
+    freeCompilerArgs.addAll '-Xjsr305=strict'
+  }
+}
+
 bootRun {
     sourceResources sourceSets.main
-	jvmArgs = ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"]
+	//jvmArgs = ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"]
 }

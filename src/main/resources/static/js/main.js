@@ -55,3 +55,9 @@ function openHistory(){
     document.getElementById("chatHistory").classList.add("active");
 
 }
+
+function openProjects(){
+    hidePages();
+    document.getElementById("projects").classList.add("active");
+
+}

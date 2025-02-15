@@ -3,6 +3,7 @@
          <#include "/parts/history.ftl" />
          <#include "/parts/account.ftl" />
          <#include "/parts/instructions.ftl" />
+         <#include "/parts/projects.ftl" />
      </div>
      <#include "/parts/panel.ftl" />
  </div>

@@ -5,11 +5,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.cassandra.core.mapping.CassandraType;
+import org.springframework.data.cassandra.core.mapping.CassandraType.Name;
+import org.springframework.data.cassandra.core.mapping.PrimaryKey;
+import org.springframework.data.cassandra.core.mapping.Table;
 
 import com.example.promptengineering.converter.ContentListConverter;
 
-
+@Table("message_entity")
 public class Message {
+    @PrimaryKey
+    @CassandraType(type = Name.BIGINT)
+    private Long id;
     private String role;
     @CassandraType(type = CassandraType.Name.TEXT)
     @jakarta.persistence.Convert(converter = ContentListConverter.class)
@@ -112,6 +118,14 @@ public class Message {
 
     public void setCached(boolean cached) {
         this.cached = cached;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
 }

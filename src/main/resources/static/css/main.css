@@ -155,6 +155,7 @@ select {
     border: none;
     border-radius: 5px;
     margin-right: 10px;
+    width: 100%;
 }
 
 #history button:hover {
@@ -192,8 +193,22 @@ select {
     display: none;
 }
 
+.panel{
+    display: flex;
+}
+
+.panel button{
+    margin-right: 5px;
+}
+
 .pages .active{
     display: block !important;
+}
+
+.send-button{
+    border-radius: 50% !important;
+    width: 48px;
+    height: 48px;
 }
 
 .user {
@@ -254,6 +269,8 @@ p {
 .edit-menu {
     position: absolute;
     background-color: #374151;
+    padding: 5px;
+    border-radius: 3px;
     /* border: 1px solid #4f46e5; */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     z-index: 10;
@@ -274,3 +291,47 @@ p {
 .mb-1 {
     margin-bottom: 1rem;
 }
+
+
+/* input range */
+input[type="range"] {
+    -webkit-appearance: none;
+    margin: 5px 0;
+    margin-right: 5px;
+    width: 100%; 
+    height: 10px; 
+    background-color: rgba(55, 65, 81, 0.95);
+    border-radius: 5px; 
+    outline: none; 
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; 
+    appearance: none; 
+    width: 20px; 
+    height: 20px; 
+    background-color: rgba(99, 102, 241, 1);
+    border-radius: 50%; 
+    cursor: pointer; 
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 20px; 
+    height: 20px; 
+    background-color: rgba(99, 102, 241, 1);
+    border-radius: 50%; 
+    cursor: pointer; 
+}
+
+input[type="range"]::-moz-range-track {
+    background: #000;
+    border-radius: 5px; 
+}
+input[type="range"]::-webkit-slider-runnable-track {
+    background-color: rgba(55, 65, 81, 0.95);
+}
+
+input[type="range"]::-moz-range-progress {
+    background-color: rgba(99, 102, 241, 1);
+}
+/*  */
