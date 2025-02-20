@@ -307,6 +307,7 @@ class Chat {
                 this.claudeKey = keys.claudeKey || "";
                 this.chatgptKey = keys.chatgptKey || "";
                 this.nvidiaKey = keys.nvidiaKey || "";
+                this.geminiKey = keys.geminiKey || "";
                 this.requestBuilder.key = this.chatgptKey;
             })
             .catch(error => {
