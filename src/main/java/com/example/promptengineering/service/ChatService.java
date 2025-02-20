@@ -66,6 +66,41 @@ public class ChatService {
 
     }
 
+    private StringBuilder geminiAccumulator = new StringBuilder();
+    private String geminiReadChunk(String chunk){
+        geminiAccumulator.append(chunk);
+        try {
+            JsonNode rootNode = objectMapper.readTree(geminiAccumulator.toString());
+            String content = "";
+            
+            if (rootNode.isArray() && rootNode.size() > 0) {
+                JsonNode firstElement = rootNode.get(0);
+                JsonNode candidates = firstElement.path("candidates");
+                if (candidates.isArray() && candidates.size() > 0) {
+                    JsonNode candidate = candidates.get(0);
+                    JsonNode parts = candidate.path("content").path("parts");
+                    if (parts.isArray() && parts.size() > 0) {
+                        content = parts.get(0).path("text").asText();
+                    }
+                }
+            } else {
+                JsonNode candidates = rootNode.path("candidates");
+                if (candidates.isArray() && candidates.size() > 0) {
+                    JsonNode candidate = candidates.get(0);
+                    JsonNode parts = candidate.path("content").path("parts");
+                    if (parts.isArray() && parts.size() > 0) {
+                        content = parts.get(0).path("text").asText();
+                    }
+                }
+            }
+            
+            geminiAccumulator.setLength(0);
+            return content;
+        } catch (JsonProcessingException ex) {
+            return "";
+        }
+    }
+
     private String readChunk(String chunk, String provider) {
         try{
             JsonNode rootNode = objectMapper.readTree(chunk);
@@ -76,8 +111,7 @@ public class ChatService {
                 String content = rootNode.path("delta").path("text").asText();
                 return content;
             }else if(provider.equals("GEMINI")){
-                String content = rootNode.path("candidates").path("content").path("parts").path("text").asText();
-                return content;
+                return this.geminiReadChunk(chunk);
             }else{
                 String content = rootNode.path("choices").get(0).path("delta").path("content").asText();
                 return content;
