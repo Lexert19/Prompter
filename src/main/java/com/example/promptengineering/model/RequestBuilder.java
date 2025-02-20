@@ -46,13 +46,6 @@ public class RequestBuilder {
         Map<String, Object> request = new HashMap<>();
 
         switch (this.provider) {
-            case "GEMINI" -> {
-                List<Map<String, Object>> messagesListGemini = new ArrayList<>();
-                for (Message message : messages) {
-                    messagesListGemini.add(message.toMap(provider));
-                }
-                request.put("contents", messagesListGemini);
-            }
             default -> {
                 List<Map<String, Object>> messagesListDefault = new ArrayList<>();
                 for (Message message : messages) {

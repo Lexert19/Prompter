@@ -48,7 +48,7 @@ class Chat {
                 name: "gemini-2.0-flash-thinking-exp-01-21",
                 text: "gemini-2.0-flash-thinking-exp-01-21",
                 provider: "GEMINI",
-                url: "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:streamGenerateContent"
+                url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
             }
         ];
         this.addPasteListener();
@@ -259,7 +259,6 @@ class Chat {
                 window.chat.requestBuilder.key = this.nvidiaKey;
             }else if(selectedModel.provider == "GEMINI"){
                 window.chat.requestBuilder.key = this.geminiKey;
-                window.chat.requestBuilder.url = selectedModel.url + "?key="+this.geminiKey;
             }
         }
     }

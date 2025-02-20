@@ -38,8 +38,6 @@ public class ChatService {
                         httpHeaders.set("Content-Type", "application/json");
                         httpHeaders.set("anthropic-version","2023-06-01");
                         httpHeaders.set("anthropic-beta", "prompt-caching-2024-07-31");
-                    }else if(request.getProvider().equals("GEMINI")){
-                        
                     }else {
                         httpHeaders.set("Authorization", "Bearer " + request.getKey());
                         httpHeaders.set("Content-Type", "application/json");
@@ -110,8 +108,6 @@ public class ChatService {
             } else if (provider.equals("ANTHROPIC")) {
                 String content = rootNode.path("delta").path("text").asText();
                 return content;
-            }else if(provider.equals("GEMINI")){
-                return this.geminiReadChunk(chunk);
             }else{
                 String content = rootNode.path("choices").get(0).path("delta").path("content").asText();
                 return content;

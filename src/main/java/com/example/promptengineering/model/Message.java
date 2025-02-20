@@ -43,15 +43,6 @@ public class Message {
                         "role", role,
                         "content", contentText.toString().trim());
             }
-            case "gemini" -> {
-                List<Map<String, Object>> contentList = new ArrayList<>();
-                for (Content item : content) {
-                    contentList.add(item.toMap(provider, cached));
-                }
-                return Map.of(
-                        //"role", role,
-                        "parts", contentList);
-            }
             default -> {
                 List<Map<String, Object>> contentList = new ArrayList<>();
                 for (Content item : content) {
