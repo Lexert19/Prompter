@@ -4,21 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.data.cassandra.core.mapping.CassandraType;
-import org.springframework.data.cassandra.core.mapping.CassandraType.Name;
-import org.springframework.data.cassandra.core.mapping.PrimaryKey;
-import org.springframework.data.cassandra.core.mapping.Table;
 
-import com.example.promptengineering.converter.ContentListConverter;
 
-@Table("message_entity")
 public class Message {
-    @PrimaryKey
-    @CassandraType(type = Name.BIGINT)
     private Long id;
     private String role;
-    @CassandraType(type = CassandraType.Name.TEXT)
-    @jakarta.persistence.Convert(converter = ContentListConverter.class)
     private List<Content> content;
     private String model;
     private String userId;
@@ -32,9 +22,9 @@ public class Message {
         this.content = content;
     }
 
-    public Map<String, Object> toMap(String provider) {
-        switch (provider.toLowerCase()) {
-            case "nvidia" -> {
+    public Map<String, Object> toMap(String provider, String type) {
+        switch (type.toLowerCase()) {
+            case "text" -> {
                 StringBuilder contentText = new StringBuilder();
                 for (Content item : content) {
                     contentText.append(item.getText());
@@ -42,15 +32,6 @@ public class Message {
                 return Map.of(
                         "role", role,
                         "content", contentText.toString().trim());
-            }
-            case "gemini" -> {
-                List<Map<String, Object>> contentList = new ArrayList<>();
-                for (Content item : content) {
-                    contentList.add(item.toMap(provider, cached));
-                }
-                return Map.of(
-                        //"role", role,
-                        "parts", contentList);
             }
             default -> {
                 List<Map<String, Object>> contentList = new ArrayList<>();

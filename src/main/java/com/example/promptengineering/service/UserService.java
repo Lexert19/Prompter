@@ -1,6 +1,5 @@
 package com.example.promptengineering.service;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,33 +15,17 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public Mono<User> setClaudeKey(String key, User user) {
-        user.setClaudeKey(key);
-        return userRepository.save(user);
-    }
-
-    public Mono<User> setChatgptKey(String key, User user) {
-        user.setChatgptKey(key);
-        return userRepository.save(user);
-    }
-
-    public Mono<User> setNvidiaKey(String key, User user) {
-        user.setNvidiaKey(key);
-        return userRepository.save(user);
-    }
-
-    public Mono<User> setGeminiKey(String key, User user) {
-        user.setGeminiKey(key);
+    public Mono<User> saveKeyToMap(User user, String keyName, String keyValue) {
+        user.getKeys().put(keyName, keyValue);
         return userRepository.save(user);
     }
 
     public Mono<Map<String, String>> getKeys(User user) {
-        Map<String, String> keys = new HashMap<>();
-        keys.put("claudeKey", user.getClaudeKey());
-        keys.put("chatgptKey", user.getChatgptKey());
-        keys.put("nvidiaKey", user.getNvidiaKey());
-        keys.put("geminiKey", user.getGeminiKey());
-        return Mono.just(keys);
+        return Mono.just(user.getKeys());
+    }
+
+    public Mono<User> findUserByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
 }

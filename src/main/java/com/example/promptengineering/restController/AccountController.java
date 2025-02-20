@@ -6,12 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.promptengineering.entity.User;
+import com.example.promptengineering.repository.UserRepository;
 import com.example.promptengineering.service.UserService;
 
 import reactor.core.publisher.Mono;
@@ -21,57 +23,37 @@ import reactor.core.publisher.Mono;
 public class AccountController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private UserRepository userRepository;
 
-    @PostMapping("/claude-key")
-    public Mono<String> setClaudeKey(
+    @PostMapping("/save-key/{keyName}")
+    public Mono<String> saveKeyToMap(
             @AuthenticationPrincipal OAuth2User oAuth2User,
-            @RequestBody String key) {
+            @PathVariable String keyName,
+            @RequestBody String keyValue) {
 
-        User user = (User) oAuth2User;
+        String userEmail = oAuth2User.getAttribute("email");
+        if (userEmail == null) {
+            return Mono.error(new IllegalArgumentException("Email not found in OAuth2User attributes"));
+        }
 
-        return userService.setClaudeKey(key, user)
-                .map(userSaved -> {
-                    return "Saved";
-                });
-    }
+        return userService.findUserByEmail(userEmail)
+                .switchIfEmpty(Mono.error(new RuntimeException("User not found for email: " + userEmail)))
+                .flatMap(existingUser -> userService.saveKeyToMap(existingUser, keyName, keyValue))
+                .map(userSaved -> String.format("Key '%s' saved to map for user with email: %s", keyName, userEmail));
 
-    @PostMapping("/chatgpt-key")
-    public Mono<String> setChatgptKey(
-            @AuthenticationPrincipal OAuth2User oAuth2User,
-            @RequestBody String key) {
-
-        User user = (User) oAuth2User;
-
-        return userService.setChatgptKey(key, user)
-                .map(userSaved -> "ChatGPT Key Saved");
-    }
-
-    @PostMapping("/nvidia-key")
-    public Mono<String> setNvidiaKey(
-            @AuthenticationPrincipal OAuth2User oAuth2User,
-            @RequestBody String key) {
-
-        User user = (User) oAuth2User;
-
-        return userService.setNvidiaKey(key, user)
-                .map(userSaved -> "NVIDIA Key Saved");
-    }
-
-    @PostMapping("/gemini-key")
-    public Mono<String> setGeminiKey(
-            @AuthenticationPrincipal OAuth2User oAuth2User,
-            @RequestBody String key) {
-
-        User user = (User) oAuth2User;
-
-        return userService.setGeminiKey(key, user)
-                .map(userSaved -> "Gemini Key Saved");
     }
 
     @GetMapping("/keys")
     public Mono<Map<String, String>> getAllKeys(
             @AuthenticationPrincipal OAuth2User oAuth2User) {
-        User user = (User) oAuth2User;
-        return userService.getKeys(user);
+        String userEmail = oAuth2User.getAttribute("email");
+        if (userEmail == null) {
+            return Mono.error(new IllegalArgumentException("Email not found in OAuth2User attributes"));
+        }
+
+        return userRepository.findByEmail(userEmail)
+                .switchIfEmpty(Mono.error(new RuntimeException("User not found in repository for email: " + userEmail)))
+                .flatMap(user -> userService.getKeys(user));
     }
 }

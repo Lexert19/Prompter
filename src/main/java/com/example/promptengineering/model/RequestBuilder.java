@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 public class RequestBuilder {
-    private String id;
     private String model;
     private List<Message> messages = new ArrayList<>();
     private Integer maxTokens = 16000;
@@ -16,6 +15,9 @@ public class RequestBuilder {
     private String provider;
     private String url;
     private String sessionId;
+    private String reasoningEffort = "medium";
+    private String type = "";
+    private String system = "";
 
     public RequestBuilder model(String model) {
         this.model = model;
@@ -45,25 +47,42 @@ public class RequestBuilder {
     public Map<String, Object> build() {
         Map<String, Object> request = new HashMap<>();
 
-        switch (this.provider) {
-            case "GEMINI" -> {
-                List<Map<String, Object>> messagesListGemini = new ArrayList<>();
-                for (Message message : messages) {
-                    messagesListGemini.add(message.toMap(provider));
-                }
-                request.put("contents", messagesListGemini);
+        if (this.provider.equals("ANTHROPIC")) {
+            if (this.system != null && !this.system.trim().isEmpty()) {
+                request.put("system", system);
             }
-            default -> {
-                List<Map<String, Object>> messagesListDefault = new ArrayList<>();
-                for (Message message : messages) {
-                    messagesListDefault.add(message.toMap(provider));
-                }
-                request.put("messages", messagesListDefault);
-                request.put("model", model);
+        } else {
+            if (this.system != null && !this.system.trim().isEmpty()) {
+                Content systemContent = new Content();
+                systemContent.setType("text");
+                systemContent.setText(this.system);
+                ArrayList<Content> systemContentList = new ArrayList<>();
+                systemContentList.add(systemContent);
+                Message systemMessage = new Message("system", systemContentList);
+                this.messages.add(0, systemMessage);
+            }
+        }
+
+        List<Map<String, Object>> messagesListDefault = new ArrayList<>();
+        for (Message message : messages) {
+            messagesListDefault.add(message.toMap(provider, type));
+        }
+        request.put("messages", messagesListDefault);
+        request.put("model", model);
+        request.put("stream", stream);
+
+        if (this.provider.equals("OPENAI")) {
+            if (this.model.contains("o3-mini")) {
+                request.put("response_format", Map.of("type", "text"));
+                request.put("reasoning_effort", this.reasoningEffort);
+            } else {
                 request.put("max_tokens", maxTokens);
-                request.put("stream", stream);
                 request.put("temperature", temperature);
             }
+        } else if (this.provider.equals("ANTHROPIC")) {
+            request.put("max_tokens", maxTokens);
+            request.put("temperature", temperature);
+
         }
 
         return request;
@@ -133,13 +152,7 @@ public class RequestBuilder {
         this.sessionId = sessionId;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
+   
 
     public String getProvider() {
         return provider;
@@ -147,6 +160,30 @@ public class RequestBuilder {
 
     public void setProvider(String provider) {
         this.provider = provider;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getReasoningEffort() {
+        return reasoningEffort;
+    }
+
+    public void setReasoningEffort(String reasoningEffort) {
+        this.reasoningEffort = reasoningEffort;
+    }
+
+    public String getSystem() {
+        return system;
+    }
+
+    public void setSystem(String system) {
+        this.system = system;
     }
 
 }

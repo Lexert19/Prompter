@@ -28,9 +28,7 @@ public class Content {
 
     private Map<String, Object> handleText(String provider, boolean cache) {
         Map<String, Object> map = new HashMap<>();
-        if (!"GEMINI".equals(provider)) {
-            map.put("type", "text");
-        }
+        map.put("type", "text");
         map.put("text", text);
 
         if (cache && provider.equals("ANTHROPIC")) {
@@ -53,8 +51,7 @@ public class Content {
                 map.put("cache_control", new CacheControl().toMap());
             }
             return map;
-        } 
-        if (provider.equals("OPENAI")) {
+        } else{
             return Map.of(
                 "type", "image_url",
                 "image_url", Map.of(
@@ -62,21 +59,9 @@ public class Content {
                 )
             );
         }
-        if ("GEMINI".equals(provider)) {
-            return Map.of(
-                "inline_data", Map.of(
-                    "mime_type", mediaType,
-                    "data", data
-                )
-            );
-        }
-        // if(provider.equals("GEMINI")){
-        //     return Map.of(
-        //         "text", text
-        //     );
-        // }
+        
        
-        throw new UnsupportedOperationException("Base64 images not supported for " + provider);
+        //throw new UnsupportedOperationException("Base64 images not supported for " + provider);
     }
     public String getType() {
         return type;

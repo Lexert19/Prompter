@@ -10,7 +10,6 @@ import org.springframework.data.cassandra.core.mapping.CassandraType;
 import org.springframework.data.cassandra.core.mapping.CassandraType.Name;
 import org.springframework.data.cassandra.core.mapping.Table;
 
-@Table
 public class ChatHistory {
     @Id
     private String id;

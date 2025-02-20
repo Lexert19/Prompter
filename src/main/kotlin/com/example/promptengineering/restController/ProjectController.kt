@@ -2,7 +2,7 @@ package com.example.promptengineering.restController
 
 import com.example.promptengineering.entity.Project
 import com.example.promptengineering.entity.User
-import com.example.promptengineering.model.FileElement
+import com.example.promptengineering.entity.FileElement
 import com.example.promptengineering.repository.ProjectRepository
 import com.example.promptengineering.repository.UserRepository
 import com.example.promptengineering.service.EmbeddingService
@@ -17,6 +17,11 @@ import java.util.*
 import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.reactive.awaitSingleOrNull
 import reactor.core.publisher.Flux
+import com.example.promptengineering.model.ProjectResponse
+import kotlin.collections.ArrayList
+import com.example.promptengineering.model.ScoredFragment
+import com.example.promptengineering.repository.FileElementsRepository
+
 
 
 
@@ -25,45 +30,74 @@ import reactor.core.publisher.Flux
 class ProjectController(
     private val projectRepository: ProjectRepository,
     private val userRepository: UserRepository,
-    private val embeddingService: EmbeddingService
+    private val embeddingService: EmbeddingService,
+    private val fileElementRepository: FileElementsRepository
 ) {
 
     @PostMapping("/create")
     suspend fun createProject(
         @AuthenticationPrincipal oAuth2User: OAuth2User,
         @RequestBody name: String
-    ): ResponseEntity<Project> {
-        val userId = oAuth2User.getAttribute<String>("sub")
+    ): ResponseEntity<ProjectResponse> {
+        val userId = oAuth2User.getAttribute<String>("id")
             ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
-        
-         val project = Project().apply {
-            id = UUID.randomUUID().toString()
-            this.userId = userId
+        val user = userRepository.findById(userId).awaitSingle()
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony") 
+        val project = Project().apply {
             this.name = name
+            this.userId = user.id
         }
     
-         val savedProject = projectRepository.save(project).awaitSingle()
-    //     val savedProject = projectRepository.save(
-    //         project.apply {
-    //             id = UUID.randomUUID().toString()
-    //             this.userId = userId
-    //             this.name = name
-    //         }
-    //     ).awaitSingle()
-        return ResponseEntity.ok(savedProject)
+        val savedProject = projectRepository.save(project).awaitSingle()
+        val projectResponse = ProjectResponse(savedProject.id, savedProject.name, ArrayList())
+        return ResponseEntity.ok(projectResponse)
     }
 
     @GetMapping("/{projectId}")
     suspend fun getProject(
         @AuthenticationPrincipal oAuth2User: OAuth2User,
         @PathVariable projectId: String
-    ): Project {
-        val userId = oAuth2User.getAttribute<String>("sub")
+    ): ResponseEntity<ProjectResponse> {
+        val userId = oAuth2User.getAttribute<String>("id")
             ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
-        
-        return projectRepository.findByIdAndUserId(projectId, userId)
+
+        val user = userRepository.findById(userId).awaitSingle()
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony")
+
+        val project = projectRepository.findByIdAndUserId(projectId, user.id)
             .awaitSingle()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nie znaleziony")
+
+        val files = fileElementRepository.findByProject(project.id)
+            .collectList()
+            .awaitSingle() ?: emptyList()
+
+        val projectResponse = ProjectResponse(project.id, project.name, files)
+        return ResponseEntity.ok(projectResponse)
+    }
+
+    @GetMapping
+    suspend fun getUserProjects(
+        @AuthenticationPrincipal oAuth2User: OAuth2User
+    ): ResponseEntity<List<ProjectResponse>> {
+        val userId = oAuth2User.getAttribute<String>("id")
+            ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
+        
+        val user = userRepository.findById(userId).awaitSingle()
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony")
+
+        val projectsFlux = projectRepository.findAllByUserId(user.id)
+        val projects = projectsFlux.collectList().awaitSingle()
+        
+        val projectResponses = projects.map { project ->
+            ProjectResponse(
+                id = project.id,
+                name = project.name,
+                files = ArrayList()
+            )
+        }
+        
+        return ResponseEntity.ok(projectResponses)
     }
 
   
@@ -72,44 +106,94 @@ class ProjectController(
         @AuthenticationPrincipal oAuth2User: OAuth2User,
         @PathVariable projectId: String,
         @RequestBody file: FileElement
-    ): Project {
-        val userId = oAuth2User.getAttribute<String>("sub")
+    ): ResponseEntity<ProjectResponse> {
+        val userId = oAuth2User.getAttribute<String>("id")
             ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
         
-        val project = projectRepository.findByIdAndUserId(projectId, userId)
+        val user = userRepository.findById(userId).awaitSingle()
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony") 
+        val project = projectRepository.findByIdAndUserId(projectId, user.id)
             .awaitSingle()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nie znaleziony")
         
-        project.files.add(file)
-        return projectRepository.save(project).awaitSingle()
+        embeddingService.addFileToProject(project, file, user).awaitSingle()
+
+        val updatedProject = projectRepository.findByIdAndUserId(projectId, user.id)
+            .awaitSingle()
+        val files = fileElementRepository.findByProject(project.id)
+            .collectList()
+            .awaitSingle() ?: emptyList()
+
+        val projectResponse = ProjectResponse(updatedProject.id, updatedProject.name, files)
+        return ResponseEntity.ok(projectResponse)
     }
 
-    @PostMapping("/{projectId}/index")
-    suspend fun indexProject(
+    @GetMapping("/{projectId}/files")
+    suspend fun getProjectFiles(
         @AuthenticationPrincipal oAuth2User: OAuth2User,
         @PathVariable projectId: String
-    ): Project {
-        val userId = oAuth2User.getAttribute<String>("sub")
+    ): ResponseEntity<List<FileElement>> {
+        val userId = oAuth2User.getAttribute<String>("id")
             ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
         
-        val project = projectRepository.findByIdAndUserId(projectId, userId)
+        val user = userRepository.findById(userId).awaitSingle()
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony")
+
+        val project = projectRepository.findByIdAndUserId(projectId, user.id)
+            .awaitSingle()
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nie istnieje lub nie należy do Ciebie")
+
+        val files = fileElementRepository.findByProject(project.id)
+            .collectList()
+            .awaitSingle() ?: emptyList()
+
+        return ResponseEntity.ok(files)
+    }
+
+    @GetMapping("/{projectId}/files/{fileId}")
+    suspend fun getFile(
+        @AuthenticationPrincipal oAuth2User: OAuth2User,
+        @PathVariable projectId: String,
+        @PathVariable fileId: String
+    ): ResponseEntity<String> {
+        val userId = oAuth2User.getAttribute<String>("id")
+            ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
+
+        val user = userRepository.findById(userId).awaitSingle()
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony")
+
+        val project = projectRepository.findByIdAndUserId(projectId, user.id)
+            .awaitSingle()
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nie istnieje lub nie należy do Ciebie")
+
+        val file = fileElementRepository.findByIdAndProject(fileId, project.id)
+            .awaitSingle()
+
+        if (file == null) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Plik nie znaleziony")
+        }
+
+        return ResponseEntity.ok(file.content)
+    }
+
+    @PostMapping("/{projectId}/similar-fragments")
+    suspend fun getSimilarFragments(
+        @AuthenticationPrincipal oAuth2User: OAuth2User,
+        @PathVariable projectId: String,
+        @RequestParam query: String
+    ): ResponseEntity<List<ScoredFragment>> {
+        val userId = oAuth2User.getAttribute<String>("id")
+            ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
+        
+        val user = userRepository.findById(userId).awaitSingle()
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony") 
+
+        val project = projectRepository.findByIdAndUserId(projectId, user.id)
             .awaitSingle()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nie znaleziony")
         
-        val user = userRepository.findById(userId)
-            .awaitSingle()
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony")
-        
-        embeddingService.createProjectEmbedding(project, user)
-        return projectRepository.save(project).awaitSingle()
+        val similarFragments = embeddingService.retrieveSimilarFragments(query, project, user).awaitSingle()
+        return ResponseEntity.ok(similarFragments)
     }
 
-    @PostMapping("/chat")
-    fun chatWithProject(
-        @AuthenticationPrincipal oAuth2User: OAuth2User,
-        @RequestBody question: String,
-        @RequestParam projectId: String
-    ): ResponseEntity<Flux<String>> {
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build()
-    }
 }
