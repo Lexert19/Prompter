@@ -28,10 +28,10 @@ class ProjectController(
     private val embeddingService: EmbeddingService
 ) {
 
-    @PostMapping
+    @PostMapping("/create")
     suspend fun createProject(
         @AuthenticationPrincipal oAuth2User: OAuth2User,
-        @RequestBody project: Project
+        @RequestBody name: String
     ): ResponseEntity<Project> {
         val userId = oAuth2User.getAttribute<String>("sub")
             ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
@@ -40,6 +40,7 @@ class ProjectController(
             project.apply {
                 id = UUID.randomUUID().toString()
                 this.userId = userId
+                this.name = name
             }
         ).awaitSingle()
         return ResponseEntity.ok(savedProject)

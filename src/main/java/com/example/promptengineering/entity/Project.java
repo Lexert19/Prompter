@@ -13,6 +13,7 @@ import com.example.promptengineering.model.FileElement;
 public class Project {
     @PrimaryKey
     private String id;
+    private String name;
     private String userId;
     @CassandraType(type = CassandraType.Name.TEXT)
     private List<FileElement> files;
@@ -20,7 +21,13 @@ public class Project {
     private List<Embedding> embeddings;
 
 
+    public String getName() {
+        return name;
+    }
 
+    public void setName(String name) {
+        this.name = name;
+    }
     public String getId() {
         return id;
     }

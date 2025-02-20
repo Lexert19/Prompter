@@ -41,6 +41,7 @@ public class UserService {
         keys.put("claudeKey", user.getClaudeKey());
         keys.put("chatgptKey", user.getChatgptKey());
         keys.put("nvidiaKey", user.getNvidiaKey());
+        keys.put("geminiKey", user.getGeminiKey());
         return Mono.just(keys);
     }
 
