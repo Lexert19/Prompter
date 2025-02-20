@@ -25,6 +25,7 @@ public class User implements OAuth2User {
     private String claudeKey;
     private String chatgptKey;
     private String nvidiaKey;
+    private String geminiKey;
 
 
     public User(String id, String email, String password) {

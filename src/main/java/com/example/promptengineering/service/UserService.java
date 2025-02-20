@@ -31,6 +31,11 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public Mono<User> setGeminiKey(String key, User user) {
+        user.setGeminiKey(key);
+        return userRepository.save(user);
+    }
+
     public Mono<Map<String, String>> getKeys(User user) {
         Map<String, String> keys = new HashMap<>();
         keys.put("claudeKey", user.getClaudeKey());

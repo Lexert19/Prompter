@@ -44,6 +44,12 @@ class Chat {
                 provider: "NVIDIA",
                 url: "https://api.deepinfra.com/v1/openai/chat/completions"
             },
+            {
+                name: "gemini-2.0-flash-thinking-exp-01-21",
+                text: "gemini-2.0-flash-thinking-exp-01-21",
+                provider: "GEMINI",
+                url: "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp-01-21:streamGenerateContent"
+            }
         ];
         this.addPasteListener();
         this.loadHistory();
@@ -251,6 +257,9 @@ class Chat {
                 window.chat.requestBuilder.key = this.claudeKey;
             } else if (selectedModel.provider === "NVIDIA") {
                 window.chat.requestBuilder.key = this.nvidiaKey;
+            }else if(selectedModel.provider == "GEMINI"){
+                window.chat.requestBuilder.key = this.geminiKey;
+                window.chat.requestBuilder.url = selectedModel.url + "?key="+this.geminiKey;
             }
         }
     }

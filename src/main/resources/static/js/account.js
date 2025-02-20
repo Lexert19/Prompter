@@ -21,6 +21,9 @@ function saveKey(key) {
         case "openaiKey":
             url = "/account/chatgpt-key";
             break;
+        case "geminiKey":
+            url = "/account/gemini-key";
+            break;
         default:
             console.error("Invalid key type");
             return;

@@ -49,6 +49,7 @@ public class Message {
                     contentList.add(item.toMap(provider, cached));
                 }
                 return Map.of(
+                        //"role", role,
                         "parts", contentList);
             }
             default -> {
