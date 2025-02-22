@@ -3,71 +3,99 @@ class HtmlParser {
         this.elements = [];
         this.currentLine = '';
         this.isInCodeBlock = false;
-        this.currentCodeBlock = null;
+        this.isInThinkingBlock = false;
+        this.codeContent = '';
+        this.thinkingContent = '';
     }
 
     parse(textFragment) {
-        // Add fragment to current line
-        this.currentLine += textFragment;
-
-        // Process complete lines
-        while (this.currentLine.includes('\n')) {
-            const lineEndIndex = this.currentLine.indexOf('\n');
-            const completeLine = this.currentLine.substring(0, lineEndIndex).trim();
-            this.currentLine = this.currentLine.substring(lineEndIndex + 1);
-
-            // Handle code blocks
+        // Split the fragment into lines and process each one
+        const lines = textFragment.split('\n');
+        
+        for (const line of lines) {
             if (this.isInCodeBlock) {
-                if (completeLine === '```') {
+                if (line.trim() === '```') {
                     this.isInCodeBlock = false;
-                    this.elements.push(this.currentCodeBlock);
-                    this.currentCodeBlock = null;
+                    this.elements.push({
+                        type: 'code',
+                        text: this.codeContent.trim()
+                    });
+                    this.codeContent = '';
                 } else {
-                    this.currentCodeBlock.text += completeLine + '\n';
+                    this.codeContent += line + '\n';
                 }
                 continue;
             }
 
-            // Check for new code block
-            if (completeLine.startsWith('```')) {
-                this.isInCodeBlock = true;
-                this.currentCodeBlock = {
-                    type: 'code',
-                    language: completeLine.substring(3),
-                    text: ''
-                };
+            if (this.isInThinkingBlock) {
+                if (line.trim() === '</think>') {
+                    this.isInThinkingBlock = false;
+                    this.elements.push({
+                        type: 'thinking',
+                        text: this.thinkingContent.trim()
+                    });
+                    this.thinkingContent = '';
+                } else {
+                    this.thinkingContent += line + '\n';
+                }
                 continue;
             }
 
-            // Parse other elements
-            if (completeLine.startsWith('###')) {
+            // Check for code block start
+            if (line.startsWith('```')) {
+                this.isInCodeBlock = true;
+                continue;
+            }
+
+            // Check for thinking block start
+            if (line.trim() === '<think>') {
+                this.isInThinkingBlock = true;
+                continue;
+            }
+
+            // Check for header
+            if (line.startsWith('###')) {
                 this.elements.push({
                     type: 'header',
-                    text: completeLine.substring(3).trim()
+                    text: line.substring(3).trim()
                 });
-            } else if (completeLine.match(/^\d+\.\s+\*\*/)) {
-                const matches = completeLine.match(/^(\d+)\.\s+\*\*(.+?)\*\*:\s*(.+)$/);
-                if (matches) {
-                    this.elements.push({
-                        type: 'olElement',
-                        header: matches[2],
-                        text: matches[3]
-                    });
-                }
-            } else if (completeLine.startsWith('-')) {
+                continue;
+            }
+
+            // Check for ordered list element
+            const olMatch = line.match(/^(\d+)\.\s+\*\*(.*?)\*\*:\s*(.*)$/);
+            if (olMatch) {
+                this.elements.push({
+                    type: 'olElement',
+                    header: olMatch[2].trim(),
+                    text: olMatch[3].trim()
+                });
+                continue;
+            }
+
+            // Check for unordered list element
+            if (line.startsWith('-')) {
                 this.elements.push({
                     type: 'ulElement',
-                    text: completeLine.substring(1).trim()
+                    text: line.substring(1).trim()
                 });
-            } else if (completeLine.startsWith('**')) {
+                continue;
+            }
+
+            // Check for strong text
+            if (line.startsWith('**') && line.endsWith('**')) {
                 this.elements.push({
                     type: 'strong',
-                    text: completeLine.replace(/\*\*/g, '').trim()
+                    text: line.slice(2, -2).trim()
                 });
-            } else if (completeLine) {
+                continue;
+            }
+
+            // Normal text
+            if (line.trim()) {
                 this.elements.push({
                     type: 'normalText',
-                    text: completeLine
+                    text: line.trim()
                 });
             }
         }
@@ -81,13 +109,15 @@ class HtmlParser {
                 case 'strong':
                     return `<strong>${element.text}</strong>`;
                 case 'olElement':
-                    return `<li><strong>${element.header}</strong>: ${element.text}</li>`;
+                    return `<div class="ol-item"><strong>${element.header}</strong>: ${element.text}</div>`;
                 case 'code':
-                    return `<pre><code class="language-${element.language}">${element.text}</code></pre>`;
-                case 'ulElement':
-                    return `<li>${element.text}</li>`;
+                    return `<pre><code>${element.text}</code></pre>`;
                 case 'normalText':
                     return `<p>${element.text}</p>`;
+                case 'ulElement':
+                    return `<ul><li>${element.text}</li></ul>`;
+                case 'thinking':
+                    return `<div class="thinking">${element.text}</div>`;
                 default:
                     return '';
             }

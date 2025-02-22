@@ -1,14 +1,14 @@
 class HtmlParser{
     constructor(){
         this.elements = [];
-        //element jest objektym ktory może mieć typ header, strong, olElement, code, normalText, ulElement
+        //element jest objektym ktory może mieć typ header, strong, olElement, code, normalText, ulElement, thinking
     }
 
 
     parse(textFragment){
         //funckja otrzymuje strumieniowany tekst, czytaj linia po linii, cala linia nie jest przykazywana w fragmencie, 
         // textFragment nie jest cala linia tylko fragmenty ktory moze zawierac aktualną i nastepna linie 
-        
+        //musisz z tych textfragment budowac linie
 
 
         //jesli linia zaczyna sie normalnym tekstem, wtedy tworzysz element normalText i dodajesz jej tekst do parametru
@@ -16,6 +16,7 @@ class HtmlParser{
         //jeli linia zacyzna się na "###" wtedzy to jest header
         //jesli linia zaczyna się na "x. **" (x jest liczbą), to jest olElement, przyklad takiej lini "1. **header**: tekst", ten element ma parmetr header i text
         // jesli linia zacyzna się na - wtedy też to jest ulElement
+        //jesli linia zaczyna się na "<think>" dodajesz linie do thinking do wystapienia lini "</think>"
     }
 
     toHTML(){
