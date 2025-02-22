@@ -21,6 +21,7 @@ class HtmlParser{
                 }
                 this.elements.push(codeBlock);
                 this.isCodeBlock = true;
+                this.isNormalBlock = false
             }
             return;
         }
@@ -29,6 +30,7 @@ class HtmlParser{
             this.currentThinkingBlock = { type: 'thinking', text: '' };
             this.elements.push(this.currentThinkingBlock);
             this.isThinkingBlock = true;
+            this.isNormalBlock = false
             return;
         }
 
@@ -37,12 +39,10 @@ class HtmlParser{
             return;
         }
 
-        if(!this.isCodeBlock && !this.isThinkingBlock){
+        if(!this.isCodeBlock && !this.isThinkingBlock && !this.isNormalBlock){
             const normalBlock = {type: "normalText", text: ""}
             this.elements.push(normalBlock);
             this.isNormalBlock = true;
-        }else{
-            this.isNormalBlock = false;
         }
 
         //readers
