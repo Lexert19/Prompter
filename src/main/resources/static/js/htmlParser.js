@@ -5,27 +5,23 @@ class HtmlParser{
         this.isCodeBlock = false;
         //this.currentCodeBlock = { type: 'code', language: '', text: '' };
         this.isThinkingBlock = false;
+        this.isNormalBlock = false;
         this.currentThinkingBlock = { type: 'thinking', text: '' };
     }
 
 
     parse(textFragment){
-        if (this.isThinkingBlock) {
-            this.readThinkElement(textFragment);
-            return;
-        }
-        if (this.isCodeBlock) {
-            this.readCodeBlock(textFragment);
-            return;
-        }
-
         if (textFragment.startsWith("```")) {
-            const codeBlock = { type: 'code', language: false, text: '' };
-            if( !textFragment.includes("\n")){
-                codeBlock.language = true;
+            if(this.isCodeBlock){
+                this.isCodeBlock = false;
+            }else{
+                const codeBlock = { type: 'code', language: false, text: '' };
+                if( !textFragment.includes("\n")){
+                    codeBlock.language = true;
+                }
+                this.elements.push(codeBlock);
+                this.isCodeBlock = true;
             }
-            this.elements.push(codeBlock);
-            this.isCodeBlock = true;
             return;
         }
 
@@ -35,7 +31,37 @@ class HtmlParser{
             this.isThinkingBlock = true;
             return;
         }
-        
+
+        if(textFragment.startsWith("</think>")){
+            this.isThinkingBlock = false;
+            return;
+        }
+
+        if(!this.isCodeBlock && !this.isThinkingBlock){
+            const normalBlock = {type: "normalText", text: ""}
+            this.elements.push(normalBlock);
+            this.isNormalBlock = true;
+        }else{
+            this.isNormalBlock = false;
+        }
+
+        //readers
+        if (this.isThinkingBlock) {
+            this.readThinkElement(textFragment);
+            return;
+        }
+        if (this.isCodeBlock) {
+            this.readCodeBlock(textFragment);
+            return;
+        }
+
+        if(this.isNormalBlock){
+            this.readNormalBlock(textFragment);
+            return;
+        }
+       
+
+
 
         // for (const line of lines) {
 
@@ -67,8 +93,12 @@ class HtmlParser{
         // }
     }
 
+    readNormalBlock(textFragment){
+        this.elements[this.elements.length-1].text += textFragment;
+    }
+
     readCodeBlock(textFragment){
-        if(textFragment.startsWith("````")){
+        if(textFragment.startsWith("```")){
             this.isCodeBlock = false;
         }else{
             this.elements[this.elements.length-1].text += textFragment;
