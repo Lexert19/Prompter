@@ -95,6 +95,7 @@ class ChatApi {
             if (done) {
                 reader.releaseLock();
                 window.chat.blockedInput = false;
+                this.parser.parse("\n");
                 return;
             }
 

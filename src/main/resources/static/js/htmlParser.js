@@ -38,6 +38,7 @@ class HtmlParser{
 
             if (line.startsWith("<think>")) {
                 this.currentThinkingBlock = { type: 'thinking', text: '' };
+                this.elements.push(this.currentThinkingBlock);
                 this.isThinkingBlock = true;
                 continue;
             }
@@ -69,7 +70,6 @@ class HtmlParser{
     readThinkElement(line){
         if (line.trim() === "</think>") {
             this.isThinkingBlock = false;
-            this.elements.push(this.currentThinkingBlock);
         } else {
             this.currentThinkingBlock.text += line + '\n';
         }
