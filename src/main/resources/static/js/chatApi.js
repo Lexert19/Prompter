@@ -84,8 +84,8 @@ class ChatApi {
         const chunk = decoder.decode(value, { stream: true });
 
         this.parser.parse(chunk);
-        //this.outputInput.textContent += chunk;
-        this.outputInput.innerHTML = this.parser.toHTML();
+        this.outputInput.textContent += chunk;
+        //this.outputInput.innerHTML = this.parser.toHTML();
         this.currentMessage.appendText(chunk);
     }
 

@@ -14,6 +14,8 @@ class HtmlParser{
         let lines = this.currentLineBuffer.split('\n');
         this.currentLineBuffer = lines.pop(); 
 
+        
+
         for (const line of lines) {
 
             if (this.isCodeBlock) {
@@ -35,6 +37,7 @@ class HtmlParser{
             }
 
             if (line.startsWith("<think>")) {
+                this.currentThinkingBlock = { type: 'thinking', text: '' };
                 this.isThinkingBlock = true;
                 continue;
             }
@@ -67,7 +70,6 @@ class HtmlParser{
         if (line.trim() === "</think>") {
             this.isThinkingBlock = false;
             this.elements.push(this.currentThinkingBlock);
-            this.currentThinkingBlock = { type: 'thinking', text: '' };
         } else {
             this.currentThinkingBlock.text += line + '\n';
         }
