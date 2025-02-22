@@ -1,6 +1,7 @@
 class ChatApi {
     constructor() {
         this.url = "/client/chat";
+        this.parser = new HtmlParser();
     }
 
     newMessage(){
@@ -82,6 +83,7 @@ class ChatApi {
     readChunk(decoder, value) {
         const chunk = decoder.decode(value, { stream: true });
 
+        this.parser.parse(chunk);
         this.outputInput.textContent += chunk;
         this.currentMessage.appendText(chunk);
     }
