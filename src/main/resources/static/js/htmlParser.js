@@ -12,29 +12,18 @@ class HtmlParser{
     parse(textFragment){
         this.currentLineBuffer += textFragment;
         let lines = this.currentLineBuffer.split('\n');
-        this.currentLineBuffer = lines.pop(); // Keep the last incomplete line in buffer
+        this.currentLineBuffer = lines.pop(); 
 
         for (const line of lines) {
+
             if (this.isCodeBlock) {
-                if (line.trim() === "```") {
-                    this.isCodeBlock = false;
-                    this.elements.push(this.currentCodeBlock);
-                    this.currentCodeBlock = { type: 'code', language: '', text: '' };
-                } else {
-                    this.currentCodeBlock.text += line + '\n';
-                }
-                continue; // Skip normal line processing when in code block
+                this.readCodeBlock(line);
+                continue; 
             }
 
             if (this.isThinkingBlock) {
-                if (line.trim() === "</think>") {
-                    this.isThinkingBlock = false;
-                    this.elements.push(this.currentThinkingBlock);
-                    this.currentThinkingBlock = { type: 'thinking', text: '' };
-                } else {
-                    this.currentThinkingBlock.text += line + '\n';
-                }
-                continue; // Skip normal line processing when in thinking block
+                this.readThinkElement(line);
+                continue; 
             }
 
 
@@ -54,21 +43,44 @@ class HtmlParser{
             if (line.startsWith("###")) {
                 this.elements.push({ type: 'header', text: line.substring(3).trim() });
             } else if (/^\d+\.\s\*\*(.+?)\*\*\:\s(.*)$/.test(line)) {
-                const match = line.match(/^(\d+)\.\s\*\*(.+?)\*\*\:\s(.*)$/);
-                if (match) {
-                    const header = match[2].trim();
-                    const text = match[3].trim();
-                    this.elements.push({ type: 'olElement', header: header, text: text });
-                } else {
-                    this.elements.push({ type: 'normalText', text: line });
-                }
-
+                this.readOlElement(line);
             } else if (line.startsWith("-")) {
                 this.elements.push({ type: 'ulElement', text: line.substring(1).trim() });
             }
-            else if (line.trim() !== "") { //ignore empty lines
+            else if (line.trim() !== "") { 
                 this.elements.push({ type: 'normalText', text: line });
             }
+        }
+    }
+
+    readCodeBlock(line){
+        if (line.trim() === "```") {
+            this.isCodeBlock = false;
+            this.elements.push(this.currentCodeBlock);
+            this.currentCodeBlock = { type: 'code', language: '', text: '' };
+        } else {
+            this.currentCodeBlock.text += line + '\n';
+        }
+    }
+
+    readThinkElement(line){
+        if (line.trim() === "</think>") {
+            this.isThinkingBlock = false;
+            this.elements.push(this.currentThinkingBlock);
+            this.currentThinkingBlock = { type: 'thinking', text: '' };
+        } else {
+            this.currentThinkingBlock.text += line + '\n';
+        }
+    }
+
+    readOlElement(line){
+        const match = line.match(/^(\d+)\.\s\*\*(.+?)\*\*\:\s(.*)$/);
+        if (match) {
+            const header = match[2].trim();
+            const text = match[3].trim();
+            this.elements.push({ type: 'olElement', header: header, text: text });
+        } else {
+            this.elements.push({ type: 'normalText', text: line });
         }
     }
 
