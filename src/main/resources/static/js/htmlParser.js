@@ -11,6 +11,7 @@ class HtmlParser{
 
 
     parse(textFragment){
+        console.log(textFragment);
         if (textFragment.startsWith("```")) {
             if(this.isCodeBlock){
                 this.isCodeBlock = false;
@@ -60,37 +61,6 @@ class HtmlParser{
             return;
         }
        
-
-
-
-        // for (const line of lines) {
-
-          
-
-           
-
-
-        //     if (line.startsWith("```")) {
-        //         const language = line.substring(3).trim();
-        //         this.isCodeBlock = true;
-        //         this.currentCodeBlock.language = language;
-        //         continue;
-        //     }
-
-           
-
-
-        //     if (line.startsWith("###")) {
-        //         this.elements.push({ type: 'header', text: line.substring(3).trim() });
-        //     } else if (/^\d+\.\s\*\*(.+?)\*\*\:\s(.*)$/.test(line)) {
-        //         this.readOlElement(line);
-        //     } else if (line.startsWith("-")) {
-        //         this.elements.push({ type: 'ulElement', text: line.substring(1).trim() });
-        //     }
-        //     else if (line.trim() !== "") { 
-        //         this.elements.push({ type: 'normalText', text: line });
-        //     }
-        // }
     }
 
     readNormalBlock(textFragment){
@@ -149,7 +119,7 @@ class HtmlParser{
                     break;
             }
         }
-        console.log(html);
+        //console.log(html);
         return html;
     }
 
