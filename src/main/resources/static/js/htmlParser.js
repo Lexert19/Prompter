@@ -3,7 +3,7 @@ class HtmlParser{
         this.elements = [];
         this.currentLineBuffer = "";
         this.isCodeBlock = false;
-        this.currentCodeBlock = { type: 'code', language: '', text: '' };
+        //this.currentCodeBlock = { type: 'code', language: '', text: '' };
         this.isThinkingBlock = false;
         this.currentThinkingBlock = { type: 'thinking', text: '' };
     }
