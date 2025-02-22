@@ -109,6 +109,7 @@ class HtmlParser{
                     break;
             }
         }
+        console.log(html);
         return html;
     }
 
