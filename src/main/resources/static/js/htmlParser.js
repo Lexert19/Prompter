@@ -10,6 +10,8 @@ class HtmlParser{
 
 
     parse(textFragment){
+
+        console.log(textFragment);
         this.currentLineBuffer += textFragment;
         let lines = this.currentLineBuffer.split('\n');
         this.currentLineBuffer = lines.pop(); 
@@ -111,7 +113,7 @@ class HtmlParser{
                     break;
             }
         }
-        console.log(html);
+        //console.log(html);
         return html;
     }
 
