@@ -1,83 +1,74 @@
 class HtmlParser {
     constructor() {
         this.elements = [];
-        this.currentElement = null;
-        this.buffer = '';
+        this.currentLine = '';
+        this.isInCodeBlock = false;
+        this.currentCodeBlock = null;
     }
 
     parse(textFragment) {
-        this.buffer += textFragment;
-        
-        // Process headers (###)
-        if (this.buffer.includes('###')) {
-            const headerStart = this.buffer.indexOf('###');
-            const headerEnd = this.buffer.indexOf('\n', headerStart);
-            
-            if (headerEnd !== -1) {
+        // Add fragment to current line
+        this.currentLine += textFragment;
+
+        // Process complete lines
+        while (this.currentLine.includes('\n')) {
+            const lineEndIndex = this.currentLine.indexOf('\n');
+            const completeLine = this.currentLine.substring(0, lineEndIndex).trim();
+            this.currentLine = this.currentLine.substring(lineEndIndex + 1);
+
+            // Handle code blocks
+            if (this.isInCodeBlock) {
+                if (completeLine === '```') {
+                    this.isInCodeBlock = false;
+                    this.elements.push(this.currentCodeBlock);
+                    this.currentCodeBlock = null;
+                } else {
+                    this.currentCodeBlock.text += completeLine + '\n';
+                }
+                continue;
+            }
+
+            // Check for new code block
+            if (completeLine.startsWith('```')) {
+                this.isInCodeBlock = true;
+                this.currentCodeBlock = {
+                    type: 'code',
+                    language: completeLine.substring(3),
+                    text: ''
+                };
+                continue;
+            }
+
+            // Parse other elements
+            if (completeLine.startsWith('###')) {
                 this.elements.push({
                     type: 'header',
-                    text: this.buffer.substring(headerStart + 3, headerEnd).trim()
+                    text: completeLine.substring(3).trim()
                 });
-                this.buffer = this.buffer.substring(headerEnd + 1);
-            }
-        }
-
-        // Process list elements (\n-)
-        if (this.buffer.includes('\n-')) {
-            const listStart = this.buffer.indexOf('\n-');
-            const listEnd = this.buffer.indexOf('\n', listStart + 2);
-            
-            if (listEnd !== -1) {
+            } else if (completeLine.match(/^\d+\.\s+\*\*/)) {
+                const matches = completeLine.match(/^(\d+)\.\s+\*\*(.+?)\*\*:\s*(.+)$/);
+                if (matches) {
+                    this.elements.push({
+                        type: 'olElement',
+                        header: matches[2],
+                        text: matches[3]
+                    });
+                }
+            } else if (completeLine.startsWith('-')) {
                 this.elements.push({
-                    type: 'listElement',
-                    text: this.buffer.substring(listStart + 2, listEnd).trim()
+                    type: 'ulElement',
+                    text: completeLine.substring(1).trim()
                 });
-                this.buffer = this.buffer.substring(listEnd + 1);
-            }
-        }
-
-        // Process code blocks (```language\n...```)
-        if (this.buffer.includes('```')) {
-            const codeStart = this.buffer.indexOf('```');
-            const languageEnd = this.buffer.indexOf('\n', codeStart);
-            const codeEnd = this.buffer.indexOf('```\n', languageEnd);
-            
-            if (codeEnd !== -1) {
-                const language = this.buffer.substring(codeStart + 3, languageEnd);
-                this.elements.push({
-                    type: 'code',
-                    language: language,
-                    text: this.buffer.substring(languageEnd + 1, codeEnd).trim()
-                });
-                this.buffer = this.buffer.substring(codeEnd + 4);
-            }
-        }
-
-        // Process normal text (\n\n...\n\n)
-        if (this.buffer.includes('\n\n')) {
-            const textStart = this.buffer.indexOf('\n\n');
-            const textEnd = this.buffer.indexOf('\n\n', textStart + 2);
-            
-            if (textEnd !== -1) {
-                this.elements.push({
-                    type: 'normalText',
-                    text: this.buffer.substring(textStart + 2, textEnd).trim()
-                });
-                this.buffer = this.buffer.substring(textEnd + 2);
-            }
-        }
-
-        // Process strong text (**...**)
-        if (this.buffer.includes('**')) {
-            const strongStart = this.buffer.indexOf('**');
-            const strongEnd = this.buffer.indexOf('**', strongStart + 2);
-            
-            if (strongEnd !== -1) {
+            } else if (completeLine.startsWith('**')) {
                 this.elements.push({
                     type: 'strong',
-                    text: this.buffer.substring(strongStart + 2, strongEnd).trim()
+                    text: completeLine.replace(/\*\*/g, '').trim()
                 });
-                this.buffer = this.buffer.substring(strongEnd + 2);
+            } else if (completeLine) {
+                this.elements.push({
+                    type: 'normalText',
+                    text: completeLine
+                });
             }
         }
     }
@@ -86,15 +77,17 @@ class HtmlParser {
         return this.elements.map(element => {
             switch (element.type) {
                 case 'header':
-                    return `<h1><pre><code>${element.text}</code></pre></h1>`;
-                case 'listElement':
-                    return `<li><pre><code>${element.text}</code></pre></li>`;
+                    return `<h3>${element.text}</h3>`;
+                case 'strong':
+                    return `<strong>${element.text}</strong>`;
+                case 'olElement':
+                    return `<li><strong>${element.header}</strong>: ${element.text}</li>`;
                 case 'code':
                     return `<pre><code class="language-${element.language}">${element.text}</code></pre>`;
+                case 'ulElement':
+                    return `<li>${element.text}</li>`;
                 case 'normalText':
-                    return `<p><pre><code>${element.text}</code></pre></p>`;
-                case 'strong':
-                    return `<strong><pre><code>${element.text}</code></pre></strong>`;
+                    return `<p>${element.text}</p>`;
                 default:
                     return '';
             }

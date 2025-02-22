@@ -1,26 +1,21 @@
 class HtmlParser{
     constructor(){
         this.elements = [];
-        //element jest objektym ktory może mieć typ header, strong, listElement, code, normalText
+        //element jest objektym ktory może mieć typ header, strong, olElement, code, normalText, ulElement
     }
 
 
     parse(textFragment){
-        //funckja ta parsuje fragment tekstu na odpowiedni element, wysylane fragmenty sa strumieniowe, przekazywane sa fragmenty tekstu z ktorych zbudjujszsz liste elemntow 
-
-        // jesli znajdzie znak "###" dodaje do elementow element header ktory ma swoj tekst kazdy nastepny
-        //  fragment tekstu bedzie dodawany do header dopoki nie znajdzie znaku \n, element header ma parametr text
-
-        //jesli znjadzie tekst "\n-" wtedy to jest element listy dodawane  sa dalsze fragmenty tekstu to prametru text dopoki nie znjadzie \n
-        //prawdopodnbie nastepny element jest tez jest listą 
+        //funckja otrzymuje strumieniowany tekst, czytaj linia po linii, cala linia nie jest przykazywana w fragmencie, 
+        // textFragment nie jest cala linia tylko fragmenty ktory moze zawierac aktualną i nastepna linie 
         
-        //elementu kodu zaczynja sie na "```language\n" i konczą na "```\n" tekst zawarty pomiędzy tymi elemnetami zostanie dodany do objektu code
-
-        //fragment tekstu ktory ma tylko na poczatku "\n\n" i na końcu "\n\n" jest to normalText i dodajesz do atrubutu jego text tekst pomiedzy tymi gragmentami
-
-        // fragment ktory zaczyna się na "**" i kończy na "**" to jest element strong, dodajesz do jego fragmenty tekstu dopoki sie nie zakonczy
 
 
+        //jesli linia zaczyna sie normalnym tekstem, wtedy tworzysz element normalText i dodajesz jej tekst do parametru
+        //jesli linia zaczyna się "```language" wtedy tworzysz element code i dodajesz do jego tekstu linie dopki nie wysapi fragment "```"
+        //jeli linia zacyzna się na "###" wtedzy to jest header
+        //jesli linia zaczyna się na "x. **" (x jest liczbą), to jest olElement, przyklad takiej lini "1. **header**: tekst", ten element ma parmetr header i text
+        // jesli linia zacyzna się na - wtedy też to jest ulElement
     }
 
     toHTML(){
