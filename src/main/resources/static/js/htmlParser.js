@@ -75,8 +75,8 @@ class HtmlParser{
         }
     }
 
-    readThinkElement(line){
-        if (line.trim() === "</think>") {
+    readThinkElement(textFragment){
+        if (textFragment.startsWith("</think>")) {
             this.isThinkingBlock = false;
         } else {
             this.elements[this.elements.length-1].text += textFragment;
