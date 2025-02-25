@@ -109,7 +109,13 @@ class RequestBuilder {
     }
 
     toRequestJSON() {
-        const messagesToInclude = [...this.messages.filter(message => message.cache === true), this.messages[this.messages.length - 1]];
+
+        let messagesToInclude;
+        if(window.CharacterData.settings.memory){
+            messagesToInclude = [...this.messages];
+        }else{
+            messagesToInclude = [...this.messages.filter(message => message.cache === true), this.messages[this.messages.length - 1]];
+        }
 
       
         return JSON.stringify({

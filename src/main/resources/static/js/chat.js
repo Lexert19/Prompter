@@ -3,6 +3,7 @@ class Chat {
     constructor() {
         this.documents = [];
         this.images = [];
+        this.settings = new Settings();
         this.chatInput = document.getElementById("input");
         this.documentsHtml = document.getElementById("documents");
         this.message = document.getElementById("input");

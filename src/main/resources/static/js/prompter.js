@@ -1,4 +1,4 @@
-class Prompter{
+class Settings{
     constructor(){
         this.memory = false;
         this.longDocument = false;
