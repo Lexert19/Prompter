@@ -29,7 +29,7 @@ public class OAuth2Config {
                 http.oauth2Login(oauth2 -> oauth2
                                 .authenticationSuccessHandler(new SuccessHandler()));
 
-                http.httpBasic(withDefaults());
+                //http.httpBasic(withDefaults());
                 return http.build();
         }
 
