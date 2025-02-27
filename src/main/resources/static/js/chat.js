@@ -267,25 +267,25 @@ class Chat {
     changeSettings(event) {
         switch (event.target.name) {
             case "memory":
-                window.chat.currentChat.prompter.memory = event.target.checked;
+                window.chat.settings.memory = event.target.checked;
                 break;
             case "longDocument":
-                window.chat.currentChat.prompter.longDocument = event.target.checked;
+                window.chat.settings.longDocument = event.target.checked;
                 break;
             case "cache":
-                window.chat.currentChat.prompter.cache = event.target.checked;
+                window.chat.settings.cache = event.target.checked;
                 break;
             case "programmer":
-                window.chat.currentChat.prompter.programmer = event.target.checked;
+                window.chat.settings.programmer = event.target.checked;
                 break;
             case "chainOfThoughts":
-                window.chat.currentChat.prompter.chainOfThoughts = event.target.checked;
+                window.chat.settings.chainOfThoughts = event.target.checked;
                 break;
             case "manySolutions":
-                window.chat.currentChat.prompter.manySolutions = event.target.checked;
+                window.chat.settings.manySolutions = event.target.checked;
                 break;
             case "temperature":
-                window.chat.currentChat.prompter.temperature = event.target.value / 100;
+                window.chat.settings.temperature = event.target.value / 100;
         }
     }
 

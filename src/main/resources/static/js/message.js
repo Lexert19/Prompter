@@ -111,7 +111,7 @@ class RequestBuilder {
     toRequestJSON() {
 
         let messagesToInclude;
-        if(window.CharacterData.settings.memory){
+        if(window.chat.settings.memory){
             messagesToInclude = [...this.messages];
         }else{
             messagesToInclude = [...this.messages.filter(message => message.cache === true), this.messages[this.messages.length - 1]];
