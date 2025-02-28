@@ -18,7 +18,7 @@
         <label class="center" for="temperature"><span>Temperatura</span></label>
     </div>
     <div>
-        <select id="modelOptions" name="model" class="mb-1" onclick="window.chat.changeModel(event)">
+        <select id="modelOptions" name="model" class="mb-1" onclick="window.settings.changeModel(event)">
         </select>
     </div>
 </div>

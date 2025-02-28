@@ -97,13 +97,21 @@ class Message {
 
 class RequestBuilder {
     constructor() {
-        this.provider = "OPENAI";
-        this.model = "gpt-4o-mini";
         this.messages = [];
         this.stream = true;
         this.id = Math.random().toString(36);
-        this.url = "https://api.openai.com/v1/chat/completions";
-        this.key = "";
+    }
+
+    getProvider(){
+        return window.settings.provider;
+    }
+
+    getModel(){
+        return window.settings.model;
+    }
+
+    getUrl(){
+        return window.settings.url;
     }
 
     getMaxTokens(){
@@ -112,6 +120,10 @@ class RequestBuilder {
 
     getTemperature(){
         return window.settings.temperature;
+    }
+
+    getKey(){
+        return window.settings.key;
     }
 
     toRequestJSON() {
@@ -125,9 +137,9 @@ class RequestBuilder {
 
       
         return JSON.stringify({
-            model: this.model,
-            url: this.url,
-            provider: this.provider,
+            model: this.getModel(),
+            url: this.getUrl(),
+            provider: this.getProvider,
             messages: messagesToInclude.map(message => ({
                 role: message.role,
                 content: message.content.map(content => this.mapContent(content))
@@ -135,7 +147,7 @@ class RequestBuilder {
             maxTokens: this.getMaxTokens(),
             temperature: this.getTemperature(),
             stream: this.stream,
-            key: this.key
+            key: this.getKey()
         });
     }
 
