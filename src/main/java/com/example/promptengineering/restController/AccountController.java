@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,50 +23,16 @@ public class AccountController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/claude-key")
-    public Mono<String> setClaudeKey(
+    @PostMapping("/save-key/{keyName}") 
+    public Mono<String> saveKeyToMap(
             @AuthenticationPrincipal OAuth2User oAuth2User,
-            @RequestBody String key) {
+            @PathVariable String keyName,
+            @RequestBody String keyValue) {
 
         User user = (User) oAuth2User;
 
-        return userService.setClaudeKey(key, user)
-                .map(userSaved -> {
-                    return "Saved";
-                });
-    }
-
-    @PostMapping("/chatgpt-key")
-    public Mono<String> setChatgptKey(
-            @AuthenticationPrincipal OAuth2User oAuth2User,
-            @RequestBody String key) {
-
-        User user = (User) oAuth2User;
-
-        return userService.setChatgptKey(key, user)
-                .map(userSaved -> "ChatGPT Key Saved");
-    }
-
-    @PostMapping("/nvidia-key")
-    public Mono<String> setNvidiaKey(
-            @AuthenticationPrincipal OAuth2User oAuth2User,
-            @RequestBody String key) {
-
-        User user = (User) oAuth2User;
-
-        return userService.setNvidiaKey(key, user)
-                .map(userSaved -> "NVIDIA Key Saved");
-    }
-
-    @PostMapping("/gemini-key")
-    public Mono<String> setGeminiKey(
-            @AuthenticationPrincipal OAuth2User oAuth2User,
-            @RequestBody String key) {
-
-        User user = (User) oAuth2User;
-
-        return userService.setGeminiKey(key, user)
-                .map(userSaved -> "Gemini Key Saved");
+        return userService.saveKeyToMap(user, keyName, keyValue)
+                .map(userSaved -> String.format("Key '%s' saved to map", keyName));
     }
 
     @GetMapping("/keys")

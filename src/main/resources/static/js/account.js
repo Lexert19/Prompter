@@ -6,35 +6,18 @@ function toggleUserPanel() {
     panel.classList.toggle('active');
 }
 
-function saveKey(key) {
-    const inputKey = document.getElementById(key);
+function saveKey() {
+    const keyName = document.getElementById("keyName");
+    const keyValue = document.getElementById("kayValue");
 
-    let url;
-    switch (key) {
-        case "nemotronKey":
-            url = "/account/nvidia-key";
-            
-            break;
-        case "claudeKey":
-            url = "/account/claude-key";     
-            break;
-        case "openaiKey":
-            url = "/account/chatgpt-key";
-            break;
-        case "geminiKey":
-            url = "/account/gemini-key";
-            break;
-        default:
-            console.error("Invalid key type");
-            return;
-    }
+    const url = "/account/save-kay/"+keyName;
 
     fetch(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: inputKey.value,
+        body: keyValue.value,
     })
         .then(response => {
             if (!response.ok) {

@@ -26,23 +26,22 @@ class Chat {
             { name: "claude-3-haiku-20240307", text: "Claude Haiku 3", provider: "ANTHROPIC", url: "https://api.anthropic.com/v1/messages" },
             { name: "claude-3-5-sonnet-20241022", text: "Claude Sonnet 3.5", provider: "ANTHROPIC", url: "https://api.anthropic.com/v1/messages" },
             { name: "claude-3-opus-20240229", text: "Claude Opus 3", provider: "ANTHROPIC", url: "https://api.anthropic.com/v1/messages" },
-            { name: "nvidia/llama-3.1-nemotron-70b-instruct", text: "nvidia/llama-3.1-nemotron-70b-instruct", provider: "NVIDIA", url: "https://api.nvidia.com/v1/messages" },
             {
                 name: "meta-llama/Llama-3.3-70B-Instruct-Turbo",
                 text: "meta-llama/Llama-3.3-70B-Instruct-Turbo",
-                provider: "NVIDIA",
+                provider: "DEEPINFRA",
                 url: "https://api.deepinfra.com/v1/openai/chat/completions"
             },
             {
                 name: "deepseek-ai/DeepSeek-V3",
                 text: "deepseek-ai/DeepSeek-V3",
-                provider: "NVIDIA",
+                provider: "DEEPINFRA",
                 url: "https://api.deepinfra.com/v1/openai/chat/completions"
             },
             {
                 name: "deepseek-ai/DeepSeek-R1",
                 text: "deepseek-ai/DeepSeek-R1",
-                provider: "NVIDIA",
+                provider: "DEEPINFRA",
                 url: "https://api.deepinfra.com/v1/openai/chat/completions"
             },
             {
@@ -304,11 +303,8 @@ class Chat {
                 return response.json();
             })
             .then(keys => {
-                this.claudeKey = keys.claudeKey || "";
-                this.chatgptKey = keys.chatgptKey || "";
-                this.nvidiaKey = keys.nvidiaKey || "";
-                this.geminiKey = keys.geminiKey || "";
-                this.requestBuilder.key = this.chatgptKey;
+                this.keys = keys;
+                this.requestBuilder.key = this.keys.CHATGPT;
             })
             .catch(error => {
                 console.error('Error loading keys:', error);
