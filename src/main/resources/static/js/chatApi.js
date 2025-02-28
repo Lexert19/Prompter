@@ -65,7 +65,7 @@ class ChatApi {
                 this.parser.toHTML();
                 this.currentMessage.appendText(content);
             }catch(error){
-                //console.log(error);
+                console.log(error);
             }
         });
     }
