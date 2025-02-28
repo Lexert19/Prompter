@@ -74,6 +74,12 @@ public class ChatService {
             } else if (provider.equals("ANTHROPIC")) {
                 String content = rootNode.path("delta").path("text").asText();
                 return content;
+            }else if(provider.equals("DEEPSEEK")){
+                if(rootNode.path("finish_reason") == null){
+                    return rootNode.path("choices").get(0).path("delta").path("reasoning_content").asText();
+                }else{
+                    return  rootNode.path("choices").get(0).path("delta").path("content").asText();
+                }
             }else{
                 String content = rootNode.path("choices").get(0).path("delta").path("content").asText();
                 return content;
