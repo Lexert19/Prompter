@@ -87,7 +87,7 @@ class ChatApi {
             }
             return content;
         } else{
-            if(this.firstReason = true){
+            if(this.firstReason == true){
                 this.firstReason = false;
                 content = content + "</think>\n"
             }
