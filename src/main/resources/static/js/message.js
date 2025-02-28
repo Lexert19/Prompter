@@ -100,7 +100,7 @@ class RequestBuilder {
         this.provider = "OPENAI";
         this.model = "gpt-4o-mini";
         this.messages = [];
-        this.maxTokens = 32000;
+        this.maxTokens = 8000;
         this.temperature = 0.0;
         this.stream = true;
         this.id = Math.random().toString(36);
