@@ -32,8 +32,7 @@ public class User implements OAuth2User {
     private String nvidiaKey;
     private String geminiKey;
 
-    @Column("keys")
-    @Convert(converter = HashMapToJsonConverter.class)
+    @Column("keys_map")
     private HashMap<String, String> keys;
 
     public User(String id, String email, String password) {
