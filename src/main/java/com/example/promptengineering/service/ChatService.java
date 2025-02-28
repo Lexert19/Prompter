@@ -75,7 +75,7 @@ public class ChatService {
                 return content;
             } else if (provider.equals("DEEPSEEK")) {
                 JsonNode choiceNode = rootNode.path("choices").get(0);
-                JsonNode finishReasonNode = choiceNode.path("finish_reason");
+                JsonNode finishReasonNode = choiceNode.path("delta").path("content");
                 if (finishReasonNode.isNull()) {
                     String content = choiceNode.path("delta").path("reasoning_content").asText();
                     return content;
