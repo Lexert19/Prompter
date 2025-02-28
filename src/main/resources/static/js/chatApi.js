@@ -66,6 +66,7 @@ class ChatApi {
                 this.currentMessage.appendText(content);
             }catch(error){
                 console.log(chunksString);
+                console.debug(error);
                 //this.outputInput.textContent += chunksString;
             }
         });
