@@ -77,8 +77,8 @@ public class ChatService {
                 JsonNode choiceNode = rootNode.path("choices").get(0);
                 JsonNode finishReasonNode = choiceNode.path("delta").path("content");
                 if (finishReasonNode.isNull()) {
-                    String content = choiceNode.path("delta").path("reasoning_content").asText();
-                    return content;
+                    //String content = choiceNode.path("delta").path("reasoning_content").asText();
+                    return "";
                 } else {
                     String content = choiceNode.path("delta").path("content").asText();
                     return content;
