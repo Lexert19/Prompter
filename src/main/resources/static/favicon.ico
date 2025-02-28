@@ -6,9 +6,9 @@
         </linearGradient>
     </defs>
 
-    <!-- Główny kształt chatbubble -->
+    <!-- Główny kształt chatbubble z większą wypustką -->
     <path fill="url(#grad)" 
-          d="M50 4H14C8.477 4 4 8.477 4 14v28c0 5.523 4.477 10 10 10h26.343L44 57.657 50.343 52H50c5.523 0 10-4.477 10-10V14c0-5.523-4.477-10-10-10z"
+          d="M50 4H14C8.477 4 4 8.477 4 14v28c0 5.523 4.477 10 10 10h26.343L44 60 53 52H50c5.523 0 10-4.477 10-10V14c0-5.523-4.477-10-10-10z"
           stroke="url(#grad)" 
           stroke-width="2"/>
 
