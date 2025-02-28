@@ -230,7 +230,7 @@ class Chat {
     newMessage() {
         this.currentMessage = new Message(
             "user",
-            this.escapeHtml(this.message.value),
+            this.message.value,
             this.images,
             this.documents
         );
