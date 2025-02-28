@@ -43,22 +43,27 @@ class ChatApi {
     readChunk(decoder, value) {
         const chunk = decoder.decode(value, { stream: true });
 
-        try{
-            console.log(chunk)
-            const rootNode = JSON.parse(chunk); 
-            const content = rootNode.choices[0].delta.content;
-
-            this.parser.parse(content);
-            this.outputInput.textContent += content;
-            this.parser.toHTML();
-            this.currentMessage.appendText(content);
-
-
-        }catch(error){
-            console.log(error);
-        }
+        this.readJsonChunk(chunk);
        
         //this.outputInput.innerHTML = this.parser.toHTML();
+    }
+
+    readJsonChunk(chunk){
+        const chunks = chunk.split("\n");
+        chunks.forEach(element => {
+            try{
+                console.log(chunk)
+                const rootNode = JSON.parse(chunk); 
+                const content = rootNode.choices[0].delta.content;
+    
+                this.parser.parse(content);
+                this.outputInput.textContent += content;
+                this.parser.toHTML();
+                this.currentMessage.appendText(content);
+            }catch(error){
+                console.log(error);
+            }
+        });
     }
 
     read(reader, decoder) {

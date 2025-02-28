@@ -65,7 +65,7 @@ public class ChatService {
     }
 
     private String readChunk(String chunk, String provider) {
-        return chunk;
+        return chunk + "\n";
         // try {
         //     JsonNode rootNode = objectMapper.readTree(chunk);
         //     if (provider.equals("OPENAI")) {
