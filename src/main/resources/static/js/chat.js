@@ -34,15 +34,27 @@ class Chat {
             },
             {
                 name: "deepseek-ai/DeepSeek-V3",
-                text: "deepseek-ai/DeepSeek-V3",
+                text: "deepinfra/DeepSeek-V3",
                 provider: "DEEPINFRA",
                 url: "https://api.deepinfra.com/v1/openai/chat/completions"
             },
             {
                 name: "deepseek-ai/DeepSeek-R1",
-                text: "deepseek-ai/DeepSeek-R1",
+                text: "deepinfra/DeepSeek-R1",
                 provider: "DEEPINFRA",
                 url: "https://api.deepinfra.com/v1/openai/chat/completions"
+            },
+            {
+                name: "deepseek-chat",
+                text: "deepseek-v3",
+                provider: "DEEPSEEK",
+                url: "https://api.deepseek.com/chat/completions"
+            },
+            {
+                name: "deepseek-reasoner",
+                text: "deepseek-r1",
+                provider: "DEEPSEEK",
+                url: "https://api.deepseek.com/chat/completions"
             },
             {
                 name: "gemini-2.0-flash-thinking-exp-01-21",
