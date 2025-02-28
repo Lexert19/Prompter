@@ -9,6 +9,9 @@
             onclick="window.chat.changeSettings(event)">
         <label for="cache">Cache</label>
     </div>
+    <div>
+        <input type="number" name="maxTokens" value="8000" onchange="window.chat.changeSettings(event)">
+    </div>
     <div class="d-flex">
         <input type="range" id="temperature" name="temperature" min="0" max="100" step="1" value="0"
             oninput="window.chat.changeSettings(event)">

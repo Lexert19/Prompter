@@ -100,8 +100,8 @@ class RequestBuilder {
         this.provider = "OPENAI";
         this.model = "gpt-4o-mini";
         this.messages = [];
-        this.maxTokens = 8000;
-        this.temperature = 0.0;
+        this.maxTokens = window.chat.settings.maxTokens;
+        this.temperature = window.chat.settings.temperature;
         this.stream = true;
         this.id = Math.random().toString(36);
         this.url = "https://api.openai.com/v1/chat/completions";

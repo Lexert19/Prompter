@@ -272,23 +272,14 @@ class Chat {
             case "memory":
                 window.chat.settings.memory = event.target.checked;
                 break;
-            case "longDocument":
-                window.chat.settings.longDocument = event.target.checked;
-                break;
             case "cache":
                 window.chat.settings.cache = event.target.checked;
                 break;
-            case "programmer":
-                window.chat.settings.programmer = event.target.checked;
-                break;
-            case "chainOfThoughts":
-                window.chat.settings.chainOfThoughts = event.target.checked;
-                break;
-            case "manySolutions":
-                window.chat.settings.manySolutions = event.target.checked;
-                break;
             case "temperature":
                 window.chat.settings.temperature = event.target.value / 100;
+            case "maxtokens":
+                window.chat.settings.maxtokens = parseInt(event.target.value);
+                break;
         }
     }
 
