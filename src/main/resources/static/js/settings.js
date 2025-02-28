@@ -9,6 +9,18 @@ class Settings{
         this.url = "https://api.openai.com/v1/chat/completions";
         this.model = "gpt-4o-mini";
         this.key = "";
+
+        this.load();
+    }
+
+    save() {
+        const { key, ...settingsToSave } = this;
+        localStorage.setItem("appSettings", JSON.stringify(settingsToSave));
+    }
+
+    load() {
+        const savedSettings = JSON.parse(localStorage.getItem("appSettings") || "{}");
+        Object.assign(this, savedSettings);
     }
 
 
@@ -26,6 +38,7 @@ class Settings{
                 window.settings.maxTokens = parseInt(event.target.value);
                 break;
         }
+        this.save(); 
     }
 
     changeModel(event) {
@@ -37,6 +50,7 @@ class Settings{
 
             window.settings.key = window.chat.keys[selectedModel.provider];
         }
+        this.save(); 
     }
 
 }

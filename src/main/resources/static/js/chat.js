@@ -273,7 +273,7 @@ class Chat {
             })
             .then(keys => {
                 this.keys = keys;
-                window.settings.key = this.keys["OPENAI"];
+                window.settings.key = this.keys[window.settings.provider];
             })
             .catch(error => {
                 console.error('Error loading keys:', error);
