@@ -8,7 +8,6 @@ class HtmlParser {
   }
 
   parseWord(textFragment) {
-    console.log(textFragment);
     if (textFragment.startsWith("```")) {
       if (this.isCodeBlock) {
         this.isCodeBlock = false;
@@ -115,17 +114,6 @@ class HtmlParser {
     }
   }
 
-  // readOlElement(line){
-  //     const match = line.match(/^(\d+)\.\s\*\*(.+?)\*\*\:\s(.*)$/);
-  //     if (match) {
-  //         const header = match[2].trim();
-  //         const text = match[3].trim();
-  //         this.elements.push({ type: 'olElement', header: header, text: text });
-  //     } else {
-  //         this.elements.push({ type: 'normalText', text: line });
-  //     }
-  // }
-
   toHTML() {
     let html = "";
     for (const element of this.elements) {
@@ -167,7 +155,7 @@ class HtmlParser {
           break;
       }
     }
-    //console.log(html);
+    console.log(html);
     return html;
   }
 
