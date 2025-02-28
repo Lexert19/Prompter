@@ -11,6 +11,7 @@ class Settings{
         this.key = "";
 
         this.load();
+        this.initUI();
     }
 
     save() {
@@ -51,6 +52,21 @@ class Settings{
             window.settings.key = window.chat.keys[selectedModel.provider];
         }
         this.save(); 
+    }
+
+    initUI() {
+        document.getElementById('memory').checked = this.memory;
+        document.getElementById('cache').checked = this.cache;
+        
+        document.querySelector('input[name="maxTokens"]').value = this.maxTokens;
+        
+        document.getElementById('temperature').value = this.temperature * 100;
+        
+        const modelSelect = document.getElementById('modelOptions');
+        modelSelect.innerHTML = window.chat.models
+            .map(model => `<option value="${model.name}">${model.name}</option>`)
+            .join('');
+        modelSelect.value = this.model;
     }
 
 }
