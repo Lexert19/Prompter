@@ -75,7 +75,7 @@ public class ChatService {
                 String content = rootNode.path("delta").path("text").asText();
                 return content;
             }else if(provider.equals("DEEPSEEK")){
-                if(rootNode.path("choices").get(0).path("finish_reason").isMissingNode()){
+                if (rootNode.path("choices").get(0).path("finish_reason").isMissingNode()) {
                     String content = rootNode.path("choices").get(0).path("delta").path("reasoning_content").asText();
                     return content;
                 }else{
