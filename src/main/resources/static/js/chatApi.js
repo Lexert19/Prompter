@@ -44,6 +44,7 @@ class ChatApi {
         const chunk = decoder.decode(value, { stream: true });
 
         try{
+            console.log(chunk)
             const rootNode = JSON.parse(chunk); 
             const content = rootNode.choices[0].delta.content;
 
