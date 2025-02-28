@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+    <defs>
+        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#6366f1"/>
+            <stop offset="100%" stop-color="#8b5cf6"/>
+        </linearGradient>
+    </defs>
+
+    <!-- Główny kształt chatbubble -->
+    <path fill="url(#grad)" 
+          d="M50 4H14C8.477 4 4 8.477 4 14v28c0 5.523 4.477 10 10 10h26.343L44 57.657 50.343 52H50c5.523 0 10-4.477 10-10V14c0-5.523-4.477-10-10-10z"
+          stroke="url(#grad)" 
+          stroke-width="2"/>
+
+    <!-- Napis AI wyśrodkowany -->
+    <text x="50%" y="50%" 
+          fill="#fff" 
+          font-family="Arial, sans-serif" 
+          font-size="24" 
+          font-weight="bold" 
+          text-anchor="middle" 
+          dominant-baseline="middle">AI</text>
+</svg>
