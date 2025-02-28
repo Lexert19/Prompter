@@ -139,7 +139,7 @@ class RequestBuilder {
         return JSON.stringify({
             model: this.getModel(),
             url: this.getUrl(),
-            provider: this.getProvider,
+            provider: this.getProvider(),
             messages: messagesToInclude.map(message => ({
                 role: message.role,
                 content: message.content.map(content => this.mapContent(content))
