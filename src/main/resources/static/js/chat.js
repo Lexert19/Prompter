@@ -251,7 +251,7 @@ class Chat {
             window.chat.requestBuilder.provider = selectedModel.provider;
             window.chat.requestBuilder.url = selectedModel.url;
 
-            window.chat.requestBuilder.key = this.keys[selectedModel.provider];
+            window.chat.requestBuilder.key = window.chat.keys[selectedModel.provider];
         }
     }
 
