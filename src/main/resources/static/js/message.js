@@ -100,12 +100,18 @@ class RequestBuilder {
         this.provider = "OPENAI";
         this.model = "gpt-4o-mini";
         this.messages = [];
-        this.maxTokens = window.settings.maxTokens;
-        this.temperature = window.settings.temperature;
         this.stream = true;
         this.id = Math.random().toString(36);
         this.url = "https://api.openai.com/v1/chat/completions";
         this.key = "";
+    }
+
+    getMaxTokens(){
+        return window.settings.maxTokens;
+    }
+
+    getTemperature(){
+        return window.settings.temperature;
     }
 
     toRequestJSON() {
@@ -126,8 +132,8 @@ class RequestBuilder {
                 role: message.role,
                 content: message.content.map(content => this.mapContent(content))
               })),
-            maxTokens: this.maxTokens,
-            temperature: this.temperature,
+            maxTokens: this.getMaxTokens(),
+            temperature: this.getTemperature(),
             stream: this.stream,
             key: this.key
         });
