@@ -10,7 +10,7 @@ function saveKey() {
     const keyName = document.getElementById("keyName");
     const keyValue = document.getElementById("keyValue");
 
-    const url = "/account/save-kay/"+keyName;
+    const url = "/account/save-kay/"+keyName.value;
 
     fetch(url, {
         method: 'POST',
