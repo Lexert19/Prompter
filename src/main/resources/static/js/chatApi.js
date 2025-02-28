@@ -2,6 +2,7 @@ class ChatApi {
     constructor() {
         this.url = "/client/chat";
         this.parser = new HtmlParser();
+        this.provider = "";
     }
 
     newMessage(){
@@ -12,6 +13,7 @@ class ChatApi {
 
     sendStreamingMessage(request) {
         console.log(request.toRequestJSON());
+        this.provider = request.provider;
         this.newMessage();
         fetch(this.url, {
             method: 'POST',
@@ -53,8 +55,12 @@ class ChatApi {
         chunks.forEach(chunk => {
             try{
                 console.log(chunk)
-                const rootNode = JSON.parse(chunk); 
-                const content = rootNode.choices[0].delta.content;
+                const rootNode = JSON.parse(chunk);
+                let content = "";
+                content = rootNode.choices[0].delta.content;
+                if(this.provider == "DEEPSEEK" && content == "null"){
+                    content = content = rootNode.choices[0].delta.reasoning_content;
+                } 
     
                 this.parser.parse(content);
                 this.outputInput.textContent += content;
