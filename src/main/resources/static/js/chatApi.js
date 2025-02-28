@@ -48,9 +48,9 @@ class ChatApi {
         //this.outputInput.innerHTML = this.parser.toHTML();
     }
 
-    readJsonChunk(chunk){
-        const chunks = chunk.split("\n");
-        chunks.forEach(element => {
+    readJsonChunk(chunksString){
+        const chunks = chunksString.split("\n");
+        chunks.forEach(chunk => {
             try{
                 console.log(chunk)
                 const rootNode = JSON.parse(chunk); 
