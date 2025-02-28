@@ -58,7 +58,7 @@ class ChatApi {
                 const rootNode = JSON.parse(chunk);
                 let content = "";
                 content = rootNode.choices[0].delta.content;
-                if(this.provider == "DEEPSEEK" && content == "null"){
+                if(this.provider == "DEEPSEEK" && content == null){
                     content = content = rootNode.choices[0].delta.reasoning_content;
                 } 
     
