@@ -65,31 +65,32 @@ public class ChatService {
     }
 
     private String readChunk(String chunk, String provider) {
-        try {
-            JsonNode rootNode = objectMapper.readTree(chunk);
-            if (provider.equals("OPENAI")) {
-                String content = rootNode.path("choices").get(0).path("delta").path("content").asText();
-                return chunk;
-            } else if (provider.equals("ANTHROPIC")) {
-                String content = rootNode.path("delta").path("text").asText();
-                return chunk;
-            } else if (provider.equals("DEEPSEEK")) {
-                JsonNode choiceNode = rootNode.path("choices").get(0);
-                JsonNode finishReasonNode = choiceNode.path("delta").path("content");
-                if (finishReasonNode.isNull()) {
-                    String content = choiceNode.path("delta").path("reasoning_content").asText();
-                    return chunk;
-                } else {
-                    String content = choiceNode.path("delta").path("content").asText();
-                    return chunk;
-                }
-            } else {
-                String content = rootNode.path("choices").get(0).path("delta").path("content").asText();
-                return chunk;
-            }
-        } catch (JsonProcessingException e) {
-            return "";
-        }
+        return chunk;
+        // try {
+        //     JsonNode rootNode = objectMapper.readTree(chunk);
+        //     if (provider.equals("OPENAI")) {
+        //         String content = rootNode.path("choices").get(0).path("delta").path("content").asText();
+        //         return chunk;
+        //     } else if (provider.equals("ANTHROPIC")) {
+        //         String content = rootNode.path("delta").path("text").asText();
+        //         return chunk;
+        //     } else if (provider.equals("DEEPSEEK")) {
+        //         JsonNode choiceNode = rootNode.path("choices").get(0);
+        //         JsonNode finishReasonNode = choiceNode.path("delta").path("content");
+        //         if (finishReasonNode.isNull()) {
+        //             String content = choiceNode.path("delta").path("reasoning_content").asText();
+        //             return chunk;
+        //         } else {
+        //             String content = choiceNode.path("delta").path("content").asText();
+        //             return chunk;
+        //         }
+        //     } else {
+        //         String content = rootNode.path("choices").get(0).path("delta").path("content").asText();
+        //         return chunk;
+        //     }
+        // } catch (JsonProcessingException e) {
+        //     return "";
+        // }
 
     }
 
