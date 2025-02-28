@@ -76,9 +76,11 @@ public class ChatService {
                 return content;
             }else if(provider.equals("DEEPSEEK")){
                 if(rootNode.path("finish_reason") == null){
-                    return rootNode.path("choices").get(0).path("delta").path("reasoning_content").asText();
+                    String content = rootNode.path("choices").get(0).path("delta").path("reasoning_content").asText();
+                    return content;
                 }else{
-                    return  rootNode.path("choices").get(0).path("delta").path("content").asText();
+                    String content = rootNode.path("choices").get(0).path("delta").path("content").asText();
+                    return content;
                 }
             }else{
                 String content = rootNode.path("choices").get(0).path("delta").path("content").asText();
