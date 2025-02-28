@@ -2,8 +2,11 @@ class ChatApi {
     constructor() {
         this.url = "/client/chat";
         this.parser = new HtmlParser();
-        this.provider = "";
         this.firstReason = false;
+    }
+
+    getProvider(){
+        return window.settings.provider;
     }
 
     newMessage(){
@@ -14,7 +17,6 @@ class ChatApi {
 
     sendStreamingMessage(request) {
         console.log(request.toRequestJSON());
-        this.provider = request.provider;
         this.newMessage();
         fetch(this.url, {
             method: 'POST',
@@ -76,7 +78,7 @@ class ChatApi {
     }
 
     deepseekParseContent(content, rootNode){
-        if(this.provider != "DEEPSEEK")
+        if(this.getProvider() != "DEEPSEEK")
             return content;
 
         if(content == null){
