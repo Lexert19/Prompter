@@ -255,16 +255,7 @@ class Chat {
         }
     }
 
-    changeModel(event) {
-        const selectedModel = this.models.find(model => model.name === event.target.value);
-        if (selectedModel) {
-            window.chat.requestBuilder.model = selectedModel.name;
-            window.chat.requestBuilder.provider = selectedModel.provider;
-            window.chat.requestBuilder.url = selectedModel.url;
-
-            window.chat.requestBuilder.key = window.chat.keys[selectedModel.provider];
-        }
-    }
+   
 
     loadKeys() {
         fetch('/account/keys', {
@@ -282,7 +273,7 @@ class Chat {
             })
             .then(keys => {
                 this.keys = keys;
-                this.requestBuilder.key = this.keys["OPENAI"];
+                window.settings.key = this.keys["OPENAI"];
             })
             .catch(error => {
                 console.error('Error loading keys:', error);
