@@ -3,7 +3,6 @@ class Chat {
     constructor() {
         this.documents = [];
         this.images = [];
-        this.settings = new Settings();
         this.chatInput = document.getElementById("input");
         this.documentsHtml = document.getElementById("documents");
         this.message = document.getElementById("input");
@@ -270,15 +269,15 @@ class Chat {
     changeSettings(event) {
         switch (event.target.name) {
             case "memory":
-                window.chat.settings.memory = event.target.checked;
+                window.settings.memory = event.target.checked;
                 break;
             case "cache":
-                window.chat.settings.cache = event.target.checked;
+                window.settings.cache = event.target.checked;
                 break;
             case "temperature":
-                window.chat.settings.temperature = event.target.value / 100;
+                window.settings.temperature = event.target.value / 100;
             case "maxtokens":
-                window.chat.settings.maxtokens = parseInt(event.target.value);
+                window.settings.maxtokens = parseInt(event.target.value);
                 break;
         }
     }

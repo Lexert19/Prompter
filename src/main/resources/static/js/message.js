@@ -100,8 +100,8 @@ class RequestBuilder {
         this.provider = "OPENAI";
         this.model = "gpt-4o-mini";
         this.messages = [];
-        this.maxTokens = window.chat.settings.maxTokens;
-        this.temperature = window.chat.settings.temperature;
+        this.maxTokens = window.settings.maxTokens;
+        this.temperature = window.settings.temperature;
         this.stream = true;
         this.id = Math.random().toString(36);
         this.url = "https://api.openai.com/v1/chat/completions";
@@ -111,7 +111,7 @@ class RequestBuilder {
     toRequestJSON() {
 
         let messagesToInclude;
-        if(window.chat.settings.memory){
+        if(window.settings.memory){
             messagesToInclude = [...this.messages];
         }else{
             messagesToInclude = [...this.messages.filter(message => message.cache === true), this.messages[this.messages.length - 1]];

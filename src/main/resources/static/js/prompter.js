@@ -7,3 +7,5 @@ class Settings{
     }
 
 }
+
+window.settings = new Settings();
