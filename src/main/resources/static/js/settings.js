@@ -6,6 +6,23 @@ class Settings{
         this.temperature = 0.0;
     }
 
+
+    change(event){
+        switch (event.target.name) {
+            case "memory":
+                window.settings.memory = event.target.checked;
+                break;
+            case "cache":
+                window.settings.cache = event.target.checked;
+                break;
+            case "temperature":
+                window.settings.temperature = event.target.value / 100;
+            case "maxTokens":
+                window.settings.maxtokens = parseInt(event.target.value);
+                break;
+        }
+    }
+
 }
 
 window.settings = new Settings();

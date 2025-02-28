@@ -266,22 +266,6 @@ class Chat {
         }
     }
 
-    changeSettings(event) {
-        switch (event.target.name) {
-            case "memory":
-                window.settings.memory = event.target.checked;
-                break;
-            case "cache":
-                window.settings.cache = event.target.checked;
-                break;
-            case "temperature":
-                window.settings.temperature = event.target.value / 100;
-            case "maxtokens":
-                window.settings.maxtokens = parseInt(event.target.value);
-                break;
-        }
-    }
-
     loadKeys() {
         fetch('/account/keys', {
             method: 'GET',
