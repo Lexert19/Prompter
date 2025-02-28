@@ -65,7 +65,7 @@ class ChatApi {
                 this.parser.toHTML();
                 this.currentMessage.appendText(content);
             }catch(error){
-                console.log(chunksString);
+                console.debug(chunk);
                 console.debug(error);
                 //this.outputInput.textContent += chunksString;
             }
