@@ -11,7 +11,6 @@ class Settings{
         this.key = "";
 
         this.load();
-        this.initUI();
     }
 
     save() {

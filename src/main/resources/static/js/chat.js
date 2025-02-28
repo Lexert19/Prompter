@@ -68,6 +68,10 @@ class Chat {
         this.initSettings();
     }
 
+    init(){    
+        window.settings.initUI();
+    }
+
     initSettings() {
         this.showSettings();
         //this.clearMessages();
@@ -282,3 +286,4 @@ class Chat {
 }
 
 window.chat = new Chat();
+window.chat.init();
