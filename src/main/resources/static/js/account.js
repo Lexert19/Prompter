@@ -8,7 +8,7 @@ function toggleUserPanel() {
 
 function saveKey() {
     const keyName = document.getElementById("keyName");
-    const keyValue = document.getElementById("kayValue");
+    const keyValue = document.getElementById("keyValue");
 
     const url = "/account/save-kay/"+keyName;
 

@@ -251,15 +251,7 @@ class Chat {
             window.chat.requestBuilder.provider = selectedModel.provider;
             window.chat.requestBuilder.url = selectedModel.url;
 
-            if (selectedModel.provider === "OPENAI") {
-                window.chat.requestBuilder.key = this.chatgptKey;
-            } else if (selectedModel.provider === "ANTHROPIC") {
-                window.chat.requestBuilder.key = this.claudeKey;
-            } else if (selectedModel.provider === "NVIDIA") {
-                window.chat.requestBuilder.key = this.nvidiaKey;
-            }else if(selectedModel.provider == "GEMINI"){
-                window.chat.requestBuilder.key = this.geminiKey;
-            }
+            window.chat.requestBuilder.key = this.keys[selectedModel.provider];
         }
     }
 
