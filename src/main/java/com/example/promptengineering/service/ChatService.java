@@ -30,19 +30,19 @@ public class ChatService {
         return webClient.post()
                 .uri(request.getUrl())
                 .headers(httpHeaders -> {
-                    if(request.getProvider().equals("OPENAI")){
+                    if (request.getProvider().equals("OPENAI")) {
                         httpHeaders.set("Authorization", "Bearer " + request.getKey());
                         httpHeaders.set("Content-Type", "application/json");
-                    }else if(request.getProvider().equals("ANTHROPIC")){
+                    } else if (request.getProvider().equals("ANTHROPIC")) {
                         httpHeaders.set("x-api-key", request.getKey());
                         httpHeaders.set("Content-Type", "application/json");
-                        httpHeaders.set("anthropic-version","2023-06-01");
+                        httpHeaders.set("anthropic-version", "2023-06-01");
                         httpHeaders.set("anthropic-beta", "prompt-caching-2024-07-31");
-                    }else {
+                    } else {
                         httpHeaders.set("Authorization", "Bearer " + request.getKey());
                         httpHeaders.set("Content-Type", "application/json");
                     }
-                    
+
                 })
                 .bodyValue(requestBodyJson)
                 .retrieve()
@@ -51,7 +51,7 @@ public class ChatService {
                     return this.readChunk(dataChunk, request.getProvider());
                 })
                 .doOnNext(dataChunk -> {
-                    //System.out.println("Received data chunk: " + dataChunk);
+                    // System.out.println("Received data chunk: " + dataChunk);
                 })
                 .retryWhen(Retry.backoff(3, Duration.ofSeconds(20))
                         .filter(error -> {
@@ -64,33 +64,33 @@ public class ChatService {
 
     }
 
-
     private String readChunk(String chunk, String provider) {
-        try{
+        try {
             JsonNode rootNode = objectMapper.readTree(chunk);
-            if(provider.equals("OPENAI")){
+            if (provider.equals("OPENAI")) {
                 String content = rootNode.path("choices").get(0).path("delta").path("content").asText();
                 return content;
             } else if (provider.equals("ANTHROPIC")) {
                 String content = rootNode.path("delta").path("text").asText();
                 return content;
-            }else if(provider.equals("DEEPSEEK")){
-                if (rootNode.path("choices").get(0).path("finish_reason").isMissingNode()) {
-                    String content = rootNode.path("choices").get(0).path("delta").path("reasoning_content").asText();
+            } else if (provider.equals("DEEPSEEK")) {
+                JsonNode choiceNode = rootNode.path("choices").get(0);
+                JsonNode finishReasonNode = choiceNode.path("finish_reason");
+                if (finishReasonNode.isMissingNode() || finishReasonNode.isNull()) {
+                    String content = choiceNode.path("delta").path("reasoning_content").asText();
                     return content;
-                }else{
-                    String content = rootNode.path("choices").get(0).path("delta").path("content").asText();
+                } else {
+                    String content = choiceNode.path("delta").path("content").asText();
                     return content;
                 }
-            }else{
+            } else {
                 String content = rootNode.path("choices").get(0).path("delta").path("content").asText();
                 return content;
             }
-        }catch (JsonProcessingException e){
+        } catch (JsonProcessingException e) {
             return "";
         }
-       
+
     }
 
-   
 }
