@@ -146,7 +146,7 @@ class Chat {
         <div id="${message.id}" class="message ${message.role}">
             ${message.getHtmlImages()}
             ${message.getHtmlFiles()}
-            <pre><code id="input-${message.id}" class="code-wrap">${message.getText()}</code></pre>
+            <div id="input-${message.id}" class="code-wrap">${this.escapeHtml(message.getText())}</div>
             <span id="cached-${message.id}">${message.cache ? "cached" : ""}<span>
         </div>
         `;
