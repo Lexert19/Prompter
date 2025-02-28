@@ -3,6 +3,9 @@ class ChatApi {
         this.url = "/client/chat";
         this.parser = new HtmlParser();
         this.provider = "";
+        this.firstReason = false;
+        this.lastReason = false;
+
     }
 
     newMessage(){
@@ -56,11 +59,10 @@ class ChatApi {
             try{
                 console.log(chunk)
                 const rootNode = JSON.parse(chunk);
-                let content = "";
-                content = rootNode.choices[0].delta.content;
-                if(this.provider == "DEEPSEEK" && content == null){
-                    content = content = rootNode.choices[0].delta.reasoning_content;
-                } 
+                let content = rootNode.choices[0].delta.content;
+
+
+                content = this.deepseekParseContent(content, rootNode);
     
                 this.parser.parse(content);
                 this.outputInput.textContent += content;
@@ -70,6 +72,28 @@ class ChatApi {
                 console.log(error);
             }
         });
+    }
+
+    deepseekParseContent(content, rootNode){
+        if(this.provider != "DEEPSEEK")
+            return content;
+
+        if(content == null){
+          
+            content = rootNode.choices[0].delta.reasoning_content;
+            if(this.firstReason == false){
+                this.firstReason = true
+                content = "<think>\n" + content;
+            }
+            return content;
+        } else{
+            if(this.firstReason = true){
+                this.firstReason = false;
+                content = content + "</think>\n"
+            }
+            return content;
+        }
+        
     }
 
     read(reader, decoder) {
