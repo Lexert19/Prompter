@@ -39,6 +39,7 @@
         </div>
     </div>
     <#include "/parts/editMessage.ftl" />
+    <script src="/static/js/settings.js"></script>
     <script src="/static/js/htmlParser.js"></script>
     <script src="/static/js/editMessageView.js"></script>
     <script src="/static/js/main.js"></script>
@@ -47,7 +48,6 @@
     <script src="/static/js/chatApi.js"></script>
     <script src="/static/js/claudeApi.js"></script>
     <script src="/static/js/chatGPTApi.js"></script>
-    <script src="/static/js/prompter.js"></script>
     <script src="/static/js/navigation-view.js"></script>
     <script src="/static/js/llamaApi.js"></script>
     <script src="/static/js/chat.js"></script>
