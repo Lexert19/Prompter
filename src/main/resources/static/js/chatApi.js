@@ -4,8 +4,6 @@ class ChatApi {
         this.parser = new HtmlParser();
         this.provider = "";
         this.firstReason = false;
-        this.lastReason = false;
-
     }
 
     newMessage(){
@@ -57,10 +55,8 @@ class ChatApi {
         const chunks = chunksString.split("\n");
         chunks.forEach(chunk => {
             try{
-                console.log(chunk)
                 const rootNode = JSON.parse(chunk);
                 let content = rootNode.choices[0].delta.content;
-
 
                 content = this.deepseekParseContent(content, rootNode);
     
@@ -69,7 +65,7 @@ class ChatApi {
                 this.parser.toHTML();
                 this.currentMessage.appendText(content);
             }catch(error){
-                console.log(error);
+                //console.log(error);
             }
         });
     }
