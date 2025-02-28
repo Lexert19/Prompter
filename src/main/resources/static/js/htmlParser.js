@@ -119,39 +119,39 @@ class HtmlParser {
     for (const element of this.elements) {
       switch (element.type) {
         case "normalText":
-          html += `<p><pre><code>${this.escapeHtml(
+          html += `<p>${this.escapeHtml(
             element.text
-          )}</code></pre></p>\n`;
+          )}</p>\n`;
           break;
         case "code":
           const languageClass = element.language
             ? `language-${element.language}`
             : "";
-          html += `<pre><code class="${languageClass}">${this.escapeHtml(
+          html += `<div class="${languageClass}">${this.escapeHtml(
             element.text
-          )}</code></pre>\n`;
+          )}</div>\n`;
           break;
         case "header":
-          html += `<h3><pre><code>${this.escapeHtml(
+          html += `<h3>${this.escapeHtml(
             element.text
-          )}</code></pre></h3>\n`;
+          )}</h3>\n`;
           break;
         case "olElement":
-          html += `<ol><li><strong><pre><code>${this.escapeHtml(
+          html += `<ol><li><strong>${this.escapeHtml(
             element.header
-          )}</code></pre></strong>: <pre><code>${this.escapeHtml(
+          )}</strong>:${this.escapeHtml(
             element.text
-          )}</code></pre></li></ol>\n`;
+          )}</li></ol>\n`;
           break;
         case "ulElement":
-          html += `<ul><li><pre><code>${this.escapeHtml(
+          html += `<ul><li>${this.escapeHtml(
             element.text
-          )}</code></pre></li></ul>\n`;
+          )}</li></ul>\n`;
           break;
         case "thinking":
-          html += `<div class="thinking"><h4>Thinking:</h4><pre><code>${this.escapeHtml(
+          html += `<div class="thinking"><h4>Thinking:</h4>${this.escapeHtml(
             element.text
-          )}</code></pre></div>\n`;
+          )}</div>\n`;
           break;
       }
     }
