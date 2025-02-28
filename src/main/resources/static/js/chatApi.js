@@ -54,7 +54,7 @@ class ChatApi {
 
 
         }catch(error){
-
+            console.log(error);
         }
        
         //this.outputInput.innerHTML = this.parser.toHTML();
