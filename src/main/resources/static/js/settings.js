@@ -18,7 +18,7 @@ class Settings{
             case "temperature":
                 window.settings.temperature = event.target.value / 100;
             case "maxTokens":
-                window.settings.maxtokens = parseInt(event.target.value);
+                window.settings.maxTokens = parseInt(event.target.value);
                 break;
         }
     }
