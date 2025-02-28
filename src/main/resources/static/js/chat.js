@@ -296,7 +296,7 @@ class Chat {
             })
             .then(keys => {
                 this.keys = keys;
-                this.requestBuilder.key = this.keys.CHATGPT;
+                this.requestBuilder.key = this.keys["OPENAI"];
             })
             .catch(error => {
                 console.error('Error loading keys:', error);
