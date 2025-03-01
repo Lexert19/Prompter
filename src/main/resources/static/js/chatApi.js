@@ -62,7 +62,7 @@ class ChatApi {
 
     readChunkData(chunk){
         try{
-            if(!chunk.trim)
+            if(!chunk.trim())
                 return;
             const rootNode = JSON.parse(chunk);
             let error = rootNode.error;
