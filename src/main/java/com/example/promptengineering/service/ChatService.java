@@ -1,6 +1,7 @@
 package com.example.promptengineering.service;
 
 import java.time.Duration;
+import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -59,7 +60,9 @@ public class ChatService {
                         })
                         .doBeforeRetry(signal -> System.out.println("Retrying request...")))
                 .onErrorResume(error -> {
-                    return Flux.just(error.getMessage() != null ? error.getMessage() : "Unknow error");
+                    String errorMessage = error.getMessage() != null ? error.getMessage() : "Unknown error";
+                    String jsonError = gson.toJson(Collections.singletonMap("error", errorMessage));
+                    return Flux.just(jsonError);
                 });
 
     }
