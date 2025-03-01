@@ -45,10 +45,7 @@
     <script src="/static/js/account.js"></script>
     <script src="/static/js/message.js"></script>
     <script src="/static/js/chatApi.js"></script>
-    <script src="/static/js/claudeApi.js"></script>
-    <script src="/static/js/chatGPTApi.js"></script>
     <script src="/static/js/navigation-view.js"></script>
-    <script src="/static/js/llamaApi.js"></script>
     <script src="/static/js/chat.js"></script>
 </body>
 
