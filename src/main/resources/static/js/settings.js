@@ -114,6 +114,7 @@ class Settings{
 
     initModels(){
         hidePages();
+        this.chatSettings = document.getElementById("chatSettings");
         this.chatSettings.classList.add("active");
         this.models.forEach(model => {
             modelOptions.innerHTML += `<option value="${model.name}">${model.text}</option>`;
