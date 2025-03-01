@@ -8,13 +8,71 @@ class Settings{
         this.provider = "OPENAI";
         this.url = "https://api.openai.com/v1/chat/completions";
         this.model = "gpt-4o-mini";
+
         this.key = "";
+        this.models = [
+            { name: "gpt-4o-mini", text: "gpt-4o-mini", provider: "OPENAI", url: "https://api.openai.com/v1/chat/completions" },
+            { name: "o3-mini", text: "o3-mini", provider: "OPENAI", url: "https://api.openai.com/v1/chat/completions" },
+
+            { name: "gpt-4o", text: "gpt-4o", provider: "OPENAI", url: "https://api.openai.com/v1/chat/completions" },
+            { name: "gpt-4-turbo", text: "gpt-4-turbo", provider: "OPENAI", url: "https://api.openai.com/v1/chat/completions" },
+            { name: "claude-3-haiku-20240307", text: "Claude Haiku 3", provider: "ANTHROPIC", url: "https://api.anthropic.com/v1/messages" },
+            { name: "claude-3-5-sonnet-20241022", text: "Claude Sonnet 3.5", provider: "ANTHROPIC", url: "https://api.anthropic.com/v1/messages" },
+            { name: "claude-3-opus-20240229", text: "Claude Opus 3", provider: "ANTHROPIC", url: "https://api.anthropic.com/v1/messages" },
+            {
+                name: "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+                text: "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+                provider: "DEEPINFRA",
+                url: "https://api.deepinfra.com/v1/openai/chat/completions"
+            },
+            {
+                name: "deepseek-ai/DeepSeek-V3",
+                text: "deepinfra/DeepSeek-V3",
+                provider: "DEEPINFRA",
+                url: "https://api.deepinfra.com/v1/openai/chat/completions"
+            },
+            {
+                name: "deepseek-ai/DeepSeek-R1",
+                text: "deepinfra/DeepSeek-R1",
+                provider: "DEEPINFRA",
+                url: "https://api.deepinfra.com/v1/openai/chat/completions"
+            },
+            {
+                name: "deepseek-chat",
+                text: "deepseek-v3",
+                provider: "DEEPSEEK",
+                url: "https://api.deepseek.com/chat/completions"
+            },
+            {
+                name: "deepseek-reasoner",
+                text: "deepseek-r1",
+                provider: "DEEPSEEK",
+                url: "https://api.deepseek.com/chat/completions"
+            },
+            {
+                name: "gemini-2.0-flash-thinking-exp-01-21",
+                text: "gemini-2.0-flash-thinking-exp-01-21",
+                provider: "GEMINI",
+                url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+            }
+        ];
+        this.keys = "";
 
         this.load();
+        this.initModels();
+        this.initUI();
     }
 
     save() {
-        const { key, ...settingsToSave } = this;
+        const settingsToSave = {
+            memory: this.memory,
+            cache: this.cache,
+            maxTokens: this.maxTokens,
+            temperature: this.temperature,
+            provider: this.provider,
+            url: this.url,
+            model: this.model
+        };
         localStorage.setItem("appSettings", JSON.stringify(settingsToSave));
     }
 
@@ -38,6 +96,7 @@ class Settings{
                 window.settings.maxTokens = parseInt(event.target.value);
                 break;
         }
+       
         this.save(); 
     }
 
@@ -53,7 +112,19 @@ class Settings{
         this.save(); 
     }
 
+    initModels(){
+        hidePages();
+        this.chatSettings.classList.add("active");
+        this.models.forEach(model => {
+            modelOptions.innerHTML += `<option value="${model.name}">${model.text}</option>`;
+        });
+    }
+
     initUI() {
+        this.models.forEach(model => {
+            modelOptions.innerHTML += `<option value="${model.name}">${model.text}</option>`;
+        });
+
         document.getElementById('memory').checked = this.memory;
         document.getElementById('cache').checked = this.cache;
         
@@ -62,10 +133,33 @@ class Settings{
         document.getElementById('temperature').value = this.temperature * 100;
         
         const modelSelect = document.getElementById('modelOptions');
-        modelSelect.innerHTML = window.chat.models
+        modelSelect.innerHTML = this.models
             .map(model => `<option value="${model.name}">${model.name}</option>`)
             .join('');
         modelSelect.value = this.model;
+    }
+
+    loadKeys() {
+        fetch('/account/keys', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch keys: ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(keys => {
+                this.keys = keys;
+                this.key = this.keys[this.provider];
+            })
+            .catch(error => {
+                console.error('Error loading keys:', error);
+            });
     }
 
 }
