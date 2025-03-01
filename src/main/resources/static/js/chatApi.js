@@ -56,7 +56,7 @@ class ChatApi {
     readJsonChunk(chunksString){
         const chunks = chunksString.split("\n");
         chunks.forEach(chunk => {
-            this.readChunk(chunk);
+            this.readChunkData(chunk);
         });
     }
 
