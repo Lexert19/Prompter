@@ -36,20 +36,13 @@ class ProjectController(
         val userId = oAuth2User.getAttribute<String>("sub")
             ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
         
-         val project = Project().apply {
+        val project = Project().apply {
             id = UUID.randomUUID().toString()
             this.userId = userId
             this.name = name
         }
     
-         val savedProject = projectRepository.save(project).awaitSingle()
-    //     val savedProject = projectRepository.save(
-    //         project.apply {
-    //             id = UUID.randomUUID().toString()
-    //             this.userId = userId
-    //             this.name = name
-    //         }
-    //     ).awaitSingle()
+        val savedProject = projectRepository.save(project).awaitSingle()
         return ResponseEntity.ok(savedProject)
     }
 

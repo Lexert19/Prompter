@@ -17,7 +17,7 @@ class Settings{
             { name: "gpt-4o", text: "gpt-4o", provider: "OPENAI", url: "https://api.openai.com/v1/chat/completions" },
             { name: "gpt-4-turbo", text: "gpt-4-turbo", provider: "OPENAI", url: "https://api.openai.com/v1/chat/completions" },
             { name: "claude-3-haiku-20240307", text: "Claude Haiku 3", provider: "ANTHROPIC", url: "https://api.anthropic.com/v1/messages" },
-            { name: "claude-3-5-sonnet-20241022", text: "Claude Sonnet 3.5", provider: "ANTHROPIC", url: "https://api.anthropic.com/v1/messages" },
+            { name: "claude-3-7-sonnet-20250219", text: "Claude Sonnet 3.7", provider: "ANTHROPIC", url: "https://api.anthropic.com/v1/messages" },
             { name: "claude-3-opus-20240229", text: "Claude Opus 3", provider: "ANTHROPIC", url: "https://api.anthropic.com/v1/messages" },
             {
                 name: "meta-llama/Llama-3.3-70B-Instruct-Turbo",

@@ -71,8 +71,15 @@ class ChatApi {
                 return;
             }
 
-            let content = rootNode.choices[0].delta.content;
-            content = this.deepseekParseContent(content, rootNode);
+            let content = "";
+            if(this.getProvider() == "ANTHROPIC"){
+                content = rootNode.delta.text;
+            }else if(this.getProvider() == "DEEPSEEK"){
+                content = this.deepseekParseContent(rootNode);
+            }else{
+                content = rootNode.choices[0].delta.content;
+            }
+
             if(!content)
                 return;
 
@@ -86,9 +93,8 @@ class ChatApi {
         }
     }
 
-    deepseekParseContent(content, rootNode){
-        if(this.getProvider() != "DEEPSEEK")
-            return content;
+    deepseekParseContent(rootNode){
+        let content = rootNode.choices[0].delta.content;
 
         if(content == null){
           
