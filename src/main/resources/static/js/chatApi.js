@@ -81,7 +81,6 @@ class ChatApi {
            
         }catch(error){
             console.debug(chunk);
-            console.debug(error);
         }
     }
 
