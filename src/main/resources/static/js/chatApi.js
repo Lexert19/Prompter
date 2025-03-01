@@ -56,29 +56,33 @@ class ChatApi {
     readJsonChunk(chunksString){
         const chunks = chunksString.split("\n");
         chunks.forEach(chunk => {
-            try{
-                if(chunk.trim()){
-                    const rootNode = JSON.parse(chunk);
-                    let error = rootNode.error;
-                    if(error){
-                        this.outputInput.textContent += error;
-                    }
-                    let content = rootNode.choices[0].delta.content;
-    
-                    content = this.deepseekParseContent(content, rootNode);
-        
-                    this.parser.parse(content);
-                    this.outputInput.textContent += content;
-                    this.parser.toHTML();
-                    this.currentMessage.appendText(content);
-                }
-               
-            }catch(error){
-                console.debug(chunk);
-                console.debug(error);
-                //this.outputInput.textContent += chunksString;
-            }
+            this.readChunk(chunk);
         });
+    }
+
+    readChunkData(chunk){
+        try{
+            if(!chunk.trim)
+                return;
+            const rootNode = JSON.parse(chunk);
+            let error = rootNode.error;
+            if(error){
+                this.outputInput.textContent += error;
+                return;
+            }
+
+            let content = rootNode.choices[0].delta.content;
+            content = this.deepseekParseContent(content, rootNode);
+
+            this.parser.parse(content);
+            this.outputInput.textContent += content;
+            this.parser.toHTML();
+            this.currentMessage.appendText(content);
+           
+        }catch(error){
+            console.debug(chunk);
+            console.debug(error);
+        }
     }
 
     deepseekParseContent(content, rootNode){
