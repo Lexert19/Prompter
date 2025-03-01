@@ -8,7 +8,6 @@ class Chat {
         this.message = document.getElementById("input");
         this.chatMessages = document.getElementById("chatMessages");
         this.chatOptions = document.getElementById("chatOptions");
-        this.chatSettings = document.getElementById("chatSettings");
         this.chatHistory = document.getElementById("chatHistory");
         this.modelOptions = document.getElementById("modelOptions");
         this.history = document.getElementById("history");
@@ -220,4 +219,3 @@ class Chat {
 }
 
 window.chat = new Chat();
-window.chat.init();
