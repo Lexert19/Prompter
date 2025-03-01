@@ -38,10 +38,10 @@
         </div>
     </div>
     <#include "/parts/editMessage.ftl" />
+    <script src="/static/js/main.js"></script>
     <script src="/static/js/settings.js"></script>
     <script src="/static/js/htmlParser.js"></script>
     <script src="/static/js/editMessageView.js"></script>
-    <script src="/static/js/main.js"></script>
     <script src="/static/js/account.js"></script>
     <script src="/static/js/message.js"></script>
     <script src="/static/js/chatApi.js"></script>
