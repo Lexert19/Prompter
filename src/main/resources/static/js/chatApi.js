@@ -73,6 +73,8 @@ class ChatApi {
 
             let content = rootNode.choices[0].delta.content;
             content = this.deepseekParseContent(content, rootNode);
+            if(!content)
+                return;
 
             this.parser.parse(content);
             this.outputInput.textContent += content;
