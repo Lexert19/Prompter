@@ -101,13 +101,13 @@ class Settings{
     }
 
     changeModel(event) {
-        const selectedModel = window.chat.models.find(model => model.name === event.target.value);
+        const selectedModel = window.settings.models.find(model => model.name === event.target.value);
         if (selectedModel) {
             window.settings.model = selectedModel.name;
             window.settings.provider = selectedModel.provider;
             window.settings.url = selectedModel.url;
 
-            window.settings.key = window.chat.keys[selectedModel.provider];
+            window.settings.key = window.settings.keys[selectedModel.provider];
         }
         this.save(); 
     }

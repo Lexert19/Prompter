@@ -19,8 +19,8 @@ class Chat {
        
         this.addPasteListener();
         this.loadHistory();
-        this.loadKeys();
-        this.initSettings();
+        //this.loadKeys();
+        //this.initSettings();
     }
 
     // init(){    
