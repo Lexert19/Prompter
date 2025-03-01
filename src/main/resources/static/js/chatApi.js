@@ -59,6 +59,10 @@ class ChatApi {
             try{
                 if(chunk.trim()){
                     const rootNode = JSON.parse(chunk);
+                    let error = rootNode.error;
+                    if(error){
+                        this.outputInput.textContent += error;
+                    }
                     let content = rootNode.choices[0].delta.content;
     
                     content = this.deepseekParseContent(content, rootNode);
