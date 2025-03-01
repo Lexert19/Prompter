@@ -59,6 +59,7 @@ class Settings{
         this.keys = "";
 
         this.load();
+        this.loadKeys();
         this.initModels();
         this.initUI();
     }
