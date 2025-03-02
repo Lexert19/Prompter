@@ -8,51 +8,58 @@ class Settings{
         this.provider = "OPENAI";
         this.url = "https://api.openai.com/v1/chat/completions";
         this.model = "gpt-4o-mini";
+        this.type = "";
 
         this.key = "";
         this.models = [
-            { name: "gpt-4o-mini", text: "gpt-4o-mini", provider: "OPENAI", url: "https://api.openai.com/v1/chat/completions" },
-            { name: "o3-mini", text: "o3-mini", provider: "OPENAI", url: "https://api.openai.com/v1/chat/completions" },
+            { name: "gpt-4o-mini", text: "gpt-4o-mini", provider: "OPENAI", url: "https://api.openai.com/v1/chat/completions", type: "vision" },
+            { name: "o3-mini", text: "o3-mini", provider: "OPENAI", url: "https://api.openai.com/v1/chat/completions", type: "vision" },
 
-            { name: "gpt-4o", text: "gpt-4o", provider: "OPENAI", url: "https://api.openai.com/v1/chat/completions" },
-            { name: "gpt-4-turbo", text: "gpt-4-turbo", provider: "OPENAI", url: "https://api.openai.com/v1/chat/completions" },
-            { name: "claude-3-haiku-20240307", text: "Claude Haiku 3", provider: "ANTHROPIC", url: "https://api.anthropic.com/v1/messages" },
-            { name: "claude-3-7-sonnet-20250219", text: "Claude Sonnet 3.7", provider: "ANTHROPIC", url: "https://api.anthropic.com/v1/messages" },
-            { name: "claude-3-opus-20240229", text: "Claude Opus 3", provider: "ANTHROPIC", url: "https://api.anthropic.com/v1/messages" },
+            { name: "gpt-4o", text: "gpt-4o", provider: "OPENAI", url: "https://api.openai.com/v1/chat/completions", type: "vision" },
+            { name: "gpt-4-turbo", text: "gpt-4-turbo", provider: "OPENAI", url: "https://api.openai.com/v1/chat/completions", type: "vision" },
+            { name: "claude-3-haiku-20240307", text: "Claude Haiku 3", provider: "ANTHROPIC", url: "https://api.anthropic.com/v1/messages", type: "vision" },
+            { name: "claude-3-7-sonnet-20250219", text: "Claude Sonnet 3.7", provider: "ANTHROPIC", url: "https://api.anthropic.com/v1/messages", type: "vision" },
+            { name: "claude-3-opus-20240229", text: "Claude Opus 3", provider: "ANTHROPIC", url: "https://api.anthropic.com/v1/messages", type: "vision" },
             {
                 name: "meta-llama/Llama-3.3-70B-Instruct-Turbo",
                 text: "meta-llama/Llama-3.3-70B-Instruct-Turbo",
                 provider: "DEEPINFRA",
+                type: "text",
                 url: "https://api.deepinfra.com/v1/openai/chat/completions"
             },
             {
                 name: "deepseek-ai/DeepSeek-V3",
                 text: "deepinfra/DeepSeek-V3",
                 provider: "DEEPINFRA",
+                type: "text",
                 url: "https://api.deepinfra.com/v1/openai/chat/completions"
             },
             {
                 name: "deepseek-ai/DeepSeek-R1",
                 text: "deepinfra/DeepSeek-R1",
                 provider: "DEEPINFRA",
+                type: "text",
                 url: "https://api.deepinfra.com/v1/openai/chat/completions"
             },
             {
                 name: "deepseek-chat",
                 text: "deepseek-v3",
                 provider: "DEEPSEEK",
+                type: "text",
                 url: "https://api.deepseek.com/chat/completions"
             },
             {
                 name: "deepseek-reasoner",
                 text: "deepseek-r1",
                 provider: "DEEPSEEK",
+                type: "text",
                 url: "https://api.deepseek.com/chat/completions"
             },
             {
                 name: "gemini-2.0-flash-thinking-exp-01-21",
                 text: "gemini-2.0-flash-thinking-exp-01-21",
                 provider: "GEMINI",
+                type: "text",
                 url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
             }
         ];

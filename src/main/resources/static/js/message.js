@@ -100,6 +100,11 @@ class RequestBuilder {
         this.messages = [];
         this.stream = true;
         this.id = Math.random().toString(36);
+        this.type = "";
+    }
+
+    getType(){
+        return window.settings.type;
     }
 
     getProvider(){
@@ -147,6 +152,7 @@ class RequestBuilder {
             maxTokens: this.getMaxTokens(),
             temperature: this.getTemperature(),
             stream: this.stream,
+            this: this.getType(),
             key: this.getKey()
         });
     }
