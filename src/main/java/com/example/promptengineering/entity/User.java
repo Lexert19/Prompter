@@ -14,9 +14,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import com.example.promptengineering.converter.HashMapToJsonConverter;
-
-import jakarta.persistence.Convert;
 import lombok.Data;
 
 @Table("user")

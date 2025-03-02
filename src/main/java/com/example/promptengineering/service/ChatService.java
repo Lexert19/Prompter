@@ -2,7 +2,6 @@ package com.example.promptengineering.service;
 
 import java.time.Duration;
 import java.util.Collections;
-import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;

@@ -1,6 +1,5 @@
 package com.example.promptengineering.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -16,13 +15,6 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 @Configuration
 @EnableWebFluxSecurity
 public class OAuth2Config {
-
-        // @Value("${spring.security.oauth2.client.registration.google.client-id}")
-        // private String clientId;
-
-        // @Value("${spring.security.oauth2.client.registration.google.client-secret}")
-        // private String clientSecret;
-
         @Bean
         public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
                 http.csrf(csrf -> csrf.disable());
