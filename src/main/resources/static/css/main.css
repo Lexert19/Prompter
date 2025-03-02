@@ -145,6 +145,7 @@ textarea {
     margin-right: 10px;
     outline: none;
     resize: none;
+    height: 51px;
 }
 
 .pages{
@@ -208,7 +209,7 @@ select {
 
 .send-button{
     border-radius: 5px !important;
-    width: 48px;
+    width: 51px;
     height: 51px;
 }
 
