@@ -114,6 +114,7 @@ class Settings{
             window.settings.model = selectedModel.name;
             window.settings.provider = selectedModel.provider;
             window.settings.url = selectedModel.url;
+            window.settings.type = selectedModel.type;
 
             window.settings.key = window.settings.keys[selectedModel.provider];
         }
