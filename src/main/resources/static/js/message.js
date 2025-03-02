@@ -152,7 +152,7 @@ class RequestBuilder {
             maxTokens: this.getMaxTokens(),
             temperature: this.getTemperature(),
             stream: this.stream,
-            this: this.getType(),
+            type: this.getType(),
             key: this.getKey()
         });
     }
