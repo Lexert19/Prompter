@@ -114,9 +114,6 @@ button {
     padding: 10px 15px;
     border: none;
     background-color: rgba(99, 102, 241, 0.9);
-
-    /* background-color: rgba(99, 102, 241, 0.5); */
-    /* background-color: #6366f1; */
     color: white;
     border-radius: 5px;
     cursor: pointer;
@@ -125,8 +122,6 @@ button {
 
 button:hover{
     background-color: rgba(99, 102, 241, 0.7);
-
-    /* background-color: #4338ca; */
 }
 
 input {
@@ -163,14 +158,6 @@ select {
 #history button:hover {
     background-color: rgba(0, 0, 0, 0.1);
 }
-
-/* #accountToggle {
-    position: fixed;
-    margin-top: 5px;
-    top: 0;
-    right: 0;
-    z-index: 1001;
-} */
 
 .image{
     max-width: 100%;
@@ -273,7 +260,6 @@ p {
     background-color: #374151;
     padding: 5px;
     border-radius: 3px;
-    /* border: 1px solid #4f46e5; */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     z-index: 10;
 }
