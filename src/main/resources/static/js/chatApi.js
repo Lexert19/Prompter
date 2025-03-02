@@ -33,7 +33,7 @@ class ChatApi {
         })
             .then(this.handleStream.bind(this))
             .catch(error => {
-                console.error('Error fetching data:', error);
+                this.outputInput.textContent += 'Error fetching data:', error;
             });
     }
 
