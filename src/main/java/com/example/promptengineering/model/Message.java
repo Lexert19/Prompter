@@ -33,7 +33,7 @@ public class Message {
     }
 
     public Map<String, Object> toMap(String provider, String type) {
-        switch (provider.toLowerCase()) {
+        switch (type.toLowerCase()) {
             case "text" -> {
                 StringBuilder contentText = new StringBuilder();
                 for (Content item : content) {
