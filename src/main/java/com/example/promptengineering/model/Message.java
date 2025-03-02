@@ -34,7 +34,7 @@ public class Message {
 
     public Map<String, Object> toMap(String provider) {
         switch (provider.toLowerCase()) {
-            case "nvidia" -> {
+            case "deepseek" -> {
                 StringBuilder contentText = new StringBuilder();
                 for (Content item : content) {
                     contentText.append(item.getText());
