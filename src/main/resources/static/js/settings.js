@@ -79,7 +79,8 @@ class Settings{
             temperature: this.temperature,
             provider: this.provider,
             url: this.url,
-            model: this.model
+            model: this.model,
+            type: this.type
         };
         localStorage.setItem("appSettings", JSON.stringify(settingsToSave));
     }
