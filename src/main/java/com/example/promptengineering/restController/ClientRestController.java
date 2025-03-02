@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.promptengineering.entity.User;
-import com.example.promptengineering.model.ChatGPTSettings;
 import com.example.promptengineering.model.RequestBuilder;
 import com.example.promptengineering.repository.RequestHistoryRepository;
 import com.example.promptengineering.service.ChatService;
