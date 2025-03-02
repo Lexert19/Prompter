@@ -16,7 +16,7 @@ public class RequestBuilder {
     private String provider;
     private String url;
     private String sessionId;
-    private String type;
+    private String type = "";
 
     public RequestBuilder model(String model) {
         this.model = model;
