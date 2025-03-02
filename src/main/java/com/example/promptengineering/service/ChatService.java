@@ -40,18 +40,16 @@ public class ChatService {
 
     }
 
-    private Consumer<HttpHeaders> configureHeaders(HttpHeaders httpHeaders, RequestBuilder request) {
-        return headers -> {
-            if (request.getProvider().equals("ANTHROPIC")) {
-                headers.set("x-api-key", request.getKey());
-                headers.set("Content-Type", "application/json");
-                headers.set("anthropic-version", "2023-06-01");
-                headers.set("anthropic-beta", "prompt-caching-2024-07-31");
-            } else {
-                headers.set("Authorization", "Bearer " + request.getKey());
-                headers.set("Content-Type", "application/json");
-            }
-        };
+    private void configureHeaders(HttpHeaders headers, RequestBuilder request) {
+        if (request.getProvider().equals("ANTHROPIC")) {
+            headers.set("x-api-key", request.getKey());
+            headers.set("Content-Type", "application/json");
+            headers.set("anthropic-version", "2023-06-01");
+            headers.set("anthropic-beta", "prompt-caching-2024-07-31");
+        } else {
+            headers.set("Authorization", "Bearer " + request.getKey());
+            headers.set("Content-Type", "application/json");
+        }
     }
 
     private Retry configureRetry() {
