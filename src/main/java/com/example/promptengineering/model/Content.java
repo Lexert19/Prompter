@@ -51,8 +51,7 @@ public class Content {
                 map.put("cache_control", new CacheControl().toMap());
             }
             return map;
-        } 
-        if (provider.equals("OPENAI")) {
+        } else{
             return Map.of(
                 "type", "image_url",
                 "image_url", Map.of(
@@ -62,7 +61,7 @@ public class Content {
         }
         
        
-        throw new UnsupportedOperationException("Base64 images not supported for " + provider);
+        //throw new UnsupportedOperationException("Base64 images not supported for " + provider);
     }
     public String getType() {
         return type;

@@ -32,9 +32,9 @@ public class Message {
         this.content = content;
     }
 
-    public Map<String, Object> toMap(String provider) {
+    public Map<String, Object> toMap(String provider, String type) {
         switch (provider.toLowerCase()) {
-            case "deepseek" -> {
+            case "text" -> {
                 StringBuilder contentText = new StringBuilder();
                 for (Content item : content) {
                     contentText.append(item.getText());

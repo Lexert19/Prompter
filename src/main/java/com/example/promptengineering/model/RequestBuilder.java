@@ -16,6 +16,7 @@ public class RequestBuilder {
     private String provider;
     private String url;
     private String sessionId;
+    private String type;
 
     public RequestBuilder model(String model) {
         this.model = model;
@@ -49,7 +50,7 @@ public class RequestBuilder {
             default -> {
                 List<Map<String, Object>> messagesListDefault = new ArrayList<>();
                 for (Message message : messages) {
-                    messagesListDefault.add(message.toMap(provider));
+                    messagesListDefault.add(message.toMap(provider, type));
                 }
                 request.put("messages", messagesListDefault);
                 request.put("model", model);
@@ -142,4 +143,13 @@ public class RequestBuilder {
         this.provider = provider;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    
 }
