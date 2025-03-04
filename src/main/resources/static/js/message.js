@@ -7,6 +7,7 @@ class Message {
         this.cache = false;
         this.documents = [];
         this.text = "";
+        this.time = Date.now();
 
         this.setText(text, documents);
         images.forEach(img => {

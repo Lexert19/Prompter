@@ -101,6 +101,10 @@ class Chat {
         
         var receivedMessage = `
         <div id="${message.id}" class="message ${message.role}">
+            <div class="assitant-data">
+                <div class="date"></div>
+                <div class="duration" id="duration-${message.id}"></div>
+            </div>
             ${message.getHtmlImages()}
             ${message.getHtmlFiles()}
             <div id="input-${message.id}" class="code-wrap">${this.escapeHtml(message.getText())}</div>

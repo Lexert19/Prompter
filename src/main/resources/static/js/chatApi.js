@@ -87,9 +87,22 @@ class ChatApi {
             this.outputInput.textContent += content;
             this.parser.toHTML();
             this.currentMessage.appendText(content);
+            this.setDuration();
            
         }catch(error){
             console.debug(chunk);
+        }
+    }
+
+    setDuration(){
+        const durationElement = document.getElementById(`duration-${this.currentMessage.id}`);
+        if(durationElement){
+            const currentTime = Date.now();
+            const elapsedTimeMs = currentTime - this.currentMessage.time;
+
+            const elapsedTimeSec = (elapsedTimeMs / 1000).toFixed(1); 
+
+            durationElement.textContent = `${elapsedTimeSec}s`; 
         }
     }
 

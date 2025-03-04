@@ -280,6 +280,10 @@ p {
     margin-bottom: 1rem;
 }
 
+.assistant-data{
+    display: flex;
+}
+
 
 /* input range */
 input[type="range"] {
