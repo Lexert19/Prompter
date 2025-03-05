@@ -22,7 +22,7 @@ public class ClientRestController {
     @Autowired
     private ChatService chatService;
     @Autowired
-    private final Gson gson;
+    private Gson gson;
 
     @PostMapping("/chat")
     public Flux<String> makeRequest(
