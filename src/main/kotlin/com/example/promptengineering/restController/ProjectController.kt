@@ -33,7 +33,7 @@ class ProjectController(
         @AuthenticationPrincipal oAuth2User: OAuth2User,
         @RequestBody name: String
     ): ResponseEntity<Project> {
-        val userId = oAuth2User.getAttribute<String>("sub")
+        val userId = oAuth2User.getAttribute<Long>("sub")
             ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
         val user = userRepository.findById(userId).awaitSingle()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony") 
@@ -51,7 +51,7 @@ class ProjectController(
         @AuthenticationPrincipal oAuth2User: OAuth2User,
         @PathVariable projectId: String
     ): Project {
-        val userId = oAuth2User.getAttribute<String>("sub")
+        val userId = oAuth2User.getAttribute<Long>("sub")
             ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
         
         val user = userRepository.findById(userId).awaitSingle()
@@ -69,7 +69,7 @@ class ProjectController(
         @PathVariable projectId: String,
         @RequestBody file: FileElement
     ): Project {
-        val userId = oAuth2User.getAttribute<String>("sub")
+        val userId = oAuth2User.getAttribute<Long>("sub")
             ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
         
         val user = userRepository.findById(userId).awaitSingle()
@@ -87,7 +87,7 @@ class ProjectController(
         @AuthenticationPrincipal oAuth2User: OAuth2User,
         @PathVariable projectId: String
     ): Project {
-        val userId = oAuth2User.getAttribute<String>("sub")
+        val userId = oAuth2User.getAttribute<Long>("sub")
             ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
         
 
