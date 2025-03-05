@@ -17,9 +17,6 @@ public class UserService {
     private UserRepository userRepository;
 
     public Mono<User> saveKeyToMap(User user, String keyName, String keyValue) {
-        if (user.getKeys() == null) {
-            user.setKeys(new HashMap<>());
-        }
         user.getKeys().put(keyName, keyValue);
         return userRepository.save(user);
     }

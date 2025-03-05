@@ -30,6 +30,7 @@ public class AccountController {
             @RequestBody String keyValue) {
 
         User user = (User) oAuth2User;
+        
 
         return userService.saveKeyToMap(user, keyName, keyValue)
                 .map(userSaved -> String.format("Key '%s' saved to map", keyName));
