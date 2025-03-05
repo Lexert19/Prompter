@@ -26,7 +26,6 @@ repositories {
 }
 
 dependencies {
-	//implementation 'org.springframework.boot:spring-boot-starter-data-cassandra-reactive'
 	
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -48,13 +47,11 @@ dependencies {
 	implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: '3.2.0'
 
 	implementation 'org.jetbrains.kotlin:kotlin-reflect'
-	//implementation "org.jetbrains.kotlinx:kotlinx-coroutines-reactor"
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.7.1"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core"
     implementation "io.projectreactor:reactor-core"
 
 	implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
-	//runtimeOnly 'io.r2dbc:r2dbc-postgresql'
 	implementation group: 'org.postgresql', name: 'r2dbc-postgresql', version: '1.0.7.RELEASE'
 	runtimeOnly 'org.postgresql:postgresql'
 	implementation 'org.flywaydb:flyway-core'

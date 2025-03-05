@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.promptengineering.entity.User;
 import com.example.promptengineering.model.RequestBuilder;
 import com.example.promptengineering.service.ChatService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -23,8 +22,7 @@ public class ClientRestController {
     @Autowired
     private ChatService chatService;
     @Autowired
-    //private RequestHistoryRepository requestHistoryRepository;
-    private final Gson gson = new Gson();
+    private final Gson gson;
 
     @PostMapping("/chat")
     public Flux<String> makeRequest(
