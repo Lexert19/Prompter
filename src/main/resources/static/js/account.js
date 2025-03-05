@@ -27,6 +27,7 @@ function saveKey() {
         })
         .then(data => {
             console.log(data);
+            window.settings.loadKeys();
             alert(data);
         })
         .catch(error => {
