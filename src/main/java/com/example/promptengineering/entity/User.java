@@ -79,6 +79,8 @@ public class User implements OAuth2User {
     }
 
     public HashMap<String, String> getKeys() {
+        if(keys == null)
+            return new HashMap<>();
         return keys;
     }
 
