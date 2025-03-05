@@ -8,7 +8,7 @@ import com.example.promptengineering.entity.User;
 import reactor.core.publisher.Mono;
 
 @Repository
-public interface UserRepository extends ReactiveCrudRepository<User, String>{
+public interface UserRepository extends ReactiveCrudRepository<User, Long>{
     Mono<User> findByEmail(String email);
 
 }

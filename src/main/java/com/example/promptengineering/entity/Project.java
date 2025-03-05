@@ -2,7 +2,6 @@ package com.example.promptengineering.entity;
 
 import java.util.List;
 
-import org.springframework.data.cassandra.core.mapping.Table;
 
 import com.example.promptengineering.model.Embedding;
 import com.example.promptengineering.model.FileElement;
@@ -14,8 +13,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
-@Table("project")
+@Table(name = "project")
 @Entity
 public class Project {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
