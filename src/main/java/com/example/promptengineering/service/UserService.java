@@ -25,4 +25,8 @@ public class UserService {
         return Mono.just(user.getKeys());
     }
 
+    public Mono<User> findUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
 }

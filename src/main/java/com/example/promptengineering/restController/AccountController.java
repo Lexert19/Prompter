@@ -23,17 +23,23 @@ public class AccountController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/save-key/{keyName}") 
+    @PostMapping("/save-key/{keyName}")
     public Mono<String> saveKeyToMap(
             @AuthenticationPrincipal OAuth2User oAuth2User,
             @PathVariable String keyName,
             @RequestBody String keyValue) {
 
-        User user = (User) oAuth2User;
-        
+        String userEmail = oAuth2User.getAttribute("email"); 
+        if (userEmail == null) {
+            return Mono.error(new IllegalArgumentException("Email not found in OAuth2User attributes"));
+        }
 
-        return userService.saveKeyToMap(user, keyName, keyValue)
-                .map(userSaved -> String.format("Key '%s' saved to map", keyName));
+        return userService.findUserByEmail(userEmail) 
+                .switchIfEmpty(Mono.error(new RuntimeException("User not found for email: " + userEmail))) 
+                .flatMap(existingUser -> userService.saveKeyToMap(existingUser, keyName, keyValue))
+                .map(userSaved -> String.format("Key '%s' saved to map for user with email: %s", keyName, userEmail));
+    }
+
     }
 
     @GetMapping("/keys")
