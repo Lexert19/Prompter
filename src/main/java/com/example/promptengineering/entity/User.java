@@ -35,25 +35,25 @@ public class User implements OAuth2User {
     private String password;
 
     @Column(name = "keys", columnDefinition = "jsonb")
-    private String keysJson;
+    private String keys;
 
     @Transient
-    private HashMap<String, String> keys = new HashMap<>();
+    private HashMap<String, String> keysMap = new HashMap<>();
 
     @PrePersist
     @PreUpdate
     public void beforeSave() throws JsonProcessingException {
-        if (keys != null) {
+        if (keysMap != null) {
             ObjectMapper objectMapper = new ObjectMapper();
-            this.keysJson = objectMapper.writeValueAsString(keys);
+            this.keys = objectMapper.writeValueAsString(keysMap);
         }
     }
 
     @PostLoad
     public void afterLoad() throws IOException {
-        if (keysJson != null && !keysJson.isEmpty()) {
+        if (keys != null && !keys.isEmpty()) {
             ObjectMapper objectMapper = new ObjectMapper();
-            this.keys = objectMapper.readValue(keysJson,
+            this.keysMap = objectMapper.readValue(keys,
                     new TypeReference<HashMap<String, String>>() {
                     });
         }
@@ -101,12 +101,12 @@ public class User implements OAuth2User {
         this.password = password;
     }
 
-    public HashMap<String, String> getKeys() {
-        return keys;
+    public HashMap<String, String> getKeysMap() {
+        return keysMap;
     }
 
-    public void setKeys(HashMap<String, String> keys) {
-        this.keys = keys;
+    public void setKeysMap(HashMap<String, String> keys) {
+        this.keysMap = keys;
     }
 
 }
