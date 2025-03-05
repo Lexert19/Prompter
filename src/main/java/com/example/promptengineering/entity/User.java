@@ -108,6 +108,14 @@ public class User implements OAuth2User {
         return id;
     }
 
+    public HashMap<String, String> getKeysMap() {
+        return keysMap;
+    }
+
+    public void setKeysMap(HashMap<String, String> keysMap) {
+        this.keysMap = keysMap;
+    }
+
    
 
 
