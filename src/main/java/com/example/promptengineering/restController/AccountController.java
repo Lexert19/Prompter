@@ -22,6 +22,8 @@ import reactor.core.publisher.Mono;
 public class AccountController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private UserRepository userRepository;
 
     @PostMapping("/save-key/{keyName}")
     public Mono<String> saveKeyToMap(
@@ -44,7 +46,13 @@ public class AccountController {
     @GetMapping("/keys")
     public Mono<Map<String, String>> getAllKeys(
             @AuthenticationPrincipal OAuth2User oAuth2User) {
-        User user = (User) oAuth2User;
-        return userService.getKeys(user);
+                String userEmail = oAuth2User.getAttribute("email");
+                if (userEmail == null) {
+                    return Mono.error(new IllegalArgumentException("Email not found in OAuth2User attributes"));
+                }
+        
+                return userRepository.findByEmail(userEmail) 
+                        .switchIfEmpty(Mono.error(new RuntimeException("User not found in repository for email: " + userEmail)))
+                        .flatMap(user -> userService.getKeys(user));
     }
 }
