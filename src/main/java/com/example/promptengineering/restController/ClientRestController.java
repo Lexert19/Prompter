@@ -24,7 +24,7 @@ public class ClientRestController {
     @Autowired
     private ChatService chatService;
     @Autowired
-    private RequestHistoryRepository requestHistoryRepository;
+    //private RequestHistoryRepository requestHistoryRepository;
     private final Gson gson = new Gson();
 
     @PostMapping("/chat")
@@ -36,7 +36,7 @@ public class ClientRestController {
             java.lang.reflect.Type requestType = new TypeToken<RequestBuilder>(){}.getType();
             RequestBuilder request = gson.fromJson(body, requestType);
             //User user = (User) oAuth2User;
-            requestHistoryRepository.save(request);
+            //requestHistoryRepository.save(request);
 
             return chatService.makeRequest(request);
         } catch (JsonProcessingException e) {
