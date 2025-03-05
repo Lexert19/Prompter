@@ -32,7 +32,7 @@ public class User implements OAuth2User {
 
     @Column(name = "keys", columnDefinition = "jsonb")
     @Convert(converter = HashMapConverter.class)
-    private HashMap<String, String> keys;
+    private HashMap<String, String> keys = new HashMap<>();
 
     public User(String email, String password) {
         this.email = email;
@@ -77,8 +77,6 @@ public class User implements OAuth2User {
     }
 
     public HashMap<String, String> getKeys() {
-        if(keys == null)
-            return new HashMap<>();
         return keys;
     }
 
