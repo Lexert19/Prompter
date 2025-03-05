@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -55,11 +56,6 @@ public class User implements OAuth2User, Persistable<Long> {
         return this.email;
     }
 
-    @Override
-    public Long getId() {
-        return id;
-    }
-
     public void setId(Long id) {
         this.id = id;
     }
@@ -95,7 +91,13 @@ public class User implements OAuth2User, Persistable<Long> {
         return this.id == null;
     }
 
-    
+    @Override
+    @Nullable
+    public Long getId() {
+        return this.id;
+    }
 
+    
+    
 
 }
