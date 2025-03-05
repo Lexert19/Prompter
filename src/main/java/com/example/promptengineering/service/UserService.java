@@ -16,12 +16,12 @@ public class UserService {
     private UserRepository userRepository;
 
     public Mono<User> saveKeyToMap(User user, String keyName, String keyValue) {
-        user.getKeys().put(keyName, keyValue);
+        user.getKeysMap().put(keyName, keyValue);
         return userRepository.save(user);
     }
 
     public Mono<Map<String, String>> getKeys(User user) {
-        return Mono.just(user.getKeys());
+        return Mono.just(user.getKeysMap());
     }
 
     public Mono<User> findUserByEmail(String email) {
