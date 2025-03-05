@@ -8,13 +8,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.example.promptengineering.entity.Project;
@@ -30,7 +26,7 @@ public class EmbeddingService {
     private WebClient webClient;
 
     public void createProjectEmbedding(Project project, User user) {
-        String apiKey = user.getChatgptKey();
+        String apiKey = user.getKeys().getOrDefault("OPENAI", "");
         List<FileElement> files = project.getFiles();
         
         if (files == null || files.isEmpty()) {
@@ -55,13 +51,14 @@ public class EmbeddingService {
         requestBody.put("input", text);
         requestBody.put("model", "text-embedding-ada-002");
 
+        ParameterizedTypeReference<Map<String, Object>> typeRef = new ParameterizedTypeReference<>() {};
         Map<String, Object> responseBody = webClient.post()
             .uri(EMBEDDINGS_URL)
             .header("Authorization", "Bearer " + apiKey)
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(requestBody)
             .retrieve()
-            .bodyToMono(Map.class)
+            .bodyToMono(typeRef)
             .block();
 
         if (responseBody != null && responseBody.containsKey("data")) {
@@ -74,7 +71,7 @@ public class EmbeddingService {
     }
 
     public List<String> retrieveSimilarFragments(String query, Project project, User user) {
-        String apiKey = user.getChatgptKey();
+        String apiKey = user.getKeys().getOrDefault("OPENAI", "");
         List<Double> queryVector = getEmbedding(query, apiKey);
         
         List<Embedding> projectEmbeddings = project.getEmbeddings();

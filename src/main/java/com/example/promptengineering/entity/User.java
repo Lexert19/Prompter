@@ -5,35 +5,33 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.cassandra.core.mapping.Column;
-import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 
 import org.springframework.data.cassandra.core.mapping.Table;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.Data;
 
+@Entity
 @Table("user")
 @Data
 public class User implements OAuth2User {
     @Id
-    @PrimaryKey
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
     private String email;
     private String password;
-    private String claudeKey;
-    private String chatgptKey;
-    private String nvidiaKey;
-    private String geminiKey;
 
-    @Column("keys_map")
+    @Column(name = "keys", columnDefinition = "jsonb")
     private HashMap<String, String> keys;
 
-    public User(String id, String email, String password) {
-        this.id = id;
+    public User(String email, String password) {
         this.email = email;
         this.password = password;
     }

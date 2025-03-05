@@ -52,6 +52,15 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core"
     implementation "io.projectreactor:reactor-core"
 
+	implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+	runtimeOnly 'io.r2dbc:r2dbc-postgresql'
+	runtimeOnly 'org.postgresql:postgresql'
+	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.springframework.session:spring-session-core'
+	implementation 'org.springframework.session:spring-session-reactor'
+	implementation 'org.springframework.session:spring-session-jdbc'
+
+
 }
 
 tasks.named('test') {

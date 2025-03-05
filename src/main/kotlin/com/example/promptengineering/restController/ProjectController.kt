@@ -35,10 +35,10 @@ class ProjectController(
     ): ResponseEntity<Project> {
         val userId = oAuth2User.getAttribute<String>("sub")
             ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
-        
+        val user = userRepository.findById(userId).awaitSingleOrNull()
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony") 
         val project = Project().apply {
-            id = UUID.randomUUID().toString()
-            this.userId = userId
+            this.user = user
             this.name = name
         }
     
@@ -54,7 +54,10 @@ class ProjectController(
         val userId = oAuth2User.getAttribute<String>("sub")
             ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
         
-        return projectRepository.findByIdAndUserId(projectId, userId)
+        val user = userRepository.findById(userId).awaitSingleOrNull()
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony") 
+
+        return projectRepository.findByIdAndUser(projectId, user)
             .awaitSingle()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nie znaleziony")
     }
@@ -69,7 +72,10 @@ class ProjectController(
         val userId = oAuth2User.getAttribute<String>("sub")
             ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
         
-        val project = projectRepository.findByIdAndUserId(projectId, userId)
+        val user = userRepository.findById(userId).awaitSingleOrNull()
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony") // Fetch User object
+
+        val project = projectRepository.findByIdAndUser(projectId, user)
             .awaitSingle()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nie znaleziony")
         
@@ -85,7 +91,11 @@ class ProjectController(
         val userId = oAuth2User.getAttribute<String>("sub")
             ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
         
-        val project = projectRepository.findByIdAndUserId(projectId, userId)
+
+        val user = userRepository.findById(userId).awaitSingleOrNull()
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony") 
+
+        val project = projectRepository.findByIdAndUser(projectId, user)
             .awaitSingle()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nie znaleziony")
         

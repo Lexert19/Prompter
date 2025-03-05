@@ -25,8 +25,8 @@ public class CustomOAuth2UserService implements ReactiveOAuth2UserService<OAuth2
         OAuth2User oAuth2User = delegate.loadUser(userRequest);
 
         String email = oAuth2User.getAttribute("email");
-        return userRepository.findById(email)
-            .switchIfEmpty(userRepository.save(new User(email, email, "")))
+        return userRepository.findByEmail(email)
+            .switchIfEmpty(userRepository.save(new User(email, "")))
             .map(user -> user);
 
     }
