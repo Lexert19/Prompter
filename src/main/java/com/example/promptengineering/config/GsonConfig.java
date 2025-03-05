@@ -3,7 +3,8 @@ package com.example.promptengineering.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.google.gson.Gson;
+import com.nimbusds.jose.shaded.gson.Gson;
+
 
 @Configuration
 public class GsonConfig {
