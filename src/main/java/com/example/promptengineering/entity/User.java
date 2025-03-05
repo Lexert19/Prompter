@@ -55,6 +55,7 @@ public class User implements OAuth2User, Persistable<Long> {
         return this.email;
     }
 
+    @Override
     public Long getId() {
         return id;
     }
@@ -95,5 +96,6 @@ public class User implements OAuth2User, Persistable<Long> {
     }
 
     
+
 
 }
