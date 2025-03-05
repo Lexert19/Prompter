@@ -29,7 +29,6 @@ public class User implements OAuth2User {
     private String password;
 
     @Column(name = "keys", columnDefinition = "jsonb")
-    @Convert(converter = HashMapConverter.class)
     private HashMap<String, String> keys = new HashMap<>();
 
     public User(String email, String password) {
