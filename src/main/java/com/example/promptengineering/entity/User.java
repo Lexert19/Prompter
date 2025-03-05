@@ -6,61 +6,22 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import dev.langchain4j.internal.Json;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 
-@Entity
-@Table(name = "users")
+@Document(collection = "users")
 public class User implements OAuth2User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
     private String email;
     private String password;
-
-    private Object keys;
-    
-    @Transient
-    private HashMap<String, String> keysMap = new HashMap<>();
-    
-    
-    public Object getKeys() {
-        if (keysMap != null && !keysMap.isEmpty()) {
-            try {
-                return new ObjectMapper().writeValueAsString(keysMap);
-            } catch (Exception e) {
-                return "{}";
-            }
-        }
-        return keys;
-    }
-    
-    public void setKeys(Object keys) {
-        this.keys = keys;
-        try {
-            if (keys != null) {
-                String jsonString = keys instanceof String ? 
-                    (String) keys : keys.toString();
-                this.keysMap = new ObjectMapper().readValue(jsonString,
-                        new TypeReference<HashMap<String, String>>() {});
-            }
-        } catch (Exception e) {
-            this.keysMap = new HashMap<>();
-        }
-    }
-
+    private HashMap<String, String> keys = new HashMap<>();
 
     public User(String email, String password) {
         this.email = email;
@@ -84,10 +45,6 @@ public class User implements OAuth2User {
         return this.email;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -104,19 +61,20 @@ public class User implements OAuth2User {
         this.password = password;
     }
 
-    public Long getId() {
+    public HashMap<String, String> getKeys() {
+        return keys;
+    }
+
+    public void setKeys(HashMap<String, String> keysMap) {
+        this.keys = keysMap;
+    }
+
+    public String getId() {
         return id;
     }
 
-    public HashMap<String, String> getKeysMap() {
-        return keysMap;
+    public void setId(String id) {
+        this.id = id;
     }
-
-    public void setKeysMap(HashMap<String, String> keysMap) {
-        this.keysMap = keysMap;
-    }
-
-   
-
 
 }

@@ -26,7 +26,7 @@ public class EmbeddingService {
     private WebClient webClient;
 
     public void createProjectEmbedding(Project project, User user) {
-        String apiKey = user.getKeysMap().getOrDefault("OPENAI", "");
+        String apiKey = user.getKeys().getOrDefault("OPENAI", "");
         List<FileElement> files = project.getFiles();
         
         if (files == null || files.isEmpty()) {
@@ -71,7 +71,7 @@ public class EmbeddingService {
     }
 
     public List<String> retrieveSimilarFragments(String query, Project project, User user) {
-        String apiKey = user.getKeysMap().getOrDefault("OPENAI", "");
+        String apiKey = user.getKeys().getOrDefault("OPENAI", "");
         List<Double> queryVector = getEmbedding(query, apiKey);
         
         List<Embedding> projectEmbeddings = project.getEmbeddings();

@@ -13,22 +13,17 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-
-@Table(name = "project")
-@Entity
+@Document(collection = "projects") 
 public class Project {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    private Long id;
+    private String id;
     private String name;
-    @ManyToOne 
-    @JoinColumn(name = "user_id")
+    @DBRef 
     private User user;
-    @Column(name = "files", columnDefinition = "jsonb")
     private List<FileElement> files;
-    @Column(name = "embeddings", columnDefinition = "jsonb")
     private List<Embedding> embeddings;
 
 
@@ -51,13 +46,7 @@ public class Project {
         this.files = files;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+  
 
     public User getUser() {
         return user;
@@ -65,6 +54,12 @@ public class Project {
 
     public void setUser(User user) {
         this.user = user;
+    }
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
     }
 
 
