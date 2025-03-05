@@ -38,7 +38,6 @@ public class AccountController {
                 .switchIfEmpty(Mono.error(new RuntimeException("User not found for email: " + userEmail))) 
                 .flatMap(existingUser -> userService.saveKeyToMap(existingUser, keyName, keyValue))
                 .map(userSaved -> String.format("Key '%s' saved to map for user with email: %s", keyName, userEmail));
-    }
 
     }
 
