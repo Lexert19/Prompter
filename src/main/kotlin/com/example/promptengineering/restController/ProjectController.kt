@@ -35,7 +35,7 @@ class ProjectController(
     ): ResponseEntity<Project> {
         val userId = oAuth2User.getAttribute<String>("sub")
             ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
-        val user = userRepository.findById(userId).awaitSingleOrNull()
+        val user = userRepository.findById(userId).awaitSingle()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony") 
         val project = Project().apply {
             this.user = user
@@ -54,7 +54,7 @@ class ProjectController(
         val userId = oAuth2User.getAttribute<String>("sub")
             ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
         
-        val user = userRepository.findById(userId).awaitSingleOrNull()
+        val user = userRepository.findById(userId).awaitSingle()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony") 
 
         return projectRepository.findByIdAndUser(projectId, user)
@@ -72,9 +72,8 @@ class ProjectController(
         val userId = oAuth2User.getAttribute<String>("sub")
             ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
         
-        val user = userRepository.findById(userId).awaitSingleOrNull()
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony") // Fetch User object
-
+        val user = userRepository.findById(userId).awaitSingle()
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony") 
         val project = projectRepository.findByIdAndUser(projectId, user)
             .awaitSingle()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nie znaleziony")
@@ -92,16 +91,12 @@ class ProjectController(
             ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
         
 
-        val user = userRepository.findById(userId).awaitSingleOrNull()
+        val user = userRepository.findById(userId).awaitSingle()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony") 
 
         val project = projectRepository.findByIdAndUser(projectId, user)
             .awaitSingle()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nie znaleziony")
-        
-        val user = userRepository.findById(userId)
-            .awaitSingle()
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony")
         
         embeddingService.createProjectEmbedding(project, user)
         return projectRepository.save(project).awaitSingle()
