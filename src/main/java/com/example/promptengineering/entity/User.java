@@ -23,7 +23,7 @@ import jakarta.persistence.GenerationType;
 
 @Entity
 @Table(name = "users")
-public class User implements OAuth2User, Persistable<Long> {
+public class User implements OAuth2User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -86,16 +86,16 @@ public class User implements OAuth2User, Persistable<Long> {
         this.keys = keys;
     }
 
-    @Override
-    public boolean isNew() {
-        return this.id == null;
-    }
+    // @Override
+    // public boolean isNew() {
+    //     return this.id == null;
+    // }
 
-    @Override
-    @Nullable
-    public Long getId() {
-        return this.id;
-    }
+    // @Override
+    // @Nullable
+    // public Long getId() {
+    //     return this.id;
+    // }
 
     
     
