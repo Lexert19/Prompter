@@ -57,7 +57,6 @@ dependencies {
 	runtimeOnly 'org.postgresql:postgresql'
 	implementation 'org.flywaydb:flyway-core'
 	implementation 'org.springframework.session:spring-session-core:3.2.0'
-	implementation 'org.springframework.session:spring-session-reactor:3.2.0'
 	implementation 'org.springframework.session:spring-session-jdbc:3.2.0'
 
 
