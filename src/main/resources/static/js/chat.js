@@ -47,32 +47,32 @@ class Chat {
     }
 
     loadHistory() {
-        fetch('/history/all', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(chatHistories => {
-                chatHistories = chatHistories.sort((a, b) => {
-                    const dateA = createDateFromComponents(a.createTime);
-                    const dateB = createDateFromComponents(b.createTime);
-                    return dateB - dateA;
-                })
-                chatHistories.forEach(historyIndex => {
-                    this.addHtmlHistoryIndex(historyIndex);
-                })
-            })
-            .catch(error => {
-                console.error('There was a problem with the fetch operation:', error);
-            });
+        // fetch('/history/all', {
+        //     method: 'GET',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        //     credentials: 'include',
+        // })
+        //     .then(response => {
+        //         if (!response.ok) {
+        //             throw new Error('Network response was not ok ' + response.statusText);
+        //         }
+        //         return response.json();
+        //     })
+        //     .then(chatHistories => {
+        //         chatHistories = chatHistories.sort((a, b) => {
+        //             const dateA = createDateFromComponents(a.createTime);
+        //             const dateB = createDateFromComponents(b.createTime);
+        //             return dateB - dateA;
+        //         })
+        //         chatHistories.forEach(historyIndex => {
+        //             this.addHtmlHistoryIndex(historyIndex);
+        //         })
+        //     })
+        //     .catch(error => {
+        //         console.error('There was a problem with the fetch operation:', error);
+        //     });
     }
 
     addHtmlHistoryIndex(historyIndex) {
