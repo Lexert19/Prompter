@@ -11,6 +11,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,6 +27,7 @@ public class User implements OAuth2User {
     private String password;
 
     @Column(name = "keys", columnDefinition = "jsonb")
+    @Convert(converter = HashMapConverter.class)
     private HashMap<String, String> keys;
 
     public User(String email, String password) {
