@@ -13,7 +13,7 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 
-@Converter(autoApply = false) 
+@Converter(autoApply = true) 
 public class HashMapConverter implements AttributeConverter<HashMap<String, String>, String> {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
