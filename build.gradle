@@ -54,12 +54,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
 	implementation group: 'org.postgresql', name: 'r2dbc-postgresql', version: '1.0.7.RELEASE'
 	runtimeOnly 'org.postgresql:postgresql'
-	implementation 'org.flywaydb:flyway-core'
 	implementation 'org.springframework.session:spring-session-core:3.2.0'
 	implementation 'org.springframework.session:spring-session-jdbc:3.2.0'
 
-
-
+	implementation group: 'org.liquibase', name: 'liquibase-core', version: '4.31.1'
 }
 
 tasks.named('test') {
