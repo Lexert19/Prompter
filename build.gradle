@@ -55,6 +55,7 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
 	//runtimeOnly 'io.r2dbc:r2dbc-postgresql'
+	implementation group: 'org.postgresql', name: 'r2dbc-postgresql', version: '1.0.7.RELEASE'
 	runtimeOnly 'org.postgresql:postgresql'
 	implementation 'org.flywaydb:flyway-core'
 	implementation 'org.springframework.session:spring-session-core:3.2.0'
