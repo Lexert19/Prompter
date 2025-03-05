@@ -1,5 +1,6 @@
 package com.example.promptengineering.entity;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -12,12 +13,19 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import com.example.promptengineering.converter.HashMapConverter;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.PostLoad;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "users")
@@ -29,7 +37,29 @@ public class User implements OAuth2User {
     private String password;
 
     @Column(name = "keys", columnDefinition = "jsonb")
+    private String keysJson;
+
+    @Transient
     private HashMap<String, String> keys = new HashMap<>();
+
+    @PrePersist
+    @PreUpdate
+    public void beforeSave() throws JsonProcessingException {
+        if (keys != null) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            this.keysJson = objectMapper.writeValueAsString(keys);
+        }
+    }
+
+    @PostLoad
+    public void afterLoad() throws IOException {
+        if (keysJson != null && !keysJson.isEmpty()) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            this.keys = objectMapper.readValue(keysJson,
+                    new TypeReference<HashMap<String, String>>() {
+                    });
+        }
+    }
 
     public User(String email, String password) {
         this.email = email;
@@ -83,16 +113,13 @@ public class User implements OAuth2User {
 
     // @Override
     // public boolean isNew() {
-    //     return this.id == null;
+    // return this.id == null;
     // }
 
     // @Override
     // @Nullable
     // public Long getId() {
-    //     return this.id;
+    // return this.id;
     // }
-
-    
-    
 
 }
