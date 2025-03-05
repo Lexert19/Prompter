@@ -13,13 +13,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import com.example.promptengineering.converter.HashMapConverter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -110,16 +108,5 @@ public class User implements OAuth2User {
     public void setKeys(HashMap<String, String> keys) {
         this.keys = keys;
     }
-
-    // @Override
-    // public boolean isNew() {
-    // return this.id == null;
-    // }
-
-    // @Override
-    // @Nullable
-    // public Long getId() {
-    // return this.id;
-    // }
 
 }
