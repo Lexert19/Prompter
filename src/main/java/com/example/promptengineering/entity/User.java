@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -21,7 +22,7 @@ import jakarta.persistence.Id;
 
 @Entity
 @Table(name = "users")
-public class User implements OAuth2User {
+public class User implements OAuth2User, Persistable<Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -86,6 +87,11 @@ public class User implements OAuth2User {
 
     public void setKeys(HashMap<String, String> keys) {
         this.keys = keys;
+    }
+
+    @Override
+    public boolean isNew() {
+        return this.id == null;
     }
 
     
