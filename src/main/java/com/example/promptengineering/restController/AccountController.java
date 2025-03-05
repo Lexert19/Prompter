@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.promptengineering.entity.User;
+import com.example.promptengineering.repository.UserRepository;
 import com.example.promptengineering.service.UserService;
 
 import reactor.core.publisher.Mono;
@@ -31,13 +32,13 @@ public class AccountController {
             @PathVariable String keyName,
             @RequestBody String keyValue) {
 
-        String userEmail = oAuth2User.getAttribute("email"); 
+        String userEmail = oAuth2User.getAttribute("email");
         if (userEmail == null) {
             return Mono.error(new IllegalArgumentException("Email not found in OAuth2User attributes"));
         }
 
-        return userService.findUserByEmail(userEmail) 
-                .switchIfEmpty(Mono.error(new RuntimeException("User not found for email: " + userEmail))) 
+        return userService.findUserByEmail(userEmail)
+                .switchIfEmpty(Mono.error(new RuntimeException("User not found for email: " + userEmail)))
                 .flatMap(existingUser -> userService.saveKeyToMap(existingUser, keyName, keyValue))
                 .map(userSaved -> String.format("Key '%s' saved to map for user with email: %s", keyName, userEmail));
 
@@ -46,13 +47,13 @@ public class AccountController {
     @GetMapping("/keys")
     public Mono<Map<String, String>> getAllKeys(
             @AuthenticationPrincipal OAuth2User oAuth2User) {
-                String userEmail = oAuth2User.getAttribute("email");
-                if (userEmail == null) {
-                    return Mono.error(new IllegalArgumentException("Email not found in OAuth2User attributes"));
-                }
-        
-                return userRepository.findByEmail(userEmail) 
-                        .switchIfEmpty(Mono.error(new RuntimeException("User not found in repository for email: " + userEmail)))
-                        .flatMap(user -> userService.getKeys(user));
+        String userEmail = oAuth2User.getAttribute("email");
+        if (userEmail == null) {
+            return Mono.error(new IllegalArgumentException("Email not found in OAuth2User attributes"));
+        }
+
+        return userRepository.findByEmail(userEmail)
+                .switchIfEmpty(Mono.error(new RuntimeException("User not found in repository for email: " + userEmail)))
+                .flatMap(user -> userService.getKeys(user));
     }
 }
