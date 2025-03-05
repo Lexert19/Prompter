@@ -21,8 +21,7 @@ import reactor.core.publisher.Flux;
 public class ClientRestController {
     @Autowired
     private ChatService chatService;
-    @Autowired
-    private Gson gson;
+    private Gson gson = new Gson();
 
     @PostMapping("/chat")
     public Flux<String> makeRequest(
