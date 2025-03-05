@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.model.RequestBuilder;
-import com.example.promptengineering.repository.RequestHistoryRepository;
 import com.example.promptengineering.service.ChatService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.reflect.TypeToken;
