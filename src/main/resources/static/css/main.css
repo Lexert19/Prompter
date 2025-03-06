@@ -375,12 +375,20 @@ input[type="range"]::-moz-range-progress {
     position: absolute;
     display: block;
     left: 50%;
-    top: 40%;
-    width: 5px;
+    top: 50%;
+    width: 10px;
     height: 10px;
-    border: solid white;
-    border-width: 0 2px 2px 0;
-    transform: translate(-50%, -50%) rotate(45deg);
+    /* This polygon creates a checkmark shape ✓ */
+    clip-path: polygon(
+      0% 50%, 
+      35% 85%, 
+      100% 15%, 
+      85% 0%, 
+      35% 50%, 
+      15% 30%
+    );
+    background-color: white;
+    transform: translate(-50%, -50%);
   }
 
 /* .checkbox-container input:checked + .custom-checkbox::before {
