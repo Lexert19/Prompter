@@ -375,7 +375,7 @@ input[type="range"]::-moz-range-progress {
     position: absolute;
     display: none;
     left: 50%;
-    top: 50%;
+    top: 60%;
     width: 10px;
     height: 10px;
     clip-path: polygon(
