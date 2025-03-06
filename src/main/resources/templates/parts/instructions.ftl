@@ -23,7 +23,7 @@
             <textarea id="system" name="system" onchange="window.settings.change(event)"></textarea>
             <label class="checkbox-container">
                 <input type="checkbox"  id="systemSwitch" name="systemSwitch" onchange="window.settings.change(event)">
-                <label for="mojcheckbox" class="custom-checkbox"></label>
+                <label for="systemSwitch" class="custom-checkbox"></label>
             </label>
         </div>
     </div>
