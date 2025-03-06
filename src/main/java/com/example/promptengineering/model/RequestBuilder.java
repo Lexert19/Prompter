@@ -16,7 +16,9 @@ public class RequestBuilder {
     private String provider;
     private String url;
     private String sessionId;
+    private String reasoningEffort = "medium";
     private String type = "";
+    private String system = "";
 
     public RequestBuilder model(String model) {
         this.model = model;
@@ -46,6 +48,16 @@ public class RequestBuilder {
     public Map<String, Object> build() {
         Map<String, Object> request = new HashMap<>();
 
+        if (this.system != null && !this.system.trim().isEmpty()) {
+            Content systemContent = new Content();
+            systemContent.setType("text");
+            systemContent.setText(this.system);
+            ArrayList<Content> systemContentList = new ArrayList<>();
+            systemContentList.add(systemContent);
+            Message systemMessage = new Message("system",  systemContentList);
+            this.messages.add(0, systemMessage);
+        }    
+
         switch (this.provider) {
             case "OPENAI" -> {
                 List<Map<String, Object>> messagesListDefault = new ArrayList<>();
@@ -57,7 +69,7 @@ public class RequestBuilder {
                 request.put("stream", stream);
                 if(this.model.contains("o3-mini")){
                     request.put("response_format", Map.of("type", "text"));
-                    request.put("reasoning_effort", "medium");
+                    request.put("reasoning_effort", this.reasoningEffort);
                 }else{
                     request.put("max_tokens", maxTokens);
                     request.put("temperature", temperature);
@@ -73,12 +85,6 @@ public class RequestBuilder {
                 request.put("max_tokens", maxTokens);
                 request.put("stream", stream);
                 request.put("temperature", temperature);
-
-                // jest provider to openai dodaj te parmatery
-//                 "response_format": {
-//     "type": "text"
-//   },
-//   "reasoning_effort": "medium"
              }
         }
 
@@ -173,5 +179,22 @@ public class RequestBuilder {
         this.type = type;
     }
 
+    public String getReasoningEffort() {
+        return reasoningEffort;
+    }
+
+    public void setReasoningEffort(String reasoningEffort) {
+        this.reasoningEffort = reasoningEffort;
+    }
+
+    public String getSystem() {
+        return system;
+    }
+
+    public void setSystem(String system) {
+        this.system = system;
+    }
+
+    
     
 }

@@ -104,6 +104,10 @@ class RequestBuilder {
         this.type = "";
     }
 
+    getSystem(){
+        return window.settings.system;
+    }
+
     getType(){
         return window.settings.type;
     }
@@ -154,7 +158,8 @@ class RequestBuilder {
             temperature: this.getTemperature(),
             stream: this.stream,
             type: this.getType(),
-            key: this.getKey()
+            key: this.getKey(),
+            system: this.getSystem()
         });
     }
 

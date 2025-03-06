@@ -4,6 +4,7 @@ class Settings{
         this.cache = false;
         this.maxTokens = 8000;
         this.temperature = 0.0;
+        this.system = "";
 
         this.provider = "OPENAI";
         this.url = "https://api.openai.com/v1/chat/completions";
@@ -107,7 +108,8 @@ class Settings{
             provider: this.provider,
             url: this.url,
             model: this.model,
-            type: this.type
+            type: this.type,
+            system: this.system
         };
         localStorage.setItem("appSettings", JSON.stringify(settingsToSave));
     }
@@ -125,6 +127,9 @@ class Settings{
                 break;
             case "cache":
                 window.settings.cache = event.target.checked;
+                break;
+            case "system":
+                window.settings.system = event.target.value;
                 break;
             case "temperature":
                 window.settings.temperature = event.target.value / 100;
@@ -165,6 +170,7 @@ class Settings{
 
         document.getElementById('memory').checked = this.memory;
         document.getElementById('cache').checked = this.cache;
+        document.getElementById("system").value = this.system;
         
         document.querySelector('input[name="maxTokens"]').value = this.maxTokens;
         

@@ -18,6 +18,9 @@
         <label class="center" for="temperature"><span>Temperatura</span></label>
     </div>
     <div>
+        <textarea id="system" name="system"  onchange="window.settings.change(event)"></textarea>
+    </div>
+    <div>
         <select id="modelOptions" name="model" class="mb-1" onclick="window.settings.changeModel(event)">
         </select>
     </div>
