@@ -370,24 +370,22 @@ input[type="range"]::-moz-range-progress {
     font-weight: bold;
 } */
 
-.custom-checkbox::before {
+.custom-checkbox.checked::before {
     content: "";
     position: absolute;
-    display: none;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 10px;
-    height: 5px;
-    background-color: white;
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-    transform: translate(-50%, -50%) rotate(45deg);
-    transition: all 0.3s ease;
-}
-
-.checkbox-container input:checked + .custom-checkbox::before {
     display: block;
-}
+    left: 50%;
+    top: 40%;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+
+/* .checkbox-container input:checked + .custom-checkbox::before {
+    display: block;
+} */
 
 .checkbox-label {
     color: white;
