@@ -12,10 +12,11 @@
         <label class="checkbox-container">
             <input type="checkbox" id="cache" name="cache" value="cache" onchange="window.settings.change(event)">
             <label for="cache" class="custom-checkbox"></label>
+            <span>Cache</span>
         </label>
         <#-- <input type="checkbox" id="cache" name="cache" value="cache"
             onclick="window.settings.change(event)"> -->
-            <label for="cache">Cache</label>
+            <label for="cache"></label>
     </div>
     <div>
         <input type="number" name="maxTokens" value="8000" onchange="window.settings.change(event)">
