@@ -53,6 +53,20 @@ class Settings{
                 provider: "DEEPINFRA",
                 type: "text",
                 url: "https://api.deepinfra.com/v1/openai/chat/completions"
+            }, 
+            {
+                name: "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+                text: "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+                provider: "DEEPINFRA",
+                type: "text",
+                url: "https://api.deepinfra.com/v1/openai/chat/completions"
+            },
+            {
+                name: "deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+                text: "deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+                provider: "DEEPINFRA",
+                type: "text",
+                url: "https://api.deepinfra.com/v1/openai/chat/completions"
             },
             {
                 name: "deepseek-chat",
