@@ -338,6 +338,9 @@ input[type="range"]::-moz-range-progress {
     cursor: pointer;
 }
 
+.checkbox-container input{
+    display: none;
+}
 .custom-checkbox {
     position: relative;
     width: 16px;
@@ -353,11 +356,11 @@ input[type="range"]::-moz-range-progress {
     background-color: rgba(99, 102, 241, 0.1);
 }
 
-.custom-checkbox:checked {
+.checkbox-container input:checked + .custom-checkbox {
     background-color: rgba(99, 102, 241, 0.9);
 }
 
-.custom-checkbox:checked::before {
+.checkbox-container input:checked + .custom-checkbox::before {
     content: "✓";
     position: absolute;
     top: 50%;
