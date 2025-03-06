@@ -20,6 +20,7 @@
     <div>
         <label for="system">System</label>
         <textarea id="system" name="system"  onchange="window.settings.change(event)"></textarea>
+        <input type="checkbox" id="systemSwitch" name="systemSwitch">
     </div>
     <div>
         <select id="modelOptions" name="model" class="mb-1" onclick="window.settings.changeModel(event)">

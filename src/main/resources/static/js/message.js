@@ -105,7 +105,10 @@ class RequestBuilder {
     }
 
     getSystem(){
-        return window.settings.system;
+        if(document.getElementById("systemSwitch").checked){
+            return window.settings.system;
+        }
+        return "";
     }
 
     getType(){
