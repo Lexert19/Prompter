@@ -340,8 +340,8 @@ input[type="range"]::-moz-range-progress {
 
 .custom-checkbox {
     position: relative;
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     background-color: #374151;
     border: 2px solid rgba(79, 70, 229, 0.3);
     border-radius: 4px;
