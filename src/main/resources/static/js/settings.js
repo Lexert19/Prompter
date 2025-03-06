@@ -48,6 +48,13 @@ class Settings{
                 url: "https://api.deepinfra.com/v1/openai/chat/completions"
             },
             {
+                name: "deepseek-ai/DeepSeek-V3-Turbo",
+                text: "deepinfra/DeepSeek-V3-Turbo",
+                provider: "DEEPINFRA",
+                type: "text",
+                url: "https://api.deepinfra.com/v1/openai/chat/completions"
+            },
+            {
                 name: "deepseek-chat",
                 text: "deepseek-v3",
                 provider: "DEEPSEEK",
