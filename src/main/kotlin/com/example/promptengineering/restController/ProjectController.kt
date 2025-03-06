@@ -102,12 +102,24 @@ class ProjectController(
         return projectRepository.save(project).awaitSingle()
     }
 
-    @PostMapping("/chat")
-    fun chatWithProject(
+    @PostMapping("/{projectId}/similar-fragments")
+    suspend fun getSimilarFragments(
         @AuthenticationPrincipal oAuth2User: OAuth2User,
-        @RequestBody question: String,
-        @RequestParam projectId: String
-    ): ResponseEntity<Flux<String>> {
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build()
+        @PathVariable projectId: String,
+        @RequestParam query: String
+    ): ResponseEntity<List<String>> {
+        val userId = oAuth2User.getAttribute<Long>("sub")
+            ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
+        
+        val user = userRepository.findById(userId).awaitSingle()
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony") 
+
+        val project = projectRepository.findByIdAndUser(projectId, user)
+            .awaitSingle()
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nie znaleziony")
+        
+        val similarFragments = embeddingService.retrieveSimilarFragments(query, project, user)
+        return ResponseEntity.ok(similarFragments)
     }
+
 }

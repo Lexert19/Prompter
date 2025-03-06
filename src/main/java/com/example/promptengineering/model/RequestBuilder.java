@@ -47,6 +47,19 @@ public class RequestBuilder {
         Map<String, Object> request = new HashMap<>();
 
         switch (this.provider) {
+            case "OPENAI" -> {
+                List<Map<String, Object>> messagesListDefault = new ArrayList<>();
+                for (Message message : messages) {
+                    messagesListDefault.add(message.toMap(provider, type));
+                }
+                request.put("messages", messagesListDefault);
+                request.put("model", model);
+                request.put("max_tokens", maxTokens);
+                request.put("stream", stream);
+                request.put("temperature", temperature);
+                request.put("response_format", Map.of("type", "text"));
+                request.put("reasoning_effort", "medium");
+            }
             default -> {
                 List<Map<String, Object>> messagesListDefault = new ArrayList<>();
                 for (Message message : messages) {
@@ -57,7 +70,13 @@ public class RequestBuilder {
                 request.put("max_tokens", maxTokens);
                 request.put("stream", stream);
                 request.put("temperature", temperature);
-            }
+
+                // jest provider to openai dodaj te parmatery
+//                 "response_format": {
+//     "type": "text"
+//   },
+//   "reasoning_effort": "medium"
+             }
         }
 
         return request;

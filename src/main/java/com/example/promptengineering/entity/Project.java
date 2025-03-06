@@ -6,13 +6,7 @@ import java.util.List;
 import com.example.promptengineering.model.Embedding;
 import com.example.promptengineering.model.FileElement;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -23,8 +17,8 @@ public class Project {
     private String name;
     @DBRef 
     private User user;
+    @DBRef
     private List<FileElement> files;
-    private List<Embedding> embeddings;
 
 
     public String getName() {
@@ -33,12 +27,7 @@ public class Project {
     public void setName(String name) {
         this.name = name;
     } 
-    public List<Embedding> getEmbeddings() {
-        return embeddings;
-    }
-    public void setEmbeddings(List<Embedding> embeddings) {
-        this.embeddings = embeddings;
-    }
+   
     public List<FileElement> getFiles() {
         return files;
     }

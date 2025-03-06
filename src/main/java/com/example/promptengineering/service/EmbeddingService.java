@@ -15,7 +15,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.example.promptengineering.entity.Project;
 import com.example.promptengineering.entity.User;
-import com.example.promptengineering.model.Embedding;
 import com.example.promptengineering.model.FileElement;
 
 @Service
@@ -25,25 +24,26 @@ public class EmbeddingService {
     @Autowired
     private WebClient webClient;
 
-    public void createProjectEmbedding(Project project, User user) {
+    public void addFileToProject(Project project, FileElement file, User user) {
         String apiKey = user.getKeys().getOrDefault("OPENAI", "");
-        List<FileElement> files = project.getFiles();
-        
-        if (files == null || files.isEmpty()) {
-            return; 
+        List<String> pages = splitContentIntoPages(file.getContent());
+        file.setPages(pages);
+        createEmbeddingForFile(file, apiKey);
+        project.getFiles().add(file);
+    }
+
+    private void createEmbeddingForFile(FileElement file, String apiKey) {
+        List<String> pages = file.getPages();
+        if (pages == null || pages.isEmpty()) {
+            return;
         }
 
-        List<Embedding> embeddings = new ArrayList<>();
-        for (FileElement file : files) {
-            String content = file.getContent();
-            List<Double> vector = getEmbedding(content, apiKey);
-            
-            Embedding embedding = new Embedding();
-            embedding.setVector(vector);
-            embedding.setName(file.getName());
-            embeddings.add(embedding);
+        List<List<Double>> vectors = new ArrayList<>();
+        for (String page : pages) {
+            List<Double> vector = getEmbedding(page, apiKey);
+            vectors.add(vector);
         }
-        project.setEmbeddings(embeddings);
+        file.setVectors(vectors);
     }
 
     public List<Double> getEmbedding(String text, String apiKey) {
@@ -51,15 +51,16 @@ public class EmbeddingService {
         requestBody.put("input", text);
         requestBody.put("model", "text-embedding-ada-002");
 
-        ParameterizedTypeReference<Map<String, Object>> typeRef = new ParameterizedTypeReference<>() {};
+        ParameterizedTypeReference<Map<String, Object>> typeRef = new ParameterizedTypeReference<>() {
+        };
         Map<String, Object> responseBody = webClient.post()
-            .uri(EMBEDDINGS_URL)
-            .header("Authorization", "Bearer " + apiKey)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(requestBody)
-            .retrieve()
-            .bodyToMono(typeRef)
-            .block();
+                .uri(EMBEDDINGS_URL)
+                .header("Authorization", "Bearer " + apiKey)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(requestBody)
+                .retrieve()
+                .bodyToMono(typeRef)
+                .block();
 
         if (responseBody != null && responseBody.containsKey("data")) {
             List<Map<String, Object>> data = (List<Map<String, Object>>) responseBody.get("data");
@@ -73,30 +74,35 @@ public class EmbeddingService {
     public List<String> retrieveSimilarFragments(String query, Project project, User user) {
         String apiKey = user.getKeys().getOrDefault("OPENAI", "");
         List<Double> queryVector = getEmbedding(query, apiKey);
-        
-        List<Embedding> projectEmbeddings = project.getEmbeddings();
-        if (projectEmbeddings == null || projectEmbeddings.isEmpty()) {
+
+        List<FileElement> projectFiles = project.getFiles();
+        if (projectFiles == null || projectFiles.isEmpty()) {
             return new ArrayList<>();
         }
-        
-        Map<String, FileElement> fileNameToFileMap = new HashMap<>();
-        project.getFiles().forEach(file -> fileNameToFileMap.put(file.getName(), file));
-        
-        List<ScoredEmbedding> scoredEmbeddings = new ArrayList<>();
-        for (Embedding emb : projectEmbeddings) {
-            if (emb.getVector() == null || emb.getVector().isEmpty()) continue;
-            double similarity = cosineSimilarity(queryVector, emb.getVector());
-            scoredEmbeddings.add(new ScoredEmbedding(emb, similarity));
+
+        List<ScoredFragment> scoredFragments = new ArrayList<>();
+        for (FileElement file : projectFiles) {
+            List<String> pages = file.getPages();
+            List<List<Double>> vectors = file.getVectors();
+            if (pages == null || vectors == null || pages.size() != vectors.size()) {
+                continue;
+            }
+            for (int i = 0; i < pages.size(); i++) {
+                String page = pages.get(i);
+                List<Double> vector = vectors.get(i);
+                if (vector == null || vector.isEmpty())
+                    continue;
+                double similarity = cosineSimilarity(queryVector, vector);
+                scoredFragments.add(new ScoredFragment(page, similarity));
+            }
         }
-        
-        scoredEmbeddings.sort((a, b) -> Double.compare(b.score, a.score));
-        
+
+        scoredFragments.sort((a, b) -> Double.compare(b.score, a.score));
+
         int topN = 5;
-        return scoredEmbeddings.stream()
+        return scoredFragments.stream()
                 .limit(topN)
-                .map(se -> fileNameToFileMap.get(se.embedding.getName()))
-                .filter(Objects::nonNull)
-                .map(FileElement::getContent)
+                .map(ScoredFragment::getText)
                 .collect(Collectors.toList());
     }
 
@@ -111,15 +117,38 @@ public class EmbeddingService {
         }
         return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
     }
-    
-    private static class ScoredEmbedding {
-        Embedding embedding;
-        double score;
+
+    private List<String> splitContentIntoPages(String content) {
+        List<String> pages = new ArrayList<>();
+        int fragmentSize = 512;
+        for (int i = 0; i < content.length(); i += fragmentSize) {
+            int end = Math.min(i + fragmentSize, content.length());
+            String fragment = content.substring(i, end);
+            if (end < content.length() && Character.isLetter(content.charAt(end - 1))) {
+                while (end > i && content.charAt(end - 1) != ' ') {
+                    end--;
+                }
+                if (end == i) {
+                    end = i + fragmentSize;
+                }
+            }
+            pages.add(fragment);
+        }
+        return pages;
+    }
+
+    private static class ScoredFragment {
+        private String text;
+        private double score;
         
-        ScoredEmbedding(Embedding embedding, double score) {
-            this.embedding = embedding;
+        public ScoredFragment(String text, double score) {
+            this.text = text;
             this.score = score;
         }
-    }
     
+        public String getText() {
+            return text;
+        }
+    }
+
 }
