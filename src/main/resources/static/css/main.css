@@ -328,3 +328,47 @@ input[type="range"]::-moz-range-progress {
     background-color: rgba(99, 102, 241, 1);
 }
 /*  */
+
+
+/* chebox */
+.checkbox-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.custom-checkbox {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    background-color: #374151;
+    border: 2px solid rgba(79, 70, 229, 0.3);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.custom-checkbox:hover {
+    background-color: rgba(99, 102, 241, 0.1);
+}
+
+.custom-checkbox:checked {
+    background-color: rgba(99, 102, 241, 0.9);
+}
+
+.custom-checkbox:checked::before {
+    content: "✓";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-weight: bold;
+}
+
+.checkbox-label {
+    color: white;
+    font-size: 14px;
+}
+/*  */

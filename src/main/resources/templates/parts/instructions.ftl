@@ -21,7 +21,9 @@
         <label for="system">System</label>
         <div class="d-flex">
             <textarea id="system" name="system" onchange="window.settings.change(event)"></textarea>
-            <input type="checkbox" id="systemSwitch" name="systemSwitch" onchange="window.settings.change(event)">
+            <label class="checkbox-container">
+                <input type="checkbox" class="custom-checkbox" id="systemSwitch" name="systemSwitch" onchange="window.settings.change(event)">
+            </label>
         </div>
     </div>
     <div>
