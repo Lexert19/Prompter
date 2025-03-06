@@ -370,15 +370,14 @@ input[type="range"]::-moz-range-progress {
     font-weight: bold;
 } */
 
-.custom-checkbox.checked::before {
+.custom-checkbox::before {
     content: "";
     position: absolute;
-    display: block;
+    display: none;
     left: 50%;
     top: 50%;
     width: 10px;
     height: 10px;
-    /* This polygon creates a checkmark shape ✓ */
     clip-path: polygon(
       0% 50%, 
       35% 85%, 
@@ -391,9 +390,9 @@ input[type="range"]::-moz-range-progress {
     transform: translate(-50%, -50%);
   }
 
-/* .checkbox-container input:checked + .custom-checkbox::before {
+.checkbox-container input:checked + .custom-checkbox::before {
     display: block;
-} */
+}
 
 .checkbox-label {
     color: white;
