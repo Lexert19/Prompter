@@ -3,10 +3,8 @@
         <label class="checkbox-container">
             <input type="checkbox" id="memory" name="memory" value="memory" onchange="window.settings.change(event)">
             <label for="memory" class="custom-checkbox"></label>
+            <span>Pamięć (pamięta poprzednie wiadomości)</span>
         </label>
-        <#-- <input type="checkbox" id="memory" name="memory" value="memory"
-            onclick="window.settings.change(event)"> -->
-            <label for="memory">Pamięć (pamięta poprzednie wiadomości)</label>
     </div>
     <div>
         <label class="checkbox-container">
@@ -14,9 +12,6 @@
             <label for="cache" class="custom-checkbox"></label>
             <span>Cache</span>
         </label>
-        <#-- <input type="checkbox" id="cache" name="cache" value="cache"
-            onclick="window.settings.change(event)"> -->
-            <label for="cache"></label>
     </div>
     <div>
         <input type="number" name="maxTokens" value="8000" onchange="window.settings.change(event)">
