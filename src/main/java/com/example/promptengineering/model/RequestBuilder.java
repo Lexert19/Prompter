@@ -54,11 +54,14 @@ public class RequestBuilder {
                 }
                 request.put("messages", messagesListDefault);
                 request.put("model", model);
-                //request.put("max_tokens", maxTokens);
                 request.put("stream", stream);
-                //request.put("temperature", temperature);
-                request.put("response_format", Map.of("type", "text"));
-                request.put("reasoning_effort", "medium");
+                if(this.model.contains("o3-mini")){
+                    request.put("response_format", Map.of("type", "text"));
+                    request.put("reasoning_effort", "medium");
+                }else{
+                    request.put("max_tokens", maxTokens);
+                    request.put("temperature", temperature);
+                }    
             }
             default -> {
                 List<Map<String, Object>> messagesListDefault = new ArrayList<>();
