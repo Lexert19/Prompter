@@ -141,6 +141,7 @@ textarea {
     outline: none;
     resize: none;
     height: 30px;
+    box-sizing: border-box;
 }
 
 .pages{
