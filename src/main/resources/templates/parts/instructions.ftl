@@ -11,7 +11,7 @@
     <div>
         <label class="checkbox-container">
             <input type="checkbox" id="cache" name="cache" value="cache" onchange="window.settings.change(event)">
-            <label for="memory" class="custom-checkbox"></label>
+            <label for="cache" class="custom-checkbox"></label>
         </label>
         <#-- <input type="checkbox" id="cache" name="cache" value="cache"
             onclick="window.settings.change(event)"> -->
