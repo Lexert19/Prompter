@@ -360,16 +360,6 @@ input[type="range"]::-moz-range-progress {
     background-color: rgba(99, 102, 241, 0.9);
 }
 
-/* .checkbox-container input:checked + .custom-checkbox::before {
-    content: "✓";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: white;
-    font-weight: bold;
-} */
-
 .custom-checkbox::before {
     content: "";
     position: absolute;

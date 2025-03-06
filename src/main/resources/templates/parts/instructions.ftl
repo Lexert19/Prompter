@@ -1,13 +1,21 @@
 <div class="chat-settings" id="chatSettings">
     <div>
-        <input type="checkbox" id="memory" name="memory" value="memory"
-            onclick="window.settings.change(event)">
-        <label for="memory">Pamięć (pamięta poprzednie wiadomości)</label>
+        <label class="checkbox-container">
+            <input type="checkbox" id="memory" name="memory" value="memory" onchange="window.settings.change(event)">
+            <label for="memory" class="custom-checkbox"></label>
+        </label>
+        <#-- <input type="checkbox" id="memory" name="memory" value="memory"
+            onclick="window.settings.change(event)"> -->
+            <label for="memory">Pamięć (pamięta poprzednie wiadomości)</label>
     </div>
     <div>
-        <input type="checkbox" id="cache" name="cache" value="cache"
-            onclick="window.settings.change(event)">
-        <label for="cache">Cache</label>
+        <label class="checkbox-container">
+            <input type="checkbox" id="cache" name="cache" value="cache" onchange="window.settings.change(event)">
+            <label for="memory" class="custom-checkbox"></label>
+        </label>
+        <#-- <input type="checkbox" id="cache" name="cache" value="cache"
+            onclick="window.settings.change(event)"> -->
+            <label for="cache">Cache</label>
     </div>
     <div>
         <input type="number" name="maxTokens" value="8000" onchange="window.settings.change(event)">
@@ -22,7 +30,7 @@
         <div class="d-flex">
             <textarea id="system" name="system" onchange="window.settings.change(event)"></textarea>
             <label class="checkbox-container">
-                <input type="checkbox"  id="systemSwitch" name="systemSwitch" onchange="window.settings.change(event)">
+                <input type="checkbox" id="systemSwitch" name="systemSwitch" onchange="window.settings.change(event)">
                 <label for="systemSwitch" class="custom-checkbox"></label>
             </label>
         </div>
