@@ -55,7 +55,7 @@ public class RequestBuilder {
                 request.put("messages", messagesListDefault);
                 request.put("model", model);
                 //request.put("max_tokens", maxTokens);
-                //request.put("stream", stream);
+                request.put("stream", stream);
                 //request.put("temperature", temperature);
                 request.put("response_format", Map.of("type", "text"));
                 request.put("reasoning_effort", "medium");
