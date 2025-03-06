@@ -131,7 +131,7 @@ class Settings{
                 window.settings.cache = event.target.checked;
                 break;
             case "systemSwitch":
-                window.settings.cache = event.target.checked;
+                window.settings.systemSwitch = event.target.checked;
                 break;
             case "system":
                 window.settings.system = event.target.value;
@@ -177,7 +177,7 @@ class Settings{
         document.getElementById('cache').checked = this.cache;
         document.getElementById("system").value = this.system;
         document.getElementById("systemSwitch").checked = this.systemSwitch;
-        
+    
         document.querySelector('input[name="maxTokens"]').value = this.maxTokens;
         
         document.getElementById('temperature').value = this.temperature * 100;
