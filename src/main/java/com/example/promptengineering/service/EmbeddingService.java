@@ -16,6 +16,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.example.promptengineering.entity.Project;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.model.FileElement;
+import com.example.promptengineering.repository.ProjectRepository;
 
 @Service
 public class EmbeddingService {
@@ -23,6 +24,8 @@ public class EmbeddingService {
 
     @Autowired
     private WebClient webClient;
+    @Autowired
+    private ProjectRepository projectRepository;
 
     public void addFileToProject(Project project, FileElement file, User user) {
         String apiKey = user.getKeys().getOrDefault("OPENAI", "");
@@ -30,6 +33,7 @@ public class EmbeddingService {
         file.setPages(pages);
         createEmbeddingForFile(file, apiKey);
         project.getFiles().add(file);
+        projectRepository.save(project);
     }
 
     private void createEmbeddingForFile(FileElement file, String apiKey) {

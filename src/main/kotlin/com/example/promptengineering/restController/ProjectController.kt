@@ -78,7 +78,7 @@ class ProjectController(
             .awaitSingle()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nie znaleziony")
         
-        project.files.add(file)
+        //project.files.add(file)
         return projectRepository.save(project).awaitSingle()
     }
 

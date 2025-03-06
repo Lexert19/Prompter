@@ -10,6 +10,7 @@ class Chat {
         this.chatOptions = document.getElementById("chatOptions");
         this.chatHistory = document.getElementById("chatHistory");
         this.modelOptions = document.getElementById("modelOptions");
+        this.chatSettings = document.getElementById("chatSettings");
         this.history = document.getElementById("history");
         this.editMessageView = new EditMessageView();
         this.requestBuilder = new RequestBuilder();
