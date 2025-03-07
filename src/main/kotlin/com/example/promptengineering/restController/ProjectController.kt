@@ -2,7 +2,7 @@ package com.example.promptengineering.restController
 
 import com.example.promptengineering.entity.Project
 import com.example.promptengineering.entity.User
-import com.example.promptengineering.model.FileElement
+import com.example.promptengineering.entity.FileElement
 import com.example.promptengineering.repository.ProjectRepository
 import com.example.promptengineering.repository.UserRepository
 import com.example.promptengineering.service.EmbeddingService
@@ -19,6 +19,8 @@ import kotlinx.coroutines.reactive.awaitSingleOrNull
 import reactor.core.publisher.Flux
 import com.example.promptengineering.model.ProjectResponse
 import kotlin.collections.ArrayList
+import com.example.promptengineering.repository.FileElementsRepository
+
 
 
 
@@ -27,7 +29,8 @@ import kotlin.collections.ArrayList
 class ProjectController(
     private val projectRepository: ProjectRepository,
     private val userRepository: UserRepository,
-    private val embeddingService: EmbeddingService
+    private val embeddingService: EmbeddingService,
+    private val fileElementRepository: FileElementsRepository
 ) {
 
     @PostMapping("/create")
@@ -54,21 +57,24 @@ class ProjectController(
     suspend fun getProject(
         @AuthenticationPrincipal oAuth2User: OAuth2User,
         @PathVariable projectId: String
-    ): ResponseEntity<ProjectResponse>  {
+    ): ResponseEntity<ProjectResponse> {
         val userId = oAuth2User.getAttribute<String>("id")
-        ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
-    
+            ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
+
         val user = userRepository.findById(userId).awaitSingle()
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony") 
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony")
 
         val project = projectRepository.findByIdAndUserId(projectId, user.id)
             .awaitSingle()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nie znaleziony")
-        
-        val projectResponse = ProjectResponse(project.id, project.name, project.files)
+
+        val files = fileElementRepository.findByProject(project.id)
+            .collectList()
+            .awaitSingle() ?: emptyList()
+
+        val projectResponse = ProjectResponse(project.id, project.name, files)
         return ResponseEntity.ok(projectResponse)
     }
-
 
     @GetMapping
     suspend fun getUserProjects(
@@ -110,9 +116,15 @@ class ProjectController(
             .awaitSingle()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nie znaleziony")
         
-        embeddingService.addFileToProject(project, file, user)
-        val savedProject = projectRepository.save(project).awaitSingle()
-        val projectResponse = ProjectResponse(savedProject.id, savedProject.name, savedProject.files)
+        embeddingService.addFileToProject(project, file, user).awaitSingle()
+
+        val updatedProject = projectRepository.findByIdAndUserId(projectId, user.id)
+            .awaitSingle()
+        val files = fileElementRepository.findByProject(project.id)
+            .collectList()
+            .awaitSingle() ?: emptyList()
+
+        val projectResponse = ProjectResponse(updatedProject.id, updatedProject.name, files)
         return ResponseEntity.ok(projectResponse)
     }
 
@@ -132,7 +144,7 @@ class ProjectController(
             .awaitSingle()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nie znaleziony")
         
-        val similarFragments = embeddingService.retrieveSimilarFragments(query, project, user)
+        val similarFragments = embeddingService.retrieveSimilarFragments(query, project, user).awaitSingle()
         return ResponseEntity.ok(similarFragments)
     }
 
