@@ -155,7 +155,7 @@ class HtmlParser {
           break;
       }
     }
-    console.log(html);
+    //console.log(html);
     return html;
   }
 

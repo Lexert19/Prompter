@@ -56,6 +56,7 @@ class Projects {
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify(projectName)
             });
 
@@ -74,7 +75,12 @@ class Projects {
         if (!projectId) return;
 
         try {
-            const response = await fetch(`${this.controllerUrl}/${projectId}`);
+            const response = await fetch(`${this.controllerUrl}/${projectId}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include'
+            });
             if (!response.ok) throw new Error('Project not found');
             
             const project = await response.json();
@@ -90,14 +96,20 @@ class Projects {
         this.loadProjectFiles(project.id);
     }
 
-    async loadProjectFiles(projectId) {
+    async loadProjects() {
         try {
-            const response = await fetch(`${this.controllerUrl}/${projectId}/files`);
-            if (!response.ok) throw new Error('Failed to fetch files');
+            const response = await fetch(`${this.controllerUrl}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include'
+            });
+            if (!response.ok) throw new Error('Failed to fetch projects');
             
-            const files = await response.json();
-            this.displayFiles(files);
+            const projects = await response.json();
+            this.populateProjectSelect(projects);
         } catch (error) {
+            this.showError('Brak dostępu do projektu');
             console.error('Error:', error);
         }
     }
@@ -142,6 +154,7 @@ class Projects {
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify({
                     name: fileName,
                     content: fileContent
