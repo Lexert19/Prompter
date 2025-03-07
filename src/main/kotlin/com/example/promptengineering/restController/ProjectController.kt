@@ -17,6 +17,8 @@ import java.util.*
 import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.reactive.awaitSingleOrNull
 import reactor.core.publisher.Flux
+import com.example.promptengineering.model.ProjectResponse
+import kotlin.collections.ArrayList
 
 
 
@@ -50,33 +52,42 @@ class ProjectController(
     suspend fun getProject(
         @AuthenticationPrincipal oAuth2User: OAuth2User,
         @PathVariable projectId: String
-    ): Project {
+    ): ResponseEntity<ProjectResponse>  {
         val userId = oAuth2User.getAttribute<String>("id")
-            ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
-        
+        ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
+    
         val user = userRepository.findById(userId).awaitSingle()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony") 
 
-        return projectRepository.findByIdAndUser(projectId, user)
+        val project = projectRepository.findByIdAndUser(projectId, user)
             .awaitSingle()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nie znaleziony")
+        
+        val projectResponse = ProjectResponse(project.id, project.name, project.files)
+        return ResponseEntity.ok(projectResponse)
     }
-
     @GetMapping
     suspend fun getUserProjects(
         @AuthenticationPrincipal oAuth2User: OAuth2User
-    ): ResponseEntity<List<Project>> {
+    ): ResponseEntity<List<ProjectResponse>> {
         val userId = oAuth2User.getAttribute<String>("id")
             ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
         
         val user = userRepository.findById(userId).awaitSingle()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony")
 
-        val projectsFlux = projectRepository.findAllByUser(user)  
-        val projects = projectsFlux.collectList().awaitSingle() 
-      
-
-        return ResponseEntity.ok(projects)
+        val projectsFlux = projectRepository.findAllByUser(user)
+        val projects = projectsFlux.collectList().awaitSingle()
+        
+        val projectResponses = projects.map { project ->
+            ProjectResponse(
+                id = project.id,
+                name = project.name,
+                files = ArrayList()
+            )
+        }
+        
+        return ResponseEntity.ok(projectResponses)
     }
 
   
