@@ -117,7 +117,7 @@ h4 , h5{
 }
 
 .file-browser {
-    max-height: 300px;
+    max-height: 230px;
     overflow-y: auto;
     border: 1px solid #ddd;
     padding: 10px;
