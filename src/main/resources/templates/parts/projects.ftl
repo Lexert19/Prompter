@@ -1,10 +1,12 @@
 <div id="projects" class="projects">
     <div class="projects-list">
         <h4>Twoje projekty</h4>
-        <select class="project-select">
-            <option value="12345">Nazwa projektu</option>
-        </select>
-        <button class="btn-create">Utwórz</button>
+        <div class="d-flex">
+            <select class="project-select">
+                <option value="12345">Nazwa projektu</option>
+            </select>
+            <button class="btn-create">Utwórz</button>
+        </div>
     </div>
     <!-- Sekcja szczegółów projektu -->
     <div class="project-details">
@@ -80,10 +82,10 @@
     </div>
 </div>
 <style>
-
-h4{
+h4 {
     margin: 0px;
 }
+
 .btn-create,
 .btn-add-file {
     color: white;
@@ -133,7 +135,7 @@ h4{
 .file-grid {
     display: grid;
     grid-template-columns: repeat(5, minmax(40px, 1fr));
-        gap: 5px;
+    gap: 5px;
 }
 
 .file-item {
