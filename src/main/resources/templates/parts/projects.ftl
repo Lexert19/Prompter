@@ -139,7 +139,7 @@ h4{
 .file-grid {
     display: grid;
     grid-template-columns: repeat(5, minmax(40px, 1fr));
-        gap: 10px;
+        gap: 5px;
 }
 
 .file-item {
