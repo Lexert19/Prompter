@@ -85,18 +85,14 @@
     </div>
 </div>
 <style>
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
+
 
 .btn-create,
 .btn-add-file {
     background: #2196F3;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 5px 10px;
     border-radius: 5px;
     cursor: pointer;
 }
@@ -124,7 +120,7 @@
 
 .project-select {
     width: 100%;
-    padding: 10px;
+    padding: 5px;
     border-radius: 5px;
     border: 1px solid #ddd;
 }
