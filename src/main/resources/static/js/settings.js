@@ -194,6 +194,8 @@ class Settings{
                 option.textContent = project.name;
                 projectSelect.appendChild(option);
             });
+
+            projectSelect.value = this.project;
         })
         .catch(error => {
             console.error('Error loading projects:', error);
@@ -217,7 +219,6 @@ class Settings{
         document.getElementById('memory').checked = this.memory;
         document.getElementById('cache').checked = this.cache;
         document.getElementById("system").value = this.system;
-        document.getElementById("project").value = this.project;
         document.getElementById("systemSwitch").checked = this.systemSwitch;
         document.getElementById("projectSwitch").checked = this.projectSwitch;
 
@@ -230,6 +231,9 @@ class Settings{
             .map(model => `<option value="${model.name}">${model.name}</option>`)
             .join('');
         modelSelect.value = this.model;
+
+        document.getElementById("project").value = this.project;
+
     }
 
     loadKeys() {
