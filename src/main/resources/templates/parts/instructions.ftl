@@ -19,9 +19,9 @@
     <div class="d-flex">
         <input type="range" id="temperature" name="temperature" min="0" max="100" step="1" value="0"
             oninput="window.settings.change(event)">
-        <label class="center" for="temperature"><span>Temperatura zzz</span></label>
+        <label class="center" for="temperature"><span>Temperatura</span></label>
     </div>
-    <div>
+    <div >
         <label for="system">System</label>
         <div class="d-flex">
             <textarea id="system" name="system" onchange="window.settings.change(event)"></textarea>
@@ -31,7 +31,7 @@
             </label>
         </div>
     </div>
-    <div>
+    <div class="mt-05" >
         <select id="modelOptions" name="model" class="mb-1" onclick="window.settings.changeModel(event)">
         </select>
     </div>
