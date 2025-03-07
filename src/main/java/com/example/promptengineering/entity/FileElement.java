@@ -4,8 +4,12 @@ import java.util.List;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import jakarta.persistence.Id;
+
 @Document(collection = "fileElements") 
 public class FileElement {
+    @Id
+    private String id;
     private String name;
     private String project;
     private String userId;
