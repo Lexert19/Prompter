@@ -23,19 +23,6 @@ class Projects {
         this.addFileButton.addEventListener('click', () => this.handleFileUpload());
     }
 
-    async loadProjects() {
-        try {
-            const response = await fetch(`${this.controllerUrl}`);
-            if (!response.ok) throw new Error('Failed to fetch projects');
-            
-            const projects = await response.json();
-            this.populateProjectSelect(projects);
-        } catch (error) {
-            this.showError('Brak dostępu do projektu');
-            console.error('Error:', error);
-        }
-    }
-
     populateProjectSelect(projects) {
         this.projectSelect.innerHTML = '<option value="">Wybierz projekt</option>';
         projects.forEach(project => {
@@ -167,6 +154,24 @@ class Projects {
             this.loadProjectFiles(projectId);
         } catch (error) {
             this.showError('Nie udało się dodać pliku');
+            console.error('Error:', error);
+        }
+    }
+
+    async loadProjectFiles(projectId) {
+        try {
+            const response = await fetch(`${this.controllerUrl}/${projectId}/files`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include'
+            });
+            if (!response.ok) throw new Error('Failed to fetch files');
+            
+            const files = await response.json();
+            this.displayFiles(files);
+        } catch (error) {
+            this.showError('Nie udało się wczytać plików');
             console.error('Error:', error);
         }
     }
