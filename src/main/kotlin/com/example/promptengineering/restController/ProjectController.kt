@@ -10,6 +10,7 @@ import kotlinx.coroutines.reactive.awaitSingle
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.core.context.ReactiveSecurityContextHolder
 import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
@@ -30,9 +31,11 @@ class ProjectController(
 
     @PostMapping("/create")
     suspend fun createProject(
-        @AuthenticationPrincipal oAuth2User: OAuth2User,
         @RequestBody name: String
     ): ResponseEntity<Project> {
+        val context = ReactiveSecurityContextHolder.getContext().awaitSingle()
+       val oAuth2User = context.authentication?.principal as? OAuth2User
+           ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak autentykacji")
         val userId = oAuth2User.getAttribute<String>("sub")
             ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
         val user = userRepository.findById(userId).awaitSingle()
@@ -48,9 +51,11 @@ class ProjectController(
 
     @GetMapping("/{projectId}")
     suspend fun getProject(
-        @AuthenticationPrincipal oAuth2User: OAuth2User,
         @PathVariable projectId: String
     ): Project {
+        val context = ReactiveSecurityContextHolder.getContext().awaitSingle()
+       val oAuth2User = context.authentication?.principal as? OAuth2User
+           ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak autentykacji")
         val userId = oAuth2User.getAttribute<String>("sub")
             ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
         
@@ -63,9 +68,10 @@ class ProjectController(
     }
 
     @GetMapping
-    suspend fun getUserProjects(
-        @AuthenticationPrincipal oAuth2User: OAuth2User
-    ): ResponseEntity<List<Project>> {
+    suspend fun getUserProjects(): ResponseEntity<List<Project>> {
+        val context = ReactiveSecurityContextHolder.getContext().awaitSingle()
+       val oAuth2User = context.authentication?.principal as? OAuth2User
+           ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak autentykacji")
         val userId = oAuth2User.getAttribute<String>("sub")
             ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
         
