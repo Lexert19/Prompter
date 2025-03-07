@@ -98,9 +98,10 @@ class Settings{
 
         this.load();
         this.loadKeys();
+
+        this.loadProjects();
         this.initModels();
         this.initUI();
-        this.loadProjects();
     }
 
     save() {
