@@ -23,7 +23,7 @@
     </div>
     <div >
         <label for="system">System</label>
-        <div class="d-flex">
+        <div class="d-flex mt-05">
             <textarea id="system" name="system" onchange="window.settings.change(event)"></textarea>
             <label class="checkbox-container">
                 <input type="checkbox" id="systemSwitch" name="systemSwitch" onchange="window.settings.change(event)">
