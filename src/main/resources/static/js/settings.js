@@ -6,6 +6,8 @@ class Settings{
         this.temperature = 0.0;
         this.system = "";
         this.systemSwitch = false;
+        this.project = "";
+        this.projectsSwitch = false;
 
         this.provider = "OPENAI";
         this.url = "https://api.openai.com/v1/chat/completions";
@@ -111,7 +113,9 @@ class Settings{
             model: this.model,
             type: this.type,
             system: this.system,
-            systemSwitch: this.systemSwitch
+            systemSwitch: this.systemSwitch,
+            project: this.project,
+            projectSwitch: this.projectsSwich
         };
         localStorage.setItem("appSettings", JSON.stringify(settingsToSave));
     }
@@ -133,8 +137,14 @@ class Settings{
             case "systemSwitch":
                 window.settings.systemSwitch = event.target.checked;
                 break;
+            case "projectSwitch":
+                window.settings.projectSwitch = event.target.checked;
+                break;
             case "system":
                 window.settings.system = event.target.value;
+                break;
+            case "project":
+                window.settings.project = event.target.value;
                 break;
             case "temperature":
                 window.settings.temperature = event.target.value / 100;
@@ -176,8 +186,10 @@ class Settings{
         document.getElementById('memory').checked = this.memory;
         document.getElementById('cache').checked = this.cache;
         document.getElementById("system").value = this.system;
+        document.getElementById("project").value = this.project;
         document.getElementById("systemSwitch").checked = this.systemSwitch;
-    
+        document.getElementById("projectSwitch").checked = this.projectSwitch;
+
         document.querySelector('input[name="maxTokens"]').value = this.maxTokens;
         
         document.getElementById('temperature').value = this.temperature * 100;

@@ -31,6 +31,16 @@
             </label>
         </div>
     </div>
+    <div>
+        <label>Projekt</label>
+        <div class="d-flex mt-025">
+            <select id="project" name="project"  onclick="window.settings.changeModel(event)"></select>
+             <label class="checkbox-container">
+                <input type="checkbox" id="projectSwitch" name="projectSwitch" onchange="window.settings.change(event)">
+                <label for="projectSwitch" class="custom-checkbox"></label>
+            </label>
+        </div>
+    </div>
     <div class="mt-05" >
         <select id="modelOptions" name="model" class="mb-1" onclick="window.settings.changeModel(event)">
         </select>
