@@ -57,7 +57,7 @@ class Projects {
                     'Content-Type': 'application/json',
                 },
                 credentials: 'include',
-                body: JSON.stringify(projectName)
+                body: projectName
             });
 
             if (!response.ok) throw new Error('Failed to create project');
