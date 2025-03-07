@@ -158,6 +158,8 @@ class Settings{
         this.save(); 
     }
 
+   
+
     changeModel(event) {
         const selectedModel = window.settings.models.find(model => model.name === event.target.value);
         if (selectedModel) {
@@ -233,7 +235,6 @@ class Settings{
             .join('');
         modelSelect.value = this.model;
 
-        document.getElementById("project").value = this.project;
 
     }
 
