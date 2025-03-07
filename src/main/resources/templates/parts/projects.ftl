@@ -1,7 +1,7 @@
 <div id="projects" class="projects">
     <div class="projects-list">
         <label>Twoje projekty</label>
-        <div class="d-flex">
+        <div class="d-flex mt-05">
             <select class="project-select">
                 <option value="12345">Nazwa projektu</option>
             </select>
