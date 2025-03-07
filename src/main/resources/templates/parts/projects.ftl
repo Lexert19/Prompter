@@ -86,14 +86,7 @@ h4 {
     margin: 0px;
 }
 
-.btn-create,
-.btn-add-file {
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-}
+
 
 .project-card {
     border: 1px solid #ddd;
