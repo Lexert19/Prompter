@@ -42,6 +42,7 @@ class ProjectController(
         val project = Project().apply {
             this.user = user
             this.name = name
+            this.userId = user.id
         }
     
         val savedProject = projectRepository.save(project).awaitSingle()
