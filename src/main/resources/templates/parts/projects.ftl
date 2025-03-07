@@ -1,15 +1,10 @@
 <div id="projects" class="projects">
-    <!-- Sekcja dodawania projektu -->
-    <div class="create-project">
-        <h4>Utwórz nowy projekt</h4>
-        <button class="btn-create">Utwórz</button>
-    </div>
-    <!-- Lista projektów -->
     <div class="projects-list">
         <h4>Twoje projekty</h4>
         <select class="project-select">
             <option value="12345">Nazwa projektu</option>
         </select>
+        <button class="btn-create">Utwórz</button>
     </div>
     <!-- Sekcja szczegółów projektu -->
     <div class="project-details">
