@@ -82,26 +82,6 @@ class ProjectController(
         return projectRepository.save(project).awaitSingle()
     }
 
-    @PostMapping("/{projectId}/index")
-    suspend fun indexProject(
-        @AuthenticationPrincipal oAuth2User: OAuth2User,
-        @PathVariable projectId: String
-    ): Project {
-        val userId = oAuth2User.getAttribute<String>("sub")
-            ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
-        
-
-        val user = userRepository.findById(userId).awaitSingle()
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony") 
-
-        val project = projectRepository.findByIdAndUser(projectId, user)
-            .awaitSingle()
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nie znaleziony")
-        
-        //embeddingService.createProjectEmbedding(project, user)
-        return projectRepository.save(project).awaitSingle()
-    }
-
     @PostMapping("/{projectId}/similar-fragments")
     suspend fun getSimilarFragments(
         @AuthenticationPrincipal oAuth2User: OAuth2User,
