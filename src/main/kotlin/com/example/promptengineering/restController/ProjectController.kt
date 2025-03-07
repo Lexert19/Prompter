@@ -34,7 +34,7 @@ class ProjectController(
     suspend fun createProject(
         @AuthenticationPrincipal oAuth2User: OAuth2User,
         @RequestBody name: String
-    ): ResponseEntity<Project> {
+    ): ResponseEntity<ProjectResponse> {
         val userId = oAuth2User.getAttribute<String>("id")
             ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
         val user = userRepository.findById(userId).awaitSingle()
@@ -45,7 +45,8 @@ class ProjectController(
         }
     
         val savedProject = projectRepository.save(project).awaitSingle()
-        return ResponseEntity.ok(savedProject)
+        val projectResponse = ProjectResponse(savedProject.id, savedProject.name, ArrayList())
+        return ResponseEntity.ok(projectResponse)
     }
 
     @GetMapping("/{projectId}")
@@ -96,7 +97,7 @@ class ProjectController(
         @AuthenticationPrincipal oAuth2User: OAuth2User,
         @PathVariable projectId: String,
         @RequestBody file: FileElement
-    ): Project {
+    ): ResponseEntity<ProjectResponse> {
         val userId = oAuth2User.getAttribute<String>("id")
             ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
         
@@ -107,7 +108,9 @@ class ProjectController(
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nie znaleziony")
         
         embeddingService.addFileToProject(project, file, user)
-        return projectRepository.save(project).awaitSingle()
+        val savedProject = projectRepository.save(project).awaitSingle()
+        val projectResponse = ProjectResponse(savedProject.id, savedProject.name, savedProject.files)
+        return ResponseEntity.ok(projectResponse)
     }
 
     @PostMapping("/{projectId}/similar-fragments")
