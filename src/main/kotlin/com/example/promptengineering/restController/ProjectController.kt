@@ -128,6 +128,28 @@ class ProjectController(
         return ResponseEntity.ok(projectResponse)
     }
 
+    @GetMapping("/{projectId}/files")
+    suspend fun getProjectFiles(
+        @AuthenticationPrincipal oAuth2User: OAuth2User,
+        @PathVariable projectId: String
+    ): ResponseEntity<List<FileElement>> {
+        val userId = oAuth2User.getAttribute<String>("id")
+            ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
+        
+        val user = userRepository.findById(userId).awaitSingle()
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony")
+
+        val project = projectRepository.findByIdAndUserId(projectId, user.id)
+            .awaitSingle()
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nie istnieje lub nie należy do Ciebie")
+
+        val files = fileElementRepository.findByProject(project.id)
+            .collectList()
+            .awaitSingle() ?: emptyList()
+
+        return ResponseEntity.ok(files)
+    }
+
     @PostMapping("/{projectId}/similar-fragments")
     suspend fun getSimilarFragments(
         @AuthenticationPrincipal oAuth2User: OAuth2User,
