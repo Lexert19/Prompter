@@ -9,6 +9,7 @@ import com.example.promptengineering.model.FileElement;
 import jakarta.persistence.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
 @Document(collection = "projects") 
 public class Project {
@@ -16,9 +17,9 @@ public class Project {
     private String id;
     private String name;
     private String userId;
-    @DBRef 
+    @DocumentReference  
     private User user;
-    @DBRef
+    @DocumentReference 
     private List<FileElement> files;
 
 
