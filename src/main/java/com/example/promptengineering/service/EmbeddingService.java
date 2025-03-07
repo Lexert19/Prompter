@@ -13,10 +13,14 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.example.promptengineering.entity.FileElement;
 import com.example.promptengineering.entity.Project;
 import com.example.promptengineering.entity.User;
-import com.example.promptengineering.model.FileElement;
+import com.example.promptengineering.repository.FileElementsRepository;
 import com.example.promptengineering.repository.ProjectRepository;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 public class EmbeddingService {
@@ -26,88 +30,93 @@ public class EmbeddingService {
     private WebClient webClient;
     @Autowired
     private ProjectRepository projectRepository;
+    @Autowired
+    private FileElementsRepository fileElementRepository;
 
-    public void addFileToProject(Project project, FileElement file, User user) {
+    public Mono<Void> addFileToProject(Project project, FileElement file, User user) {
         String apiKey = user.getKeys().getOrDefault("OPENAI", "");
         List<String> pages = splitContentIntoPages(file.getContent());
         file.setPages(pages);
-        createEmbeddingForFile(file, apiKey);
-        project.getFiles().add(file);
-        projectRepository.save(project);
+        file.setProject(project.getId());
+        file.setUserId(user.getId());
+    
+        return createEmbeddingForFile(file, apiKey)
+            .flatMap(f -> fileElementRepository.save(f))
+            .then(); 
     }
 
-    private void createEmbeddingForFile(FileElement file, String apiKey) {
+    private Mono<FileElement> createEmbeddingForFile(FileElement file, String apiKey) {
         List<String> pages = file.getPages();
         if (pages == null || pages.isEmpty()) {
-            return;
+            return Mono.just(file);
         }
 
-        List<List<Double>> vectors = new ArrayList<>();
-        for (String page : pages) {
-            List<Double> vector = getEmbedding(page, apiKey);
-            vectors.add(vector);
-        }
-        file.setVectors(vectors);
+        return Flux.fromIterable(pages)
+                .flatMap(page -> getEmbedding(page, apiKey))
+                .collectList()
+                .map(vectors -> {
+                    file.setVectors(vectors);
+                    return file;
+                });
     }
 
-    public List<Double> getEmbedding(String text, String apiKey) {
+    public Mono<List<Double>> getEmbedding(String text, String apiKey) {
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("input", text);
         requestBody.put("model", "text-embedding-ada-002");
 
         ParameterizedTypeReference<Map<String, Object>> typeRef = new ParameterizedTypeReference<>() {
         };
-        Map<String, Object> responseBody = webClient.post()
+
+        return webClient.post()
                 .uri(EMBEDDINGS_URL)
                 .header("Authorization", "Bearer " + apiKey)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(requestBody)
                 .retrieve()
                 .bodyToMono(typeRef)
-                .block();
-
-        if (responseBody != null && responseBody.containsKey("data")) {
-            List<Map<String, Object>> data = (List<Map<String, Object>>) responseBody.get("data");
-            if (!data.isEmpty()) {
-                return (List<Double>) data.get(0).get("embedding");
-            }
-        }
-        throw new RuntimeException("Failed to get embedding for text: " + text);
+                .map(responseBody -> {
+                    List<Map<String, Object>> data = (List<Map<String, Object>>) responseBody.get("data");
+                    if (!data.isEmpty()) {
+                        return (List<Double>) data.get(0).get("embedding");
+                    }
+                    throw new RuntimeException("Failed to get embedding for text: " + text);
+                });
     }
 
-    public List<String> retrieveSimilarFragments(String query, Project project, User user) {
+    public Mono<List<String>> retrieveSimilarFragments(String query, Project project, User user) {
         String apiKey = user.getKeys().getOrDefault("OPENAI", "");
-        List<Double> queryVector = getEmbedding(query, apiKey);
-
-        List<FileElement> projectFiles = project.getFiles();
-        if (projectFiles == null || projectFiles.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        List<ScoredFragment> scoredFragments = new ArrayList<>();
-        for (FileElement file : projectFiles) {
-            List<String> pages = file.getPages();
-            List<List<Double>> vectors = file.getVectors();
-            if (pages == null || vectors == null || pages.size() != vectors.size()) {
-                continue;
-            }
-            for (int i = 0; i < pages.size(); i++) {
-                String page = pages.get(i);
-                List<Double> vector = vectors.get(i);
-                if (vector == null || vector.isEmpty())
-                    continue;
-                double similarity = cosineSimilarity(queryVector, vector);
-                scoredFragments.add(new ScoredFragment(page, similarity));
-            }
-        }
-
-        scoredFragments.sort((a, b) -> Double.compare(b.score, a.score));
-
-        int topN = 5;
-        return scoredFragments.stream()
-                .limit(topN)
-                .map(ScoredFragment::getText)
-                .collect(Collectors.toList());
+    
+        return getEmbedding(query, apiKey)
+            .flatMap(queryVector -> {
+                return fileElementRepository.findByProject(project.getId())
+                    .flatMap(file -> {
+                        List<String> pages = file.getPages();
+                        List<List<Double>> vectors = file.getVectors();
+                        if (pages == null || vectors == null || pages.size() != vectors.size()) {
+                            return Mono.empty();
+                        }
+    
+                        return Flux.range(0, pages.size())
+                            .flatMap(index -> {
+                                String page = pages.get(index);
+                                List<Double> vector = vectors.get(index);
+                                if (vector == null || vector.isEmpty()) {
+                                    return Mono.empty();
+                                }
+                                double similarity = cosineSimilarity(queryVector, vector);
+                                return Mono.just(new ScoredFragment(page, similarity));
+                            });
+                    })
+                    .collectList()
+                    .map(scoredFragments -> {
+                        scoredFragments.sort((a, b) -> Double.compare(b.score, a.score));
+                        return scoredFragments.stream()
+                            .limit(5)
+                            .map(ScoredFragment::getText)
+                            .collect(Collectors.toList());
+                    });
+            });
     }
 
     private double cosineSimilarity(List<Double> vectorA, List<Double> vectorB) {
@@ -144,12 +153,12 @@ public class EmbeddingService {
     private static class ScoredFragment {
         private String text;
         private double score;
-        
+
         public ScoredFragment(String text, double score) {
             this.text = text;
             this.score = score;
         }
-    
+
         public String getText() {
             return text;
         }

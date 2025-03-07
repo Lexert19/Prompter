@@ -69,6 +69,8 @@ class ProjectController(
         val projectResponse = ProjectResponse(project.id, project.name, project.files)
         return ResponseEntity.ok(projectResponse)
     }
+
+    
     @GetMapping
     suspend fun getUserProjects(
         @AuthenticationPrincipal oAuth2User: OAuth2User

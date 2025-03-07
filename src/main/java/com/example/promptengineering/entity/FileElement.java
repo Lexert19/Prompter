@@ -1,9 +1,14 @@
-package com.example.promptengineering.model;
+package com.example.promptengineering.entity;
 
 import java.util.List;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document(collection = "fileElements") 
 public class FileElement {
     private String name;
+    private String project;
+    private String userId;
     private String content;
     private List<String> pages;
     private List<List<Double>> vectors;
@@ -33,7 +38,20 @@ public class FileElement {
     public void setVectors(List<List<Double>> vectors) {
         this.vectors = vectors;
     }
+    public String getProject() {
+        return project;
+    }
+    public void setProject(String project) {
+        this.project = project;
+    }
+    public String getUserId() {
+        return userId;
+    }
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
    
+    
 
     
 

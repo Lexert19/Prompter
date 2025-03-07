@@ -17,8 +17,6 @@ public class Project {
     private String userId;
     @DocumentReference  
     private User user;
-    @DocumentReference 
-    private List<FileElement> files;
 
 
     public String getName() {
@@ -27,15 +25,6 @@ public class Project {
     public void setName(String name) {
         this.name = name;
     } 
-   
-    public List<FileElement> getFiles() {
-        return files;
-    }
-    public void setFiles(List<FileElement> files) {
-        this.files = files;
-    }
-
-  
 
     public User getUser() {
         return user;
