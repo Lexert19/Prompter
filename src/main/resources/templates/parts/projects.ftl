@@ -86,7 +86,6 @@ h4{
 }
 .btn-create,
 .btn-add-file {
-    background: #2196F3;
     color: white;
     border: none;
     padding: 10px 20px;
