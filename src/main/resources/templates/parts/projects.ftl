@@ -21,9 +21,55 @@
         <!-- Sekcja przeglądania plików -->
         <div class="file-browser">
             <div class="file-grid">
-                <div class="file-item">📄 nazwa_pliku.txt</div>
-                <div class="file-item">📄 inny_plik.doc</div>
+                <div class="file-item">
+                    <span class="icon-file">📄</span>
+                    <span class="file-name">nazwa_pliku.txt</span>
+                </div>
+                <div class="file-item">
+                    <span class="icon-file">📄</span>
+                    <span class="file-name">inny_plik.doc</span>
+                </div>
                 <!-- Dodaj więcej plików tutaj -->
+                <div class="file-item">
+                    <span class="icon-file">📄</span>
+                    <span class="file-name">plik1.pdf</span>
+                </div>
+                <div class="file-item">
+                    <span class="icon-file">📄</span>
+                    <span class="file-name">plik2.docx</span>
+                </div>
+                <div class="file-item">
+                    <span class="icon-file">📄</span>
+                    <span class="file-name">plik3.xlsx</span>
+                </div>
+                <div class="file-item">
+                    <span class="icon-file">📄</span>
+                    <span class="file-name">plik4.jpg</span>
+                </div>
+                <div class="file-item">
+                    <span class="icon-file">📄</span>
+                    <span class="file-name">plik5.png</span>
+                </div>
+                <div class="file-item">
+                    <span class="icon-file">📄</span>
+                    <span class="file-name">plik6.zip</span>
+                </div>
+                <div class="file-item">
+                    <span class="icon-file">📄</span>
+                    <span class="file-name">plik7.rar</span>
+                </div>
+                <div class="file-item">
+                    <span class="icon-file">📄</span>
+                    <span class="file-name">plik8.mp3</span>
+                </div>
+                <div class="file-item">
+                    <span class="icon-file">📄</span>
+                    <span class="file-name">plik9.mp4</span>
+                </div>
+                <div class="file-item">
+                    <span class="icon-file">📄</span>
+                    <span class="file-name">plik10.avi</span>
+                </div>
             </div>
         </div>
         <!-- Dodawanie plików -->
@@ -39,7 +85,6 @@
         <div class="alert alert-error">Błąd: Projekt nie istnieje</div>
     </div>
 </div>
-
 <style>
 .container {
     max-width: 1200px;
@@ -47,7 +92,8 @@
     padding: 20px;
 }
 
-.btn-create, .btn-add-file {
+.btn-create,
+.btn-add-file {
     background: #2196F3;
     color: white;
     border: none;
@@ -95,20 +141,28 @@
 
 .file-grid {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     gap: 10px;
 }
 
 .file-item {
     display: flex;
+    flex-direction: column;
     align-items: center;
     padding: 10px;
-    border: 1px solid #eee;
     border-radius: 5px;
+    text-align: center;
 }
 
 .icon-file {
-    margin-right: 10px;
+    font-size: 1.5em;
+    margin-bottom: 5px;
+}
+
+.file-name {
+    font-size: 0.8em;
+    word-wrap: break-word;
+    width: 100%;
 }
 
 .icon-plus {
