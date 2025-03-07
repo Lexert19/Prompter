@@ -1,11 +1,12 @@
 
 class Message {
-    constructor(role = "", text = "", images = [], documents = []) {
+    constructor(role = "", text = "", images = [], documents = [], context = []) {
         this.role = role;
         this.content = [];
         this.id = Math.random().toString(36);
         this.cache = false;
         this.documents = [];
+        this.context = context;
         this.text = "";
         this.time = Date.now();
 
@@ -19,6 +20,7 @@ class Message {
         let textContent = "";
         this.documents = documents;
         this.text = text;
+        this.context.forEach(context => textContent += `<context>${context}</context>`)
         documents.forEach(doc => textContent += "<document>" + doc + "</document>");
 
         this.content.push({

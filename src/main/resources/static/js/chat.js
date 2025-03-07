@@ -178,23 +178,38 @@ class Chat {
         });
     }
 
-    chat() {
+    async chat() {
         if (this.blockedInput == true)
             return;
         this.blockedInput = true;
-        this.newMessage();
+
+        const fragments = await this.getContext();
+        console.log(fragments);
+        this.newMessage([]);
         this.createMessage(this.currentMessage);
+
+
         this.requestBuilder.addMessage(this.currentMessage);
         this.chatClient.sendStreamingMessage(this.requestBuilder);
         this.message.value = "";
     }
 
-    newMessage() {
+    async getContext(){
+        if (window.settings.projectSwitch && window.settings.project) {
+            const query = this.message.value;
+            const fragments = window.projects.searchSimilarFragments(window.settings.project, encodeURIComponent(query));
+            return fragments;
+        }
+        return [];
+    }
+
+    newMessage(fragments) {
         this.currentMessage = new Message(
             "user",
             this.message.value,
             this.images,
-            this.documents
+            this.documents,
+            fragments
         );
         this.images = [];
         this.documents = [];

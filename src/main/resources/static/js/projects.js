@@ -168,6 +168,29 @@ class Projects {
         }
     }
 
+    async searchSimilarFragments(projectId, query) {
+        try {
+            const response = await fetch(
+                `${this.controllerUrl}/${projectId}/similar-fragments?query=${encodeURIComponent(query)}`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include'
+                }
+            );
+    
+            if (!response.ok) throw new Error('Błąd podczas wyszukiwania');
+    
+            const fragments = await response.json();
+            return fragments;
+        } catch (error) {
+            this.showError('Nie udało się znaleźć podobnych fragmentów');
+            console.error('Błąd:', error);
+        }
+    }
+
     async loadProjectFiles(projectId) {
         try {
             const response = await fetch(`${this.controllerUrl}/${projectId}/files`, {
