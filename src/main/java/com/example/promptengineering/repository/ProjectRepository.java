@@ -16,6 +16,6 @@ import reactor.core.publisher.Mono;
 public interface ProjectRepository extends ReactiveMongoRepository<Project, String> {
 
     Mono<Project> findByIdAndUser(String projectId, User user);
-    @Query("{ 'user.$id' : ObjectId(?0) }")
+    @Query("{ 'user.$id': ?#{#user.id} }")
     Flux<Project> findAllByUser(@Param("user") User user);
 }
