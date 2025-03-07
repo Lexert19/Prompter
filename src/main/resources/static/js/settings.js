@@ -115,7 +115,7 @@ class Settings{
             system: this.system,
             systemSwitch: this.systemSwitch,
             project: this.project,
-            projectSwitch: this.projectsSwich
+            projectSwitch: this.projectSwitch
         };
         localStorage.setItem("appSettings", JSON.stringify(settingsToSave));
     }
