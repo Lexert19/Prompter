@@ -64,7 +64,7 @@ public class EmbeddingService {
     public Mono<List<Double>> getEmbedding(String text, String apiKey) {
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("input", text);
-        requestBody.put("model", "text-embedding-ada-002");
+        requestBody.put("model", "text-embedding-3-large");
 
         ParameterizedTypeReference<Map<String, Object>> typeRef = new ParameterizedTypeReference<>() {
         };
