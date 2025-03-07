@@ -1,4 +1,4 @@
-<div id="projects">
+<div id="projects" class="projects">
     <h1>Projekty</h1>
     <!-- Sekcja dodawania projektu -->
     <div class="create-project">
