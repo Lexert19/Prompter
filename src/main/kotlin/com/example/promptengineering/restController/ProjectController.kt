@@ -78,7 +78,7 @@ class ProjectController(
         val user = userRepository.findById(userId).awaitSingle()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony")
 
-        val projectsFlux = projectRepository.findAllByUser(user.id)
+        val projectsFlux = projectRepository.findAllByUserId(user.id)
         val projects = projectsFlux.collectList().awaitSingle()
         
         val projectResponses = projects.map { project ->
