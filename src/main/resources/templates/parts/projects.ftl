@@ -157,7 +157,7 @@ h4{
 }
 
 .file-name {
-    font-size: 13px;
+    font-size: 11px;
     word-wrap: break-word;
     width: 100%;
 }
