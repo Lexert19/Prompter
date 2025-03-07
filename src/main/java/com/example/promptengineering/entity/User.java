@@ -11,10 +11,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-
 @Document(collection = "users")
 public class User implements OAuth2User {
     @Id
