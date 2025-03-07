@@ -138,7 +138,7 @@ h4{
 
 .file-grid {
     display: grid;
-    grid-template-columns: repeat(5, minmax(100px, 1fr));
+    grid-template-columns: repeat(5, minmax(40px, 1fr));
         gap: 10px;
 }
 
