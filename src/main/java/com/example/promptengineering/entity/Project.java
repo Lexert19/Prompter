@@ -3,11 +3,9 @@ package com.example.promptengineering.entity;
 import java.util.List;
 
 
-import com.example.promptengineering.model.Embedding;
 import com.example.promptengineering.model.FileElement;
 
 import jakarta.persistence.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
