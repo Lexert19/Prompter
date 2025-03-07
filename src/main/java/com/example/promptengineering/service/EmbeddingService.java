@@ -79,7 +79,8 @@ public class EmbeddingService {
                 .map(responseBody -> {
                     List<Map<String, Object>> data = (List<Map<String, Object>>) responseBody.get("data");
                     if (!data.isEmpty()) {
-                        return (List<Double>) data.get(0).get("embedding");
+                        List<Double> embedding = (List<Double>) data.get(0).get("embedding");
+                        return embedding;
                     }
                     throw new RuntimeException("Failed to get embedding for text: " + text);
                 });
