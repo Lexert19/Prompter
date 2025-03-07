@@ -7,7 +7,7 @@ import com.example.promptengineering.entity.FileElement;
 import reactor.core.publisher.Flux;
 
 public interface FileElementsRepository extends ReactiveMongoRepository<FileElement, String> {
-    Flux<FileElement> findByProject(String projectId);
+    Flux<FileElement> findByProject(String project);
     Flux<FileElement> findByIdAndProject(String id, String projectId);
 }
 
