@@ -19,7 +19,7 @@
     <div class="d-flex">
         <input type="range" id="temperature" name="temperature" min="0" max="100" step="1" value="0"
             oninput="window.settings.change(event)">
-        <label class="center" for="temperature"><span>Temperatura</span></label>
+        <label class="center" for="temperature"><span>Temperatura yyy</span></label>
     </div>
     <div>
         <label for="system">System</label>
