@@ -34,7 +34,7 @@
     <div>
         <label>Projekt</label>
         <div class="d-flex mt-025">
-            <select id="project" name="project" onblur="window.settings.change(event)"></select>
+            <select id="project" name="project" onchange="window.settings.change(event)"></select>
              <label class="checkbox-container">
                 <input type="checkbox" id="projectSwitch" name="projectSwitch" onchange="window.settings.change(event)">
                 <label for="projectSwitch" class="custom-checkbox"></label>
