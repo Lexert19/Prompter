@@ -1,19 +1,19 @@
 <div id="projects" class="projects">
     <!-- Sekcja dodawania projektu -->
     <div class="create-project">
-        <h2>Utwórz nowy projekt</h2>
+        <h4>Utwórz nowy projekt</h4>
         <button class="btn-create">Utwórz</button>
     </div>
     <!-- Lista projektów -->
     <div class="projects-list">
-        <h2>Twoje projekty</h2>
+        <h4>Twoje projekty</h4>
         <select class="project-select">
             <option value="12345">Nazwa projektu</option>
         </select>
     </div>
     <!-- Sekcja szczegółów projektu -->
     <div class="project-details">
-        <h2>Szczegóły projektu</h2>
+        <h4>Szczegóły projektu</h4>
         <div class="detail-section">
             <p><strong>Nazwa:</strong> <span class="project-name-display"></span></p>
         </div>
