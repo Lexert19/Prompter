@@ -1,5 +1,4 @@
 <div id="projects" class="projects">
-   <h1>Projekty</h1>
     <!-- Sekcja dodawania projektu -->
     <div class="create-project">
         <h2>Utwórz nowy projekt</h2>
@@ -16,7 +15,7 @@
         </select>
     </div>
     <!-- Sekcja szczegółów projektu -->
-    <div class="project-details" style="display: none;">
+    <div class="project-details" >
         <h2>Szczegóły projektu</h2>
         <div class="detail-section">
             <p><strong>Nazwa:</strong> <span class="project-name-display"></span></p>
