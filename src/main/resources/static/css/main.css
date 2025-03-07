@@ -446,6 +446,7 @@ input[type="range"]::-moz-range-progress {
     padding: 10px;
     border-radius: 5px;
     text-align: center;
+    cursor: pointer;
 }
 
 .icon-file {
