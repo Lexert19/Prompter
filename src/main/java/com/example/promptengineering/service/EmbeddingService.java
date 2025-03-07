@@ -120,7 +120,7 @@ public class EmbeddingService {
             return Mono.empty();
         }
 
-        double similarity = cosineSimilarity(queryVector, vector);
+        double similarity = euclideanDistance(queryVector, vector);
         return Mono.just(new ScoredFragment(page, similarity));
     }
 
@@ -135,41 +135,7 @@ public class EmbeddingService {
                 });
     }
 
-    // public Mono<List<String>> retrieveSimilarFragments(String query, Project
-    // project, User user) {
-    // String apiKey = user.getKeys().getOrDefault("OPENAI", "");
-
-    // return getEmbedding(query, apiKey)
-    // .flatMap(queryVector -> {
-    // return fileElementRepository.findByProject(project.getId())
-    // .flatMap(file -> {
-    // List<String> pages = file.getPages();
-    // List<List<Double>> vectors = file.getVectors();
-    // if (pages == null || vectors == null || pages.size() != vectors.size()) {
-    // return Mono.empty();
-    // }
-
-    // return Flux.range(0, pages.size())
-    // .flatMap(index -> {
-    // String page = pages.get(index);
-    // List<Double> vector = vectors.get(index);
-    // if (vector == null || vector.isEmpty()) {
-    // return Mono.empty();
-    // }
-    // double similarity = cosineSimilarity(queryVector, vector);
-    // return Mono.just(new ScoredFragment(page, similarity));
-    // });
-    // })
-    // .collectList()
-    // .map(scoredFragments -> {
-    // scoredFragments.sort((a, b) -> Double.compare(b.score, a.score));
-    // return scoredFragments.stream()
-    // .limit(5)
-    // .map(ScoredFragment::getText)
-    // .collect(Collectors.toList());
-    // });
-    // });
-    // }
+  
 
     private double cosineSimilarity(List<Double> vectorA, List<Double> vectorB) {
         double dotProduct = 0.0;
@@ -182,6 +148,15 @@ public class EmbeddingService {
         }
         return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
     }
+
+    private double euclideanDistance(List<Double> vectorA, List<Double> vectorB) {
+        double sum = 0.0;
+        for (int i = 0; i < vectorA.size(); i++) {
+            sum += Math.pow(vectorA.get(i) - vectorB.get(i), 2);
+        }
+        return Math.sqrt(sum);
+    }
+    
 
     private List<String> splitContentIntoPages(String content) {
         List<String> pages = new ArrayList<>();
