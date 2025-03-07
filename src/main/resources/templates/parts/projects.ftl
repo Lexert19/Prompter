@@ -69,7 +69,7 @@
             </div>
         </div>
         <!-- Dodawanie plików -->
-        <div class="add-file-section mt-1">
+        <div class="add-file-section mt-05">
             <button class="btn-add-file">
                 <span class="icon-plus">+</span> Dodaj plik
             </button>
