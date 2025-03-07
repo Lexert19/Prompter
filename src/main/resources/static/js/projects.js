@@ -167,4 +167,4 @@ class Projects {
     }
 }
 
-window.projects = new Projects();
+window.projects = new Projects();   
