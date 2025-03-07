@@ -1,6 +1,6 @@
 <div id="projects" class="projects">
     <div class="projects-list">
-        <h4>Twoje projekty</h4>
+        <h5>Twoje projekty</h5>
         <div class="d-flex">
             <select class="project-select">
                 <option value="12345">Nazwa projektu</option>
@@ -10,7 +10,7 @@
     </div>
     <!-- Sekcja szczegółów projektu -->
     <div class="project-details">
-        <h4>Szczegóły projektu</h4>
+        <h5>Szczegóły projektu</h5>
         <div class="detail-section">
             <p><strong>Nazwa:</strong> <span class="project-name-display"></span></p>
         </div>
