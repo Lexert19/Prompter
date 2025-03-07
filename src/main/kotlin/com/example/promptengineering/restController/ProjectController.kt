@@ -104,7 +104,7 @@ class ProjectController(
         
         val user = userRepository.findById(userId).awaitSingle()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony") 
-        val project = projectRepository.findByIdAndUser(projectId, user)
+        val project = projectRepository.findByIdAndUserId(projectId, user.id)
             .awaitSingle()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nie znaleziony")
         
@@ -126,7 +126,7 @@ class ProjectController(
         val user = userRepository.findById(userId).awaitSingle()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony") 
 
-        val project = projectRepository.findByIdAndUser(projectId, user)
+        val project = projectRepository.findByIdAndUserId(projectId, user.id)
             .awaitSingle()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nie znaleziony")
         
