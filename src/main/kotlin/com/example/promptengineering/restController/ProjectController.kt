@@ -62,6 +62,22 @@ class ProjectController(
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nie znaleziony")
     }
 
+    @GetMapping
+    suspend fun getUserProjects(
+        @AuthenticationPrincipal oAuth2User: OAuth2User
+    ): ResponseEntity<List<Project>> {
+        val userId = oAuth2User.getAttribute<String>("sub")
+            ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
+        
+        val user = userRepository.findById(userId).awaitSingle()
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony")
+
+        val projects = projectRepository.findAllByUser(user).awaitSingle()
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Brak projektów dla tego użytkownika")
+
+        return ResponseEntity.ok(projects)
+    }
+
   
     @PostMapping("/{projectId}/files")
     suspend fun addFileToProject(
@@ -78,7 +94,7 @@ class ProjectController(
             .awaitSingle()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nie znaleziony")
         
-        //project.files.add(file)
+        embeddingService.addFileToProject(project, file, user)
         return projectRepository.save(project).awaitSingle()
     }
 

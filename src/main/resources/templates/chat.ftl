@@ -39,6 +39,7 @@
     </div>
     <#include "/parts/editMessage.ftl" />
     <script src="/static/js/main.js"></script>
+    <script src="/static/js/projects.js"></script>
     <script src="/static/js/settings.js"></script>
     <script src="/static/js/htmlParser.js"></script>
     <script src="/static/js/editMessageView.js"></script>
