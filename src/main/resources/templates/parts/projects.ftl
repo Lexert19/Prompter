@@ -82,12 +82,6 @@
     </div>
 </div>
 <style>
-h4 , h5{
-    margin: 0px;
-}
-
-
-
 .project-card {
     border: 1px solid #ddd;
     padding: 15px;
