@@ -197,7 +197,7 @@ class Chat {
     async getContext(){
         if (window.settings.projectSwitch && window.settings.project) {
             const query = this.message.value;
-            const fragments = window.projects.searchSimilarFragments(window.settings.project, encodeURIComponent(query));
+            const fragments = await window.projects.searchSimilarFragments(window.settings.project, encodeURIComponent(query));
             return fragments;
         }
         return [];
