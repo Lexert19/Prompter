@@ -17,6 +17,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.example.promptengineering.entity.FileElement;
 import com.example.promptengineering.entity.Project;
 import com.example.promptengineering.entity.User;
+import com.example.promptengineering.model.ScoredFragment;
 import com.example.promptengineering.repository.FileElementsRepository;
 import com.example.promptengineering.repository.ProjectRepository;
 
@@ -86,7 +87,7 @@ public class EmbeddingService {
                 });
     }
 
-    public Mono<List<String>> retrieveSimilarFragments(String query, Project project, User user) {
+    public Mono<List<ScoredFragment>> retrieveSimilarFragments(String query, Project project, User user) {
         String apiKey = user.getKeys().getOrDefault("OPENAI", "");
 
         return getEmbedding(query, apiKey)
@@ -125,13 +126,12 @@ public class EmbeddingService {
         return Mono.just(new ScoredFragment(page, similarity));
     }
 
-    private Mono<List<String>> formatTopFiveResults(List<ScoredFragment> scoredFragments) {
+    private Mono<List<ScoredFragment>> formatTopFiveResults(List<ScoredFragment> scoredFragments) {
         return Mono.just(scoredFragments)
                 .map(list -> {
                     list.sort(Comparator.comparingDouble(ScoredFragment::getScore).reversed());
                     return list.stream()
                             .limit(5)
-                            .map(ScoredFragment::getText)
                             .collect(Collectors.toList());
                 });
     }
@@ -174,22 +174,6 @@ public class EmbeddingService {
         return pages;
     }
 
-    private static class ScoredFragment {
-        private String text;
-        private double score;
-
-        public ScoredFragment(String text, double score) {
-            this.text = text;
-            this.score = score;
-        }
-
-        public String getText() {
-            return text;
-        }
-        public double getScore() { 
-            return score;
-        }
-
-    }
+    
 
 }

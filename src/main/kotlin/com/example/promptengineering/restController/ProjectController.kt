@@ -19,6 +19,7 @@ import kotlinx.coroutines.reactive.awaitSingleOrNull
 import reactor.core.publisher.Flux
 import com.example.promptengineering.model.ProjectResponse
 import kotlin.collections.ArrayList
+import com.example.promptengineering.model.ScoredFragment
 import com.example.promptengineering.repository.FileElementsRepository
 
 
@@ -181,7 +182,7 @@ class ProjectController(
         @AuthenticationPrincipal oAuth2User: OAuth2User,
         @PathVariable projectId: String,
         @RequestParam query: String
-    ): ResponseEntity<List<String>> {
+    ): ResponseEntity<List<ScoredFragment>> {
         val userId = oAuth2User.getAttribute<String>("id")
             ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Brak identyfikatora użytkownika")
         
