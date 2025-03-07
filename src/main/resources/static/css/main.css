@@ -183,6 +183,9 @@ select {
     display: none;
 }
 
+.projects{
+    display: none;
+}
 .panel{
     display: flex;
 }
