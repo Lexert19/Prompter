@@ -1,6 +1,7 @@
 package com.example.promptengineering.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,10 +40,10 @@ public class EmbeddingService {
         file.setPages(pages);
         file.setProject(project.getId());
         file.setUserId(user.getId());
-    
+
         return createEmbeddingForFile(file, apiKey)
-            .flatMap(f -> fileElementRepository.save(f))
-            .then(); 
+                .flatMap(f -> fileElementRepository.save(f))
+                .then();
     }
 
     private Mono<FileElement> createEmbeddingForFile(FileElement file, String apiKey) {
@@ -86,38 +87,89 @@ public class EmbeddingService {
 
     public Mono<List<String>> retrieveSimilarFragments(String query, Project project, User user) {
         String apiKey = user.getKeys().getOrDefault("OPENAI", "");
-    
+
         return getEmbedding(query, apiKey)
-            .flatMap(queryVector -> {
-                return fileElementRepository.findByProject(project.getId())
-                    .flatMap(file -> {
-                        List<String> pages = file.getPages();
-                        List<List<Double>> vectors = file.getVectors();
-                        if (pages == null || vectors == null || pages.size() != vectors.size()) {
-                            return Mono.empty();
-                        }
-    
-                        return Flux.range(0, pages.size())
-                            .flatMap(index -> {
-                                String page = pages.get(index);
-                                List<Double> vector = vectors.get(index);
-                                if (vector == null || vector.isEmpty()) {
-                                    return Mono.empty();
-                                }
-                                double similarity = cosineSimilarity(queryVector, vector);
-                                return Mono.just(new ScoredFragment(page, similarity));
-                            });
-                    })
-                    .collectList()
-                    .map(scoredFragments -> {
-                        scoredFragments.sort((a, b) -> Double.compare(b.score, a.score));
-                        return scoredFragments.stream()
+                .flatMap(queryVector -> processQueryVectorWithProjectFiles(queryVector, project))
+                .flatMap(this::formatTopFiveResults);
+    }
+
+    private Mono<List<ScoredFragment>> processQueryVectorWithProjectFiles(List<Double> queryVector, Project project) {
+        return fileElementRepository.findByProject(project.getId())
+                .flatMap(file -> processFile(file, queryVector))
+                .collectList();
+    }
+
+    private Flux<ScoredFragment> processFile(FileElement file, List<Double> queryVector) {
+        List<String> pages = file.getPages();
+        List<List<Double>> vectors = file.getVectors();
+
+        if (pages == null || vectors == null || pages.size() != vectors.size()) {
+            return Flux.empty();
+        }
+
+        return Flux.range(0, pages.size())
+                .flatMap(index -> processPage(pages, vectors, index, queryVector));
+    }
+
+    private Mono<ScoredFragment> processPage(List<String> pages, List<List<Double>> vectors, int index,
+            List<Double> queryVector) {
+        String page = pages.get(index);
+        List<Double> vector = vectors.get(index);
+
+        if (vector == null || vector.isEmpty()) {
+            return Mono.empty();
+        }
+
+        double similarity = cosineSimilarity(queryVector, vector);
+        return Mono.just(new ScoredFragment(page, similarity));
+    }
+
+    private Mono<List<String>> formatTopFiveResults(List<ScoredFragment> scoredFragments) {
+        return Mono.just(scoredFragments)
+                .map(list -> {
+                    list.sort(Comparator.comparingDouble(ScoredFragment::getScore).reversed());
+                    return list.stream()
                             .limit(5)
                             .map(ScoredFragment::getText)
                             .collect(Collectors.toList());
-                    });
-            });
+                });
     }
+
+    // public Mono<List<String>> retrieveSimilarFragments(String query, Project
+    // project, User user) {
+    // String apiKey = user.getKeys().getOrDefault("OPENAI", "");
+
+    // return getEmbedding(query, apiKey)
+    // .flatMap(queryVector -> {
+    // return fileElementRepository.findByProject(project.getId())
+    // .flatMap(file -> {
+    // List<String> pages = file.getPages();
+    // List<List<Double>> vectors = file.getVectors();
+    // if (pages == null || vectors == null || pages.size() != vectors.size()) {
+    // return Mono.empty();
+    // }
+
+    // return Flux.range(0, pages.size())
+    // .flatMap(index -> {
+    // String page = pages.get(index);
+    // List<Double> vector = vectors.get(index);
+    // if (vector == null || vector.isEmpty()) {
+    // return Mono.empty();
+    // }
+    // double similarity = cosineSimilarity(queryVector, vector);
+    // return Mono.just(new ScoredFragment(page, similarity));
+    // });
+    // })
+    // .collectList()
+    // .map(scoredFragments -> {
+    // scoredFragments.sort((a, b) -> Double.compare(b.score, a.score));
+    // return scoredFragments.stream()
+    // .limit(5)
+    // .map(ScoredFragment::getText)
+    // .collect(Collectors.toList());
+    // });
+    // });
+    // }
 
     private double cosineSimilarity(List<Double> vectorA, List<Double> vectorB) {
         double dotProduct = 0.0;
@@ -162,6 +214,10 @@ public class EmbeddingService {
         public String getText() {
             return text;
         }
+        public double getScore() { 
+            return score;
+        }
+
     }
 
 }
