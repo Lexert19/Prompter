@@ -54,6 +54,12 @@ public class FileElement {
     public void setUserId(String userId) {
         this.userId = userId;
     }
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
+    }
    
     
 
