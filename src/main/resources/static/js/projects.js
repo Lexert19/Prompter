@@ -8,6 +8,7 @@ class Projects {
         this.fileGrid = document.querySelector('.file-grid');
         this.addFileButton = document.getElementById('btn-add-file');
         this.errorMessages = document.querySelector('.error-messages');
+        this.currentProjectId = null;
 
         this.initialize();
     }
@@ -80,6 +81,7 @@ class Projects {
 
     displayProjectDetails(project) {
         this.projectNameDisplay.textContent = project.name;
+        this.currentProjectId = project.id; 
         this.loadProjectFiles(project.id);
     }
 
@@ -110,6 +112,14 @@ class Projects {
                 <span class="icon-file">📄</span>
                 <span class="file-name">${file.name}</span>
             `;
+
+            fileElement.dataset.fileId = file.id;
+            fileElement.dataset.projectId = this.currentProjectId;
+
+            fileElement.addEventListener('click', () => {
+                this.showFileContent(fileElement.dataset.projectId, fileElement.dataset.fileId);
+            });
+
             this.fileGrid.appendChild(fileElement);
         });
     }
@@ -182,6 +192,28 @@ class Projects {
         setTimeout(() => {
             this.errorMessages.style.display = 'none';
         }, 3000);
+    }
+    async showFileContent(projectId, fileId) {
+        try {
+            const response = await fetch(`/api/projects/${projectId}/files/${fileId}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error('Nie udało się pobrać pliku');
+            }
+
+            const content = await response.text();
+            const blob = new Blob([content], { type: 'text/plain' }); 
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
+        } catch (error) {
+            this.showError('Nie udało się otworzyć pliku');
+            console.error('Błąd:', error);
+        }
     }
 }
 

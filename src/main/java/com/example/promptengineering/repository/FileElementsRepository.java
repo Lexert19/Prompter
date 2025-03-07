@@ -8,5 +8,6 @@ import reactor.core.publisher.Flux;
 
 public interface FileElementsRepository extends ReactiveMongoRepository<FileElement, String> {
     Flux<FileElement> findByProject(String projectId);
+    Flux<FileElement> findByIdAndProject(String id, String projectId);
 }
 
