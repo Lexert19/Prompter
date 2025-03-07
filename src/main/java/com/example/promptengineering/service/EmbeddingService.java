@@ -139,6 +139,9 @@ public class EmbeddingService {
   
 
     private double cosineSimilarity(List<Double> vectorA, List<Double> vectorB) {
+        if (vectorA.size() != vectorB.size()) {
+            throw new IllegalArgumentException("Vectors must have the same length");
+        }
         double dotProduct = 0.0;
         double normA = 0.0;
         double normB = 0.0;
