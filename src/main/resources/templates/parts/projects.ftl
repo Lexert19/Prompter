@@ -16,7 +16,6 @@
         <h2>Szczegóły projektu</h2>
         <div class="detail-section">
             <p><strong>Nazwa:</strong> <span class="project-name-display"></span></p>
-            <p><strong>Właściciel:</strong> <span class="project-owner"></span></p>
         </div>
         <!-- Sekcja przeglądania plików -->
         <div class="file-browser">
@@ -141,8 +140,8 @@
 
 .file-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(5, minmax(100px, 1fr));
+        gap: 10px;
 }
 
 .file-item {
