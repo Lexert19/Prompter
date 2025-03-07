@@ -86,13 +86,15 @@
 </div>
 <style>
 
-
+h4{
+    margin: 0px;
+}
 .btn-create,
 .btn-add-file {
     background: #2196F3;
     color: white;
     border: none;
-    padding: 5px 10px;
+    padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
 }
@@ -120,7 +122,7 @@
 
 .project-select {
     width: 100%;
-    padding: 5px;
+    padding: 10px;
     border-radius: 5px;
     border: 1px solid #ddd;
 }
