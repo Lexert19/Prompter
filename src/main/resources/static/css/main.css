@@ -288,6 +288,10 @@ p {
     margin-top: 1rem;
 }
 
+.mt-05{
+    margin-top: 0.5rem;
+}
+
 .assistant-data{
     display: flex;
 }
