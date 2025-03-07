@@ -1,5 +1,5 @@
 <div id="projects" class="projects">
-    <h1>Projekty</h1>
+   <h1>Projekty</h1>
     <!-- Sekcja dodawania projektu -->
     <div class="create-project">
         <h2>Utwórz nowy projekt</h2>
@@ -11,16 +11,9 @@
     <!-- Lista projektów -->
     <div class="projects-list">
         <h2>Twoje projekty</h2>
-        <ul class="project-items">
-            <!-- Przykładowy element listy -->
-            <li class="project-item">
-                <div class="project-card">
-                    <h3>Nazwa projektu</h3>
-                    <p>ID: <span>12345</span></p>
-                    <button class="btn-view">Przejdź do projektu</button>
-                </div>
-            </li>
-        </ul>
+        <select class="project-select">
+            <option value="12345">Nazwa projektu</option>
+        </select>
     </div>
     <!-- Sekcja szczegółów projektu -->
     <div class="project-details" style="display: none;">
@@ -31,12 +24,18 @@
         </div>
         <!-- Dodawanie plików -->
         <div class="add-file-section">
-            <h3>Dodaj plik</h3>
-            <form class="file-form">
-                <input type="text" placeholder="Nazwa pliku" class="file-name" required>
-                <input type="text" placeholder="Ścieżka pliku" class="file-path" required>
-                <button type="submit" class="btn-add-file">Dodaj plik</button>
-            </form>
+            <button class="btn-add-file">
+                <span class="icon-plus">+</span> Dodaj plik
+            </button>
+        </div>
+        <!-- Sekcja przeglądania plików -->
+        <div class="file-browser">
+            <div class="file-item">
+                <span class="icon-file">📄</span> nazwa_pliku.txt
+            </div>
+            <div class="file-item">
+                <span class="icon-file">📄</span> inny_plik.doc
+            </div>
         </div>
         <!-- Sekcja indeksowania -->
         <div class="index-section">
@@ -49,7 +48,6 @@
             <button class="btn-search">Szukaj</button>
             <div class="results">
                 <ul class="result-list">
-                    <!-- Przykładowy wynik -->
                     <li class="result-item">Fragment 1...</li>
                 </ul>
             </div>
@@ -64,52 +62,88 @@
 
 
 <style>
-    /* Podstawowe style */
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-    }
+   .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
 
-    .btn-create, .btn-add-file, .btn-index, .btn-search {
-        background: #2196F3;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-    }
+.btn-create, .btn-add-file, .btn-index, .btn-search {
+    background: #2196F3;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
 
-    .project-card {
-        border: 1px solid #ddd;
-        padding: 15px;
-        margin: 10px 0;
-        border-radius: 5px;
-    }
+.project-card {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 5px;
+}
 
-    .project-details {
-        margin-top: 30px;
-        border-top: 2px solid #eee;
-        padding-top: 20px;
-    }
+.project-details {
+    margin-top: 30px;
+    border-top: 2px solid #eee;
+    padding-top: 20px;
+}
 
-    .alert-error {
-        background: #ffdddd;
-        color: #cc0000;
-        padding: 10px;
-        margin: 10px 0;
-        border-radius: 5px;
-    }
+.alert-error {
+    background: #ffdddd;
+    color: #cc0000;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+}
 
-    .result-list {
-        list-style: none;
-        padding: 0;
-    }
+.result-list {
+    list-style: none;
+    padding: 0;
+}
 
-    .result-item {
-        background: #f0f0f0;
-        padding: 10px;
-        margin: 5px 0;
-        border-radius: 3px;
-    }
+.result-item {
+    background: #f0f0f0;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 3px;
+}
+
+/* Nowe style */
+.project-select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+.file-browser {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+.file-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.file-item:last-child {
+    border-bottom: none;
+}
+
+.icon-file {
+    margin-right: 10px;
+}
+
+.icon-plus {
+    font-size: 1.2em;
+    margin-right: 5px;
+}
 </style>
