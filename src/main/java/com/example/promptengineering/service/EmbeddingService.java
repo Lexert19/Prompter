@@ -120,7 +120,7 @@ public class EmbeddingService {
             return Mono.empty();
         }
 
-        double similarity = euclideanDistance(queryVector, vector);
+        double similarity = cosineSimilarity(queryVector, vector);
         return Mono.just(new ScoredFragment(page, similarity));
     }
 
@@ -146,17 +146,13 @@ public class EmbeddingService {
             normA += Math.pow(vectorA.get(i), 2);
             normB += Math.pow(vectorB.get(i), 2);
         }
-        return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
-    }
-
-    private double euclideanDistance(List<Double> vectorA, List<Double> vectorB) {
-        double sum = 0.0;
-        for (int i = 0; i < vectorA.size(); i++) {
-            sum += Math.pow(vectorA.get(i) - vectorB.get(i), 2);
+        normA = Math.sqrt(normA);
+        normB = Math.sqrt(normB);
+        if (normA == 0 || normB == 0) {
+            return 0.0; 
         }
-        return Math.sqrt(sum);
+        return dotProduct / (normA * normB);
     }
-    
 
     private List<String> splitContentIntoPages(String content) {
         List<String> pages = new ArrayList<>();
