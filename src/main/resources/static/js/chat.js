@@ -19,21 +19,7 @@ class Chat {
        
         this.addPasteListener();
         this.loadHistory();
-        //this.loadKeys();
-        //this.initSettings();
     }
-
-    // init(){    
-    //     window.settings.initUI();
-    // }
-
-    // initSettings() {
-    //     this.showSettings();
-    //     //this.clearMessages();
-    //     this.models.forEach(model => {
-    //         modelOptions.innerHTML += `<option value="${model.name}">${model.text}</option>`;
-    //     });
-    // }
 
     showSettings(){
         hidePages();
@@ -48,32 +34,6 @@ class Chat {
     }
 
     loadHistory() {
-        // fetch('/history/all', {
-        //     method: 'GET',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     },
-        //     credentials: 'include',
-        // })
-        //     .then(response => {
-        //         if (!response.ok) {
-        //             throw new Error('Network response was not ok ' + response.statusText);
-        //         }
-        //         return response.json();
-        //     })
-        //     .then(chatHistories => {
-        //         chatHistories = chatHistories.sort((a, b) => {
-        //             const dateA = createDateFromComponents(a.createTime);
-        //             const dateB = createDateFromComponents(b.createTime);
-        //             return dateB - dateA;
-        //         })
-        //         chatHistories.forEach(historyIndex => {
-        //             this.addHtmlHistoryIndex(historyIndex);
-        //         })
-        //     })
-        //     .catch(error => {
-        //         console.error('There was a problem with the fetch operation:', error);
-        //     });
     }
 
     addHtmlHistoryIndex(historyIndex) {
@@ -129,6 +89,7 @@ class Chat {
         };
         this.documentsHtml.append("text:" + content.length + " ");
         this.documents.push(doc);
+        this.updateDocumentsDisplay(); 
     }
 
     addImage(content, type) {
@@ -139,6 +100,21 @@ class Chat {
         };
         this.documentsHtml.append("image:" + content.length + " ");
         this.documents.push(doc);
+        this.updateDocumentsDisplay(); 
+    }
+
+    updateDocumentsDisplay() {
+        const docElement = this.documentsHtml;
+        let content = '';
+        const imgElement = docElement.querySelector('img');
+        if (imgElement) content += imgElement.outerHTML;
+    
+        const texts = [];
+        for (const doc of this.documents) texts.push(`text: ${doc.content.length}`);
+        for (const img of this.images) texts.push(`image: ${img.content.length}`);
+    
+        if (texts.length) content += ' ' + texts.join(' ');
+        docElement.innerHTML = content;
     }
 
     addPasteListener() {
@@ -213,6 +189,7 @@ class Chat {
         );
         this.images = [];
         this.documents = [];
+        this.updateDocumentsDisplay(); 
     }
 
     clearMessages() {
