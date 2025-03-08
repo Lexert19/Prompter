@@ -106,12 +106,10 @@ class Chat {
     updateDocumentsDisplay() {
         const docElement = this.documentsHtml;
         let content = '';
-        // const imgElement = docElement.querySelector('img');
-        // if (imgElement) content += imgElement.outerHTML;
     
         const texts = [];
         this.documents.forEach(doc =>{
-            texts.push(`text: ${doc.content.length}`);
+            texts.push(`text: ${doc.length}`);
         });
         this.images.forEach(img =>{
             texts.push(`image: ${img.content.length}`);
