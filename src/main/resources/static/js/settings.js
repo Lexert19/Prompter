@@ -19,10 +19,8 @@ class Settings{
             { name: "gpt-4o-mini", text: "gpt-4o-mini", provider: "OPENAI", url: "https://api.openai.com/v1/chat/completions", type: "vision" },
             { name: "o3-mini", text: "o3-mini", provider: "OPENAI", url: "https://api.openai.com/v1/chat/completions", type: "vision" },
             { name: "gpt-4o", text: "gpt-4o", provider: "OPENAI", url: "https://api.openai.com/v1/chat/completions", type: "vision" },
-            { name: "gpt-4-turbo", text: "gpt-4-turbo", provider: "OPENAI", url: "https://api.openai.com/v1/chat/completions", type: "vision" },
             { name: "claude-3-haiku-20240307", text: "Claude Haiku 3", provider: "ANTHROPIC", url: "https://api.anthropic.com/v1/messages", type: "vision" },
             { name: "claude-3-7-sonnet-20250219", text: "Claude Sonnet 3.7", provider: "ANTHROPIC", url: "https://api.anthropic.com/v1/messages", type: "vision" },
-            { name: "claude-3-opus-20240229", text: "Claude Opus 3", provider: "ANTHROPIC", url: "https://api.anthropic.com/v1/messages", type: "vision" },
             {
                 name: "meta-llama/Llama-3.3-70B-Instruct-Turbo",
                 text: "meta-llama/Llama-3.3-70B-Instruct-Turbo",
@@ -61,13 +59,6 @@ class Settings{
             {
                 name: "Qwen/QwQ-32B",
                 text: "Qwen/QwQ-32B",
-                provider: "DEEPINFRA",
-                type: "text",
-                url: "https://api.deepinfra.com/v1/openai/chat/completions"
-            },
-            {
-                name: "deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
-                text: "deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
                 provider: "DEEPINFRA",
                 type: "text",
                 url: "https://api.deepinfra.com/v1/openai/chat/completions"
