@@ -212,9 +212,9 @@ select {
 }
 
 .assistant {
-    background-color: #374151;
+    /* background-color: #374151;
     
-    border: 1px solid rgba(79, 70, 229, 0.2); 
+    border: 1px solid rgba(79, 70, 229, 0.2);  */
 }
 
 .chat-input {
