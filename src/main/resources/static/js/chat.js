@@ -82,26 +82,26 @@ class Chat {
         return document.getElementById("input-" + message.id);
     }
 
-    addDocument(content) {
-        let doc = {
-            type: "text",
-            content: content
-        };
-        this.documentsHtml.append("text:" + content.length + " ");
-        this.documents.push(doc);
-        this.updateDocumentsDisplay(); 
-    }
+    // addDocument(content) {
+    //     let doc = {
+    //         type: "text",
+    //         content: content
+    //     };
+    //     this.documentsHtml.append("text:" + content.length + " ");
+    //     this.documents.push(doc);
+    //     this.updateDocumentsDisplay(); 
+    // }
 
-    addImage(content, type) {
-        let doc = {
-            type: "image",
-            imageType: type,
-            content: content
-        };
-        this.documentsHtml.append("image:" + content.length + " ");
-        this.documents.push(doc);
-        this.updateDocumentsDisplay(); 
-    }
+    // addImage(content, type) {
+    //     let doc = {
+    //         type: "image",
+    //         imageType: type,
+    //         content: content
+    //     };
+    //     this.documentsHtml.append("image:" + content.length + " ");
+    //     this.documents.push(doc);
+    //     this.updateDocumentsDisplay(); 
+    // }
 
     updateDocumentsDisplay() {
         const docElement = this.documentsHtml;
