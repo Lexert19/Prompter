@@ -152,6 +152,7 @@ class Chat {
 
     async chat() {
         if (this.blockedInput == true){
+            this.chatClient.stopStreaming();
             return;
         }
         this.setBlockedInput(true);
