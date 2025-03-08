@@ -48,44 +48,42 @@ public class RequestBuilder {
     public Map<String, Object> build() {
         Map<String, Object> request = new HashMap<>();
 
-        if (this.system != null && !this.system.trim().isEmpty()) {
-            Content systemContent = new Content();
-            systemContent.setType("text");
-            systemContent.setText(this.system);
-            ArrayList<Content> systemContentList = new ArrayList<>();
-            systemContentList.add(systemContent);
-            Message systemMessage = new Message("system",  systemContentList);
-            this.messages.add(0, systemMessage);
-        }    
-
-        switch (this.provider) {
-            case "OPENAI" -> {
-                List<Map<String, Object>> messagesListDefault = new ArrayList<>();
-                for (Message message : messages) {
-                    messagesListDefault.add(message.toMap(provider, type));
-                }
-                request.put("messages", messagesListDefault);
-                request.put("model", model);
-                request.put("stream", stream);
-                if(this.model.contains("o3-mini")){
-                    request.put("response_format", Map.of("type", "text"));
-                    request.put("reasoning_effort", this.reasoningEffort);
-                }else{
-                    request.put("max_tokens", maxTokens);
-                    request.put("temperature", temperature);
-                }    
+        if (this.provider.equals("ANTHROPIC")) {
+            if (this.system != null && !this.system.trim().isEmpty()) {
+                request.put("system", system);
             }
-            default -> {
-                List<Map<String, Object>> messagesListDefault = new ArrayList<>();
-                for (Message message : messages) {
-                    messagesListDefault.add(message.toMap(provider, type));
-                }
-                request.put("messages", messagesListDefault);
-                request.put("model", model);
+        } else {
+            if (this.system != null && !this.system.trim().isEmpty()) {
+                Content systemContent = new Content();
+                systemContent.setType("text");
+                systemContent.setText(this.system);
+                ArrayList<Content> systemContentList = new ArrayList<>();
+                systemContentList.add(systemContent);
+                Message systemMessage = new Message("system", systemContentList);
+                this.messages.add(0, systemMessage);
+            }
+        }
+
+        List<Map<String, Object>> messagesListDefault = new ArrayList<>();
+        for (Message message : messages) {
+            messagesListDefault.add(message.toMap(provider, type));
+        }
+        request.put("messages", messagesListDefault);
+        request.put("model", model);
+        request.put("stream", stream);
+
+        if (this.provider.equals("OPENAI")) {
+            if (this.model.contains("o3-mini")) {
+                request.put("response_format", Map.of("type", "text"));
+                request.put("reasoning_effort", this.reasoningEffort);
+            } else {
                 request.put("max_tokens", maxTokens);
-                request.put("stream", stream);
                 request.put("temperature", temperature);
-             }
+            }
+        } else if (this.provider.equals("ANTHROPIC")) {
+            request.put("max_tokens", maxTokens);
+            request.put("temperature", temperature);
+
         }
 
         return request;
@@ -195,6 +193,4 @@ public class RequestBuilder {
         this.system = system;
     }
 
-    
-    
 }
