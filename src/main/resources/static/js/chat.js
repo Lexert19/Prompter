@@ -112,7 +112,7 @@ class Chat {
             texts.push(`text: ${doc.length}`);
         });
         this.images.forEach(img =>{
-            texts.push(`image: ${img.content.length}`);
+            texts.push(`image: ${img.length}`);
         });
     
         if (texts.length) content += ' ' + texts.join(' ');
