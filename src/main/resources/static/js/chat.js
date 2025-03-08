@@ -82,26 +82,6 @@ class Chat {
         return document.getElementById("input-" + message.id);
     }
 
-    // addDocument(content) {
-    //     let doc = {
-    //         type: "text",
-    //         content: content
-    //     };
-    //     this.documentsHtml.append("text:" + content.length + " ");
-    //     this.documents.push(doc);
-    //     this.updateDocumentsDisplay(); 
-    // }
-
-    // addImage(content, type) {
-    //     let doc = {
-    //         type: "image",
-    //         imageType: type,
-    //         content: content
-    //     };
-    //     this.documentsHtml.append("image:" + content.length + " ");
-    //     this.documents.push(doc);
-    //     this.updateDocumentsDisplay(); 
-    // }
 
     updateDocumentsDisplay() {
         const docElement = this.documentsHtml;
@@ -161,9 +141,9 @@ class Chat {
 
     async chat() {
         if (this.blockedInput == true){
-            this.changeIcon();
             return;
         }
+        this.changeToStopIcon();
         this.blockedInput = true;
 
         const fragments = await this.getContext();
@@ -177,7 +157,7 @@ class Chat {
         this.message.value = "";
     }
 
-    changeIcon(){
+    changeToStopIcon(){
         const sendButton = document.getElementById('send-button');
         sendButton.innerHTML = `
         <div class="center">
@@ -185,6 +165,17 @@ class Chat {
                 <path fill="#ffffff" d="M0 96C0 60.7 28.7 32 64 32H320c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V96z" />
             </svg>
         </div>
+        `;
+    }
+
+    changeToSendIcon(){
+        const sendButton = document.getElementById('send-button');
+        sendButton.innerHTML = `
+        <div class="center">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="16" width="12" viewBox="0 0 384 512">
+                            <path fill="#ffffff" d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2 160 448c0 17.7 14.3 32 32 32s32-14.3 32-32l0-306.7L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z" />
+                        </svg>
+                    </div>
         `;
     }
 
