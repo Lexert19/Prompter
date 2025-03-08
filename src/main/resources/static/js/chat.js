@@ -106,12 +106,16 @@ class Chat {
     updateDocumentsDisplay() {
         const docElement = this.documentsHtml;
         let content = '';
-        const imgElement = docElement.querySelector('img');
-        if (imgElement) content += imgElement.outerHTML;
+        // const imgElement = docElement.querySelector('img');
+        // if (imgElement) content += imgElement.outerHTML;
     
         const texts = [];
-        for (const doc of this.documents) texts.push(`text: ${doc.content.length}`);
-        for (const img of this.images) texts.push(`image: ${img.content.length}`);
+        this.documents.forEach(doc =>{
+            texts.push(`text: ${doc.content.length}`);
+        });
+        this.images.forEach(img =>{
+            texts.push(`image: ${img.content.length}`);
+        });
     
         if (texts.length) content += ' ' + texts.join(' ');
         docElement.innerHTML = content;
