@@ -19,7 +19,6 @@
                 <h1 style="margin: 0; font-size: 2.5rem;">
                     <span style="color: #6366f1;">Prompter</span>
                     <img src="/favicon.ico" width="40px" height="40px" style="vertical-align: middle; margin-left: 10px;">
-                    <#--  <span class="document-icon" style="vertical-align: middle; margin-left: 10px;"></span>  -->
                 </h1>
                 <p style="margin-top: 5px; color: #a0a6b9;">AI Assistant Platform</p>
             </div>
@@ -33,8 +32,8 @@
             <div class="alert-error" style="background: rgba(255, 221, 221, 0.1); border: 1px solid rgba(255, 0, 0, 0.2);">
                 <h3 style="margin: 0 0 10px 0; color: #ff6b6b;">Uwaga!</h3>
                 <p style="margin: 0; color: #ff9f9f;">
-                    Subskrypcje są 3x droższe niż średnia rynkowa.<br>
-                    Zalecamy użycie własnych kluczy API dla oszczędności.
+                    Subskrypcje są bardzo drogie i nie warto przepłacać!<br>
+                    Zalecamy korzystanie z własnych kluczy API dla oszczędności.
                 </p>
             </div>
 
@@ -53,10 +52,6 @@
                         <div class="file-name">Dilman</div>
                     </div>
                 </div>
-            </div>
-
-            <div class="mt-1" style="text-align: center; color: #a0a6b9; font-size: 0.9rem;">
-                <p>Korzystając z własnego klucza API oszczędzasz do $120/miesięcznie</p>
             </div>
         </div>
     </div>
