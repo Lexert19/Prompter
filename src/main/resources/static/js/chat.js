@@ -147,7 +147,7 @@ class Chat {
                 if (pastedText.length > 2000) {
                     event.preventDefault();
                     window.chat.documents.push(pastedText);
-                    this.createMessage(this.currentMessage);
+                    this.updateDocumentsDisplay(); 
 
                 } else {
                 }
