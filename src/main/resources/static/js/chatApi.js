@@ -113,8 +113,7 @@ class ChatApi {
         if (this.abortController) {
             this.abortController.abort(); 
             this.abortController = null; 
-            window.chat.blockedInput = false; 
-            window.chat.changeToSendIcon();
+            window.chat.setBlockedInput(false);
             console.log('Strumieniowanie zostało zatrzymane');
         }
     }
@@ -144,8 +143,8 @@ class ChatApi {
         reader.read().then(({ done, value }) => {
             if (done) {
                 reader.releaseLock();
-                window.chat.blockedInput = false;
-                window.chat.changeToSendIcon();
+                window.chat.setBlockedInput(false);
+
                 this.parser.parse("\n\n");
                 return;
             }
@@ -154,8 +153,8 @@ class ChatApi {
 
             this.read(reader, decoder);
         }).catch(error => {
-            window.chat.blockedInput = false;
-            window.chat.changeToSendIcon();
+            window.chat.setBlockedInput(false);
+
             reader.releaseLock();
         });
     }

@@ -21,6 +21,17 @@ class Chat {
         this.loadHistory();
     }
 
+    setBlockedInput(value){
+        this.blockedInput = value;
+        if(value){
+            document.getElementById('send-icon').style.display = 'none'; 
+            document.getElementById('stop-icon').style.display = 'block'; 
+        }else{
+            document.getElementById('send-icon').style.display = 'block'; 
+            document.getElementById('stop-icon').style.display = 'none'; 
+        }
+    }
+
     showSettings(){
         hidePages();
         this.chatSettings.classList.add("active");
@@ -143,8 +154,7 @@ class Chat {
         if (this.blockedInput == true){
             return;
         }
-        this.changeToStopIcon();
-        this.blockedInput = true;
+        this.setBlockedInput(true);
 
         const fragments = await this.getContext();
         console.log(fragments);
