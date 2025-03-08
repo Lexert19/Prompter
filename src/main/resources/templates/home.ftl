@@ -18,7 +18,7 @@
             <div class="chat-header" style="border-radius: 10px; margin-bottom: 30px;">
                 <h1 style="margin: 0; font-size: 2.5rem;">
                     <span style="color: #6366f1;">Prompter</span>
-                    <img src="/favicon.ico">
+                    <img src="/favicon.ico" width="40px" height="40px">
                     <#--  <span class="document-icon" style="vertical-align: middle; margin-left: 10px;"></span>  -->
                 </h1>
                 <p style="margin-top: 5px; color: #a0a6b9;">AI Assistant Platform</p>
