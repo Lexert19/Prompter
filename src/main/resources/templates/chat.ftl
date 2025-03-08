@@ -19,7 +19,7 @@
             <div class="chat-messages" id="chatMessages">
             </div>
             <div id="documents">
-                <img width="24" height="24" src="/static/svg/document.svg">
+                <#--  <img width="24" height="24" src="/static/svg/document.svg">  -->
             </div>
             <div class="chat-input">
                 <div class="cache-container">

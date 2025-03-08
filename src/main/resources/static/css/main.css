@@ -176,7 +176,7 @@ select {
 }
 
 #documents{
-    display: none;
+    /* display: none; */
 }
 
 .account-panel {
