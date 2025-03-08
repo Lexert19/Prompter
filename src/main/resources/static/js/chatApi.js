@@ -3,6 +3,7 @@ class ChatApi {
         this.url = "/client/chat";
         this.parser = new HtmlParser();
         this.firstReason = false;
+        this.abortController = null; 
     }
 
     getProvider(){
@@ -16,6 +17,7 @@ class ChatApi {
     }
 
     sendStreamingMessage(request) {
+        this.abortController = new AbortController();
         console.log(request.toRequestJSON());
         this.newMessage();
         fetch(this.url, {
@@ -24,7 +26,8 @@ class ChatApi {
                 'Content-Type': 'application/json',
             },
             credentials: 'include',
-            body: request.toRequestJSON()
+            body: request.toRequestJSON(),
+            signal: this.abortController.signal
         }).then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -103,6 +106,15 @@ class ChatApi {
             const elapsedTimeSec = (elapsedTimeMs / 1000).toFixed(1); 
 
             durationElement.textContent = `${elapsedTimeSec}s`; 
+        }
+    }
+
+    stopStreaming() {
+        if (this.abortController) {
+            this.abortController.abort(); 
+            this.abortController = null; 
+            window.chat.blockedInput = false; 
+            console.log('Strumieniowanie zostało zatrzymane');
         }
     }
 
