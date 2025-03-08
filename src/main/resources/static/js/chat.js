@@ -160,8 +160,10 @@ class Chat {
     }
 
     async chat() {
-        if (this.blockedInput == true)
+        if (this.blockedInput == true){
+            this.changeIcon();
             return;
+        }
         this.blockedInput = true;
 
         const fragments = await this.getContext();
@@ -173,6 +175,17 @@ class Chat {
         this.requestBuilder.addMessage(this.currentMessage);
         this.chatClient.sendStreamingMessage(this.requestBuilder);
         this.message.value = "";
+    }
+
+    changeIcon(){
+        const sendButton = document.getElementById('send-button');
+        sendButton.innerHTML = `
+        <div class="center">
+            <svg xmlns="http://www.w3.org/2000/svg" height="16" width="12" viewBox="0 0 384 512">
+                <path fill="#ffffff" d="M0 96C0 60.7 28.7 32 64 32H320c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V96z" />
+            </svg>
+        </div>
+        `;
     }
 
     async getContext(){
