@@ -97,7 +97,8 @@ body {
 .message {
     margin: 10px 0;
     padding: 10px;
-    border-radius: 12px;
+    border-radius: 18px;
+    min-width: 30px;
     font-size: 16px;
 }
 
