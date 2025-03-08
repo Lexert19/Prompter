@@ -135,6 +135,7 @@ class Chat {
 
                     reader.onload = function (event) {
                         window.chat.images.push(event.target.result);
+                        window.chat.updateDocumentsDisplay(); 
                     };
 
                     reader.readAsDataURL(file);
@@ -147,7 +148,7 @@ class Chat {
                 if (pastedText.length > 2000) {
                     event.preventDefault();
                     window.chat.documents.push(pastedText);
-                    this.updateDocumentsDisplay(); 
+                    window.chat.updateDocumentsDisplay(); 
 
                 } else {
                 }
