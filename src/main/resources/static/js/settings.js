@@ -29,6 +29,13 @@ class Settings{
                 url: "https://api.deepinfra.com/v1/openai/chat/completions"
             },
             {
+                name: "meta-llama/Llama-3.2-90B-Vision-Instruct",
+                text: "meta-llama/Llama-3.2-90B-Vision-Instruct",
+                provider: "DEEPINFRA",
+                type: "text",
+                url: "https://api.deepinfra.com/v1/openai/chat/completions"
+            },
+            {
                 name: "deepseek-ai/DeepSeek-V3",
                 text: "deepinfra/DeepSeek-V3",
                 provider: "DEEPINFRA",
