@@ -32,7 +32,7 @@ class Settings{
                 name: "meta-llama/Llama-3.2-90B-Vision-Instruct",
                 text: "meta-llama/Llama-3.2-90B-Vision-Instruct",
                 provider: "DEEPINFRA",
-                type: "text",
+                type: "vision",
                 url: "https://api.deepinfra.com/v1/openai/chat/completions"
             },
             {
