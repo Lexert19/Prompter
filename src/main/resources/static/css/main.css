@@ -469,45 +469,44 @@ input[type="range"]::-moz-range-progress {
 .open_chat {
     padding: 15px 30px;
     font-size: 1.1rem;
-    background-color: #6366f1; /* Podstawowy kolor */
+    background-color: #6366f1; 
     color: white;
     border: none;
     border-radius: 10px;
     cursor: pointer;
-    transition: background-color 0.3s ease; /* Płynna animacja */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Delikatny cień */
-    display: inline-flex; /* Aby umieścić ikonę obok tekstu */
-    align-items: center; /* Wyśrodkowanie ikony */
-    justify-content: center; /* Wyśrodkowanie tekstu */
+    transition: background-color 0.3s ease; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+    display: inline-flex; 
+    align-items: center; 
+    justify-content: center; 
 }
 
 .open_chat:hover {
-    background-color: #4f46e5; /* Ciemniejszy odcień na hover */
+    background-color: #4f46e5; 
 }
 
-/* Dodaj styl dla ikony (jeśli chcesz użyć ikon font-awesome lub podobnych) */
 .open_chat i {
-    margin-right: 10px; /* Odstęp między ikoną a tekstem */
-    font-size: 1.2rem; /* Rozmiar ikony */
+    margin-right: 10px; 
+    font-size: 1.2rem;
 }
 
-.alert-warning { /* Zmieniono nazwę klasy na bardziej opisową */
-    background: rgba(255, 235, 205, 0.3); /* Jaśniejszy, żółtawy odcień */
-    border: 1px solid rgba(255, 204, 0, 0.4); /* Delikatniejsza obramowanie */
-    border-radius: 8px; /* Zaokrąglone rogi */
+.alert-warning { 
+    background: rgba(255, 235, 205, 0.3); 
+    border: 1px solid rgba(255, 204, 0, 0.4); 
+    border-radius: 8px; 
     padding: 15px;
     margin-top: 15px;
 }
 
 .alert-warning h3 {
     margin: 0 0 10px 0;
-    color: #ffc107; /* Żółty kolor nagłówka */
+    color: #ffc107;
     font-weight: bold;
-    display: flex; /* Aby ikona i tekst były w jednej linii */
-    align-items: center; /* Wyśrodkowanie ikony */
+    display: flex; 
+    align-items: center; 
 }
 
-.alert-warning h3 i { /* Styl dla ikony */
+.alert-warning h3 i {
     margin-right: 10px;
     font-size: 1.5rem;
 }
@@ -515,5 +514,5 @@ input[type="range"]::-moz-range-progress {
 
 .alert-warning p {
     margin: 0;
-    color: #ffb347; /* Ciemniejszy odcień żółtego dla tekstu */
+    color: #ffb347; 
 }
