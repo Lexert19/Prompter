@@ -238,6 +238,10 @@ select {
     border-top-right-radius: 22px;
 }
 
+.instruction-field{
+    min-height: 50px;
+}
+
 .code-wrap {
     white-space: pre-wrap;
     word-wrap: break-word;

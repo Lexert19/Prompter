@@ -1,5 +1,5 @@
 <div class="chat-settings" id="chatSettings">
-    <div>
+    <div class="instruction-field">
         <label class="checkbox-container">
             <input type="checkbox" id="memory" name="memory" value="memory" onchange="window.settings.change(event)">
             <label for="memory" class="custom-checkbox"></label>
