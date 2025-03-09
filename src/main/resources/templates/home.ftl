@@ -16,32 +16,22 @@
 <body>
     <div class="center" style="height: 100vh;">
         <div class="block" style="max-width: 600px; padding: 20px;">
-            <#-- <div class="chat-header" style="border-radius: 10px; margin-bottom: 30px;">
-                <h1 style="margin: 0; font-size: 2.5rem;">
-                    <span style="color: #6366f1;">Prompter</span>
-                    <img src="/favicon.ico" width="40px" height="40px" style="vertical-align: middle; margin-left: 10px;">
-                </h1>
-                <p style="margin-top: 5px; color: #a0a6b9;">AI Assistant Platform</p>
-        </div> -->
         <div class="chat-header" style="border-radius: 10px; margin-bottom: 30px; text-align: center;">
-            <!-- Dodano text-align: center -->
             <h1 style="margin: 0; font-size: 3rem; font-weight: bold;">
-                <!-- Zwiększono font-size i pogrubiono -->
                 <span style="color: #6366f1;">Prompter</span>
                 <img src="/favicon.ico" width="50px" height="50px" style="vertical-align: middle; margin-left: 10px; filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.3));"> <!-- Powiększono logo i dodano cień -->
             </h1>
-            <p style="margin-top: 10px; color: #a0a6b9; font-size: 1.2rem;">Twój inteligentny asystent AI do kreatywnych zadań</p> <!-- Zmienione hasło i font-size -->
+            <p style="margin-top: 10px; color: #a0a6b9; font-size: 1.2rem;">Twój inteligentny asystent AI do kreatywnych zadań</p>
         </div>
         <div class="panel center mb-1">
             <a href="/chat" class="button" style="padding: 15px 30px; font-size: 1.1rem;">
-                <i class="fas fa-comment-dots"></i> <!-- Ikona czatu (Font Awesome) -->
+                <i class="fas fa-comment-dots"></i>
                 Rozpocznij czat
             </a>
         </div>
         <div class="alert-warning mt-1">
-            <!-- Zmieniono klasę na alert-warning -->
-            <h3 style="margin: 0 0 10px 0; color: #ffc107;">
-                <i class="fas fa-exclamation-triangle"></i> <!-- Ikona ostrzeżenia (Font Awesome) -->
+            <h3 style="margin: 0 0 10px 0; color: #ffc107; text: center;">
+                <i class="fas fa-exclamation-triangle"></i> 
                 Wskazówka!
             </h3>
             <p style="margin: 0; color: #ffb347;">
