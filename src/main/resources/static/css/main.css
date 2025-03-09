@@ -134,7 +134,6 @@ input {
 textarea {
     width: 100%;
     padding: 10px;
-    font-size: 16px;
     border: none;
     border-radius: 5px;
     margin: 0px;
@@ -240,6 +239,7 @@ select {
 input, textarea, select {
     background-color: #374151;
     color: #ffffff;
+    font-size: 16px;
     border: 1px solid rgba(79, 70, 229, 0.3);
 }
 
