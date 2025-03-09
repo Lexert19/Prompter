@@ -51,13 +51,6 @@ dependencies {
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.7.1"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core"
     implementation "io.projectreactor:reactor-core"
-
-	// implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
-	// implementation group: 'org.postgresql', name: 'r2dbc-postgresql', version: '1.0.7.RELEASE'
-	// runtimeOnly 'org.postgresql:postgresql'
-	// implementation 'org.springframework.session:spring-session-core:3.2.0'
-	// implementation 'org.springframework.session:spring-session-jdbc:3.2.0'
-
 	
 }
 
@@ -74,6 +67,4 @@ kotlin {
 bootRun {
     sourceResources sourceSets.main
 	jvmArgs = ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=127.0.0.1:5005"]
-
-	//jvmArgs = ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"]
 }

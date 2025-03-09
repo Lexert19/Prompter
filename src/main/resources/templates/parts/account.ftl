@@ -7,4 +7,12 @@
         <input type="text" id="keyValue" name="keyValue">
         <button onclick="saveKey()">Zapisz</button>
     </div>
+
+    <div>
+        <label class="checkbox-container">
+            <input type="checkbox" id="history" name="history" value="history" onchange="window.settings.change(event)">
+            <label for="history" class="custom-checkbox"></label>
+            <span>Zapisuj do historii</span>
+        </label>
+    </div>
 </div>
