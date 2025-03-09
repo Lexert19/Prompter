@@ -219,7 +219,10 @@ select {
 
 .chat-input {
     display: flex;
-    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+
+    background-color: #374151;
+    border: 1px solid rgba(79, 70, 229, 0.3);
 }
 
 .code-wrap {
@@ -235,8 +238,7 @@ select {
     border-radius: 5px;
     margin-right: 10px;
 
-    background-color: #374151;
-    border: 1px solid rgba(79, 70, 229, 0.3);
+   
 }
 
 input, textarea, select {
