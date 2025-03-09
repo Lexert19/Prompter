@@ -88,7 +88,14 @@ class Settings{
                 name: "gemini-2.0-flash-thinking-exp-01-21",
                 text: "gemini-2.0-flash-thinking-exp-01-21",
                 provider: "GEMINI",
-                type: "text",
+                type: "vision",
+                url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+            },
+            {
+                name: "gemini-2.0-flash",
+                text: "gemini-2.0-flash",
+                provider: "GEMINI",
+                type: "vision",
                 url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
             }
         ];
