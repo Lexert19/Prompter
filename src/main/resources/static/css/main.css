@@ -144,6 +144,12 @@ textarea {
     box-sizing: border-box;
 }
 
+
+.transparent-textarea{
+    background-color: transparent;
+    border: none;
+}
+
 .pages{
     height: 96%;
 }
@@ -223,6 +229,8 @@ select {
 
     background-color: #374151;
     border: 1px solid rgba(79, 70, 229, 0.3);
+    border-top-left-radius: 22px;
+    border-top-right-radius: 22px;
 }
 
 .code-wrap {

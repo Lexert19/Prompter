@@ -20,7 +20,7 @@
             <div class="chat-input">
                 <div class="cache-container">
                 </div>
-                <textarea type="text" onkeydown="window.chat.appendText(event)" id="input"
+                <textarea type="text" class="transparent-textarea" onkeydown="window.chat.appendText(event)" id="input"
                     placeholder="Wpisz wiadomość..."></textarea>
                 <button id="send-button" class="send-button" onclick="window.chat.chat()">
                     <div id="send-icon" class="center">
