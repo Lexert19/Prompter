@@ -44,7 +44,6 @@ class ProjectController(
         val user = userRepository.findById(userId).awaitSingle()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Użytkownik nie znaleziony") 
         val project = Project().apply {
-            this.user = user
             this.name = name
             this.userId = user.id
         }

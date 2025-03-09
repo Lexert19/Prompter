@@ -12,8 +12,6 @@ public class Project {
     private String id;
     private String name;
     private String userId;
-    @DocumentReference  
-    private User user;
 
 
     public String getName() {
@@ -23,13 +21,6 @@ public class Project {
         this.name = name;
     } 
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
     public String getId() {
         return id;
     }

@@ -5,10 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/css/main.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/default.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js"
-        integrity="sha512-6yoqbrcLAHDWAdQmiRlHG4+m0g/CT/V9AGyxabG8j7Jk8j3r3K6due7oqpiRMZqcYe9WM2gPcaNNxnl2ux+3tA=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="..." crossorigin="anonymous" referrerpolicy="no-referrer" />
     <title>Prompter</title>
 </head>
@@ -19,7 +15,7 @@
             <div class="chat-header" style="border-radius: 10px; margin-bottom: 30px; text-align: center;">
                 <h1 style="margin: 0; font-size: 3rem; font-weight: bold;">
                     <span style="color: #6366f1;">Prompter</span>
-                    <img src="/favicon.ico" width="50px" height="50px" style="vertical-align: middle; margin-left: 10px; filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.3));"> <!-- Powiększono logo i dodano cień -->
+                    <img src="/favicon.ico" width="50px" height="50px" style="vertical-align: middle; margin-left: 10px; filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.3));"> 
                 </h1>
                 <p style="margin-top: 10px; color: #a0a6b9; font-size: 1.2rem;">Twój inteligentny asystent AI do kreatywnych zadań</p>
             </div>
