@@ -32,7 +32,7 @@
             </label>
         </div>
     </div>
-    <div >
+    <div  class="instruction-field ">
         <label>Projekt</label>
         <div class="d-flex mt-025">
             <select id="project" name="project" onchange="window.settings.change(event)"></select>
@@ -42,7 +42,7 @@
             </label>
         </div>
     </div>
-    <div class="mt-05" >
+    <div class="mt-05 instruction-field" >
         <select id="modelOptions" name="model" class="mb-1" onchange="window.settings.changeModel(event)">
         </select>
     </div>
