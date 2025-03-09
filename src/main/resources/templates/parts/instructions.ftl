@@ -1,27 +1,27 @@
 <div class="chat-settings" id="chatSettings">
-    <div class="instruction-field">
+    <div class="instruction-field center">
         <label class="checkbox-container">
             <input type="checkbox" id="memory" name="memory" value="memory" onchange="window.settings.change(event)">
             <label for="memory" class="custom-checkbox"></label>
             <span>Pamięć (pamięta poprzednie wiadomości)</span>
         </label>
     </div>
-    <div>
+    <div  class="instruction-field center">
         <label class="checkbox-container">
             <input type="checkbox" id="cache" name="cache" value="cache" onchange="window.settings.change(event)">
             <label for="cache" class="custom-checkbox"></label>
             <span>Cache</span>
         </label>
     </div>
-    <div>
+    <div  class="instruction-field center">
         <input type="number" name="maxTokens" value="8000" onchange="window.settings.change(event)">
     </div>
-    <div class="d-flex">
+    <div  class="instruction-field center">
         <input type="range" id="temperature" name="temperature" min="0" max="100" step="1" value="0"
             oninput="window.settings.change(event)">
         <label class="center" for="temperature"><span>Temperatura</span></label>
     </div>
-    <div >
+    <div  class="instruction-field ">
         <label for="system">System</label>
         <div class="d-flex mt-025">
             <textarea id="system" name="system" onchange="window.settings.change(event)"></textarea>
@@ -31,7 +31,7 @@
             </label>
         </div>
     </div>
-    <div>
+    <div >
         <label>Projekt</label>
         <div class="d-flex mt-025">
             <select id="project" name="project" onchange="window.settings.change(event)"></select>
