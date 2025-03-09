@@ -339,7 +339,7 @@ input[type="range"] {
     background-color: rgba(55, 65, 81, 0.95);
     border-radius: 5px; 
     box-sizing: border-box;
-    padding: 0.5rem 0.25rem;
+    padding: 1rem 0.25rem;
     outline: none; 
 }
 
