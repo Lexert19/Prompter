@@ -24,7 +24,7 @@
                 <p style="margin-top: 10px; color: #a0a6b9; font-size: 1.2rem;">Twój inteligentny asystent AI do kreatywnych zadań</p>
             </div>
             <div class="panel center mb-1">
-                <a href="/chat" class="button" style="padding: 15px 30px; font-size: 1.1rem;">
+                <a href="/chat" class="open_chat" style="padding: 15px 30px; font-size: 1.1rem;">
                     <i class="fas fa-comment-dots"></i>
                     Rozpocznij czat
                 </a>
