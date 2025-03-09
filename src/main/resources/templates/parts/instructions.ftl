@@ -42,7 +42,7 @@
             </label>
         </div>
     </div>
-    <div class="mt-05 instruction-field" >
+    <div class="instruction-field" >
         <select id="modelOptions" name="model" class="mb-1" onchange="window.settings.changeModel(event)">
         </select>
     </div>
