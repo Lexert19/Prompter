@@ -100,10 +100,10 @@ class Chat {
     
         const texts = [];
         this.documents.forEach(doc =>{
-            texts.push(`text: ${doc.length}`);
+            texts.push(`<i class="fas fa-file-alt" style="margin-right: 5px;"></i> ${doc.length}`);
         });
         this.images.forEach(img =>{
-            texts.push(`image: ${img.length}`);
+            texts.push(`<i class="fas fa-image" style="margin-right: 5px;"></i> ${img.length}`);
         });
     
         if (texts.length) content += ' ' + texts.join(' ');
