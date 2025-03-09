@@ -239,7 +239,7 @@ select {
 }
 
 .instruction-field{
-    min-height: 40px;
+    margin: 0.25rem;
 }
 
 .code-wrap {
