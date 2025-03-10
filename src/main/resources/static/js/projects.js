@@ -34,6 +34,14 @@ class Projects {
         });
     }
 
+    async getContext(query){
+        if (window.settings.projectSwitch && window.settings.project) {
+            const fragments = await this.searchSimilarFragments(window.settings.project, encodeURIComponent(query));
+            return fragments;
+        }
+        return [];
+    }
+
     async createProject() {
         const projectName = prompt('Podaj nazwę nowego projektu:');
         if (!projectName) return;

@@ -18,7 +18,7 @@ class Chat {
         this.blockedInput = false;
        
         this.addPasteListener();
-        this.loadHistory();
+        window.history.loadHistory();
     }
 
     setBlockedInput(value){
@@ -32,11 +32,7 @@ class Chat {
         }
     }
 
-    showSettings(){
-        hidePages();
-        this.chatSettings.classList.add("active");
-    }
-
+   
     appendText(event) {
         if (event.key === "Enter") {
             event.preventDefault();
@@ -44,29 +40,24 @@ class Chat {
         }
     }
 
-    loadHistory() {
-    }
-
-    addHtmlHistoryIndex(historyIndex) {
-        let index = `<button onclick="window.chat.loadChat('${historyIndex.id}','${historyIndex.name}')">${historyIndex.name}: ${historyIndex.title}</button>`;
-        this.history.innerHTML += index;
-    }
+  
+    
 
     loadChat(id, name) {
-        hidePages();
-        this.clearMessages();
-        this.currentChat = this.chats[name];
-        this.chatSettings.classList.add("active");
-        this.currentChat.loadChat(id)
-            .then(messages => {
-                messages.forEach(message => {
-                    this.createMessage(message);
-                })
-            })
+        // hidePages();
+        // this.clearMessages();
+        // this.currentChat = this.chats[name];
+        // this.chatSettings.classList.add("active");
+        // this.currentChat.loadChat(id)
+        //     .then(messages => {
+        //         messages.forEach(message => {
+        //             this.createMessage(message);
+        //         })
+        //     })
 
-        this.currentChat.models.forEach(model => {
-            modelOptions.innerHTML += `<option value="${model.name}">${model.text}</option>`;
-        });
+        // this.currentChat.models.forEach(model => {
+        //     modelOptions.innerHTML += `<option value="${model.name}">${model.text}</option>`;
+        // });
     }
 
     createMessage(message) {
@@ -79,7 +70,7 @@ class Chat {
             </div>
             ${message.getHtmlImages()}
             ${message.getHtmlFiles()}
-            <div id="input-${message.id}" class="code-wrap">${this.escapeHtml(message.getText())}</div>
+            <div id="input-${message.id}" class="code-wrap">${escapeHtml(message.getText())}</div>
             <span id="cached-${message.id}">${message.cache ? "cached" : ""}<span>
         </div>
         `;
@@ -157,7 +148,7 @@ class Chat {
         }
         this.setBlockedInput(true);
 
-        const fragments = await this.getContext();
+        const fragments = await window.projects.getContext(this.message.value);
         console.log(fragments);
         this.newMessage([]);
         this.createMessage(this.currentMessage);
@@ -168,14 +159,7 @@ class Chat {
         this.message.value = "";
     }
 
-    async getContext(){
-        if (window.settings.projectSwitch && window.settings.project) {
-            const query = this.message.value;
-            const fragments = await window.projects.searchSimilarFragments(window.settings.project, encodeURIComponent(query));
-            return fragments;
-        }
-        return [];
-    }
+    
 
     newMessage(fragments) {
         this.currentMessage = new Message(
@@ -193,19 +177,6 @@ class Chat {
     clearMessages() {
         this.modelOptions.innerHTML = "";
         document.getElementById("chatMessages").innerHTML = "";
-    }
-
-    escapeHtml(content) {
-        try {
-            return content
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        } catch (error) {
-            return "";
-        }
     }
 
    

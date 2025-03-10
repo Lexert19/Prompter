@@ -72,4 +72,8 @@ public class HistoryService {
             return Flux.empty(); 
         }
     }
+
+    public Flux<Chat> getChatsForUser(User user) {
+        return chatRepository.findByUserId(user.getId());
+    }
 }
