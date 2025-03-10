@@ -1,13 +1,21 @@
 package com.example.promptengineering.entity;
 
 import java.time.LocalDate;
+import java.util.List;
+
+import jakarta.persistence.Id;
 
 public class Message {
+    @Id
     private String id;
     private String chatId;
-    private String message;
+    private String text;
+    private List<String> documents;
+    private List<String> images;  
     private LocalDate createdAt;
     private int duration;
+    private String role;
+    private String cache;
 
 
     public String getId() {
@@ -22,12 +30,6 @@ public class Message {
     public void setChatId(String chatId) {
         this.chatId = chatId;
     }
-    public String getMessage() {
-        return message;
-    }
-    public void setMessage(String message) {
-        this.message = message;
-    }
     public LocalDate getCreatedAt() {
         return createdAt;
     }
@@ -40,6 +42,26 @@ public class Message {
     public void setDuration(int duration) {
         this.duration = duration;
     }
+    public String getText() {
+        return text;
+    }
+    public void setText(String text) {
+        this.text = text;
+    }
+    public List<String> getDocuments() {
+        return documents;
+    }
+    public void setDocuments(List<String> documents) {
+        this.documents = documents;
+    }
+    public List<String> getImages() {
+        return images;
+    }
+    public void setImages(List<String> images) {
+        this.images = images;
+    }
+
+    
 
 
 }

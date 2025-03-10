@@ -9,6 +9,8 @@ class Message {
         this.context = context;
         this.text = "";
         this.time = Date.now();
+        this.start = Date.now();
+        this.end = null;
 
         this.setText(text, documents);
         images.forEach(img => {
@@ -40,7 +42,6 @@ class Message {
     }
 
     getText() {
-        //return this.content.find(item => item.type === "text")?.text;
         return this.text;
     }
 
@@ -92,7 +93,7 @@ class Message {
     getHtmlFiles() {
         let documentsText = "";
         this.documents.forEach((document, index) => {
-            documentsText += "Dokument: " + document.length;
+            documentsText += "Dokument: " + document.length + " ";
         });
         return documentsText;
     }

@@ -23,12 +23,14 @@ class Chat {
         window.chatHistory.loadHistory();
     }
 
-    createChatSession(){
+    async saveMessage(content){
+        if(!window.settings.activeHistory)
+            return;
         if(this.session == ""){
-            window.chatHistory.createChatSession().then(sessionId=>{
-                this.session = sessionId;
-            });
+            const id =  await window.chatHistory.createChatSession();
+            this.session = id;
         }
+        await window.chatHistory.saveMessage(this.session, content);
     }
 
     setBlockedInput(value){
@@ -53,21 +55,8 @@ class Chat {
   
     
 
-    loadChat(id, name) {
-        // hidePages();
-        // this.clearMessages();
-        // this.currentChat = this.chats[name];
-        // this.chatSettings.classList.add("active");
-        // this.currentChat.loadChat(id)
-        //     .then(messages => {
-        //         messages.forEach(message => {
-        //             this.createMessage(message);
-        //         })
-        //     })
-
-        // this.currentChat.models.forEach(model => {
-        //     modelOptions.innerHTML += `<option value="${model.name}">${model.text}</option>`;
-        // });
+    loadChat(id) {
+        this.session = id;
     }
 
     createMessage(message) {
@@ -152,7 +141,6 @@ class Chat {
     }
 
     async chat() {
-        this.createChatSession();
         if (this.blockedInput == true){
             this.chatClient.stopStreaming();
             return;
@@ -162,6 +150,7 @@ class Chat {
         const fragments = await window.projects.getContext(this.message.value);
         console.log(fragments);
         this.newMessage([]);
+        this.saveMessage(this.currentMessage);
         this.createMessage(this.currentMessage);
 
 

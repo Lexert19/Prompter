@@ -51,12 +51,14 @@ public class HistoryService {
         return chat.getUserId() != null && chat.getUserId().equals(user.getId());
     }
 
-    private Mono<Message> convertAndSaveMessage(MessageBody messageBody, Chat chat) {
+    public Mono<Message> convertAndSaveMessage(MessageBody messageBody, Chat chat) {
         Message messageEntity = new Message();
         messageEntity.setChatId(messageBody.getChatId());
-        messageEntity.setMessage(messageBody.getMessage());
         messageEntity.setCreatedAt(LocalDate.now());
         messageEntity.setDuration(messageBody.getDuration());
+        messageEntity.setText(messageBody.getText());
+        messageEntity.setDocuments(messageBody.getDocuments());
+        messageEntity.setImages(messageBody.getImages());
         return messageRepository.save(messageEntity);
     }
 
