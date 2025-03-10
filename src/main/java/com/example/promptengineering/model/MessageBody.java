@@ -53,7 +53,7 @@ public class MessageBody {
     }
 
 
-    public boolean isCache() {
+    public boolean getCache() {
         return cache;
     }
 

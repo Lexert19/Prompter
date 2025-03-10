@@ -68,7 +68,7 @@ public class Message {
     }
 
 
-    public boolean isCache() {
+    public boolean getCache() {
         return cache;
     }
 
