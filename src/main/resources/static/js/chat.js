@@ -18,10 +18,10 @@ class Chat {
         this.blockedInput = false;
        
         this.addPasteListener();
-        window.history.createChatSession().then(sessionId=>{
+        window.chatHistory.createChatSession().then(sessionId=>{
             this.session = sessionId;
         });
-        window.history.loadHistory();
+        window.chatHistory.loadHistory();
     }
 
     setBlockedInput(value){

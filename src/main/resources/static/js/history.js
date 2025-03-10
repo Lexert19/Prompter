@@ -124,4 +124,4 @@ class History{
     }
 }
 
-window.history = new History();
+window.chatHistory = new History();
