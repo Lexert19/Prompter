@@ -59,6 +59,9 @@ public class HistoryService {
         messageEntity.setText(messageBody.getText());
         messageEntity.setDocuments(messageBody.getDocuments());
         messageEntity.setImages(messageBody.getImages());
+        messageEntity.setRole(messageBody.getRole()); 
+        messageEntity.setCache(messageBody.getCache());
+        
         return messageRepository.save(messageEntity);
     }
 
