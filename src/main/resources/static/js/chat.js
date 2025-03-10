@@ -18,6 +18,7 @@ class Chat {
         this.blockedInput = false;
        
         this.addPasteListener();
+        this.session = window.history.createChatSession();
         window.history.loadHistory();
     }
 

@@ -13,6 +13,14 @@ class History{
         });
     }
 
+    async createChatSession(){
+        if(window.showSettings.activeHistory){
+            const chat = await this.createChat();
+             return chat.id;
+        }
+        return "";
+    }
+
     async createChat() {
         try {
             const response = await fetch(`${this.baseUrl}/chats`, {
