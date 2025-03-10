@@ -16,12 +16,19 @@ class Chat {
         this.requestBuilder = new RequestBuilder();
         this.chatClient = new ChatApi();
         this.blockedInput = false;
+        this.session = "";
        
         this.addPasteListener();
-        window.chatHistory.createChatSession().then(sessionId=>{
-            this.session = sessionId;
-        });
+       
         window.chatHistory.loadHistory();
+    }
+
+    createChatSession(){
+        if(this.session == ""){
+            window.chatHistory.createChatSession().then(sessionId=>{
+                this.session = sessionId;
+            });
+        }
     }
 
     setBlockedInput(value){
@@ -145,6 +152,7 @@ class Chat {
     }
 
     async chat() {
+        this.createChatSession();
         if (this.blockedInput == true){
             this.chatClient.stopStreaming();
             return;
