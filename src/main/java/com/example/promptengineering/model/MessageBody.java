@@ -11,7 +11,7 @@ public class MessageBody {
     private String role;
     private String cache;
 
-    
+
     public String getChatId() {
         return chatId;
     }
@@ -53,5 +53,19 @@ public class MessageBody {
     }
 
 
+    public boolean isCache() {
+        return cache;
+    }
+
+    public void setCache(boolean cache) {
+        this.cache = cache;
+    }
+
+    public String getRole(){
+        return role;
+    }
+    public void setRole(String role){
+        this.role = role;
+    }
 
 }

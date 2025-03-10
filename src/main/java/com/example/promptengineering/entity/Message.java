@@ -15,9 +15,15 @@ public class Message {
     private LocalDate createdAt;
     private int duration;
     private String role;
-    private String cache;
+    private boolean cache;
 
 
+    public String getRole(){
+        return role;
+    }
+    public void setRole(String role){
+        this.role = role;
+    }
     public String getId() {
         return id;
     }
@@ -61,7 +67,14 @@ public class Message {
         this.images = images;
     }
 
-    
+
+    public boolean isCache() {
+        return cache;
+    }
+
+    public void setCache(boolean cache) {
+        this.cache = cache;
+    }
 
 
 }
