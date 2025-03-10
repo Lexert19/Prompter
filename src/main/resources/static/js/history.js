@@ -14,7 +14,7 @@ class History{
     }
 
     async createChatSession(){
-        if(window.showSettings.activeHistory){
+        if(window.settings.activeHistory){
             const chat = await this.createChat();
              return chat.id;
         }
