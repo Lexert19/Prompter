@@ -9,7 +9,7 @@ public class MessageBody {
     private List<String> images;
     private int duration;
     private String role;
-    private String cache;
+    private boolean cache;
 
 
     public String getChatId() {
