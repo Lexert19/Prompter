@@ -177,7 +177,7 @@ class Settings {
       case "systemSwitch":
         window.settings.systemSwitch = event.target.checked;
         break;
-      case "history":
+      case "chatHistory":
         window.settings.activeHistory = event.target.checked;
         break;
       case "projectSwitch":
@@ -261,7 +261,7 @@ class Settings {
     });
 
     document.getElementById("memory").checked = this.memory;
-    document.getElementById("history").checked = this.activeHistory;
+    document.getElementById("chatHistory").checked = this.activeHistory;
     document.getElementById("cache").checked = this.cache;
     document.getElementById("system").value = this.system;
     document.getElementById("systemSwitch").checked = this.systemSwitch;
