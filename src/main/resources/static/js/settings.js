@@ -262,7 +262,7 @@ class Settings {
     });
 
     document.getElementById("memory").checked = this.memory;
-    document.getElementById("chatHistory").checked = this.activeHistory;
+    document.getElementById("chatHistoryInput").checked = this.activeHistory;
     document.getElementById("cache").checked = this.cache;
     document.getElementById("system").value = this.system;
     document.getElementById("systemSwitch").checked = this.systemSwitch;
