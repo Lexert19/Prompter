@@ -10,8 +10,8 @@
 
     <div>
         <label class="checkbox-container">
-            <input type="checkbox" id="chatHistory" name="history" value="history" onchange="window.settings.change(event)">
-            <label for="history" class="custom-checkbox"></label>
+            <input type="checkbox" id="chatHistory" name="chatHistory"  value="chatHistory" onchange="window.settings.change(event)">
+            <label for="chatHistory" class="custom-checkbox"></label>
             <span>Zapisuj do historii</span>
         </label>
     </div>
