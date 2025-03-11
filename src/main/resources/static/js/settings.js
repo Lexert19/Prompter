@@ -195,6 +195,7 @@ class Settings {
         window.settings.maxTokens = parseInt(event.target.value);
         break;
     }
+    
 
     this.save();
   }
