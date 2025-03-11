@@ -177,7 +177,7 @@ class Settings {
       case "systemSwitch":
         window.settings.systemSwitch = event.target.checked;
         break;
-      case "chatHistory":
+      case "chatHistoryInput":
         window.settings.activeHistory = event.target.checked;
         break;
       case "projectSwitch":
@@ -195,7 +195,7 @@ class Settings {
         window.settings.maxTokens = parseInt(event.target.value);
         break;
     }
-    
+
 
     this.save();
   }
