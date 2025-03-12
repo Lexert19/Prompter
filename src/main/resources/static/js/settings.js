@@ -129,6 +129,13 @@ class Settings {
         type: "vision",
         url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
       },
+      {
+        name: "qwen-qwq-32b",
+        text: "qwen-qwq-32b",
+        provider: "GROQ",
+        type: "text",
+        url: "https://api.groq.com/openai/v1/chat/completions",
+      },
     ];
     this.keys = "";
 
