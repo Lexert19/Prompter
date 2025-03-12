@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 public class RequestBuilder {
-    private String id;
     private String model;
     private List<Message> messages = new ArrayList<>();
     private Integer maxTokens = 16000;
@@ -153,13 +152,7 @@ public class RequestBuilder {
         this.sessionId = sessionId;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
+   
 
     public String getProvider() {
         return provider;

@@ -6,14 +6,9 @@ import java.util.Map;
 
 
 
-//@Table("message_entity")
 public class Message {
-    // @PrimaryKey
-    // @CassandraType(type = Name.BIGINT)
     private Long id;
     private String role;
-    // @CassandraType(type = CassandraType.Name.TEXT)
-    // @jakarta.persistence.Convert(converter = ContentListConverter.class)
     private List<Content> content;
     private String model;
     private String userId;

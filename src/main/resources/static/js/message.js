@@ -4,27 +4,25 @@ class Message {
     this.content = [];
     this.id = Math.random().toString(36);
     this.cache = false;
-    this.documents = [];
+    this.documents = documents;
     this.context = context;
-    this.text = "";
+    this.text = text;
     this.time = Date.now();
     this.start = Date.now();
     this.end = null;
 
-    this.setText(text, documents);
+    this.setText(text);
     images.forEach((img) => {
       this.addBase64Image(img);
     });
   }
 
-  setText(text, documents = [], cache = false) {
+  setText(text, cache = false) {
     let textContent = "";
-    this.documents = documents;
-    this.text = text;
     this.context.forEach(
       (context) => (textContent += `<context>${context}</context>`)
     );
-    documents.forEach(
+    this.documents.forEach(
       (doc) => (textContent += "<document>" + doc + "</document>")
     );
 
@@ -39,25 +37,21 @@ class Message {
 
   appendText(text) {
     this.text += text;
-    // const textItem = this.content.find(item => item.type === "text");
-    // if (textItem) {
-    //     textItem.text += text;
-    // }
   }
 
   getText() {
     return this.text;
   }
 
-  addImageUrl(url, mediaType, cache = false) {
-    this.content.push({
-      type: "image_url",
-      url: url,
-      mediaType: mediaType,
-      cache: cache,
-    });
-    return this;
-  }
+  // addImageUrl(url, mediaType, cache = false) {
+  //   this.content.push({
+  //     type: "image_url",
+  //     url: url,
+  //     mediaType: mediaType,
+  //     cache: cache,
+  //   });
+  //   return this;
+  // }
 
   addBase64Image(data, cache = false) {
     const regex = /^data:(image\/\w+);base64,(.+)$/;
@@ -105,8 +99,6 @@ class RequestBuilder {
   constructor() {
     this.messages = [];
     this.stream = true;
-    this.id = Math.random().toString(36);
-    this.type = "";
   }
 
   getSystem() {

@@ -55,17 +55,40 @@ class Chat {
   
     
 
-    loadChat(id) {
+    async loadChat(id) {
         this.session = id;
+
+        try {
+            const messages = await window.chatHistory.getChatHistory(this.session);
+    
+            this.clearMessages();
+    
+            messages.forEach((message) => {
+                this.createMessage(message);
+            });
+    
+            const chatContainer = this.chatMessages;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+    
+        } catch (error) {
+            console.error("Error loading chat history", error);
+        } finally {
+            this.setBlockedInput(false); 
+        }
     }
 
     createMessage(message) {
-        
+        let duration = "";
+        if (message.end !== null) {
+            const durationMs = message.end - message.start;
+            const seconds = (durationMs / 1000).toFixed(1);
+            duration = `${seconds} s`;
+        }
         var receivedMessage = `
         <div id="${message.id}" class="message ${message.role}">
             <div class="assitant-data">
                 <div class="date"></div>
-                <div class="duration" id="duration-${message.id}"></div>
+                <div class="duration" id="duration-${message.id}">${duration}</div>
             </div>
             ${message.getHtmlImages()}
             ${message.getHtmlFiles()}
@@ -140,6 +163,18 @@ class Chat {
         });
     }
 
+    updateDurationCounter(message){
+        const durationElement = document.getElementById(`duration-${message.id}`);
+        if(durationElement){
+            const currentTime = Date.now();
+            const elapsedTimeMs = currentTime - message.start;
+
+            const elapsedTimeSec = (elapsedTimeMs / 1000).toFixed(1); 
+
+            durationElement.textContent = `${elapsedTimeSec}s`; 
+        }
+    }
+
     async chat() {
         if (this.blockedInput == true){
             this.chatClient.stopStreaming();
@@ -150,6 +185,7 @@ class Chat {
         const fragments = await window.projects.getContext(this.message.value);
         console.log(fragments);
         this.newMessage([]);
+        this.updateDocumentsDisplay(); 
         this.saveMessage(this.currentMessage);
         this.createMessage(this.currentMessage);
 
@@ -161,7 +197,7 @@ class Chat {
 
     
 
-    newMessage(fragments) {
+    newMessage(fragments = []) {
         this.currentMessage = new Message(
             "user",
             this.message.value,
@@ -171,7 +207,6 @@ class Chat {
         );
         this.images = [];
         this.documents = [];
-        this.updateDocumentsDisplay(); 
     }
 
     clearMessages() {

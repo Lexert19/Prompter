@@ -97,10 +97,45 @@ class History {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      return await response.json();
+      const rawMessages = await response.json();
+      return rawMessages.map(msgData => {
+        const message = new Message(
+          msgData.role || '',
+          msgData.text || '',
+          msgData.images || [],
+          msgData.documents || [],
+          msgData.context || []
+        );
+  
+        message.id = msgData.id || message.id; 
+        message.time = msgData.time || Date.now();
+        message.start = msgData.start || message.start;
+        message.end = msgData.end || null;
+        message.cache = msgData.cache || false;
+
+  
+        return message;
+      });
     } catch (error) {
       console.error("Error getting chat history:", error);
       throw error;
+    }
+  }
+
+  async getRequestBuilderForChat(chatId) {
+    try {
+      const messages = await this.getChatHistory(chatId);
+      
+      const builder = new RequestBuilder();
+      
+      messages.forEach(msg => {
+        builder.addMessage(msg);
+      });
+      
+      return builder;
+    } catch(err) {
+      console.error("Error creating RequestBuilder from history", err);
+      throw err;
     }
   }
 

@@ -55,7 +55,8 @@ public class HistoryService {
         Message messageEntity = new Message();
         messageEntity.setChatId(messageBody.getChatId());
         messageEntity.setCreatedAt(LocalDate.now());
-        messageEntity.setDuration(messageBody.getDuration());
+        messageEntity.setStart(messageBody.getStart());
+        messageEntity.setEnd(messageBody.getEnd());
         messageEntity.setText(messageBody.getText());
         messageEntity.setDocuments(messageBody.getDocuments());
         messageEntity.setImages(messageBody.getImages());

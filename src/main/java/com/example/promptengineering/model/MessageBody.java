@@ -7,7 +7,8 @@ public class MessageBody {
     private String text;
     private List<String> documents;
     private List<String> images;
-    private int duration;
+    private long start;
+    private long end;
     private String role;
     private boolean cache;
 
@@ -20,13 +21,7 @@ public class MessageBody {
         this.chatId = chatId;
     }
 
-    public int getDuration() {
-        return duration;
-    }
-
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
+   
 
     public String getText() {
         return text;
@@ -66,6 +61,22 @@ public class MessageBody {
     }
     public void setRole(String role){
         this.role = role;
+    }
+
+    public long getStart() {
+        return start;
+    }
+
+    public void setStart(long start) {
+        this.start = start;
+    }
+
+    public long getEnd() {
+        return end;
+    }
+
+    public void setEnd(long end) {
+        this.end = end;
     }
 
 }

@@ -90,22 +90,10 @@ class ChatApi {
             this.outputInput.textContent += content;
             this.parser.toHTML();
             this.currentMessage.appendText(content);
-            this.setDuration();
+            window.chat.updateDurationCounter();
            
         }catch(error){
             console.debug(chunk);
-        }
-    }
-
-    setDuration(){
-        const durationElement = document.getElementById(`duration-${this.currentMessage.id}`);
-        if(durationElement){
-            const currentTime = Date.now();
-            const elapsedTimeMs = currentTime - this.currentMessage.time;
-
-            const elapsedTimeSec = (elapsedTimeMs / 1000).toFixed(1); 
-
-            durationElement.textContent = `${elapsedTimeSec}s`; 
         }
     }
 
@@ -115,7 +103,6 @@ class ChatApi {
             this.abortController = null; 
             window.chat.setBlockedInput(false);
             window.chat.saveMessage(this.currentMessage);
-            console.log('Strumieniowanie zostało zatrzymane');
         }
     }
 

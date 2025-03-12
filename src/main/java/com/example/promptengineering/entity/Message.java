@@ -13,7 +13,8 @@ public class Message {
     private List<String> documents;
     private List<String> images;  
     private LocalDate createdAt;
-    private int duration;
+    private long start;
+    private long end;
     private String role;
     private boolean cache;
 
@@ -42,12 +43,7 @@ public class Message {
     public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
-    public int getDuration() {
-        return duration;
-    }
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
+   
     public String getText() {
         return text;
     }
@@ -74,6 +70,18 @@ public class Message {
 
     public void setCache(boolean cache) {
         this.cache = cache;
+    }
+    public long getStart() {
+        return start;
+    }
+    public void setStart(long start) {
+        this.start = start;
+    }
+    public long getEnd() {
+        return end;
+    }
+    public void setEnd(long end) {
+        this.end = end;
     }
 
 
