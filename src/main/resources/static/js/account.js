@@ -35,3 +35,46 @@ function saveKey() {
             alert('Error saving key: ' + error.message);
         });
 }
+
+function setNewPassword() {
+    const newPass = document.getElementById('newPassword').value;
+    const confirmPass = document.getElementById('confirmPassword').value;
+
+    if (!newPass || !confirmPass) {
+        alert("Proszę wypełnić oba pola.");
+        return;
+    }
+
+    if (newPass !== confirmPass) {
+        alert("Hasła nie są identyczne!");
+        return;
+    }
+
+    fetch('/account/change-password', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+         body: JSON.stringify({
+                    newPassword: newPass,
+                    confirmPassword: confirmPass
+
+                }),
+        credentials: 'include'
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => { throw new Error(text) });
+        }
+        return response.text();
+    })
+    .then(data => {
+        alert("Hasło zostało zmienione!");
+        document.getElementById('newPassword').value = '';
+        document.getElementById('confirmPassword').value = '';
+    })
+    .catch(error => {
+        console.error("Błąd:", error);
+        alert(`Błąd zmiany hasła: ${error.message}`);
+    });
+}

@@ -51,6 +51,10 @@ dependencies {
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.7.1"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core"
     implementation "io.projectreactor:reactor-core"
+	implementation "org.jetbrains.kotlin:kotlin-stdlib"
+
+ 	implementation 'com.sun.mail:jakarta.mail:2.0.1'
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	
 }
 
