@@ -1,5 +1,6 @@
 package com.example.promptengineering.entity;
 
+import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -13,7 +14,7 @@ import com.nimbusds.oauth2.sdk.Role;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "users")
-public class User implements OAuth2User {
+public class User implements OAuth2User, Principal {
     @Id
     private String id;
     private String email;

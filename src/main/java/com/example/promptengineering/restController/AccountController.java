@@ -1,5 +1,6 @@
 package com.example.promptengineering.restController;
 
+import java.security.Principal;
 import java.util.Map;
 
 import com.example.promptengineering.model.PasswordChangeRequest;
@@ -32,11 +33,11 @@ public class AccountController {
 
     @PostMapping("/save-key/{keyName}")
     public Mono<String> saveKeyToMap(
-            @AuthenticationPrincipal OAuth2User oAuth2User,
+            @AuthenticationPrincipal Principal oAuth2User,
             @PathVariable String keyName,
             @RequestBody String keyValue) {
 
-        String userEmail = oAuth2User.getAttribute("email");
+        String userEmail = oAuth2User.getName();
         if (userEmail == null) {
             return Mono.error(new IllegalArgumentException("Email not found in OAuth2User attributes"));
         }
@@ -50,8 +51,8 @@ public class AccountController {
 
     @GetMapping("/keys")
     public Mono<Map<String, String>> getAllKeys(
-            @AuthenticationPrincipal OAuth2User oAuth2User) {
-        String userEmail = oAuth2User.getAttribute("email");
+            @AuthenticationPrincipal Principal oAuth2User) {
+        String userEmail = oAuth2User.getName();
         if (userEmail == null) {
             return Mono.error(new IllegalArgumentException("Email not found in OAuth2User attributes"));
         }
@@ -64,10 +65,10 @@ public class AccountController {
 
     @PostMapping("/change-password")
     public Mono<String> changePassword(
-            @AuthenticationPrincipal OAuth2User oAuth2User,
+            @AuthenticationPrincipal Principal oAuth2User,
             @RequestBody PasswordChangeRequest request) {
 
-        String userEmail = oAuth2User.getAttribute("email");
+        String userEmail = oAuth2User.getName();
         if (userEmail == null) {
             return Mono.error(new IllegalArgumentException("Nie znaleziono adresu email w atrybutach użytkownika OAuth2"));
         }
