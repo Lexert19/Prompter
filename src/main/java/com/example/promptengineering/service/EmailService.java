@@ -1,5 +1,6 @@
 package com.example.promptengineering.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -13,13 +14,11 @@ import reactor.core.scheduler.Schedulers;
 @Service
 public class EmailService {
 
-    private final JavaMailSender javaMailSender;
-    private final String domain;
+    @Autowired
+    private JavaMailSender javaMailSender;
+    @Value("${app.domain}")
+    private String domain;
 
-    public EmailService(JavaMailSender javaMailSender, @Value("${app.domain}") String domain) {
-        this.javaMailSender = javaMailSender;
-        this.domain = domain;
-    }
 
     public Mono<Void> sendPasswordResetEmail(String email, String token) {
         return Mono.fromRunnable(() -> {
