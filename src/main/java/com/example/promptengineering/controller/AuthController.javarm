@@ -1,0 +1,135 @@
+package com.example.promptengineering.controller;
+
+import java.net.URI;
+import java.time.Duration;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.reactive.result.view.Rendering;
+import org.springframework.web.server.ServerWebExchange;
+
+import com.example.promptengineering.model.LoginForm;
+import com.example.promptengineering.service.AuthService;
+import com.example.promptengineering.service.ResetTokenService;
+
+import reactor.core.publisher.Mono;
+
+@Controller
+@RequestMapping("/auth")
+public class AuthController {
+
+    @Autowired
+    private AuthService authService;
+    @Autowired
+    private ResetTokenService resetTokenService;
+
+    @PostMapping("/login")
+    public Mono<ResponseEntity<String>> handleLogin(
+            @ModelAttribute LoginForm loginForm,
+            ServerWebExchange exchange) {
+
+        return authService.login(loginForm.getLogin(), loginForm.getPassword())
+                .flatMap(authenticatedUser -> setCookie(exchange)
+                        .thenReturn(ResponseEntity.status(HttpStatus.FOUND).body("chat")))
+                .onErrorResume(e -> {
+                    return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage()));
+                });
+    }
+
+    private Mono<Void> setCookie(ServerWebExchange exchange) {
+        String token = UUID.randomUUID().toString();
+
+        ResponseCookie sessionCookie = ResponseCookie.from("SESSION", token)
+                .httpOnly(true)
+                .path("/")
+                .maxAge(Duration.ofDays(7))
+                .build();
+
+        ServerHttpResponse response = exchange.getResponse();
+        response.addCookie(sessionCookie);
+
+        response.setStatusCode(HttpStatus.SEE_OTHER);
+        response.getHeaders().setLocation(URI.create("/"));
+        return Mono.empty();
+    }
+
+    @GetMapping("/logout")
+    public Mono<String> handleLogout(ServerWebExchange exchange) {
+        ResponseCookie sessionCookie = ResponseCookie.from("session_id", "")
+                .httpOnly(true)
+                .path("/")
+                .maxAge(0)
+                .build();
+
+        ServerHttpResponse response = exchange.getResponse();
+        response.addCookie(sessionCookie);
+
+        response.setStatusCode(HttpStatus.SEE_OTHER);
+        response.getHeaders().setLocation(URI.create("/auth/login"));
+        return Mono.empty();
+    }
+
+    @GetMapping("/reset-password-request")
+    public String showForgotPasswordForm() {
+        return "reset-password-request";
+    }
+
+    @PostMapping("/reset-password-request")
+    public Mono<Rendering> handleForgotPassword(ServerWebExchange exchange) {
+        return exchange.getFormData()
+                .flatMap(formData -> {
+                    String email = formData.getFirst("email");
+                    return resetTokenService.createPasswordResetToken(email);
+                })
+                .map(token -> Rendering.view("reset-password-request")
+                        .modelAttribute("token", token)
+                        .build());
+    }
+
+    @GetMapping("/reset-password-confirm")
+    public Mono<Rendering> showResetPasswordForm(ServerWebExchange exchange) {
+        return Mono.justOrEmpty(exchange.getRequest().getQueryParams().getFirst("token"))
+                .map(token -> Rendering.view("reset-password")
+                        .modelAttribute("token", token)
+                        .build());
+    }
+
+    @PostMapping("/reset-password-confirm")
+    public Mono<String> handleResetPassword(ServerWebExchange exchange, Model model) {
+        return exchange.getFormData()
+                .flatMap(formData -> {
+                    String token = formData.getFirst("token");
+                    String newPassword = formData.getFirst("password");
+                    String passwordConfirmation = formData.getFirst("password_confirmation");
+                    if (!newPassword.equals(passwordConfirmation)) {
+                        model.addAttribute("error", "Passwords do not match.");
+                        model.addAttribute("token", token);
+                        return Mono.just("reset-password");
+                    }
+
+                    return resetTokenService.resetPassword(token, newPassword)
+                            .onErrorResume(e -> {
+                                model.addAttribute("error", "Invalid or expired token.");
+                                return Mono.just("reset-password");
+                            });
+                })
+                .thenReturn("reset-password-success");
+    }
+
+    // @ExceptionHandler(Exception.class)
+    // public String handleException(Exception ex, Model model) {
+    // model.addAttribute("error", ex.getMessage());
+    // return "error"; // Nazwa szablonu Freemarker do wyświetlania błędów
+    // }
+
+}

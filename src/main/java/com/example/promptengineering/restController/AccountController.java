@@ -2,6 +2,8 @@ package com.example.promptengineering.restController;
 
 import java.util.Map;
 
+import com.example.promptengineering.model.PasswordChangeRequest;
+import com.example.promptengineering.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -25,6 +27,8 @@ public class AccountController {
     private UserService userService;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private AuthService authService;
 
     @PostMapping("/save-key/{keyName}")
     public Mono<String> saveKeyToMap(
@@ -55,5 +59,24 @@ public class AccountController {
         return userRepository.findByEmail(userEmail)
                 .switchIfEmpty(Mono.error(new RuntimeException("User not found in repository for email: " + userEmail)))
                 .flatMap(user -> userService.getKeys(user));
+    }
+
+
+    @PostMapping("/change-password")
+    public Mono<String> changePassword(
+            @AuthenticationPrincipal OAuth2User oAuth2User,
+            @RequestBody PasswordChangeRequest request) {
+
+        String userEmail = oAuth2User.getAttribute("email");
+        if (userEmail == null) {
+            return Mono.error(new IllegalArgumentException("Nie znaleziono adresu email w atrybutach użytkownika OAuth2"));
+        }
+
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            return Mono.error(new IllegalArgumentException("Nowe hasło i potwierdzenie nie są identyczne"));
+        }
+
+        return authService.updatePassword(userEmail, request.getNewPassword())
+                .thenReturn("Hasło zostało pomyślnie zmienione");
     }
 }

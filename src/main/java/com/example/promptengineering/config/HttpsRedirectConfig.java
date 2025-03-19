@@ -15,23 +15,23 @@ import java.net.URI;
 @Configuration
 public class HttpsRedirectConfig {
     
-    @Bean
-    public WebFilter httpsRedirectFilter() {
-        return (exchange, chain) -> {
-            ServerHttpRequest request = exchange.getRequest();
-            if (request.getURI().getScheme().equals("http")) {
-                URI httpsUri = UriComponentsBuilder
-                    .fromUri(request.getURI())
-                    .scheme("https")
-                    .port(8080)
-                    .build().toUri();
+    // @Bean
+    // public WebFilter httpsRedirectFilter() {
+    //     return (exchange, chain) -> {
+    //         ServerHttpRequest request = exchange.getRequest();
+    //         if (request.getURI().getScheme().equals("http")) {
+    //             URI httpsUri = UriComponentsBuilder
+    //                 .fromUri(request.getURI())
+    //                 .scheme("https")
+    //                 .port(8080)
+    //                 .build().toUri();
                 
-                ServerHttpResponse response = exchange.getResponse();
-                response.setStatusCode(HttpStatus.MOVED_PERMANENTLY);
-                response.getHeaders().setLocation(httpsUri);
-                return Mono.empty();
-            }
-            return chain.filter(exchange);
-        };
-    }
+    //             ServerHttpResponse response = exchange.getResponse();
+    //             response.setStatusCode(HttpStatus.MOVED_PERMANENTLY);
+    //             response.getHeaders().setLocation(httpsUri);
+    //             return Mono.empty();
+    //         }
+    //         return chain.filter(exchange);
+    //     };
+    // }
 }

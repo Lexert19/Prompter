@@ -1,14 +1,15 @@
 package com.example.promptengineering.entity;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+
+import com.nimbusds.oauth2.sdk.Role;
+
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "users")
@@ -18,11 +19,19 @@ public class User implements OAuth2User {
     private String email;
     private String password;
     private HashMap<String, String> keys = new HashMap<>();
+    private List<Role> roles = new ArrayList<>();
 
     public User(String email, String password) {
         this.email = email;
         this.password = password;
     }
+
+    
+
+    public User() {
+    }
+
+
 
     @Override
     public Map<String, Object> getAttributes() {
@@ -33,7 +42,9 @@ public class User implements OAuth2User {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.name()))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -71,6 +82,18 @@ public class User implements OAuth2User {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
     }
 
 }
