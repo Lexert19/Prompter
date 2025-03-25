@@ -67,8 +67,8 @@ class Settings {
         url: "https://api.deepinfra.com/v1/openai/chat/completions",
       },
       {
-        name: "deepseek-ai/DeepSeek-V3",
-        text: "deepinfra/DeepSeek-V3",
+        name: "deepseek-ai/DeepSeek-V3-0324",
+        text: "deepinfra/DeepSeek-V3-new",
         provider: "DEEPINFRA",
         type: "text",
         url: "https://api.deepinfra.com/v1/openai/chat/completions",

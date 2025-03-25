@@ -7,7 +7,6 @@ import com.example.promptengineering.model.PasswordChangeRequest;
 import com.example.promptengineering.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.promptengineering.entity.User;
 import com.example.promptengineering.repository.UserRepository;
 import com.example.promptengineering.service.UserService;
 
@@ -33,11 +31,11 @@ public class AccountController {
 
     @PostMapping("/save-key/{keyName}")
     public Mono<String> saveKeyToMap(
-            @AuthenticationPrincipal Principal oAuth2User,
+            @AuthenticationPrincipal Principal principal,
             @PathVariable String keyName,
             @RequestBody String keyValue) {
 
-        String userEmail = oAuth2User.getName();
+        String userEmail = principal.getName();
         if (userEmail == null) {
             return Mono.error(new IllegalArgumentException("Email not found in OAuth2User attributes"));
         }
@@ -51,8 +49,8 @@ public class AccountController {
 
     @GetMapping("/keys")
     public Mono<Map<String, String>> getAllKeys(
-            @AuthenticationPrincipal Principal oAuth2User) {
-        String userEmail = oAuth2User.getName();
+            @AuthenticationPrincipal Principal principal) {
+        String userEmail = principal.getName();
         if (userEmail == null) {
             return Mono.error(new IllegalArgumentException("Email not found in OAuth2User attributes"));
         }
@@ -65,10 +63,10 @@ public class AccountController {
 
     @PostMapping("/change-password")
     public Mono<String> changePassword(
-            @AuthenticationPrincipal Principal oAuth2User,
+            @AuthenticationPrincipal Principal principal,
             @RequestBody PasswordChangeRequest request) {
 
-        String userEmail = oAuth2User.getName();
+        String userEmail = principal.getName();
         if (userEmail == null) {
             return Mono.error(new IllegalArgumentException("Nie znaleziono adresu email w atrybutach użytkownika OAuth2"));
         }
