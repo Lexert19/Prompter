@@ -16,6 +16,8 @@ import com.nimbusds.jose.shaded.gson.Gson;
 
 import reactor.core.publisher.Flux;
 
+import java.security.Principal;
+
 @RestController
 @RequestMapping("/client")
 public class ClientRestController {
@@ -25,13 +27,13 @@ public class ClientRestController {
 
     @PostMapping("/chat")
     public Flux<String> makeRequest(
-            @AuthenticationPrincipal OAuth2User oAuth2User,
+            @AuthenticationPrincipal Principal principal,
             @RequestBody String body) throws JsonProcessingException {
 
         try {
             java.lang.reflect.Type requestType = new TypeToken<RequestBuilder>(){}.getType();
             RequestBuilder request = gson.fromJson(body, requestType);
-            //User user = (User) oAuth2User;
+            //User user = (User) principal;
             //requestHistoryRepository.save(request);
 
             return chatService.makeRequest(request);
