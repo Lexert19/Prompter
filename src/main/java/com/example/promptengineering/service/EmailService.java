@@ -6,29 +6,20 @@ import com.mailersend.sdk.emails.Email;
 import com.mailersend.sdk.exceptions.MailerSendException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
 
 
 @Service
 public class EmailService {
-
-    @Autowired
-    private JavaMailSender javaMailSender;
     @Value("${app.domain}")
     private String domain;
     @Value("${mailersend.api.token}")
     private String apiToken;
-    @Autowired
-    private WebClient webClient;
 
 
     private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
