@@ -10,30 +10,26 @@ class Message {
     this.time = Date.now();
     this.start = Date.now();
     this.end = null;
-
-    this.setText(text);
-    images.forEach((img) => {
-      this.addBase64Image(img);
-    });
+    this.images = images;
   }
 
-  setText(text, cache = false) {
-    let textContent = "";
-    this.context.forEach(
-      (context) => (textContent += `<context>${context}</context>`)
-    );
-    this.documents.forEach(
-      (doc) => (textContent += "<document>" + doc + "</document>")
-    );
-
-    this.content.push({
-      type: "text",
-      text: textContent + text,
-      cache: cache,
-    });
-
-    return this;
-  }
+//  setText(text, cache = false) {
+//    let textContent = "";
+//    this.context.forEach(
+//      (context) => (textContent += `<context>${context}</context>`)
+//    );
+//    this.documents.forEach(
+//      (doc) => (textContent += "<document>" + doc + "</document>")
+//    );
+//
+//    this.content.push({
+//      type: "text",
+//      text: textContent + text,
+//      cache: cache,
+//    });
+//
+//    return this;
+//  }
 
   appendText(text) {
     this.text += text;
@@ -42,6 +38,37 @@ class Message {
   getText() {
     return this.text;
   }
+
+   buildContent() {
+      const content = [];
+
+      if (this.text) {
+        let textContent = "";
+        this.context.forEach(
+          (context) => (textContent += `<context>${context}</context>`)
+        );
+        this.documents.forEach(
+          (doc) => (textContent += "<document>" + doc + "</document>")
+        );
+
+        content.push({
+          type: "text",
+          text: textContent + this.text,
+          cache: this.cache,
+        });
+      }
+
+      this.images.forEach(img => {
+        content.push({
+          type: "image",
+          mediaType: img.mediaType,
+          data: img.data,
+          cache: img.cache
+        });
+      });
+
+      return content;
+    }
 
   // addImageUrl(url, mediaType, cache = false) {
   //   this.content.push({
@@ -153,7 +180,7 @@ class RequestBuilder {
       provider: this.getProvider(),
       messages: messagesToInclude.map((message) => ({
         role: message.role,
-        content: message.content.map((content) => this.mapContent(content)),
+        content: message.buildContent()
       })),
       maxTokens: this.getMaxTokens(),
       temperature: this.getTemperature(),

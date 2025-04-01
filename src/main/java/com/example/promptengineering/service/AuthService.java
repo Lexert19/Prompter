@@ -30,7 +30,7 @@ public class AuthService {
                 .switchIfEmpty(Mono.error(new RuntimeException("User not found")));
     }
 
-    public Mono<Void> updatePassword(String userLogin, String newPassword) {
+    public Mono<User> updatePassword(String userLogin, String newPassword) {
 
         return userRepository.findByEmail(userLogin)
                 .switchIfEmpty(Mono.error(new Exception("User not found")))
@@ -38,8 +38,7 @@ public class AuthService {
                     String encryptedPassword = passwordEncoder.encode(newPassword);
                     user.setPassword(encryptedPassword);
                     return userRepository.save(user);
-                })
-                .then();
+                });
     }
 
 }

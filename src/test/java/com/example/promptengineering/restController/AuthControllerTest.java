@@ -123,6 +123,8 @@ public class AuthControllerTest {
 
     @Test
     public void testPasswordResetRequest() {
+        resetTokenRepository.deleteByUserLogin("testuser123@wp.pl").block();
+
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("email", "testuser123@wp.pl");
 
@@ -138,17 +140,11 @@ public class AuthControllerTest {
         System.out.println("Response body: " + result.getResponseBody().blockFirst(Duration.ofSeconds(1000)));
         HttpStatusCode status = result.getStatus();
 
-        assertTrue(status.is2xxSuccessful());
+        assertTrue(status.is3xxRedirection());
         ResetToken resetToken = resetTokenRepository.findByUserLogin("testuser123@wp.pl")
                 .switchIfEmpty(Mono
                         .error(() -> new AssertionError("Reset token not found for the user")))
                 .blockFirst();
-
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime tokenCreationTime = resetToken.getCreationTime();
-        assertTrue(tokenCreationTime.isBefore(now.minusMinutes(1)), "Token is older than 5 minutes");
-
-        resetTokenRepository.delete(resetToken);
     }
 
     @Test

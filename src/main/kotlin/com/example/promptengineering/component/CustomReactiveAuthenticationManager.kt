@@ -20,7 +20,7 @@ open class CustomReactiveAuthenticationManager(
     override fun authenticate(authentication: Authentication): Mono<Authentication> {
         return mono {
             val username = authentication.name
-            val password = authentication.credentials.toString()
+            val presentedPassword = authentication.credentials.toString()
 
             val user = userRepository.findByEmail(username).awaitSingleOrNull()
 
@@ -28,7 +28,8 @@ open class CustomReactiveAuthenticationManager(
                 return@mono Mono.error<Authentication>(UsernameNotFoundException("User not found")).awaitSingleOrNull()
             }
 
-            if (!passwordEncoder.matches(password, user.password)) {
+
+            if (!passwordEncoder.matches(presentedPassword, user.password)) {
                 return@mono Mono.error<Authentication>(BadCredentialsException("Invalid credentials")).awaitSingleOrNull()
             }
 
