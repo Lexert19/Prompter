@@ -13,4 +13,5 @@ public interface ResetTokenRepository extends ReactiveMongoRepository<ResetToken
     Flux<ResetToken> findByUserLogin(String userLogin);
     Mono<ResetToken> findByToken(String token);
     Mono<Void> deleteByToken(String token);
+    Mono<Void> deleteByUserLogin(String userLogin);
 }

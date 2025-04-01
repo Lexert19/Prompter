@@ -175,6 +175,18 @@ class Chat {
         }
     }
 
+    startDurationCounter(message){
+        this.updateDurationCounter(message);
+
+        const intervalId = setInterval(() => {
+            if (message.end !== null) {
+                clearInterval(intervalId);
+                return;
+            }
+            this.updateDurationCounter(message);
+        }, 100);
+    }
+
     async chat() {
         if (this.blockedInput == true){
             this.chatClient.stopStreaming();

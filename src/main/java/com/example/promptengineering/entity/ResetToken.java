@@ -12,6 +12,7 @@ public class ResetToken {
     private String token;
     private String userLogin;
     private LocalDateTime creationTime;
+    private boolean used;
     
     public String getId() {
         return id;
@@ -38,6 +39,12 @@ public class ResetToken {
         this.creationTime = creationTime;
     }
 
-    
-    
+
+    public boolean isUsed() {
+        return used;
+    }
+
+    public void setUsed(boolean used) {
+        this.used = used;
+    }
 }

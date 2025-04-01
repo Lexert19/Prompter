@@ -39,11 +39,11 @@ class Settings {
         type: "vision",
       },
       {
-        name: "claude-3-haiku-20240307",
-        text: "Claude Haiku 3",
+        name: "claude-3-5-haiku-latest",
+        text: "Claude Haiku 3.5",
         provider: "ANTHROPIC",
         url: "https://api.anthropic.com/v1/messages",
-        type: "vision",
+        type: "text",
       },
       {
         name: "claude-3-7-sonnet-20250219",

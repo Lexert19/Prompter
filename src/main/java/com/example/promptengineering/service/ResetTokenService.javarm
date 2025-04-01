@@ -3,6 +3,8 @@ package com.example.promptengineering.service;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +24,7 @@ public class ResetTokenService {
     @Autowired
     private EmailService emailService;
 
-
+    private static final Logger logger = LoggerFactory.getLogger(ResetTokenService.class);
 
     public Mono<String> createPasswordResetToken(String email) {
         String token = generateUniqueToken();
@@ -30,8 +32,10 @@ public class ResetTokenService {
         resetToken.setToken(token);
         resetToken.setUserLogin(email);
         resetToken.setCreationTime(LocalDateTime.now());
-
+        resetToken.setUsed(false);
         return resetTokenRepository.save(resetToken)
+                .doOnNext(savedToken -> logger.error("Token saved: {}", savedToken.getToken()))
+                .doOnError(e -> logger.error("Failed to save token", e))
                 .then(emailService.sendPasswordResetEmail(email, token))
                 .thenReturn(token);
     }
@@ -39,7 +43,8 @@ public class ResetTokenService {
     public Mono<ResetToken> validateResetToken(String token) {
         return resetTokenRepository.findByToken(token)
                 .switchIfEmpty(Mono.error(new Exception("Invalid reset token")))
-                .flatMap(this::validateTokenExpiration);
+                .flatMap(this::validateToken)
+                .flatMap(this::markTokenAsUsed);
     }
 
     public Mono<Void> deleteToken(String token) {
@@ -50,11 +55,19 @@ public class ResetTokenService {
         return UUID.randomUUID().toString();
     }
 
-    private Mono<ResetToken> validateTokenExpiration(ResetToken token) {
-        LocalDateTime expirationTime = token.getCreationTime().plusHours(TOKEN_EXPIRATION_HOURS);
-        return LocalDateTime.now().isBefore(expirationTime)
-                ? Mono.just(token)
-                : Mono.error(new Exception("Reset token has expired"));
+    private Mono<ResetToken> validateToken(ResetToken resetToken) {
+        if (resetToken.getCreationTime().plusHours(24).isBefore(LocalDateTime.now())) {
+            return Mono.error(new IllegalArgumentException("Reset token has expired"));
+        }
+        if (resetToken.isUsed()) {
+            return Mono.error(new IllegalArgumentException("Reset token has already been used"));
+        }
+        return Mono.just(resetToken);
+    }
+
+    private Mono<ResetToken> markTokenAsUsed(ResetToken resetToken) {
+        resetToken.setUsed(true);
+        return resetTokenRepository.save(resetToken);
     }
 
     public Mono<Void> resetPassword(String token, String newPassword) {

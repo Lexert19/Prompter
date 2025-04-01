@@ -14,6 +14,7 @@ class ChatApi {
         this.currentMessage = new Message("assistant");
 
         this.outputInput = window.chat.createMessage(this.currentMessage);
+        window.chat.startDurationCounter(this.currentMessage);
     }
 
     sendStreamingMessage(request) {
@@ -90,8 +91,7 @@ class ChatApi {
             this.outputInput.textContent += content;
             this.parser.toHTML();
             this.currentMessage.appendText(content);
-            window.chat.updateDurationCounter();
-           
+
         }catch(error){
             console.debug(chunk);
         }
@@ -132,6 +132,7 @@ class ChatApi {
             if (done) {
                 reader.releaseLock();
                 window.chat.setBlockedInput(false);
+                this.currentMessage.end = Date.now();
                 window.chat.saveMessage(this.currentMessage);
 
                 this.parser.parse("\n\n");
