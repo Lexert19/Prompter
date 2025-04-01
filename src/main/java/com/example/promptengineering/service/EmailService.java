@@ -70,31 +70,5 @@ public class EmailService {
         }
     }
 
-//    public Mono<Void> sendPasswordResetEmail(String email, String token) {
-//        return Mono.fromCallable(() -> {
-//                    MailerSend ms = new MailerSend();
-//                    ms.setToken(apiToken);
-//
-//                    String resetLink = domain + "/auth/reset-password-confirm?token=" + token;
-//                    String textBody = String.format(
-//                            "Password reset requested. Click the link: %s%nIf you didn't request this, ignore this email.",
-//                            resetLink);
-//                    String htmlBody = String.format("<p>Password reset requested. <a href=\"%s\">Click here to reset your password</a></p><p>%s</p><p>If you didn't request this, ignore this email.</p>",
-//                            resetLink, resetLink);
-//
-//                    Email emailMessage = new Email();
-//                    emailMessage.setFrom("Prompter", "no-reply@trial-nrw7gym9kvng2k8e.mlsender.net");
-//                    emailMessage.addRecipient(email, email);
-//                    emailMessage.setSubject("Password Reset Request");
-//                    emailMessage.setPlain(textBody);
-//                    emailMessage.setHtml(htmlBody);
-//
-//                    MailerSendResponse response = ms.emails().send(emailMessage);
-//                    return response;
-//                }).doOnError(e -> {
-//                    logger.error("Failed to send password reset email", e);
-//                }).onErrorMap(e -> new RuntimeException("Email sending failed", e))
-//                .then();
-//    }
 
 }
