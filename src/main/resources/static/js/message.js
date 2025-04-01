@@ -13,24 +13,6 @@ class Message {
     this.images = images;
   }
 
-//  setText(text, cache = false) {
-//    let textContent = "";
-//    this.context.forEach(
-//      (context) => (textContent += `<context>${context}</context>`)
-//    );
-//    this.documents.forEach(
-//      (doc) => (textContent += "<document>" + doc + "</document>")
-//    );
-//
-//    this.content.push({
-//      type: "text",
-//      text: textContent + text,
-//      cache: cache,
-//    });
-//
-//    return this;
-//  }
-
   appendText(text) {
     this.text += text;
   }
