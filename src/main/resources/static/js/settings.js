@@ -53,15 +53,8 @@ class Settings {
         type: "vision",
       },
       {
-        name: "meta-llama/Llama-3.3-70B-Instruct-Turbo",
-        text: "meta-llama/Llama-3.3-70B-Instruct-Turbo",
-        provider: "DEEPINFRA",
-        type: "text",
-        url: "https://api.deepinfra.com/v1/openai/chat/completions",
-      },
-      {
-        name: "meta-llama/Llama-3.2-90B-Vision-Instruct",
-        text: "meta-llama/Llama-3.2-90B-Vision-Instruct",
+        name: "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
+        text: "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
         provider: "DEEPINFRA",
         type: "vision",
         url: "https://api.deepinfra.com/v1/openai/chat/completions",
