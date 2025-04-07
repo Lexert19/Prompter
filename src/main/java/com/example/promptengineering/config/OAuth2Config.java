@@ -67,6 +67,8 @@ public class OAuth2Config implements WebMvcConfigurer   {
         return http.build();
     }
 
+
+
     @Bean
     public OidcUserService oidcUserService() {
         return new OidcUserService();
