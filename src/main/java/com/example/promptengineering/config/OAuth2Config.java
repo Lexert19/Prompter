@@ -42,7 +42,12 @@ public class OAuth2Config implements WebMvcConfigurer   {
                         .userService(customOAuth2UserService))
                 .successHandler((request, response, authentication) -> {
                     String serverName = request.getServerName();
-                    response.sendRedirect("http://" + serverName + ":8080/");
+                    response.sendRedirect("https://" + serverName + ":8080/");
+                })
+                .failureHandler((request, response, exception) -> {
+                    exception.printStackTrace();
+                    String serverName = request.getServerName();
+                    response.sendRedirect("https://" + serverName + ":8080/");
                 }));
 
         http.authenticationManager(authenticationManager);
@@ -50,7 +55,7 @@ public class OAuth2Config implements WebMvcConfigurer   {
         http.formLogin(customizer -> customizer
                 .loginPage("/auth/login")
                 .successHandler((request, response, authentication) -> {
-                    String redirectUrl = "http://" + request.getServerName() + ":8080/";
+                    String redirectUrl = "https://" + request.getServerName() + ":8080/";
                     response.sendRedirect(redirectUrl);
                 })
                 .failureHandler(authenticationFailureHandler()));
