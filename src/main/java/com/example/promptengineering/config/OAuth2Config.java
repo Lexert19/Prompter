@@ -1,6 +1,7 @@
 package com.example.promptengineering.config;
 
 import com.example.promptengineering.component.CustomAuthenticationManager;
+import com.example.promptengineering.service.CustomOAuth2UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -28,6 +29,8 @@ import java.util.Map;
 public class OAuth2Config implements WebMvcConfigurer {
     @Autowired
     private CustomAuthenticationManager authenticationManager;
+    @Autowired
+    private CustomOAuth2UserService customOAuth2UserService;
 
     @Bean
     public SecurityFilterChain securityWebFilterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
@@ -40,6 +43,8 @@ public class OAuth2Config implements WebMvcConfigurer {
 
         http.oauth2Login(oauth2 -> oauth2
                 .loginPage("/auth/login")
+                .userInfoEndpoint(userInfo -> userInfo
+                        .userService(customOAuth2UserService))
                 .successHandler((request, response, authentication) -> {
                     response.sendRedirect("/");
                 }));
