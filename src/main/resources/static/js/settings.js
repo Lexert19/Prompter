@@ -56,7 +56,7 @@ class Settings {
         name: "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
         text: "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
         provider: "DEEPINFRA",
-        type: "vision",
+        type: "text",
         url: "https://api.deepinfra.com/v1/openai/chat/completions",
       },
       {
@@ -76,13 +76,6 @@ class Settings {
       {
         name: "deepseek-ai/DeepSeek-R1-Turbo",
         text: "deepinfra/DeepSeek-R1-Turbo",
-        provider: "DEEPINFRA",
-        type: "text",
-        url: "https://api.deepinfra.com/v1/openai/chat/completions",
-      },
-      {
-        name: "deepseek-ai/DeepSeek-V3-Turbo",
-        text: "deepinfra/DeepSeek-V3-Turbo",
         provider: "DEEPINFRA",
         type: "text",
         url: "https://api.deepinfra.com/v1/openai/chat/completions",

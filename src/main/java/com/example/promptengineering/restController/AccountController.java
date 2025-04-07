@@ -3,6 +3,7 @@ package com.example.promptengineering.restController;
 import java.security.Principal;
 import java.util.Map;
 
+import com.example.promptengineering.entity.User;
 import com.example.promptengineering.model.PasswordChangeRequest;
 import com.example.promptengineering.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,52 +31,31 @@ public class AccountController {
     private AuthService authService;
 
     @PostMapping("/save-key/{keyName}")
-    public Mono<String> saveKeyToMap(
-            @AuthenticationPrincipal Principal principal,
+    public String saveKeyToMap(
+            @AuthenticationPrincipal User user,
             @PathVariable String keyName,
             @RequestBody String keyValue) {
-
-        String userEmail = principal.getName();
-        if (userEmail == null) {
-            return Mono.error(new IllegalArgumentException("Email not found in OAuth2User attributes"));
-        }
-
-        return userService.findUserByEmail(userEmail)
-                .switchIfEmpty(Mono.error(new RuntimeException("User not found for email: " + userEmail)))
-                .flatMap(existingUser -> userService.saveKeyToMap(existingUser, keyName, keyValue))
-                .map(userSaved -> String.format("Key '%s' saved to map for user with email: %s", keyName, userEmail));
-
+        userService.saveKeyToMap(user, keyName, keyValue);
+        return String.format("Key '%s' saved to map for user with email: %s", keyName, user.getEmail());
     }
 
     @GetMapping("/keys")
-    public Mono<Map<String, String>> getAllKeys(
-            @AuthenticationPrincipal Principal principal) {
-        String userEmail = principal.getName();
-        if (userEmail == null) {
-            return Mono.error(new IllegalArgumentException("Email not found in OAuth2User attributes"));
-        }
-
-        return userRepository.findByEmail(userEmail)
-                .switchIfEmpty(Mono.error(new RuntimeException("User not found in repository for email: " + userEmail)))
-                .flatMap(user -> userService.getKeys(user));
+    public Map<String, String> getAllKeys(
+            @AuthenticationPrincipal User user) {
+        return userService.getKeys(user);
     }
 
 
     @PostMapping("/change-password")
-    public Mono<String> changePassword(
-            @AuthenticationPrincipal Principal principal,
-            @RequestBody PasswordChangeRequest request) {
-
-        String userEmail = principal.getName();
-        if (userEmail == null) {
-            return Mono.error(new IllegalArgumentException("Nie znaleziono adresu email w atrybutach użytkownika OAuth2"));
-        }
+    public String changePassword(
+            @AuthenticationPrincipal User user,
+            @RequestBody PasswordChangeRequest request) throws Exception {
 
         if (!request.getNewPassword().equals(request.getConfirmPassword())) {
-            return Mono.error(new IllegalArgumentException("Nowe hasło i potwierdzenie nie są identyczne"));
+            throw new IllegalArgumentException("Nowe hasło i potwierdzenie nie są identyczne");
         }
 
-        return authService.updatePassword(userEmail, request.getNewPassword())
-                .thenReturn("Hasło zostało pomyślnie zmienione");
+        authService.updatePassword(user.getEmail(), request.getNewPassword());
+        return "Hasło zostało pomyślnie zmienione";
     }
 }

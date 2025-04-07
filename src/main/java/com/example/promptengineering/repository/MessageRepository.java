@@ -1,12 +1,15 @@
 package com.example.promptengineering.repository;
 
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 
 import com.example.promptengineering.entity.Message;
 
 import reactor.core.publisher.Flux;
 
-public interface MessageRepository extends ReactiveMongoRepository<Message, String> {
+import java.util.List;
 
-    Flux<Message> findByChatId(String chatId); 
+public interface MessageRepository extends MongoRepository<Message, String> {
+
+    List<Message> findByChatId(String chatId);
 }

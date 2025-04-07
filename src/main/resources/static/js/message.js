@@ -41,59 +41,32 @@ class Message {
       }
 
       this.images.forEach(img => {
+        const parts = img.split(';');
+        const mediaType = parts[0].split(':')[1];
+        const data = parts[1].split(',')[1];
+
         content.push({
           type: "image",
-          mediaType: img.mediaType,
-          data: img.data,
-          cache: img.cache
+          mediaType: mediaType,
+          data: data,
+          cache: this.cache
         });
       });
 
       return content;
     }
 
-  // addImageUrl(url, mediaType, cache = false) {
-  //   this.content.push({
-  //     type: "image_url",
-  //     url: url,
-  //     mediaType: mediaType,
-  //     cache: cache,
-  //   });
-  //   return this;
-  // }
 
-  addBase64Image(data, cache = false) {
-    const regex = /^data:(image\/\w+);base64,(.+)$/;
-    const matches = data.match(regex);
 
-    if (matches) {
-      const mediaType = matches[1];
-      const base64Data = matches[2];
+ getHtmlImages() {
+   return this.images.map((img) => {
+     const parts = img.split(';');
+     const mediaType = parts[0].split(':')[1];
+     const data = parts[1].split(',')[1];
 
-      this.content.push({
-        type: "image",
-        mediaType: mediaType,
-        data: base64Data,
-        cache: cache,
-      });
-    } else {
-      throw new Error("Invalid base64 image data");
-    }
-
-    return this;
-  }
-
-  getHtmlImages() {
-    return this.content
-      .filter((item) => ["image_url", "image"].includes(item.type))
-      .map((item) => {
-        if (item.type === "image_url") {
-          return `<img class="image" src="${item.url}" alt="Uploaded image">`;
-        }
-        return `<img class="image" src="data:${item.mediaType};base64,${item.data}" alt="Inline image">`;
-      })
-      .join("");
-  }
+     return `<img class="image" src="data:${mediaType};base64,${data}" alt="Inline image">`;
+   }).join("");
+ }
 
   getHtmlFiles() {
     let documentsText = "";

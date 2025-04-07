@@ -28,7 +28,7 @@ public class ResetTokenService @Autowired constructor(
             isUsed = false
         }
 
-        val savedToken = resetTokenRepository.save(resetToken).awaitSingle()
+        val savedToken = resetTokenRepository.save(resetToken)
         logger.debug("Token saved: {}", savedToken.token)
         try {
             emailService.sendPasswordResetEmail(email, token)
@@ -39,15 +39,16 @@ public class ResetTokenService @Autowired constructor(
         }
     }
 
-    suspend fun validateResetToken(token: String): ResetToken {
-        val resetToken = resetTokenRepository.findByToken(token).awaitSingleOrNull()
-            ?: throw Exception("Invalid reset token")
+    fun validateResetToken(token: String): ResetToken {
+        val resetToken = resetTokenRepository.findByToken(token)
+        if(resetToken.isEmpty)
+            throw Exception("Invalid reset token");
 
-        return validateToken(resetToken)
+        return validateToken(resetToken.get())
     }
 
-    suspend fun deleteToken(token: String) {
-        resetTokenRepository.deleteByToken(token).awaitSingleOrNull()
+    fun deleteToken(token: String) {
+        resetTokenRepository.deleteByToken(token)
     }
 
     private fun generateUniqueToken(): String {
@@ -64,9 +65,9 @@ public class ResetTokenService @Autowired constructor(
         return resetToken
     }
 
-    suspend fun resetPassword(token: String, newPassword: String) {
+    fun resetPassword(token: String, newPassword: String) {
         val resetToken = validateResetToken(token)
-        val user = authService.updatePassword(resetToken.userLogin, newPassword).awaitSingle()
+        val user = authService.updatePassword(resetToken.userLogin, newPassword)
         deleteToken(token)
     }
 }

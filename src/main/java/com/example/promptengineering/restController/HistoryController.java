@@ -1,5 +1,6 @@
 package com.example.promptengineering.restController;
 
+import com.example.promptengineering.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,9 @@ import com.example.promptengineering.service.HistoryService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.security.Principal;
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/history")
 public class HistoryController {
@@ -31,51 +35,31 @@ public class HistoryController {
     private UserRepository userRepository;
 
     @PostMapping("/chats")
-    public Mono<ResponseEntity<Chat>> createChat(@AuthenticationPrincipal OAuth2User oAuth2User) {
-        String userIdFromOAuth2 = oAuth2User.getAttribute("id").toString();
-        return userRepository.findById(userIdFromOAuth2)
-                .switchIfEmpty(Mono.error(new RuntimeException("User not found for ID: " + userIdFromOAuth2)))
-                .flatMap(user -> historyService.createChat(user))
-                .map(chat -> ResponseEntity.status(HttpStatus.CREATED).body(chat))
-                .onErrorResume(e -> Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()));
+    public ResponseEntity<Chat> createChat(@AuthenticationPrincipal User user) {
+        Chat chat = historyService.createChat(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(chat);
     }
 
     @PostMapping("/messages")
-    public Mono<ResponseEntity<Message>> saveMessage(
+    public ResponseEntity<Message> saveMessage(
             @RequestBody MessageBody messageBody,
-            @AuthenticationPrincipal OAuth2User oAuth2User) {
-        String userIdFromOAuth2 = oAuth2User.getAttribute("id").toString();
-        return userRepository.findById(userIdFromOAuth2)
-                .switchIfEmpty(Mono.error(new RuntimeException("User not found for ID: " + userIdFromOAuth2)))
-                .flatMap(user -> historyService.saveMessage(messageBody, user))
-                .map(message -> ResponseEntity.status(HttpStatus.CREATED).body(message))
-                .onErrorResume(IllegalArgumentException.class, e -> Mono.just(ResponseEntity.badRequest().build()))
-                .onErrorResume(SecurityException.class,
-                        e -> Mono.just(ResponseEntity.status(HttpStatus.FORBIDDEN).build()))
-                .onErrorResume(e -> Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()));
+            @AuthenticationPrincipal User user) {
+        Message message = historyService.saveMessage(messageBody, user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(message);
+
     }
 
     @GetMapping("/chats/{chatId}/messages")
-    public Mono<ResponseEntity<Flux<Message>>> getChatHistory(
+    public ResponseEntity<List<Message>> getChatHistory(
             @PathVariable String chatId,
-            @AuthenticationPrincipal OAuth2User oAuth2User) {
-        String userIdFromOAuth2 = oAuth2User.getAttribute("id").toString();
-        return userRepository.findById(userIdFromOAuth2)
-                .switchIfEmpty(Mono.error(new RuntimeException("User not found for ID: " + userIdFromOAuth2)))
-                .flatMap(user -> historyService.getChatHistory(chatId, user)
-                        .collectList()
-                        .map(messages -> ResponseEntity.ok(Flux.fromIterable(messages))))
-                .onErrorResume(e -> Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()));
+            @AuthenticationPrincipal User user) {
+        List<Message> messages = historyService.getChatHistory(chatId, user);
+        return ResponseEntity.ok(messages);
     }
 
     @GetMapping("/chats")
-    public Mono<ResponseEntity<Flux<Chat>>> getChats(@AuthenticationPrincipal OAuth2User oAuth2User) {
-        String userIdFromOAuth2 = oAuth2User.getAttribute("id").toString();
-        return userRepository.findById(userIdFromOAuth2)
-                .switchIfEmpty(Mono.error(new RuntimeException("User not found for ID: " + userIdFromOAuth2)))
-                .flatMap(user -> historyService.getChatsForUser(user)
-                        .collectList()
-                        .map(chats -> ResponseEntity.ok(Flux.fromIterable(chats))))
-                .onErrorResume(e -> Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()));
+    public ResponseEntity<List<Chat>> getChats(@AuthenticationPrincipal User user) {
+        List<Chat> chats = historyService.getChatsForUser(user);
+        return ResponseEntity.ok(chats);
     }
 }
