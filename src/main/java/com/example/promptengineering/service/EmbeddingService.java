@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestTemplate;
 
 import com.example.promptengineering.entity.FileElement;
 import com.example.promptengineering.entity.Project;
@@ -29,111 +29,113 @@ public class EmbeddingService {
     private static final String EMBEDDINGS_URL = "https://api.openai.com/v1/embeddings";
 
     @Autowired
-    private WebClient webClient;
+    private RestTemplate restTemplate;
     @Autowired
     private ProjectRepository projectRepository;
     @Autowired
     private FileElementsRepository fileElementRepository;
 
-    public Mono<Void> addFileToProject(Project project, FileElement file, User user) {
+    public void addFileToProject(Project project, FileElement file, User user) {
         String apiKey = user.getKeys().getOrDefault("OPENAI", "");
         List<String> pages = splitContentIntoPages(file.getContent());
         file.setPages(pages);
         file.setProject(project.getId());
         file.setUserId(user.getId());
 
-        return createEmbeddingForFile(file, apiKey)
-                .flatMap(f -> fileElementRepository.save(f))
-                .then();
+        FileElement fileElement = createEmbeddingForFile(file, apiKey);
+        fileElementRepository.save(fileElement);
     }
 
-    private Mono<FileElement> createEmbeddingForFile(FileElement file, String apiKey) {
+    private FileElement createEmbeddingForFile(FileElement file, String apiKey) {
         List<String> pages = file.getPages();
         if (pages == null || pages.isEmpty()) {
-            return Mono.just(file);
+            return file;
         }
 
-        return Flux.fromIterable(pages)
-                .flatMap(page -> getEmbedding(page, apiKey))
-                .collectList()
-                .map(vectors -> {
-                    file.setVectors(vectors);
-                    return file;
-                });
+        List<List<Double>> vectors = new ArrayList<>();
+        for (String page : pages) {
+            List<Double> vector = getEmbedding(page, apiKey);
+            vectors.add(vector);
+        }
+        file.setVectors(vectors);
+        return file;
     }
 
-    public Mono<List<Double>> getEmbedding(String text, String apiKey) {
+    public List<Double> getEmbedding(String text, String apiKey) {
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("input", text);
         requestBody.put("model", "text-embedding-3-large");
 
-        ParameterizedTypeReference<Map<String, Object>> typeRef = new ParameterizedTypeReference<>() {
-        };
+        Map<String, Object> response = restTemplate.postForObject(EMBEDDINGS_URL,
+                getHttpEntity(requestBody, apiKey), Map.class);
 
-        return webClient.post()
-                .uri(EMBEDDINGS_URL)
-                .header("Authorization", "Bearer " + apiKey)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(requestBody)
-                .retrieve()
-                .bodyToMono(typeRef)
-                .map(responseBody -> {
-                    List<Map<String, Object>> data = (List<Map<String, Object>>) responseBody.get("data");
-                    if (!data.isEmpty()) {
-                        List<Double> embedding = (List<Double>) data.get(0).get("embedding");
-                        return embedding;
-                    }
-                    throw new RuntimeException("Failed to get embedding for text: " + text);
-                });
+        List<Map<String, Object>> data = (List<Map<String, Object>>) response.get("data");
+        if (!data.isEmpty()) {
+            return (List<Double>) data.get(0).get("embedding");
+        }
+        throw new RuntimeException("Failed to get embedding for text: " + text);
     }
 
-    public Mono<List<ScoredFragment>> retrieveSimilarFragments(String query, Project project, User user) {
+    private org.springframework.http.HttpEntity<Map<String, Object>> getHttpEntity(Map<String, Object> requestBody, String apiKey) {
+        org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + apiKey);
+        return new org.springframework.http.HttpEntity<>(requestBody, headers);
+    }
+
+    public List<ScoredFragment> retrieveSimilarFragments(String query, Project project, User user) {
         String apiKey = user.getKeys().getOrDefault("OPENAI", "");
 
-        return getEmbedding(query, apiKey)
-                .flatMap(queryVector -> processQueryVectorWithProjectFiles(queryVector, project))
-                .flatMap(this::formatTopFiveResults);
+        List<Double> queryVector = getEmbedding(query, apiKey);
+        return processQueryVectorWithProjectFiles(queryVector, project);
     }
 
-    private Mono<List<ScoredFragment>> processQueryVectorWithProjectFiles(List<Double> queryVector, Project project) {
-        return fileElementRepository.findByProject(project.getId())
-                .flatMap(file -> processFile(file, queryVector))
-                .collectList();
+    private List<ScoredFragment> processQueryVectorWithProjectFiles(List<Double> queryVector, Project project) {
+        List<FileElement> fileElements = fileElementRepository.findByProject(project.getId());
+        List<ScoredFragment> scoredFragments = new ArrayList<>();
+
+        for (FileElement fileElement : fileElements){
+            scoredFragments.addAll(processFile(fileElement, queryVector));
+        }
+        return formatTopFiveResults(scoredFragments);
     }
 
-    private Flux<ScoredFragment> processFile(FileElement file, List<Double> queryVector) {
+    private List<ScoredFragment> processFile(FileElement file, List<Double> queryVector) {
         List<String> pages = file.getPages();
         List<List<Double>> vectors = file.getVectors();
 
         if (pages == null || vectors == null || pages.size() != vectors.size()) {
-            return Flux.empty();
+            return List.of();
         }
 
-        return Flux.range(0, pages.size())
-                .flatMap(index -> processPage(pages, vectors, index, queryVector));
+        List<ScoredFragment> scoredFragments = new ArrayList<>();
+        for (int i = 0; i < pages.size(); i++) {
+            ScoredFragment scoredFragment = processPage(pages, vectors, i, queryVector);
+            if (scoredFragment != null) {
+                scoredFragments.add(scoredFragment);
+            }
+        }
+        return scoredFragments;
     }
 
-    private Mono<ScoredFragment> processPage(List<String> pages, List<List<Double>> vectors, int index,
-            List<Double> queryVector) {
+    private ScoredFragment processPage(List<String> pages, List<List<Double>> vectors, int index,
+                                       List<Double> queryVector) {
         String page = pages.get(index);
         List<Double> vector = vectors.get(index);
 
         if (vector == null || vector.isEmpty()) {
-            return Mono.empty();
+            return null;
         }
 
         double similarity = cosineSimilarity(queryVector, vector);
-        return Mono.just(new ScoredFragment(page, similarity));
+        return new ScoredFragment(page, similarity);
     }
 
-    private Mono<List<ScoredFragment>> formatTopFiveResults(List<ScoredFragment> scoredFragments) {
-        return Mono.just(scoredFragments)
-                .map(list -> {
-                    list.sort(Comparator.comparingDouble(ScoredFragment::getScore).reversed());
-                    return list.stream()
-                            .limit(5)
-                            .collect(Collectors.toList());
-                });
+    private List<ScoredFragment> formatTopFiveResults(List<ScoredFragment> scoredFragments) {
+        scoredFragments.sort(Comparator.comparingDouble(ScoredFragment::getScore).reversed());
+        return scoredFragments.stream()
+                .limit(5)
+                .collect(Collectors.toList());
     }
 
   

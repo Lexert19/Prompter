@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.data.annotation.Id;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import com.nimbusds.oauth2.sdk.Role;
@@ -14,7 +15,7 @@ import com.nimbusds.oauth2.sdk.Role;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "users")
-public class User implements OAuth2User, Principal {
+public class User implements OAuth2User, Principal, UserDetails {
     @Id
     private String id;
     private String email;
@@ -27,11 +28,9 @@ public class User implements OAuth2User, Principal {
         this.password = password;
     }
 
-    
 
     public User() {
     }
-
 
 
     @Override
@@ -65,6 +64,11 @@ public class User implements OAuth2User, Principal {
         return password;
     }
 
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
+
     public void setPassword(String password) {
         this.password = password;
     }
@@ -86,15 +90,33 @@ public class User implements OAuth2User, Principal {
     }
 
 
-
     public List<Role> getRoles() {
         return roles;
     }
 
 
-
     public void setRoles(List<Role> roles) {
         this.roles = roles;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 
 }

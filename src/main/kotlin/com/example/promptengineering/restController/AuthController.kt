@@ -9,9 +9,9 @@ import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.reactive.result.view.Rendering
 import org.springframework.web.server.ServerWebExchange
 import kotlinx.coroutines.reactor.awaitSingle
+import org.springframework.web.bind.annotation.RequestParam
 
 
 @Controller
@@ -40,34 +40,29 @@ class AuthController {
     }
 
     @PostMapping("/reset-password-request")
-    suspend fun handleForgotPassword(exchange: ServerWebExchange): Rendering  {
+    suspend fun handleForgotPassword(exchange: ServerWebExchange, model: Model): String  {
         val formData = exchange.formData.awaitSingle()
         val email = formData.getFirst("email") ?: "";
         try{
             val token = resetTokenService.createPasswordResetToken(email)
         }catch (e: Exception){
-            return Rendering.view("reset-password-request")
-                .modelAttribute("error", e.message!!)
-                .build()
+            model.addAttribute("error", e.message)
+            return "reset-password-request"
         }
-        return Rendering.redirectTo("/auth/reset-password-info").build()
+        return "redirect:/auth/reset-password-info"
     }
 
     @GetMapping("/reset-password-confirm")
-    suspend fun showResetPasswordForm(exchange: ServerWebExchange): Rendering {
-        val token = exchange.request.queryParams.getFirst("token") ?: ""
-        return Rendering.view("reset-password-confirm")
-            .modelAttribute("token", token)
-            .build()
+    fun showResetPasswordForm(@RequestParam("token") token: String, model: Model): String {
+        model.addAttribute("token", token)
+        return "reset-password-confirm"
     }
 
     @PostMapping("/reset-password-confirm")
-    suspend fun handleResetPassword(exchange: ServerWebExchange, model: Model): String {
-        val formData = exchange.formData.awaitSingle()
-        val token = formData.getFirst("token") ?: ""
-        val newPassword = formData.getFirst("password") ?: ""
-        val passwordConfirmation = formData.getFirst("password_confirmation")
-
+    fun handleResetPassword(@RequestParam("token") token: String,
+                            @RequestParam("password") newPassword: String,
+                            @RequestParam("password_confirmation") passwordConfirmation: String,
+                            model: Model): String {
         if (newPassword != passwordConfirmation) {
             model.addAttribute("error", "Passwords do not match.")
             model.addAttribute("token", token)
@@ -83,10 +78,4 @@ class AuthController {
             "reset-password-confirm"
         }
     }
-
-    // @ExceptionHandler(Exception::class)
-    // fun handleException(ex: Exception, model: Model): String {
-    //     model.addAttribute("error", ex.message)
-    //     return "error" // Nazwa szablonu Freemarker do wyświetlania błędów
-    // }
 }

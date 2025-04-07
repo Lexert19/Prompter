@@ -9,6 +9,8 @@ import com.example.promptengineering.repository.UserRepository;
 
 import reactor.core.publisher.Mono;
 
+import java.util.Optional;
+
 @Service
 public class AuthService {
 
@@ -18,27 +20,25 @@ public class AuthService {
     private PasswordEncoder passwordEncoder;
 
 
-    public Mono<User> login(String login, String password) {
-        return userRepository.findByEmail(login)
-                .flatMap(user -> {
-                    if (passwordEncoder.matches(password, user.getPassword())) {
-                        return Mono.just(user);
-                    } else {
-                        return Mono.error(new RuntimeException("Invalid credentials"));
-                    }
-                })
-                .switchIfEmpty(Mono.error(new RuntimeException("User not found")));
-    }
+//    public Mono<User> login(String login, String password) {
+//        return userRepository.findByEmail(login)
+//                .flatMap(user -> {
+//                    if (passwordEncoder.matches(password, user.getPassword())) {
+//                        return Mono.just(user);
+//                    } else {
+//                        return Mono.error(new RuntimeException("Invalid credentials"));
+//                    }
+//                })
+//                .switchIfEmpty(Mono.error(new RuntimeException("User not found")));
+//    }
 
-    public Mono<User> updatePassword(String userLogin, String newPassword) {
-
-        return userRepository.findByEmail(userLogin)
-                .switchIfEmpty(Mono.error(new Exception("User not found")))
-                .flatMap(user -> {
-                    String encryptedPassword = passwordEncoder.encode(newPassword);
-                    user.setPassword(encryptedPassword);
-                    return userRepository.save(user);
-                });
+    public User updatePassword(String userLogin, String newPassword) throws Exception {
+        Optional<User> user = userRepository.findByEmail(userLogin);
+        if(user.isEmpty())
+            throw new Exception("User not found");
+        String encryptedPassword = passwordEncoder.encode(newPassword);
+        user.get().setPassword(encryptedPassword);
+        return userRepository.save(user.get());
     }
 
 }
