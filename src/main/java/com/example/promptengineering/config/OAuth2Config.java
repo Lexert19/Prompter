@@ -32,7 +32,7 @@ public class OAuth2Config implements WebMvcConfigurer {
     @Bean
     public SecurityFilterChain securityWebFilterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
         http.csrf(csrf -> csrf.disable());
-        http.requiresChannel(channel -> channel.anyRequest().requiresInsecure());
+        //http.requiresChannel(channel -> channel.anyRequest().requiresInsecure());
         http.authorizeHttpRequests(exchanges -> exchanges
                 .requestMatchers("/", "/login", "/error", "/static/**", "/auth/**", "/favicon.ico", "/favicon")
                 .permitAll()
@@ -51,8 +51,15 @@ public class OAuth2Config implements WebMvcConfigurer {
                 .failureHandler(authenticationFailureHandler()));
 
         http.logout(customizer -> customizer.logoutUrl("/auth/logout"));
-
+        http.portMapper(portMapper -> portMapper.portMapper(portMapper()));
         return http.build();
+    }
+
+    @Bean
+    public PortMapper portMapper() {
+        PortMapperImpl portMapper = new PortMapperImpl();
+        portMapper.setPortMappings(Collections.singletonMap("8080", "8080"));
+        return portMapper;
     }
 
     @Bean
