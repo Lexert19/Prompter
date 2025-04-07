@@ -30,6 +30,8 @@ public class ChatService {
         try {
             URL url = new URL(request.getUrl());
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setConnectTimeout(300000);
+            connection.setReadTimeout(0);
             connection.setRequestMethod("POST");
             configureHeaders(connection, request);
             connection.setDoOutput(true);

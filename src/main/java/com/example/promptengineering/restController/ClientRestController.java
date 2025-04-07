@@ -33,7 +33,7 @@ public class ClientRestController {
             @AuthenticationPrincipal User user,
             @RequestBody String body) throws JsonProcessingException {
 
-        SseEmitter emitter = new SseEmitter();
+        SseEmitter emitter = new SseEmitter(30 * 60 * 1000L);
 
         executor.execute(() -> {
             try {
