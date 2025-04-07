@@ -1,7 +1,11 @@
 package com.example.promptengineering.config;
 
+import com.example.promptengineering.component.CustomAuthenticationEntryPoint;
 import com.example.promptengineering.component.CustomAuthenticationManager;
 import com.example.promptengineering.service.CustomOAuth2UserService;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -10,10 +14,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.web.PortMapper;
-import org.springframework.security.web.PortMapperImpl;
-import org.springframework.security.web.PortResolverImpl;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.*;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.web.client.RestTemplate;
@@ -21,12 +23,13 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
-public class OAuth2Config implements WebMvcConfigurer {
+public class OAuth2Config implements WebMvcConfigurer   {
     @Autowired
     private CustomAuthenticationManager authenticationManager;
     @Autowired
@@ -55,17 +58,21 @@ public class OAuth2Config implements WebMvcConfigurer {
                 .loginPage("/auth/login")
                 .failureHandler(authenticationFailureHandler()));
 
+        http.exceptionHandling(exception -> exception
+                .authenticationEntryPoint(authenticationEntryPoint())
+        );
         http.logout(customizer -> customizer.logoutUrl("/auth/logout"));
-        http.portMapper(portMapper -> portMapper.portMapper(portMapper()));
+        //http.portMapper(portMapper -> portMapper.portMapper(portMapper()));
         return http.build();
     }
 
     @Bean
     public PortMapper portMapper() {
         PortMapperImpl portMapper = new PortMapperImpl();
-        portMapper.setPortMappings(Collections.singletonMap("8080", "8080"));
+        portMapper.setPortMappings(Collections.singletonMap("8443", "8080"));
         return portMapper;
     }
+
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -93,6 +100,8 @@ public class OAuth2Config implements WebMvcConfigurer {
     }
 
 
-
-
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        return new CustomAuthenticationEntryPoint("/auth/login");
+    }
 }
