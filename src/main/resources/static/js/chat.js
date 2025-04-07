@@ -73,7 +73,8 @@ class Chat {
         } catch (error) {
             console.error("Error loading chat history", error);
         } finally {
-            this.setBlockedInput(false); 
+            this.setBlockedInput(false);
+            //this.currentMessage.end = Date.now();
         }
     }
 
