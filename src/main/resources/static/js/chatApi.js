@@ -105,6 +105,7 @@ class ChatApi {
             this.abortController.abort(); 
             this.abortController = null; 
             window.chat.setBlockedInput(false);
+            this.currentMessage.end = Date.now();
             window.chat.saveMessage(this.currentMessage);
         }
     }
@@ -147,6 +148,7 @@ class ChatApi {
             this.read(reader, decoder);
         }).catch(error => {
             window.chat.setBlockedInput(false);
+            this.currentMessage.end = Date.now();
             window.chat.saveMessage(this.currentMessage);
 
             reader.releaseLock();

@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    <link rel="icon" type="image/svg+xml" href="/favicon">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/css/main.css">
@@ -15,7 +16,7 @@
             <div class="chat-header" style="border-radius: 10px; margin-bottom: 30px; text-align: center;">
                 <h1 style="margin: 0; font-size: 3rem; font-weight: bold;">
                     <span style="color: #6366f1;">Prompter</span>
-                    <img src="/favicon.ico" width="50px" height="50px" style="vertical-align: middle; margin-left: 10px; filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.3));"> 
+                    <img src="/favicon" width="50px" height="50px" style="vertical-align: middle; margin-left: 10px; filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.3));">
                 </h1>
                 <p style="margin-top: 10px; color: #a0a6b9; font-size: 1.2rem;">Twój inteligentny asystent AI do kreatywnych zadań</p>
             </div>

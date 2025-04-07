@@ -12,10 +12,13 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.filter.CharacterEncodingFilter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 @Configuration
 @EnableWebSecurity
-public class OAuth2Config  {
+public class OAuth2Config implements WebMvcConfigurer {
     @Autowired
     private CustomAuthenticationManager authenticationManager;
 
@@ -24,7 +27,7 @@ public class OAuth2Config  {
         http.csrf(csrf -> csrf.disable());
 
         http.authorizeHttpRequests(exchanges -> exchanges
-                .requestMatchers("/", "/login", "/error", "/static/**", "/auth/**", "/favicon.ico")
+                .requestMatchers("/", "/login", "/error", "/static/**", "/auth/**", "/favicon.ico", "/favicon")
                 .permitAll()
                 .anyRequest().authenticated());
 
@@ -61,5 +64,16 @@ public class OAuth2Config  {
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
         return builder.build();
     }
+
+    @Bean
+    public CharacterEncodingFilter characterEncodingFilter() {
+        CharacterEncodingFilter filter = new CharacterEncodingFilter();
+        filter.setEncoding("UTF-8");
+        filter.setForceEncoding(true);
+        return filter;
+    }
+
+
+
 
 }
