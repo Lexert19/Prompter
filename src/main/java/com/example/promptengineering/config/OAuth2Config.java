@@ -50,7 +50,7 @@ public class OAuth2Config implements WebMvcConfigurer   {
                     response.sendRedirect("https://" + serverName + ":8080/");
                 }));
 
-        http.authenticationManager(authenticationManager);
+        //http.authenticationManager(authenticationManager);
 
         http.formLogin(customizer -> customizer
                 .loginPage("/auth/login")
