@@ -108,6 +108,13 @@ class Settings {
         type: "vision",
         url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
       },
+       {
+              name: "gemini-2.5-pro-preview-03-25",
+              text: "gemini-2.5-pro-preview-03-25",
+              provider: "GEMINI",
+              type: "vision",
+              url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+            },
       {
         name: "gemini-2.0-flash",
         text: "gemini-2.0-flash",
