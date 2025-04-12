@@ -12,7 +12,6 @@ class Chat {
         this.modelOptions = document.getElementById("modelOptions");
         this.chatSettings = document.getElementById("chatSettings");
         this.history = document.getElementById("history");
-        this.editMessageView = new EditMessageView();
         this.requestBuilder = new RequestBuilder();
         this.chatClient = new ChatApi();
         this.blockedInput = false;
@@ -59,52 +58,19 @@ class Chat {
         this.session = id;
 
         try {
-            const messages = await window.chatHistory.getChatHistory(this.session);
-    
+            this.requestBuilder = await window.chatHistory.getRequestBuilderForChat(this.session);
             this.clearMessages();
-    
-            messages.forEach((message) => {
-                this.createMessage(message);
+            this.requestBuilder.messages.forEach(message =>{
+                const messageView = new MessageView(message);
+                messageView.createHtmlElement(this.chatMessages, true);
             });
-    
-            const chatContainer = this.chatMessages;
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-    
+
         } catch (error) {
             console.error("Error loading chat history", error);
         } finally {
             this.setBlockedInput(false);
             //this.currentMessage.end = Date.now();
         }
-    }
-
-    createMessage(message) {
-        let duration = "";
-        if (message.end !== null) {
-            const durationMs = message.end - message.start;
-            const seconds = (durationMs / 1000).toFixed(1);
-            duration = `${seconds} s`;
-        }
-        var receivedMessage = `
-        <div id="${message.id}" class="message ${message.role}">
-            <div class="assitant-data">
-                <div class="date"></div>
-                <div class="duration" id="duration-${message.id}">${duration}</div>
-            </div>
-            ${message.getHtmlImages()}
-            ${message.getHtmlFiles()}
-            <div id="input-${message.id}" class="code-wrap">${escapeHtml(message.getText())}</div>
-            <span id="cached-${message.id}">${message.cache ? "cached" : ""}<span>
-        </div>
-        `;
-
-        this.chatMessages.insertAdjacentHTML('afterbegin', receivedMessage);
-        const messageElement = document.getElementById(message.id);
-        messageElement.addEventListener('contextmenu', (event) => {
-            event.preventDefault();
-            this.editMessageView.showEditMenu(event, message.id);
-        });
-        return document.getElementById("input-" + message.id);
     }
 
 
@@ -164,30 +130,6 @@ class Chat {
         });
     }
 
-    updateDurationCounter(message){
-        const durationElement = document.getElementById(`duration-${message.id}`);
-        if(durationElement){
-            const currentTime = Date.now();
-            const elapsedTimeMs = currentTime - message.start;
-
-            const elapsedTimeSec = (elapsedTimeMs / 1000).toFixed(1); 
-
-            durationElement.textContent = `${elapsedTimeSec}s`; 
-        }
-    }
-
-    startDurationCounter(message){
-        this.updateDurationCounter(message);
-
-        const intervalId = setInterval(() => {
-            if (message.end !== null) {
-                clearInterval(intervalId);
-                return;
-            }
-            this.updateDurationCounter(message);
-        }, 100);
-    }
-
     async chat() {
         if (this.blockedInput == true){
             this.chatClient.stopStreaming();
@@ -200,7 +142,9 @@ class Chat {
         this.newMessage([]);
         this.updateDocumentsDisplay(); 
         this.saveMessage(this.currentMessage);
-        this.createMessage(this.currentMessage);
+        const messageView = new MessageView(this.currentMessage);
+        messageView.createHtmlElement(this.chatMessages);
+        //this.createMessage(this.currentMessage);
 
 
         this.requestBuilder.addMessage(this.currentMessage);
@@ -232,4 +176,6 @@ class Chat {
    
 }
 
-window.chat = new Chat();
+document.addEventListener('DOMContentLoaded', function() {
+    window.chat = new Chat();
+});

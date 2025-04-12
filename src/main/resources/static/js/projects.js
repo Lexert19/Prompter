@@ -114,22 +114,11 @@ class Projects {
     displayFiles(files) {
         this.fileGrid.innerHTML = '';
         files.forEach(file => {
-            const fileElement = document.createElement('div');
-            fileElement.className = 'file-item';
-            fileElement.innerHTML = `
-                <span class="icon-file">📄</span>
-                <span class="file-name">${file.name}</span>
-            `;
+              const fileItem = new FileItem(file.id, this.currentProjectId);
+              fileItem.createHtmlItem(file, this.fileGrid);
 
-            fileElement.dataset.fileId = file.id;
-            fileElement.dataset.projectId = this.currentProjectId;
-
-            fileElement.addEventListener('click', () => {
-                this.showFileContent(fileElement.dataset.projectId, fileElement.dataset.fileId);
-            });
-
-            this.fileGrid.appendChild(fileElement);
         });
+
     }
 
     handleFileUpload() {

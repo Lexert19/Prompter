@@ -140,8 +140,32 @@ class History {
   }
 
   addHtmlHistoryIndex(historyIndex) {
-    let index = `<button onclick="window.chat.loadChat('${historyIndex.id}')">${historyIndex.id}: </button>`;
+    let index = `
+      <div style="display: flex; align-items: center;">
+        <button onclick="window.chat.loadChat('${historyIndex.id}')">${historyIndex.id}: </button>
+        <button onclick="window.chatHistory.deleteChat('${historyIndex.id}')" style="margin-left: 10px; background-color: transparent; border: none; cursor: pointer;">
+          <i class="fa fa-trash" aria-hidden="true"></i>
+        </button>
+      </div>
+    `;
     this.history.innerHTML += index;
+  }
+
+  async deleteChat(chatId) {
+    try {
+      const response = await fetch(`${this.baseUrl}/chats/${chatId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      this.loadHistory();
+    } catch (error) {
+      console.error("Error deleting chat:", error);
+    }
   }
 
   async loadChats() {

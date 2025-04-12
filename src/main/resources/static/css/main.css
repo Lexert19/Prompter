@@ -30,10 +30,9 @@ body {
     display: none;
 }
 
-.chat-navigation:hover {
+.chat-navigation-show {
     left: 0;
     opacity: 1;
-
 }
 
 .center{
@@ -76,6 +75,7 @@ body {
 }
 
 .chat-history{
+    height: 100%;
     display: none;
 }
 
@@ -163,6 +163,11 @@ select {
     width: 100%;
 }
 
+input {
+    box-sizing: border-box;
+ width: 100%;
+}
+
 #history button:hover {
     background-color: rgba(0, 0, 0, 0.1);
 }
@@ -223,7 +228,7 @@ select {
 .assistant {
     /* background-color: #374151; */
     
-    border: 1px solid rgba(79, 70, 229, 0.2);  
+/*    border: 1px solid rgba(79, 70, 229, 0.2);  */
 }
 
 .chat-input {
@@ -239,7 +244,7 @@ select {
 }
 
 .instruction-field{
-    margin: 0.5rem 0;
+    padding: 0.5rem 0;
 
 }
 
@@ -247,6 +252,28 @@ select {
     white-space: pre-wrap;
     word-wrap: break-word;
     overflow-wrap: break-word;
+}
+
+.code-block{
+    background-color: black;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(79, 70, 229, 0.4);
+}
+
+.code-block code{
+    text-wrap: wrap;
+}
+
+.thinking{
+    border: 1px solid rgba(79, 70, 229, 0.2);
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+.thinking h4{
+    font-size: 16px;
+    margin: 4px 0;
 }
 
 .chat-input input {
@@ -284,7 +311,7 @@ p {
 
 
 .history{
-    height: 80vh;
+    height: 100%;
     overflow-y: auto;
 }
 
@@ -294,7 +321,7 @@ p {
     padding: 5px;
     border-radius: 3px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    z-index: 10;
+    z-index: 2000;
 }
 
 #edit-menu{
@@ -311,6 +338,9 @@ p {
 
 .mb-1 {
     margin-bottom: 1rem;
+}
+.mb-05 {
+    margin-bottom: 0.5rem;
 }
 
 .mt-1{

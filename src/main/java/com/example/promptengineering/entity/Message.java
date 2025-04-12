@@ -12,7 +12,7 @@ public class Message {
     private String text;
     private List<String> documents;
     private List<String> images;  
-    private LocalDate createdAt;
+    private Long createdAt;
     private long start;
     private long end;
     private String role;
@@ -37,13 +37,19 @@ public class Message {
     public void setChatId(String chatId) {
         this.chatId = chatId;
     }
-    public LocalDate getCreatedAt() {
+
+    public Long getCreatedAt() {
         return createdAt;
     }
-    public void setCreatedAt(LocalDate createdAt) {
+
+    public void setCreatedAt(Long createdAt) {
         this.createdAt = createdAt;
     }
-   
+
+    public boolean isCache() {
+        return cache;
+    }
+
     public String getText() {
         return text;
     }

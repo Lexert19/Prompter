@@ -29,10 +29,20 @@ public class HistoryService {
     public Chat createChat(User user) {
         Chat chat = new Chat();
         chat.setUserId(user.getId());
-        chat.setCreatedAt(LocalDate.now());
+        chat.setCreatedAt(System.currentTimeMillis());
         chat.setFavorite(false);
 
         return chatRepository.save(chat);
+    }
+
+    public void deleteChat(String chatId, User user) {
+        Optional<Chat> chat = chatRepository.findById(chatId);
+        if (chat.isEmpty()) {
+            throw new IllegalArgumentException("Chat not found with id: " + chatId);
+        }
+        checkUserAuthorization(chat.get(), user);
+        chatRepository.delete(chat.get());
+        messageRepository.deleteByChatId(chatId);
     }
 
     public Message saveMessage(MessageBody messageBody, User user) {
@@ -58,7 +68,7 @@ public class HistoryService {
     public Message convertAndSaveMessage(MessageBody messageBody, Chat chat) {
         Message messageEntity = new Message();
         messageEntity.setChatId(messageBody.getChatId());
-        messageEntity.setCreatedAt(LocalDate.now());
+        messageEntity.setCreatedAt(System.currentTimeMillis());
         messageEntity.setStart(messageBody.getStart());
         messageEntity.setEnd(messageBody.getEnd());
         messageEntity.setText(messageBody.getText());
@@ -86,4 +96,5 @@ public class HistoryService {
     public List<Chat> getChatsForUser(User user) {
         return chatRepository.findByUserId(user.getId());
     }
+
 }

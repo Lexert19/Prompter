@@ -6,12 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.promptengineering.entity.Chat;
 import com.example.promptengineering.entity.Message;
@@ -38,6 +33,14 @@ public class HistoryController {
     public ResponseEntity<Chat> createChat(@AuthenticationPrincipal User user) {
         Chat chat = historyService.createChat(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(chat);
+    }
+
+    @DeleteMapping("/chats/{chatId}")
+    public ResponseEntity<Void> deleteChat(
+            @PathVariable String chatId,
+            @AuthenticationPrincipal User user) {
+        historyService.deleteChat(chatId, user);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/messages")

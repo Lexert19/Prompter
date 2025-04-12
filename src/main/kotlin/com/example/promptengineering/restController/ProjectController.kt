@@ -1,5 +1,6 @@
 package com.example.promptengineering.restController
 
+import com.example.promptengineering.dto.FileElementDTO
 import com.example.promptengineering.entity.Project
 import com.example.promptengineering.entity.FileElement
 import com.example.promptengineering.entity.User
@@ -55,6 +56,7 @@ class ProjectController(
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found")
 
         val files = fileElementRepository.findByProject(project.get().id)
+            .map { FileElementDTO(it.id, it.name) }
 
         val projectResponse = ProjectResponse(project.get().id, project.get().name, files)
         return ResponseEntity.ok(projectResponse)
@@ -94,9 +96,28 @@ class ProjectController(
         if(updatedProject.isEmpty)
             throw  Exception("Project not found");
         val files = fileElementRepository.findByProject(project.get().id)
+            .map { FileElementDTO(it.id, it.name) }
+
 
         val projectResponse = ProjectResponse(updatedProject.get().id, updatedProject.get().name, files)
         return ResponseEntity.ok(projectResponse)
+    }
+
+    @DeleteMapping("/{projectId}/files/{fileId}")
+    suspend fun deleteFileFromProject(
+        @AuthenticationPrincipal user: User,
+        @PathVariable projectId: String,
+        @PathVariable fileId: String
+    ): ResponseEntity<Void> {
+        val project = projectRepository.findByIdAndUserId(projectId, user.id)
+            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nie istnieje lub nie należy do Ciebie") }
+
+        val file = fileElementRepository.findByIdAndProject(fileId, project.id)
+            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Plik nie znaleziony") }
+
+        fileElementRepository.delete(file)
+
+        return ResponseEntity.noContent().build()
     }
 
     @GetMapping("/{projectId}/files")
