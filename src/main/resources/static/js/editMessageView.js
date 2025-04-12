@@ -37,6 +37,6 @@ class EditMessageView {
             this.hideEditMenu();
         });
     }
-
-
 }
+
+window.editMessageView = new EditMessageView();

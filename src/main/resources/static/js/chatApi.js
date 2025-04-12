@@ -12,9 +12,10 @@ class ChatApi {
 
     newMessage(){
         this.currentMessage = new Message("assistant");
-
-        this.outputInput = window.chat.createMessage(this.currentMessage);
-        window.chat.startDurationCounter(this.currentMessage);
+        const messageView = new MessageView(this.currentMessage);
+        this.outputInput = messageView.createHtmlElement(window.chat.chatMessages);
+        //this.outputInput = window.chat.createMessage(this.currentMessage);
+        //window.chat.startDurationCounter(this.currentMessage);
     }
 
     sendStreamingMessage(request) {

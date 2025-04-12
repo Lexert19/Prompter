@@ -82,3 +82,13 @@ function escapeHtml(content) {
     return "";
   }
 }
+
+const chatNavigation = document.getElementById('ChatNavigation');
+
+document.addEventListener('mousemove', (e) => {
+  if (e.clientX < 400) {
+    chatNavigation.classList.add('chat-navigation-show');
+  } else {
+    chatNavigation.classList.remove('chat-navigation-show');
+  }
+});

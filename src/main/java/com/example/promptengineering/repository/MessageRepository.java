@@ -12,4 +12,6 @@ import java.util.List;
 public interface MessageRepository extends MongoRepository<Message, String> {
 
     List<Message> findByChatId(String chatId);
+
+    void deleteByChatId(String chatId);
 }

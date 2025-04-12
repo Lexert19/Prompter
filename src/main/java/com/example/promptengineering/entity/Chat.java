@@ -1,11 +1,13 @@
 package com.example.promptengineering.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.LocalDate;
 
 public class Chat {
     private String id;
     private String userId;
-    private LocalDate createdAt;
+    private Long createdAt;
     private boolean favorite;
 
     
@@ -23,15 +25,19 @@ public class Chat {
     public void setUserId(String userId) {
         this.userId = userId;
     }
-    public LocalDate getCreatedAt() {
+
+    public Long getCreatedAt() {
         return createdAt;
     }
-    public void setCreatedAt(LocalDate createdAt) {
+
+    public void setCreatedAt(Long createdAt) {
         this.createdAt = createdAt;
     }
+
     public boolean isFavorite() {
         return favorite;
     }
+
     public void setFavorite(boolean favorite) {
         this.favorite = favorite;
     }

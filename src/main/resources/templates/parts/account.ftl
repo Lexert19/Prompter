@@ -1,10 +1,9 @@
-
 <div id="accountPanel" tabindex="0" class="account-panel">
     <div class="mb-1">
         <label class="block" for="keyName">Nazwa klucza</label>
-        <input type="text" id="keyName" name="keyName">
+        <input type="text" class="mb-05" id="keyName" name="keyName">
         <label class="block" for="keyValue">Wartość klucza</label>
-        <input type="text" id="keyValue" name="keyValue">
+        <input type="text" class="mb-05" id="keyValue" name="keyValue">
         <button onclick="saveKey()">Zapisz</button>
     </div>
 
@@ -18,9 +17,9 @@
 
     <div>
         <label>Nowe hasło</label>
-        <input class="block" type="password" id="newPassword">
+        <input class="block mb-05" type="password" id="newPassword">
         <label>Powtórz hasło</label>
-        <input class="block" type="password" id="confirmPassword">
+        <input class="block mb-05" type="password" id="confirmPassword">
         <button onclick="setNewPassword()">Ustaw</button>
     </div>
 </div>
