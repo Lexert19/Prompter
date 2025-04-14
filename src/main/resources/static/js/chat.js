@@ -12,7 +12,6 @@ class Chat {
         this.modelOptions = document.getElementById("modelOptions");
         this.chatSettings = document.getElementById("chatSettings");
         this.history = document.getElementById("history");
-        //this.editMessageView = new EditMessageView();
         this.requestBuilder = new RequestBuilder();
         this.chatClient = new ChatApi();
         this.blockedInput = false;

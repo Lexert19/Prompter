@@ -228,7 +228,7 @@ input {
 .assistant {
     /* background-color: #374151; */
     
-    border: 1px solid rgba(79, 70, 229, 0.2);  
+/*    border: 1px solid rgba(79, 70, 229, 0.2);  */
 }
 
 .chat-input {
@@ -252,6 +252,28 @@ input {
     white-space: pre-wrap;
     word-wrap: break-word;
     overflow-wrap: break-word;
+}
+
+.code-block{
+    background-color: black;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(79, 70, 229, 0.4);
+}
+
+.code-block code{
+    text-wrap: wrap;
+}
+
+.thinking{
+    border: 1px solid rgba(79, 70, 229, 0.2);
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+.thinking h4{
+    font-size: 16px;
+    margin: 4px 0;
 }
 
 .chat-input input {

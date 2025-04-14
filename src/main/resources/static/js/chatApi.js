@@ -19,6 +19,7 @@ class ChatApi {
     }
 
     sendStreamingMessage(request) {
+        this.parser.clear();
         this.abortController = new AbortController();
         console.log(request.toRequestJSON());
         this.newMessage();
@@ -92,8 +93,10 @@ class ChatApi {
                 return;
 
             this.parser.parse(content);
-            this.outputInput.textContent += content;
-            this.parser.toHTML();
+            const html = this.parser.toHTML();
+            //this.outputInput.textContent += content;
+            this.outputInput.innerHTML  = html;
+
             this.currentMessage.appendText(content);
 
         }catch(error){
