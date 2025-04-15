@@ -52,6 +52,10 @@ body {
     display: none;
 }
 
+h3{
+    margin: 8px 0;
+}
+
 .chat-container {
     width: 900px;
     height: 100vh;

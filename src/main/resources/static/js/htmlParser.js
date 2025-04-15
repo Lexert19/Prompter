@@ -51,7 +51,7 @@ class HtmlParser {
         }else if(previousLine.mode == "START_CODE" || previousLine.mode == "CODE"){
             return "CODE";
         }else if(line.startsWith("###") || line.startsWith("##")){
-            return "HEADER2"
+            return "HEADER3"
         }else if(line.startsWith("**")){
             //return "HEADER3"
         }
@@ -150,8 +150,10 @@ class HtmlParser {
             case 'HEADER2':
                 return `<h2>${this.escapeHtml(block.content.substring(3).trim())}</h2>\n`;
             case 'HEADER3':
-                const header2Content = block.content.substring(2).replace(/\*\*/g, '').trim();
-                return `<h3>${header2Content}</h3>\n`;
+                let withoutHtmlContent = this.escapeHtml(block.content.substring(3).trim());
+                let content = withoutHtmlContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                //const header2Content = block.content.substring(2).replace(/\*\*/g, '').trim();
+                return `<h3>${content}</h3>\n`;
 
             default:
                 return '';
