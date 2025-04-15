@@ -135,10 +135,12 @@ class HtmlParser {
     }
 
     renderBlock(block) {
+        let content = "";
+        let withoutHtmlContent = "";
         switch (block.type) {
             case 'NORMAL':
-                let withoutHtmlContent = this.escapeHtml(block.content);
-                let content = withoutHtmlContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                withoutHtmlContent = this.escapeHtml(block.content);
+                content = withoutHtmlContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                 return `<p>${content}</p>\n`;
 
             case 'THINKING':
@@ -150,8 +152,8 @@ class HtmlParser {
             case 'HEADER2':
                 return `<h2>${this.escapeHtml(block.content.substring(3).trim())}</h2>\n`;
             case 'HEADER3':
-                let withoutHtmlContent = this.escapeHtml(block.content.substring(3).trim());
-                let content = withoutHtmlContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                withoutHtmlContent = this.escapeHtml(block.content.substring(3).trim());
+                content = withoutHtmlContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                 //const header2Content = block.content.substring(2).replace(/\*\*/g, '').trim();
                 return `<h3>${content}</h3>\n`;
 
