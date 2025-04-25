@@ -4,6 +4,7 @@
          <#include "/parts/account.ftl" />
          <#include "/parts/instructions.ftl" />
          <#include "/parts/projects.ftl" />
-     </div>
+         <#include "/parts/models.ftl" />
+      </div>
      <#include "/parts/panel.ftl" />
  </div>

@@ -22,4 +22,6 @@
         <input class="block mb-05" type="password" id="confirmPassword">
         <button onclick="setNewPassword()">Ustaw</button>
     </div>
+
+
 </div>

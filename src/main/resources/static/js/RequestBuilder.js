@@ -64,6 +64,7 @@ class RequestBuilder {
             stream: this.stream,
             type: this.getType(),
             key: this.getKey(),
+            reasoningEffort: window.settings.thinkingEffort,
             system: this.getSystem(),
         });
     }

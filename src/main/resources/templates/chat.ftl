@@ -20,9 +20,9 @@
             <div class="chat-input">
                 <div class="cache-container">
                 </div>
-                <textarea type="text" class="transparent-textarea" onkeydown="window.chat.appendText(event)" id="input"
+                <textarea type="text" class="transparent-textarea" onkeydown="window.inputView.appendText(event)" id="input"
                     placeholder="Wpisz wiadomość..."></textarea>
-                <button id="send-button" class="send-button" onclick="window.chat.chat()">
+                <button id="send-button" class="send-button" onclick="window.inputView.makeChat()">
                     <div id="send-icon" class="center">
                         <svg xmlns="http://www.w3.org/2000/svg" height="16" width="12" viewBox="0 0 384 512">
                             <path fill="#ffffff" d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2 160 448c0 17.7 14.3 32 32 32s32-14.3 32-32l0-306.7L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z" />
@@ -37,6 +37,10 @@
             </div>
         </div>
     </div>
+    <div id="overlay" style="display: none;"></div>
+    <#include "/parts/deleteModelMenu.ftl" />
+    <#include "/parts/addModelMenu.ftl" />
+    <#include "/parts/editModelMenu.ftl" />
     <#include "/parts/editMessage.ftl" />
     <#include "/parts/editFile.ftl" />
     <#list jsFiles as jsFile>
