@@ -70,6 +70,11 @@ function openProjects() {
   document.getElementById("projects").classList.add("active");
 }
 
+function openModels(){
+  hidePages();
+  document.getElementById("models").classList.add("active");
+}
+
 function escapeHtml(content) {
   try {
     return content
@@ -92,3 +97,5 @@ document.addEventListener('mousemove', (e) => {
     chatNavigation.classList.remove('chat-navigation-show');
   }
 });
+
+

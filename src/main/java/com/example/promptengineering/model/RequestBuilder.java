@@ -72,7 +72,7 @@ public class RequestBuilder {
         request.put("stream", stream);
 
         if (this.provider.equals("OPENAI")) {
-            if (this.model.contains("o3-mini")) {
+            if (this.model.contains("o4-mini")) {
                 request.put("response_format", Map.of("type", "text"));
                 request.put("reasoning_effort", this.reasoningEffort);
             } else {

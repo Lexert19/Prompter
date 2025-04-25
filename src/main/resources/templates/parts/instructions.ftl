@@ -46,4 +46,6 @@
         <select id="modelOptions" name="model" class="mb-1" onchange="window.settings.changeModel(event)">
         </select>
     </div>
+    <#include "/parts/instructionThinkingEffort.ftl" />
 </div>
+

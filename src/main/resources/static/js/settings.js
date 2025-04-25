@@ -9,6 +9,7 @@ class Settings {
         this.project = "";
         this.projectsSwitch = false;
         this.activeHistory = false;
+        this.thinkingEffort = "normal"
 
         this.provider = "OPENAI";
         this.url = "https://api.openai.com/v1/chat/completions";
@@ -25,8 +26,8 @@ class Settings {
                 type: "vision",
             },
             {
-                name: "o3-mini",
-                text: "o3-mini",
+                name: "o4-mini",
+                text: "o4-mini",
                 provider: "OPENAI",
                 url: "https://api.openai.com/v1/chat/completions",
                 type: "vision",
@@ -155,9 +156,13 @@ class Settings {
             project: this.project,
             projectSwitch: this.projectSwitch,
             activeHistory: this.activeHistory,
+            thinkingEffort: this.thinkingEffort,
         };
         localStorage.setItem("appSettings", JSON.stringify(settingsToSave));
     }
+
+
+
 
     load() {
         const savedSettings = JSON.parse(
@@ -251,9 +256,31 @@ class Settings {
         hidePages();
         this.chatSettings = document.getElementById("chatSettings");
         this.chatSettings.classList.add("active");
-        this.models.forEach((model) => {
-            modelOptions.innerHTML += `<option value="${model.name}">${model.text}</option>`;
-        });
+        fetch('/api/models/all-models', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        })
+            .then(response => response.json())
+            .then(models => {
+            this.models = [...this.models, ...models.map(model => ({
+                name: model.name,
+                text: model.text || model.name,
+                provider: model.provider,
+                url: model.url,
+                type: model.type
+            }))];
+            const uniqueModels = [...new Map(this.models.map(model => [model.name, model])).values()];
+            this.models = uniqueModels;
+            const modelSelect = document.getElementById("modelOptions");
+            modelSelect.innerHTML = this.models
+                .map(model => `<option value="${model.name}">${model.text}</option>`)
+                .join("");
+            modelSelect.value = this.model;
+        })
+            .catch(error => console.error('Error loading models:', error));
     }
 
     initUI() {

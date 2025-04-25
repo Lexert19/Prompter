@@ -105,6 +105,10 @@ h3{
     font-size: 16px;
 }
 
+.message li{
+    margin: 0;
+}
+
 #history button {
     display: block;
     width: 100%;
@@ -584,4 +588,51 @@ input[type="range"]::-moz-range-progress {
 .alert-warning p {
     margin: 0;
     color: #ffb347; 
+}
+
+
+.model-menu {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    padding: 20px;
+    border: 1px solid rgba(79, 70, 229, 0.3);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    z-index: 3000;
+}
+
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: 999;
+}
+
+.ml-1{
+    margin-left: 1rem !important;
+}
+
+.ml-2{
+    margin-left: 2rem !important;
+}
+
+.line{
+    width: 100%;
+    height: 1px;
+    margin: 12px 0;
+    background-color: rgba(79, 70, 229, 0.3);
+}
+
+.message p{
+    margin: 8px 0;
+}
+
+.code-block pre{
+    margin: 0;
 }
