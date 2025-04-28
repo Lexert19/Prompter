@@ -71,73 +71,126 @@ class HtmlParser {
         return "NORMAL";
     }
 
-    toHTML() {
-        let html = '';
-        let currentMode = 'NORMAL';
+    toHTML(){
+        this.blocks = [];
         let currentBlock = { type: 'NORMAL', content: '' };
 
-        for (const line of this.lines) {
-            currentBlock = { type: 'NORMAL', content: '' };
-            switch (line.mode) {
+        for(const line of this.lines){
+            switch(line.mode){
                 case 'START_THINKING':
                     currentBlock = { type: 'THINKING', content: '' };
+                    this.blocks.push(currentBlock);
                     break;
-
                 case 'STOP_THINKING':
-                    currentBlock = { type: 'NORMAL', content: '' };
                     break;
-
                 case 'START_CODE':
                     currentBlock = {
                         type: 'CODE',
                         content: '',
                         language: line.text.replace(/```/, '').trim() || null
                     };
+                    this.blocks.push(currentBlock);
                     break;
-
                 case 'STOP_CODE':
-                    currentBlock = { type: 'NORMAL', content: '' };
                     break;
-
                 case 'CODE':
                 case 'THINKING':
-                    currentBlock = { type: 'NORMAL', content: "\n" + line.text };
+                    this.blocks[this.blocks.length-1].content += line.text + "\n";
                     break;
                 case 'NORMAL':
                     if(line.text){
-                        currentBlock = { type: 'NORMAL', content: "\n" + line.text };
+                        currentBlock = { type: line.mode, content: line.text };
+                        this.blocks.push(currentBlock);
                     }
-                    break;
+                break;
                 case 'LISTITEM':
-                    currentBlock = { type: 'LISTITEM', content: line.text };
-                    break;
                 case 'LISTITEM2':
-                    currentBlock = { type: line.mode, content: line.text };
-                    break;
                 case 'LISTITEM2DEEPSEEK':
-                    currentBlock = { type: line.mode, content: line.text };
-                    break;
                 case 'LISTITEM3':
-                    currentBlock = { type: line.mode, content: line.text };
-                    break;
                 case 'LISTITEM3DEEPSEEK':
-                    currentBlock = { type: line.mode, content: line.text };
-                    break;
                 case 'LINE':
-                    currentBlock = { type: line.mode, content: line.text };
-                    break;
                 case 'HEADER2':
                 case 'HEADER3':
                     currentBlock = { type: line.mode, content: line.text };
+                    this.blocks.push(currentBlock);
                     break;
 
             }
-
-            html += this.renderBlock(currentBlock);
         }
-
+        let html = "";
+        for(const block of this.blocks){
+            html += this.renderBlock(block);
+        }
         return html;
     }
+
+//    toBlocks() {
+//        let html = '';
+//        let currentMode = 'NORMAL';
+//        let currentBlock = { type: 'NORMAL', content: '' };
+//
+//        for (const line of this.lines) {
+//            currentBlock = { type: 'NORMAL', content: '' };
+//            switch (line.mode) {
+//                case 'START_THINKING':
+//                    currentBlock = { type: 'THINKING', content: '' };
+//                    break;
+//
+//                case 'STOP_THINKING':
+//                    currentBlock = { type: 'NORMAL', content: '' };
+//                    break;
+//
+//                case 'START_CODE':
+//                    currentBlock = {
+//                        type: 'CODE',
+//                        content: '',
+//                        language: line.text.replace(/```/, '').trim() || null
+//                    };
+//                    break;
+//
+//                case 'STOP_CODE':
+//                    currentBlock = { type: 'NORMAL', content: '' };
+//                    break;
+//
+//                case 'CODE':
+//                case 'THINKING':
+//                    currentBlock = { type: line.mode, content: "\n" + line.text };
+//                    break;
+//                case 'NORMAL':
+//                    if(line.text){
+//                        currentBlock = { type: line.mode, content: "\n" + line.text };
+//                    }
+//                    break;
+//                case 'LISTITEM':
+//                    currentBlock = { type: 'LISTITEM', content: line.text };
+//                    break;
+//                case 'LISTITEM2':
+//                    currentBlock = { type: line.mode, content: line.text };
+//                    break;
+//                case 'LISTITEM2DEEPSEEK':
+//                    currentBlock = { type: line.mode, content: line.text };
+//                    break;
+//                case 'LISTITEM3':
+//                    currentBlock = { type: line.mode, content: line.text };
+//                    break;
+//                case 'LISTITEM3DEEPSEEK':
+//                    currentBlock = { type: line.mode, content: line.text };
+//                    break;
+//                case 'LINE':
+//                    currentBlock = { type: line.mode, content: line.text };
+//                    break;
+//                case 'HEADER2':
+//                case 'HEADER3':
+//                    currentBlock = { type: line.mode, content: line.text };
+//                    break;
+//
+//            }
+//
+//            html += this.renderBlock(currentBlock);
+//        }
+//
+//        return html;
+//    }
 
     renderStrongs(content){
         const withoutHtmlContent = this.escapeHtml(content);
@@ -146,6 +199,8 @@ class HtmlParser {
         return formattedContent;
     }
 
+
+
     renderBlock(block) {
         let content = "";
         let withoutHtmlContent = "";
@@ -153,34 +208,27 @@ class HtmlParser {
             case 'NORMAL':
                 withoutHtmlContent = this.escapeHtml(block.content);
                 content = this.renderStrongs(block.content)
-                //withoutHtmlContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                 return `<p>${content}</p>`;
-
+            case 'RAW':
+                withoutHtmlContent = this.escapeHtml(block.content);
+                return `${withoutHtmlContent}`;
             case 'THINKING':
                 return `<div class="thinking"><h4>Thinking:</h4><p>${this.escapeHtml(block.content)}</p></div>\n`;
-
             case 'CODE':
                 const langClass = block.language ? ` class="language-${block.language}"` : '';
                 return `<div class="code-block"><pre><code${langClass}>${this.escapeHtml(block.content)}</code></pre></div>\n`;
             case 'HEADER2':
                 return `<h2>${this.escapeHtml(block.content.substring(3).trim())}</h2>\n`;
             case 'HEADER3':
-                //withoutHtmlContent = this.escapeHtml(block.content.substring(3).trim());
-                //content = withoutHtmlContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                 content = this.renderStrongs(block.content.substring(3).trim())
-                //const header2Content = block.content.substring(2).replace(/\*\*/g, '').trim();
                 return `<h3>${content}</h3>`;
             case 'LISTITEM':
-                //withoutHtmlContent = this.escapeHtml(block.content.substring(2).trim());
-                //content = withoutHtmlContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                 content = this.renderStrongs(block.content.substring(2).trim())
                 return `<li>${content}</li>`;
             case 'LISTITEM2':
-
                 content = this.renderStrongs(block.content.substring(5).trim())
                 return `<li class="ml-1">${content}</li>`;
             case 'LISTITEM2DEEPSEEK':
-
                 content = this.renderStrongs(block.content.substring(4).trim())
                 return `<li class="ml-1">${content}</li>`;
             case 'LISTITEM3':

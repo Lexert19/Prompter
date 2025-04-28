@@ -67,6 +67,7 @@ class ChatApi {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
+            this.requestBuilder.addMessage(this.currentMessage);
             return response.body;
         })
             .then(this.handleStream.bind(this))
@@ -132,7 +133,8 @@ class ChatApi {
             this.currentMessage.appendText(content);
 
         }catch(error){
-            console.debug(chunk);
+            console.log(chunk);
+            //console.log(error);
         }
     }
 
