@@ -37,14 +37,16 @@ class HtmlParser {
         }
     }
 
+
     getLineMode(previousLine, line){
+        const codeBlockDelimiterRegex = /^ *```/;
         if(line.startsWith('<think>')){
             return "START_THINKING";
         }else if (line.startsWith('</think>')) {
             return "STOP_THINKING";
-        }else if(line.startsWith('```') && previousLine.mode != "CODE"){
+        }else if(codeBlockDelimiterRegex.test(line) && previousLine.mode != "CODE"){
             return "START_CODE";
-        }else if(line.startsWith('```') && previousLine.mode == "CODE"){
+        }else if(codeBlockDelimiterRegex.test(line) && previousLine.mode == "CODE"){
             return "STOP_CODE";
         }else if(previousLine.mode == "START_THINKING" || previousLine.mode == "THINKING"){
             return "THINKING";
