@@ -636,3 +636,21 @@ input[type="range"]::-moz-range-progress {
 .code-block pre{
     margin: 0;
 }
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"]::-moz-spin-button {
+    display: none;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+input[type="number"]::-ms-spin-button {
+    display: none;
+}
