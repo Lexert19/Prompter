@@ -196,9 +196,9 @@ class Settings {
                 break;
             case "temperature":
                 window.settings.temperature = event.target.value / 100;
-            case "maxTokens":
-                window.settings.maxTokens = parseInt(event.target.value);
-                break;
+//            case "maxTokens":
+//                window.settings.maxTokens = parseInt(event.target.value);
+//                break;
         }
 
 
@@ -295,7 +295,7 @@ class Settings {
         document.getElementById("systemSwitch").checked = this.systemSwitch;
         document.getElementById("projectSwitch").checked = this.projectSwitch;
 
-        document.querySelector('input[name="maxTokens"]').value = this.maxTokens;
+        //document.querySelector('input[name="maxTokens"]').value = this.maxTokens;
 
         document.getElementById("temperature").value = this.temperature * 100;
 

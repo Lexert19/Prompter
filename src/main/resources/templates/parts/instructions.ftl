@@ -13,9 +13,8 @@
             <span>Cache</span>
         </label>
     </div>
-    <div  class="instruction-field ">
-        <input type="number" name="maxTokens" value="8000" onchange="window.settings.change(event)">
-    </div>
+    <#include "/parts/maxTokenView.ftl" />
+
     <div  class="instruction-field ">
         <label for="temperature"><span>Temperatura</span></label>
         <input type="range" id="temperature" name="temperature" min="0" max="100" step="1" value="0"
