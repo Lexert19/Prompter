@@ -328,8 +328,8 @@ p {
     position: absolute;
     background-color: #333340;
 /*    background-color: #374151;*/
-    padding: 5px;
-    border-radius: 3px;
+    padding: 5px 0;
+/*    border-radius: 3px;*/
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     z-index: 2000;
 }
@@ -653,4 +653,14 @@ input[type="number"] {
 
 input[type="number"]::-ms-spin-button {
     display: none;
+}
+
+.edit-menu-button{
+    border-radius: 0;
+    display: block;
+    background-color: #333340;
+}
+
+.edit-menu-button:hover{
+    background-color: rgba(99, 102, 241, 0.7);
 }
