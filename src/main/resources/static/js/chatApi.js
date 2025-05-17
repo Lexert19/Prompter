@@ -12,6 +12,16 @@ class ChatApi {
         return window.settings.provider;
     }
 
+    async continueMessage(){
+        if (window.data.blockedInput == true){
+            this.stopStreaming();
+            return;
+        }
+        window.data.setBlockedInput(true);
+        this.sendStreamingMessage(this.requestBuilder);
+
+    }
+
     async chat(text, role){
         if (window.data.blockedInput == true){
             this.stopStreaming();
