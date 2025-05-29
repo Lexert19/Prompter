@@ -19,13 +19,6 @@ class Settings {
         this.key = "";
         this.models = [
             {
-                name: "gpt-4o-mini",
-                text: "gpt-4o-mini",
-                provider: "OPENAI",
-                url: "https://api.openai.com/v1/chat/completions",
-                type: "vision",
-            },
-            {
                 name: "o4-mini",
                 text: "o4-mini",
                 provider: "OPENAI",
@@ -38,13 +31,6 @@ class Settings {
                 provider: "OPENAI",
                 url: "https://api.openai.com/v1/chat/completions",
                 type: "vision",
-            },
-            {
-                name: "claude-3-5-haiku-latest",
-                text: "Claude Haiku 3.5",
-                provider: "ANTHROPIC",
-                url: "https://api.anthropic.com/v1/messages",
-                type: "text",
             },
             {
                 name: "claude-3-7-sonnet-20250219",
@@ -62,14 +48,14 @@ class Settings {
             },
             {
                 name: "deepseek-ai/DeepSeek-V3-0324",
-                text: "deepinfra/DeepSeek-V3-new",
+                text: "deepinfra/DeepSeek-V3",
                 provider: "DEEPINFRA",
                 type: "text",
                 url: "https://api.deepinfra.com/v1/openai/chat/completions",
             },
             {
-                name: "deepseek-ai/DeepSeek-R1",
-                text: "deepinfra/DeepSeek-R1",
+                name: "deepseek-ai/DeepSeek-R1-0528",
+                text: "deepseek-ai/DeepSeek-R1-0528",
                 provider: "DEEPINFRA",
                 type: "text",
                 url: "https://api.deepinfra.com/v1/openai/chat/completions",
