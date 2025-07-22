@@ -29,13 +29,16 @@ class InputView{
     }
 
     makeChat(){
-        const sended = window.chatApi.chat(
-            this.chatInput.value,
-            "user"
-        );
-        if(sended){
+        const messgae = this.chatInput.value;
+        if (window.data.blockedInput == false){
             this.chatInput.value = "";
         }
+        const sended = window.chatApi.chat(
+            messgae,
+            "user"
+        );
+
+
     }
 
     updateView(){
