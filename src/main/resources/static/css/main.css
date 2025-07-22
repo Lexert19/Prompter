@@ -1,7 +1,8 @@
 body {
     font-family: Arial, sans-serif;
     color: white !important;
-    background-color: #262630 !important;
+/*    background-color: #262630 !important;*/
+    background-color: #2A2F42 !important;
     margin: 0;
     padding: 0;
 }
@@ -11,7 +12,8 @@ body {
 }
 
 .chat-navigation {
-    background-color: rgba(45, 45, 59, 0.9);
+    background-color: #1B1E31;
+/*    background-color: rgba(45, 45, 59, 0.9);*/
     position: fixed;
     top: 0;
     bottom: 0;
@@ -154,7 +156,7 @@ textarea {
     margin-right: 10px;
     outline: none;
     resize: none !important;
-    height: 50px;
+    height: 70px;
     box-sizing: border-box;
 }
 
@@ -257,11 +259,17 @@ input {
     padding: 0.25rem;
     padding-bottom: 1rem;
 
-    background-color: #333340;
+/*    background-color: #333340;*/
+    background-color: #3E4153;
 /*    background-color: #374151;*/
     border: 1px solid rgba(79, 70, 229, 0.3);
     border-top-left-radius: 22px;
     border-top-right-radius: 22px;
+}
+
+.chat-input textarea:focus, textarea:active{
+    outline: none;
+    border: none;
 }
 
 .instruction-field{
@@ -279,11 +287,13 @@ input {
     background-color: black;
 /*    padding: 12px;*/
     border-radius: 12px;
-    border: 1px solid rgba(79, 70, 229, 0.4);
+    border: 1px solid #555866;
+/*    border: 1px solid rgba(79, 70, 229, 0.4);*/
 }
 
 .code-block code{
     text-wrap: wrap;
+    border-radius: 12px;
 }
 
 .thinking{
@@ -311,8 +321,18 @@ input, textarea, select {
     color: #ffffff;
     font-size: 16px;
     /* border: 1px solid rgba(79, 70, 229, 0.3);  */
-    background-color: #333340;
+/*    background-color: #333340;*/
+    background-color: #2A2D3F;
+    border-radius: 1.5rem;
+    padding: 8px 16px;
+    border: 1px solid #555866;
 /*    background-color: #374151;*/
+}
+
+input:active, textarea:active, select:active,
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border: 1px solid #6e7287;
 }
 
 input[type="number"]{
@@ -391,8 +411,8 @@ input[type="range"] {
     width: 100%; 
     height: 10px; 
 /*    background-color: rgba(55, 65, 81, 0.95);*/
-    background-color: rgb(51, 51, 64);
-    border-radius: 5px; 
+/*    background-color: rgb(51, 51, 64);*/
+    border-radius: 50px;
     box-sizing: border-box;
     padding: 1rem 0.25rem;
     outline: none; 
@@ -656,6 +676,7 @@ input[type="range"]::-moz-range-progress {
 
 .code-block pre{
     margin: 0;
+    border-radius: 12px;
 }
 
 input[type="number"]::-webkit-inner-spin-button,
