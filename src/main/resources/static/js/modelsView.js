@@ -31,6 +31,7 @@ class ModelsView{
         modelsDiv.innerHTML = '';
         models.forEach(model => {
             const modelDiv = document.createElement('div');
+            modelDiv.classList.add("mb-1");
             modelDiv.style.display = 'flex';
             modelDiv.style.alignItems = 'center';
             const modelNameSpan = document.createElement('span');
@@ -38,6 +39,7 @@ class ModelsView{
             modelNameSpan.style.flexGrow = '1';
             const editButton = document.createElement('button');
             editButton.textContent = 'Edytuj';
+            editButton.classList.add("me-1");
             editButton.onclick = () => window.addEditModelMenu.showEditMenu(model);
             const deleteButton = document.createElement('button');
             deleteButton.textContent = 'Usuń';
