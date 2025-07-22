@@ -49,8 +49,6 @@ class ChatApi {
 
         this.requestBuilder.addMessage(this.currentMessage);
         this.sendStreamingMessage(this.requestBuilder);
-
-        return true;
     }
 
 
