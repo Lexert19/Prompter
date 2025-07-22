@@ -94,6 +94,7 @@ class HtmlParser {
                     this.blocks.push(currentBlock);
                     break;
                 case 'STOP_CODE':
+                    hljs.highlightAll();
                     break;
                 case 'CODE':
                 case 'THINKING':

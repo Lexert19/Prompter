@@ -139,7 +139,7 @@ class ChatApi {
             const html = this.parser.toHTML();
             //this.outputInput.textContent += content;
             this.outputInput.innerHTML  = html;
-
+            hljs.highlightAll();
             this.currentMessage.appendText(content);
 
         }catch(error){
