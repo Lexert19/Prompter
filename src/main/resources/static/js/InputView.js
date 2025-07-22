@@ -29,9 +29,6 @@ class InputView{
     }
 
     makeChat(){
-        if(this.chatInput.value == ""){
-            return;
-        }
         window.chatApi.chat(
             this.chatInput.value,
             "user"

@@ -27,6 +27,9 @@ class ChatApi {
             this.stopStreaming();
             return;
         }
+        if(text == ""){
+            return;
+        }
         window.data.setBlockedInput(true);
 
         const fragments = await window.projects.getContext(text);
