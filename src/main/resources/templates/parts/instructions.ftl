@@ -42,7 +42,8 @@
         </div>
     </div>
     <div class="instruction-field" >
-        <select id="modelOptions" name="model" class="mb-1" onchange="window.settings.changeModel(event)">
+        <label>Model</label>
+        <select id="modelOptions" name="model" class="" onchange="window.settings.changeModel(event)">
         </select>
     </div>
     <#include "/parts/instructionThinkingEffort.ftl" />
