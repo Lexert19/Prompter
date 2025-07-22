@@ -39,13 +39,7 @@ class Settings {
                 url: "https://api.anthropic.com/v1/messages",
                 type: "vision",
             },
-            {
-                name: "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
-                text: "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
-                provider: "DEEPINFRA",
-                type: "text",
-                url: "https://api.deepinfra.com/v1/openai/chat/completions",
-            },
+
             {
                 name: "deepseek-ai/DeepSeek-V3-0324",
                 text: "deepinfra/DeepSeek-V3",
@@ -60,20 +54,7 @@ class Settings {
                 type: "text",
                 url: "https://api.deepinfra.com/v1/openai/chat/completions",
             },
-            {
-                name: "deepseek-ai/DeepSeek-R1-Turbo",
-                text: "deepinfra/DeepSeek-R1-Turbo",
-                provider: "DEEPINFRA",
-                type: "text",
-                url: "https://api.deepinfra.com/v1/openai/chat/completions",
-            },
-            {
-                name: "Qwen/QwQ-32B",
-                text: "Qwen/QwQ-32B",
-                provider: "DEEPINFRA",
-                type: "text",
-                url: "https://api.deepinfra.com/v1/openai/chat/completions",
-            },
+
             {
                 name: "deepseek-chat",
                 text: "deepseek-v3",
@@ -87,20 +68,6 @@ class Settings {
                 provider: "DEEPSEEK",
                 type: "text",
                 url: "https://api.deepseek.com/chat/completions",
-            },
-            {
-                name: "gemini-2.0-flash-thinking-exp-01-21",
-                text: "gemini-2.0-flash-thinking-exp-01-21",
-                provider: "GEMINI",
-                type: "vision",
-                url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
-            },
-            {
-                name: "gemini-2.5-pro-exp-03-25",
-                text: "gemini-2.5.pro-exp-03-25",
-                provider: "GEMINI",
-                type: "vision",
-                url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
             },
             {
                 name: "gemini-2.0-flash",
