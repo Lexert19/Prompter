@@ -72,8 +72,8 @@ h3{
 }
 
 .chat-header {
-    background-color: rgba(55, 65, 81, 0.95);
-    color: #e0e7ff;
+/*    background-color: rgba(55, 65, 81, 0.95);*/
+/*    color: #e0e7ff;*/
     padding: 15px;
     text-align: center;
 }
@@ -81,6 +81,14 @@ h3{
 .chat-history{
     height: 100%;
     display: none;
+}
+
+.text-shadow-md {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.text-shadow-lg {
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.9);
 }
 
 .chat-messages {
@@ -193,6 +201,13 @@ input {
     background-repeat: no-repeat;
     display: inline-block;
     background-image: url("/static/svg/document.svg");
+}
+
+.background{
+    background-image: url("/static/images/background.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+
 }
 
 #documents{
@@ -541,8 +556,7 @@ input[type="range"]::-moz-range-progress {
 
 .open_chat {
     padding: 15px 30px;
-    font-size: 1.1rem;
-    background-color: #6366f1; 
+    background-color: #6366f1;
     color: white;
     border: none;
     border-radius: 10px;
@@ -554,8 +568,16 @@ input[type="range"]::-moz-range-progress {
     justify-content: center; 
 }
 
+.navbar{
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
 .open_chat:hover {
     background-color: #4f46e5; 
+}
+
+.navbar-toggler-icon {
+    filter: invert(100%);
 }
 
 .open_chat i {
