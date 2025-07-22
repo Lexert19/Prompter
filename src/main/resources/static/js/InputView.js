@@ -29,6 +29,9 @@ class InputView{
     }
 
     makeChat(){
+        if(this.chatInput.value == ""){
+            return;
+        }
         window.chatApi.chat(
             this.chatInput.value,
             "user"
@@ -38,11 +41,11 @@ class InputView{
 
     updateView(){
         if(window.data.blockedInput){
-            document.getElementById('send-icon').style.display = 'none';
-            document.getElementById('stop-icon').style.display = 'block';
+            document.getElementById('send-icon').classList.add("d-none");
+            document.getElementById('stop-icon').classList.remove("d-none");
         }else{
-            document.getElementById('send-icon').style.display = 'block';
-            document.getElementById('stop-icon').style.display = 'none';
+            document.getElementById('send-icon').classList.remove("d-none");
+            document.getElementById('stop-icon').classList.add("d-none");
         }
         this.updateDocumentsView();
     }
