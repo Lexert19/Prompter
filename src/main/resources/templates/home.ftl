@@ -1,32 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <link rel="icon" type="image/svg+xml" href="/favicon">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/css/main.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="..." crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <title>Prompter</title>
-</head>
-
-<body>
+<#include "/parts/head.ftl" />
     <div class="center" style="height: 100vh;">
         <div class="block" style="max-width: 600px; padding: 20px;">
-            <div class="chat-header" style="border-radius: 10px; margin-bottom: 30px; text-align: center;">
-                <h1 style="margin: 0; font-size: 3rem; font-weight: bold;">
-                    <span style="color: #6366f1;">Prompter</span>
-                    <img src="/favicon" width="50px" height="50px" style="vertical-align: middle; margin-left: 10px; filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.3));">
+            <div class="chat-header d-flex flex-column align-items-center" style="border-radius: 10px; margin-bottom: 24px; text-align: center;">
+                    <img src="/favicon" class="d-block" width="90px" height="90px" style="vertical-align: middle; margin-left: 10px; filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.3));">
+                <h1 style="margin: 0; font-size: 4rem; font-weight: bold;">
+                    <span class="text-shadow-md" style="color: #6366f1;">Prompter</span>
                 </h1>
-                <p style="margin-top: 10px; color: #a0a6b9; font-size: 1.2rem;">Twój inteligentny asystent AI do kreatywnych zadań</p>
+                <p class="text-white fs-5 text-shadow-lg" style="margin-top: 10px; font-size: 1.2rem;">Podłącz klucze API i płać tylko za wykorzystanie.</p>
             </div>
             <div class="panel center mb-1">
-                <a href="/chat" class="open_chat" style="padding: 15px 30px; font-size: 1.1rem;">
+                <a href="/chat" class="open_chat text-decoration-none rounded-pill" style="padding: 15px 30px; font-size: 1.1rem;">
                     <i class="fas fa-comment-dots"></i>
                     Rozpocznij czat
                 </a>
             </div>
-            <div class="alert-warning mt-1">
+            <div class="alert-warning d-none mt-1">
                 <h3 class="center" style="margin: 0 0 10px 0; color: #ffc107;">
                     <i class="fas fa-exclamation-triangle"></i>
                     Wskazówka!
@@ -36,7 +24,7 @@
                     Uniknij wysokich opłat subskrypcyjnych!
                 </p>
             </div>
-            <div class="mt-1" style="background: rgba(45,45,49,0.8); padding: 20px; border-radius: 10px;">
+            <div class="mt-1 d-none" style="background: rgba(45,45,49,0.8); padding: 20px; border-radius: 10px;">
                 <h2 style="color: white; margin-bottom: 20px; font-size: 1.5rem;">Zaawansowane funkcje Promptera</h2>
                 <p style="color: #a0a6b9; margin-bottom: 20px;">Odkryj możliwości Promptera, które przeniosą Twoją interakcję z AI na wyższy poziom:</p>
                 <div class="file-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px;">
@@ -59,6 +47,5 @@
             </div>
         </div>
     </div>
-</body>
 
-</html>
+<#include "/parts/footer.ftl" />

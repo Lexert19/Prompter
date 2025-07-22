@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <#include "/parts/links.ftl" />
+
     <title>Login</title>
+
     <style>
         /* Include the provided CSS styles here */
         body {
@@ -137,7 +138,9 @@
                 }
     </style>
 </head>
-<body>
+<body class="background">
+<#include "/parts/navbar.ftl" />
+
     <div class="login-container">
         <h2>Login</h2>
 
