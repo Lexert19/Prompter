@@ -25,10 +25,10 @@ class ChatApi {
     async chat(text, role){
         if (window.data.blockedInput == true){
             this.stopStreaming();
-            return;
+            return false;
         }
         if(text == ""){
-            return;
+            return false;
         }
         window.data.setBlockedInput(true);
 
@@ -50,7 +50,7 @@ class ChatApi {
         this.requestBuilder.addMessage(this.currentMessage);
         this.sendStreamingMessage(this.requestBuilder);
 
-
+        return true;
     }
 
 
