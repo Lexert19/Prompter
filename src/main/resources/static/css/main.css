@@ -1,8 +1,18 @@
+
+:root {
+    --main-bg: #0f1620;
+    --second-bg: #1c232d;
+/*    --accent: #802fff;*/
+    --accent: rgba(99, 102, 241, 0.9);
+/*    --accent-darker: #6c26d9;*/
+    --accent-darker: rgba(99, 102, 241, 0.7);;
+}
+
 body {
     font-family: Arial, sans-serif;
     color: white !important;
 /*    background-color: #262630 !important;*/
-    background-color: #2A2F42 !important;
+    background-color: var(--main-bg) !important;
     margin: 0;
     padding: 0;
 }
@@ -12,7 +22,8 @@ body {
 }
 
 .chat-navigation {
-    background-color: #1B1E31;
+/*    background-color: #1B1E31;*/
+        background-color: var(--second-bg);
 /*    background-color: rgba(45, 45, 59, 0.9);*/
     position: fixed;
     border-right: 1px solid #555866;
@@ -130,7 +141,8 @@ h3{
 button {
     padding: 10px 15px;
     border: none;
-    background-color: rgba(99, 102, 241, 0.9);
+/*    background-color: rgba(99, 102, 241, 0.9);*/
+    background-color: var(--accent);
     color: white;
     border-radius: 5px;
     cursor: pointer;
@@ -138,7 +150,8 @@ button {
 }
 
 button:hover{
-    background-color: rgba(99, 102, 241, 0.7);
+    background: var(--accent-darker);
+/*    background-color: rgba(99, 102, 241, 0.7);*/
 }
 
 input {
