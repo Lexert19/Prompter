@@ -15,7 +15,7 @@ public class RequestBuilder {
     private String provider;
     private String url;
     private String sessionId;
-    private String reasoningEffort = "medium";
+    private String reasoningEffort = "";
     private String type = "";
     private String system = "";
 
@@ -71,19 +71,12 @@ public class RequestBuilder {
         request.put("model", model);
         request.put("stream", stream);
 
-        if (this.provider.equals("OPENAI")) {
-            if (this.model.contains("o4-mini")) {
-                request.put("response_format", Map.of("type", "text"));
-                request.put("reasoning_effort", this.reasoningEffort);
-            } else {
-                request.put("max_tokens", maxTokens);
-                request.put("temperature", temperature);
-            }
-        } else if (this.provider.equals("ANTHROPIC")) {
-            request.put("max_tokens", maxTokens);
-            request.put("temperature", temperature);
-
+        if(!this.reasoningEffort.equals("")){
+            request.put("response_format", Map.of("type", "text"));
+            request.put("reasoning_effort", this.reasoningEffort);
         }
+        request.put("max_tokens", maxTokens);
+        request.put("temperature", temperature);
 
         return request;
     }
