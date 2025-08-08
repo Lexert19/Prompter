@@ -731,6 +731,10 @@ input[type="number"]::-ms-spin-button {
     font-size: 14px;
 }
 
+.border-blue{
+    border: 1px solid rgba(79, 70, 229, 0.2);
+}
+
 .thinking-content.show{
     max-height: 9999px;
 }

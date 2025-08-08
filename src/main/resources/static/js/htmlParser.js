@@ -88,6 +88,8 @@ class HtmlParser {
             return "LISTITEM2DEEPSEEK";
         }else if(line.startsWith("     -")){
             return "LISTITEM3DEEPSEEK";
+        }else if(line.startsWith("|")){
+            return "ROW";
         }
 
         return "NORMAL";
@@ -150,6 +152,7 @@ class HtmlParser {
                         this.blocks.push(currentBlock);
                     }
                     break;
+                case 'ROW':
                 case 'LISTITEM':
                 case 'LISTITEM2':
                 case 'LISTITEM2DEEPSEEK':
@@ -165,76 +168,6 @@ class HtmlParser {
             }
         }
     }
-
-
-
-    //    toBlocks() {
-    //        let html = '';
-    //        let currentMode = 'NORMAL';
-    //        let currentBlock = { type: 'NORMAL', content: '' };
-    //
-    //        for (const line of this.lines) {
-    //            currentBlock = { type: 'NORMAL', content: '' };
-    //            switch (line.mode) {
-    //                case 'START_THINKING':
-    //                    currentBlock = { type: 'THINKING', content: '' };
-    //                    break;
-    //
-    //                case 'STOP_THINKING':
-    //                    currentBlock = { type: 'NORMAL', content: '' };
-    //                    break;
-    //
-    //                case 'START_CODE':
-    //                    currentBlock = {
-    //                        type: 'CODE',
-    //                        content: '',
-    //                        language: line.text.replace(/```/, '').trim() || null
-    //                    };
-    //                    break;
-    //
-    //                case 'STOP_CODE':
-    //                    currentBlock = { type: 'NORMAL', content: '' };
-    //                    break;
-    //
-    //                case 'CODE':
-    //                case 'THINKING':
-    //                    currentBlock = { type: line.mode, content: "\n" + line.text };
-    //                    break;
-    //                case 'NORMAL':
-    //                    if(line.text){
-    //                        currentBlock = { type: line.mode, content: "\n" + line.text };
-    //                    }
-    //                    break;
-    //                case 'LISTITEM':
-    //                    currentBlock = { type: 'LISTITEM', content: line.text };
-    //                    break;
-    //                case 'LISTITEM2':
-    //                    currentBlock = { type: line.mode, content: line.text };
-    //                    break;
-    //                case 'LISTITEM2DEEPSEEK':
-    //                    currentBlock = { type: line.mode, content: line.text };
-    //                    break;
-    //                case 'LISTITEM3':
-    //                    currentBlock = { type: line.mode, content: line.text };
-    //                    break;
-    //                case 'LISTITEM3DEEPSEEK':
-    //                    currentBlock = { type: line.mode, content: line.text };
-    //                    break;
-    //                case 'LINE':
-    //                    currentBlock = { type: line.mode, content: line.text };
-    //                    break;
-    //                case 'HEADER2':
-    //                case 'HEADER3':
-    //                    currentBlock = { type: line.mode, content: line.text };
-    //                    break;
-    //
-    //            }
-    //
-    //            html += this.renderBlock(currentBlock);
-    //        }
-    //
-    //        return html;
-    //    }
 
     renderStrongs(content){
         const withoutHtmlContent = this.escapeHtml(content);
@@ -290,6 +223,18 @@ class HtmlParser {
                 return `<li class="ml-2">${content}</li>`;
             case 'LINE':
                 return `<div class="line">${content}</div>`;
+            case 'ROW':
+                let rowContent = block.content.trim();
+                if (rowContent.startsWith('|') && rowContent.endsWith('|')) {
+                    rowContent = rowContent.substring(1, rowContent.length - 1);
+                }
+
+                let cells = rowContent.split('|').map(cell => cell.trim());
+                cells = cells.filter(cell => !cell.includes('---'));
+
+                const cellHtml = cells.map(cell => `<div class="border-blue p-1 w-100">${this.renderStrongs(cell)}</div>`).join('');
+
+                return `<div class="d-flex">${cellHtml}</div>`;
             default:
                 return '';
         }
