@@ -1,3 +1,4 @@
+"use strict";
 class ChatApi {
     constructor() {
         this.url = "/client/chat";
@@ -127,11 +128,14 @@ class ChatApi {
             let content = "";
             if(this.getProvider() == "ANTHROPIC"){
                 content = rootNode.delta.text;
-            }else if(this.getProvider() == "DEEPSEEK"){
-                content = this.deepseekParseContent(rootNode);
             }else{
-                content = rootNode.choices[0].delta.content;
+                if(rootNode.choices[0].delta.content)
+                    content += rootNode.choices[0].delta.content;
             }
+
+            let reasoningContent = this.parseReasoningContent(rootNode);
+            if(reasoningContent)
+                content += reasoningContent;
 
             if(!content)
                 return;
@@ -159,25 +163,21 @@ class ChatApi {
         }
     }
 
-    deepseekParseContent(rootNode){
-        let content = rootNode.choices[0].delta.content;
+    parseReasoningContent(rootNode){
+        let content = rootNode.choices[0].delta.reasoning_content;
 
-        if(content == null){
-          
-            content = rootNode.choices[0].delta.reasoning_content;
+        if(content != null){
             if(this.firstReason == false){
                 this.firstReason = true
                 content = "<think>\n" + content;
             }
-            return content;
         } else{
             if(this.firstReason == true){
                 this.firstReason = false;
-                content = "\n</think>\n" + content
+                content = "\n</think>\n";
             }
-            return content;
         }
-        
+        return content;
     }
 
     read(reader, decoder) {

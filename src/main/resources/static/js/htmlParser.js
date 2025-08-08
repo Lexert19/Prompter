@@ -216,7 +216,8 @@ class HtmlParser {
                 withoutHtmlContent = this.escapeHtml(block.content);
                 return `${withoutHtmlContent}`;
             case 'THINKING':
-                return `<div class="thinking"><h4>Thinking:</h4><p>${this.escapeHtml(block.content)}</p></div>\n`;
+                const randomId = Math.floor(Math.random() * 1000000);
+                return `<div class="thinking"><button class="clear-button p-0 bg-transparent" onclick="collapseThinkingContent(${randomId})"><h4>Thinking:</h4></button><p class="thinking-content" id="thinkingContent-${randomId}">${this.escapeHtml(block.content)}</p></div>\n`;
             case 'CODE':
                 const langClass = block.language ? ` class="language-${block.language}"` : '';
                 return `<div class="code-block"><pre><code${langClass}>${this.escapeHtml(block.content)}</code></pre></div>\n`;

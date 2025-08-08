@@ -99,3 +99,8 @@ document.addEventListener('mousemove', (e) => {
 });
 
 
+function collapseThinkingContent(id){
+  document.getElementById("thinkingContent-"+id).classList.toggle("show");
+}
+
+

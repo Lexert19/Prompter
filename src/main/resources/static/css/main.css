@@ -311,10 +311,10 @@ input {
 }
 
 .thinking{
-    border: 1px solid rgba(79, 70, 229, 0.2);
+    border-left: 2px solid rgba(79, 70, 229, 0.2);
     padding: 12px;
-    border-radius: 12px;
     font-size: 12px;
+    color: gray;
 }
 .thinking h4{
     font-size: 16px;
@@ -327,8 +327,10 @@ input {
     border: none;
     border-radius: 5px;
     margin-right: 10px;
+}
 
-   
+.bg-transparent{
+    background-color: transparent !important;
 }
 
 input, textarea, select {
@@ -720,4 +722,34 @@ input[type="number"]::-ms-spin-button {
 
 .edit-menu-button:hover{
     background-color: rgba(99, 102, 241, 0.7);
+}
+
+.thinking-content{
+    position: relative;
+    max-height: 70px;
+    overflow: hidden;
+    font-size: 14px;
+}
+
+.thinking-content.show{
+    max-height: 9999px;
+}
+
+.thinking-content::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 12px;
+    background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0),
+    var(--main-bg)
+    );
+    pointer-events: none;
+}
+
+.thinking-content.show::after {
+    display: none;
 }
