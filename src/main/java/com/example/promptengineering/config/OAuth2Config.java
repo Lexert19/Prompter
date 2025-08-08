@@ -20,7 +20,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
-public class OAuth2Config implements WebMvcConfigurer   {
+public class OAuth2Config implements WebMvcConfigurer {
     @Autowired
     private CustomAuthenticationManager authenticationManager;
     @Autowired
@@ -41,13 +41,12 @@ public class OAuth2Config implements WebMvcConfigurer   {
                         .oidcUserService(oidcUserService())
                         .userService(customOAuth2UserService))
                 .successHandler((request, response, authentication) -> {
-                    String serverName = request.getServerName();
-                    response.sendRedirect("https://" + serverName + ":8080/");
+
+                    response.sendRedirect("/");
                 })
                 .failureHandler((request, response, exception) -> {
                     exception.printStackTrace();
-                    String serverName = request.getServerName();
-                    response.sendRedirect("https://" + serverName + ":8080/");
+                    response.sendRedirect("/auth/login?error=true");
                 }));
 
         //http.authenticationManager(authenticationManager);
@@ -55,8 +54,7 @@ public class OAuth2Config implements WebMvcConfigurer   {
         http.formLogin(customizer -> customizer
                 .loginPage("/auth/login")
                 .successHandler((request, response, authentication) -> {
-                    String redirectUrl = "https://" + request.getServerName() + ":8080/";
-                    response.sendRedirect(redirectUrl);
+                    response.sendRedirect("/");
                 })
                 .failureHandler(authenticationFailureHandler()));
 
@@ -66,7 +64,6 @@ public class OAuth2Config implements WebMvcConfigurer   {
         http.logout(customizer -> customizer.logoutUrl("/auth/logout"));
         return http.build();
     }
-
 
 
     @Bean

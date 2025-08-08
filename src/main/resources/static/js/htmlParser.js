@@ -6,18 +6,38 @@ class HtmlParser {
         this.isThinkingBlock = false;
         this.isNormalBlock = false;
         this.lines = [];
+        this.randomId = Math.floor(Math.random() * 1000000);
+
+
+        this.lines2 = [];
+        this.lines2.push({
+            content: "",
+            fnished: false
+        });
+        this.currentLine = 0;
+        this.currentBlock = 0;
+        this.blocks2 = [];
+        this.blocks2.push({
+            type: "NORMAL",
+            finished: false,
+            lines: {},
+            content: ""
+        });
+        this.finishedBlocks = [];
     }
 
     clear(){
         this.lines = [];
         this.bufferedText = "";
-
+        this.randomId = Math.floor(Math.random() * 1000000);
     }
 
     parse(textFragment) {
         this.bufferedText += textFragment;
+
         this.readLines();
     }
+
 
     readLines(){
         let lines = this.bufferedText.split('\n');
@@ -26,9 +46,9 @@ class HtmlParser {
 
             let previousLine = null;
             if(i == 0)
-                previousLine = {text: "", mode: ""};
+            previousLine = {text: "", mode: ""};
             else
-                previousLine = this.lines[i-1];
+            previousLine = this.lines[i-1];
             this.lines[i] = {
                 text: line,
                 mode: this.getLineMode(previousLine, line)
@@ -68,12 +88,39 @@ class HtmlParser {
             return "LISTITEM2DEEPSEEK";
         }else if(line.startsWith("     -")){
             return "LISTITEM3DEEPSEEK";
+        }else if(line.startsWith("|")){
+            return "ROW";
         }
 
         return "NORMAL";
     }
 
     toHTML(){
+        this.updateBlocks();
+        let html = "";
+        for(const block of this.blocks){
+            html += this.renderBlock(block);
+        }
+        return html;
+    }
+
+    getLastBlockHtml(){
+        this.updateBlocks();
+        if (this.blocks.length === 0) {
+            return { index: -1, html: "" };
+        }
+
+        const lastIndex = this.blocks.length - 1;
+        const lastBlock = this.blocks[lastIndex];
+        const lastBlockHtml = this.renderBlock(lastBlock);
+
+        return {
+            index: lastIndex,
+            html: lastBlockHtml
+        };
+    }
+
+    updateBlocks(){
         this.blocks = [];
         let currentBlock = { type: 'NORMAL', content: '' };
 
@@ -94,7 +141,6 @@ class HtmlParser {
                     this.blocks.push(currentBlock);
                     break;
                 case 'STOP_CODE':
-                    hljs.highlightAll();
                     break;
                 case 'CODE':
                 case 'THINKING':
@@ -105,7 +151,8 @@ class HtmlParser {
                         currentBlock = { type: line.mode, content: line.text };
                         this.blocks.push(currentBlock);
                     }
-                break;
+                    break;
+                case 'ROW':
                 case 'LISTITEM':
                 case 'LISTITEM2':
                 case 'LISTITEM2DEEPSEEK':
@@ -120,80 +167,7 @@ class HtmlParser {
 
             }
         }
-        let html = "";
-        for(const block of this.blocks){
-            html += this.renderBlock(block);
-        }
-        return html;
     }
-
-//    toBlocks() {
-//        let html = '';
-//        let currentMode = 'NORMAL';
-//        let currentBlock = { type: 'NORMAL', content: '' };
-//
-//        for (const line of this.lines) {
-//            currentBlock = { type: 'NORMAL', content: '' };
-//            switch (line.mode) {
-//                case 'START_THINKING':
-//                    currentBlock = { type: 'THINKING', content: '' };
-//                    break;
-//
-//                case 'STOP_THINKING':
-//                    currentBlock = { type: 'NORMAL', content: '' };
-//                    break;
-//
-//                case 'START_CODE':
-//                    currentBlock = {
-//                        type: 'CODE',
-//                        content: '',
-//                        language: line.text.replace(/```/, '').trim() || null
-//                    };
-//                    break;
-//
-//                case 'STOP_CODE':
-//                    currentBlock = { type: 'NORMAL', content: '' };
-//                    break;
-//
-//                case 'CODE':
-//                case 'THINKING':
-//                    currentBlock = { type: line.mode, content: "\n" + line.text };
-//                    break;
-//                case 'NORMAL':
-//                    if(line.text){
-//                        currentBlock = { type: line.mode, content: "\n" + line.text };
-//                    }
-//                    break;
-//                case 'LISTITEM':
-//                    currentBlock = { type: 'LISTITEM', content: line.text };
-//                    break;
-//                case 'LISTITEM2':
-//                    currentBlock = { type: line.mode, content: line.text };
-//                    break;
-//                case 'LISTITEM2DEEPSEEK':
-//                    currentBlock = { type: line.mode, content: line.text };
-//                    break;
-//                case 'LISTITEM3':
-//                    currentBlock = { type: line.mode, content: line.text };
-//                    break;
-//                case 'LISTITEM3DEEPSEEK':
-//                    currentBlock = { type: line.mode, content: line.text };
-//                    break;
-//                case 'LINE':
-//                    currentBlock = { type: line.mode, content: line.text };
-//                    break;
-//                case 'HEADER2':
-//                case 'HEADER3':
-//                    currentBlock = { type: line.mode, content: line.text };
-//                    break;
-//
-//            }
-//
-//            html += this.renderBlock(currentBlock);
-//        }
-//
-//        return html;
-//    }
 
     renderStrongs(content){
         const withoutHtmlContent = this.escapeHtml(content);
@@ -202,9 +176,16 @@ class HtmlParser {
         return formattedContent;
     }
 
+    renderCurrentLine(){
 
+    }
 
-    renderBlock(block) {
+    renderBlock(block, index = 0){
+//        return `<div id="${index}">${this.getBlockContent(block)}</div>`;
+        return this.getBlockContent(block);
+    }
+
+    getBlockContent(block) {
         let content = "";
         let withoutHtmlContent = "";
         switch (block.type) {
@@ -216,8 +197,7 @@ class HtmlParser {
                 withoutHtmlContent = this.escapeHtml(block.content);
                 return `${withoutHtmlContent}`;
             case 'THINKING':
-                const randomId = Math.floor(Math.random() * 1000000);
-                return `<div class="thinking"><button class="clear-button p-0 bg-transparent" onclick="collapseThinkingContent(${randomId})"><h4>Thinking:</h4></button><p class="thinking-content" id="thinkingContent-${randomId}">${this.escapeHtml(block.content)}</p></div>\n`;
+                return `<div class="thinking"><button class="clear-button p-0 bg-transparent" onclick="collapseThinkingContent(${this.randomId})"><h4>Thinking:</h4></button><p class="thinking-content show" id="thinkingContent-${this.randomId}">${this.escapeHtml(block.content)}</p></div>\n`;
             case 'CODE':
                 const langClass = block.language ? ` class="language-${block.language}"` : '';
                 return `<div class="code-block"><pre><code${langClass}>${this.escapeHtml(block.content)}</code></pre></div>\n`;
@@ -243,6 +223,18 @@ class HtmlParser {
                 return `<li class="ml-2">${content}</li>`;
             case 'LINE':
                 return `<div class="line">${content}</div>`;
+            case 'ROW':
+                let rowContent = block.content.trim();
+                if (rowContent.startsWith('|') && rowContent.endsWith('|')) {
+                    rowContent = rowContent.substring(1, rowContent.length - 1);
+                }
+
+                let cells = rowContent.split('|').map(cell => cell.trim());
+                cells = cells.filter(cell => !cell.includes('---'));
+
+                const cellHtml = cells.map(cell => `<div class="border-blue p-1 w-100 text-break">${this.renderStrongs(cell)}</div>`).join('');
+
+                return `<div class="d-flex">${cellHtml}</div>`;
             default:
                 return '';
         }
