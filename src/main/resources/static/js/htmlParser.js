@@ -232,7 +232,7 @@ class HtmlParser {
                 let cells = rowContent.split('|').map(cell => cell.trim());
                 cells = cells.filter(cell => !cell.includes('---'));
 
-                const cellHtml = cells.map(cell => `<div class="border-blue p-1 w-100">${this.renderStrongs(cell)}</div>`).join('');
+                const cellHtml = cells.map(cell => `<div class="border-blue p-1 w-100 text-break">${this.renderStrongs(cell)}</div>`).join('');
 
                 return `<div class="d-flex">${cellHtml}</div>`;
             default:
