@@ -18,7 +18,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
             throws IOException {
-        String redirectUrl = "https://" + request.getServerName() + ":8080" + request.getContextPath() + loginPath;
-        response.sendRedirect(redirectUrl);
+//        String redirectUrl = "https://" + request.getServerName() + ":8080" + request.getContextPath() + loginPath;
+//        response.sendRedirect(redirectUrl);
     }
 }

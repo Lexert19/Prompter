@@ -1,4 +1,3 @@
-"use strict";
 class ChatApi {
     constructor() {
         this.url = "/client/chat";
@@ -7,6 +6,8 @@ class ChatApi {
         this.abortController = null;
         this.currentMessage = false;
         this.requestBuilder = new RequestBuilder();
+        setInterval(this.renderHtml.bind(this), 300);
+        this.rerender = false;
     }
 
     getProvider(){
@@ -84,8 +85,8 @@ class ChatApi {
         })
             .then(this.handleStream.bind(this))
             .catch(error => {
-                this.outputInput.textContent += 'Error fetching data:', error;
-            });
+            this.outputInput.textContent += 'Error fetching data:', error;
+        });
     }
 
     handleStream(stream) {
@@ -100,24 +101,26 @@ class ChatApi {
         const chunk = decoder.decode(value, { stream: true });
 
         this.readJsonChunk(chunk);
-       
+
         //this.outputInput.innerHTML = this.parser.toHTML();
     }
 
     readJsonChunk(chunksString){
         const chunks = chunksString.split("\n");
         chunks.forEach(chunk => {
-           if (chunk.startsWith('data:')) {
+            if (chunk.startsWith('data:')) {
                 chunk = chunk.slice(5).trim();
-           }
-           this.readChunkData(chunk);
+            }
+            this.readChunkData(chunk);
         });
     }
 
     readChunkData(chunk){
         try{
             if(!chunk.trim())
-                return;
+            return;
+            if(chunk == "[DONE]")
+            return;
             const rootNode = JSON.parse(chunk);
             let error = rootNode.error;
             if(error){
@@ -130,33 +133,57 @@ class ChatApi {
                 content = rootNode.delta.text;
             }else{
                 if(rootNode.choices[0].delta.content)
-                    content += rootNode.choices[0].delta.content;
+                content += rootNode.choices[0].delta.content;
             }
 
             let reasoningContent = this.parseReasoningContent(rootNode);
             if(reasoningContent)
-                content += reasoningContent;
+            content += reasoningContent;
 
             if(!content)
-                return;
+            return;
 
             this.parser.parse(content);
-            const html = this.parser.toHTML();
+            //            const lastBlock = this.parser.getLastBlockHtml();
+            //            const currentBlock = document.getElementById(lastBlock.index);
+            //            if(currentBlock){
+            //                document.getElementById(lastBlock.index).innerHtml = lastBlock.html;
+            //            }else{
+            //                this.outputInput.innerHTML += `<div id="${lastBlock.index}">${lastBlock.html}</div`;
+            //            }
             //this.outputInput.textContent += content;
-            this.outputInput.innerHTML  = html;
-            hljs.highlightAll();
+            this.rerender = true;
+//            const previouslyHighlightedElements = document.querySelectorAll('.hljs[data-highlighted="yes"]');
+//
+//            previouslyHighlightedElements.forEach(element => {
+//                element.removeAttribute('data-highlighted');
+//            });
+//            hljs.initHighlighting.called = false;
+//            hljs.highlightAll();
             this.currentMessage.appendText(content);
 
         }catch(error){
-            console.log(chunk);
+            console.error(chunk);
+            console.error(error);
             //console.log(error);
         }
     }
 
+    renderHtml(){
+        if(this.rerender){
+            const html = this.parser.toHTML();
+            this.outputInput.innerHTML = html;
+            hljs.initHighlighting.called = false;
+            hljs.highlightAll();
+            this.rerender = false;
+        }
+
+    }
+
     stopStreaming() {
         if (this.abortController) {
-            this.abortController.abort(); 
-            this.abortController = null; 
+            this.abortController.abort();
+            this.abortController = null;
             window.chat.setBlockedInput(false);
             this.currentMessage.end = Date.now();
             window.chat.saveMessage(this.currentMessage);
