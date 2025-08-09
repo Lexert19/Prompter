@@ -6,7 +6,7 @@ class ChatApi {
         this.abortController = null;
         this.currentMessage = false;
         this.requestBuilder = new RequestBuilder();
-        setInterval(this.renderHtml.bind(this), 300);
+        setInterval(this.renderHtml.bind(this), 100);
         this.rerender = false;
     }
 
@@ -59,6 +59,7 @@ class ChatApi {
         this.currentMessage = new Message("assistant");
         const messageView = new MessageView(this.currentMessage);
         this.outputInput = messageView.createHtmlElement(window.chat.chatMessages);
+        this.parser.setRootElement(this.outputInput);
         //this.outputInput = window.chat.createMessage(this.currentMessage);
         //window.chat.startDurationCounter(this.currentMessage);
     }
@@ -141,23 +142,9 @@ class ChatApi {
             content += reasoningContent;
 
             if(!content)
-            return;
+                return;
 
             this.parser.parse(content);
-            //            const lastBlock = this.parser.getLastBlockHtml();
-            //            const currentBlock = document.getElementById(lastBlock.index);
-            //            if(currentBlock){
-            //                document.getElementById(lastBlock.index).innerHtml = lastBlock.html;
-            //            }else{
-            //                this.outputInput.innerHTML += `<div id="${lastBlock.index}">${lastBlock.html}</div`;
-            //            }
-            //this.outputInput.textContent += content;
-            this.rerender = true;
-//            const previouslyHighlightedElements = document.querySelectorAll('.hljs[data-highlighted="yes"]');
-//
-//            previouslyHighlightedElements.forEach(element => {
-//                element.removeAttribute('data-highlighted');
-//            });
 //            hljs.initHighlighting.called = false;
 //            hljs.highlightAll();
             this.currentMessage.appendText(content);
@@ -171,11 +158,9 @@ class ChatApi {
 
     renderHtml(){
         if(this.rerender){
-            const html = this.parser.toHTML();
-            this.outputInput.innerHTML = html;
-            hljs.initHighlighting.called = false;
-            hljs.highlightAll();
             this.rerender = false;
+
+
         }
 
     }
