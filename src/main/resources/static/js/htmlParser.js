@@ -5,37 +5,33 @@ class HtmlParser {
         this.isCodeBlock = false;
         this.isThinkingBlock = false;
         this.isNormalBlock = false;
+        this.blocks = [];
+        this.previousBlocks = [];
         this.lines = [];
+        this.blockElements = new Map();
         this.randomId = Math.floor(Math.random() * 1000000);
+        this.nextBlockId = 0;
+    }
 
-
-        this.lines2 = [];
-        this.lines2.push({
-            content: "",
-            fnished: false
-        });
-        this.currentLine = 0;
-        this.currentBlock = 0;
-        this.blocks2 = [];
-        this.blocks2.push({
-            type: "NORMAL",
-            finished: false,
-            lines: {},
-            content: ""
-        });
-        this.finishedBlocks = [];
+    setRootElement(rootElement){
+        this.rootElement = rootElement;
     }
 
     clear(){
         this.lines = [];
         this.bufferedText = "";
+        this.blocks = [];
+        this.blockElements.clear();
+        this.previousBlocks = [];
         this.randomId = Math.floor(Math.random() * 1000000);
+        this.nextBlockId = 0;
     }
 
     parse(textFragment) {
         this.bufferedText += textFragment;
-
         this.readLines();
+        this.updateBlocks();
+        this.renderChanges();
     }
 
 
@@ -95,45 +91,48 @@ class HtmlParser {
         return "NORMAL";
     }
 
-    toHTML(){
-        this.updateBlocks();
-        let html = "";
-        for(const block of this.blocks){
-            html += this.renderBlock(block);
-        }
-        return html;
-    }
+//    toHTML(){
+//        //this.readLines();
+//        this.updateBlocks();
+//        let html = "";
+//        for(const block of this.blocks){
+//            html += this.renderBlock(block);
+//        }
+//        return html;
+//    }
 
-    getLastBlockHtml(){
-        this.updateBlocks();
-        if (this.blocks.length === 0) {
-            return { index: -1, html: "" };
-        }
-
-        const lastIndex = this.blocks.length - 1;
-        const lastBlock = this.blocks[lastIndex];
-        const lastBlockHtml = this.renderBlock(lastBlock);
-
-        return {
-            index: lastIndex,
-            html: lastBlockHtml
-        };
-    }
+//        getLastBlockHtml(){
+//        this.updateBlocks();
+//        if (this.blocks.length === 0) {
+//            return { index: -1, html: "" };
+//        }
+//
+//        const lastIndex = this.blocks.length - 1;
+//        const lastBlock = this.blocks[lastIndex];
+//        const lastBlockHtml = this.renderBlock(lastBlock);
+//
+//        return {
+//            index: lastIndex,
+//            html: lastBlockHtml
+//        };
+//    }
 
     updateBlocks(){
         this.blocks = [];
         let currentBlock = { type: 'NORMAL', content: '' };
+        let blockIdCounter = 0;
 
         for(const line of this.lines){
             switch(line.mode){
                 case 'START_THINKING':
-                    currentBlock = { type: 'THINKING', content: '' };
+                    currentBlock = { id: blockIdCounter++, type: 'THINKING', content: '' };
                     this.blocks.push(currentBlock);
                     break;
                 case 'STOP_THINKING':
                     break;
                 case 'START_CODE':
                     currentBlock = {
+                        id: blockIdCounter++,
                         type: 'CODE',
                         content: '',
                         language: line.text.replace(/```/, '').trim() || null
@@ -148,7 +147,7 @@ class HtmlParser {
                     break;
                 case 'NORMAL':
                     if(line.text){
-                        currentBlock = { type: line.mode, content: line.text };
+                        currentBlock = { id: blockIdCounter++, type: line.mode, content: line.text };
                         this.blocks.push(currentBlock);
                     }
                     break;
@@ -161,7 +160,7 @@ class HtmlParser {
                 case 'LINE':
                 case 'HEADER2':
                 case 'HEADER3':
-                    currentBlock = { type: line.mode, content: line.text };
+                    currentBlock = { id: blockIdCounter++, type: line.mode, content: line.text };
                     this.blocks.push(currentBlock);
                     break;
 
@@ -180,12 +179,12 @@ class HtmlParser {
 
     }
 
-    renderBlock(block, index = 0){
+    renderBlock(block){
 //        return `<div id="${index}">${this.getBlockContent(block)}</div>`;
-        return this.getBlockContent(block);
+        return `<div id="block-${block.id}">${this.renderBlockToHtmlString(block)}</div>`;
     }
 
-    getBlockContent(block) {
+    renderBlockToHtmlString(block) {
         let content = "";
         let withoutHtmlContent = "";
         switch (block.type) {
@@ -222,7 +221,7 @@ class HtmlParser {
                 content = this.renderStrongs(block.content.substring(6).trim())
                 return `<li class="ml-2">${content}</li>`;
             case 'LINE':
-                return `<div class="line">${content}</div>`;
+                return `<div class="line"></div>`;
             case 'ROW':
                 let rowContent = block.content.trim();
                 if (rowContent.startsWith('|') && rowContent.endsWith('|')) {
@@ -239,6 +238,87 @@ class HtmlParser {
                 return '';
         }
     }
+
+    _removeStaleBlocks(newBlockMap) {
+        for (const [id, element] of this.blockElements.entries()) {
+            if (!newBlockMap.has(id)) {
+                element.remove();
+                this.blockElements.delete(id);
+            }
+        }
+    }
+
+    _highlightCodeBlock(parentElement) {
+        const codeElement = parentElement.querySelector('pre code');
+        if (codeElement) {
+            delete codeElement.dataset.highlighted;
+            hljs.highlightElement(codeElement);
+        }
+    }
+
+    _updateExistingBlock(existingElement, newBlock, oldBlock) {
+        if (!oldBlock || JSON.stringify(oldBlock) !== JSON.stringify(newBlock)) {
+            existingElement.innerHTML = this.renderBlockToHtmlString(newBlock);
+            if (newBlock.type === 'CODE') {
+                this._highlightCodeBlock(existingElement);
+            }
+        }
+    }
+
+    _createNewBlockElement(newBlock) {
+        const newElement = document.createElement('div');
+        newElement.id = `block-${newBlock.id}`;
+        newElement.innerHTML = this.renderBlockToHtmlString(newBlock);
+        return newElement;
+    }
+
+    _handleNewBlock(newBlock, currentDomNode) {
+        const newElement = this._createNewBlockElement(newBlock);
+        this.rootElement.insertBefore(newElement, currentDomNode);
+        this.blockElements.set(newBlock.id, newElement);
+
+        if (newBlock.type === 'CODE') {
+            this._highlightCodeBlock(newElement);
+        }
+        return newElement.nextSibling;
+    }
+
+    _handleExistingBlock(existingElement, newBlock, oldBlock, currentDomNode) {
+        this._updateExistingBlock(existingElement, newBlock, oldBlock);
+        if (currentDomNode !== existingElement) {
+            this.rootElement.insertBefore(existingElement, currentDomNode);
+        }
+        return existingElement.nextSibling;
+    }
+
+    renderChanges() {
+        if (!this.rootElement) {
+            console.error("Root element not found for rendering.");
+            return;
+        }
+
+        const newBlockMap = new Map();
+        this.blocks.forEach(block => newBlockMap.set(block.id, block));
+
+        this._removeStaleBlocks(newBlockMap);
+
+        let currentDomNode = this.rootElement.firstChild;
+        for (let i = 0; i < this.blocks.length; i++) {
+            const newBlock = this.blocks[i];
+            const oldBlock = this.previousBlocks.find(b => b.id === newBlock.id);
+            let existingElement = this.blockElements.get(newBlock.id);
+
+            if (existingElement) {
+                currentDomNode = this._handleExistingBlock(existingElement, newBlock, oldBlock, currentDomNode);
+            } else {
+                currentDomNode = this._handleNewBlock(newBlock, currentDomNode);
+            }
+        }
+
+        this.previousBlocks = JSON.parse(JSON.stringify(this.blocks));
+    }
+
+
 
     escapeHtml(text) {
         return text
