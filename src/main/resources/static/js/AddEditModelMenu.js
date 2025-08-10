@@ -1,4 +1,29 @@
 class AddEditModelMenu{
+    loadProviders(){
+        const providerSelect = document.getElementById("modelProvider");
+        this.insertProviders(providerSelect);
+    }
+
+    insertProviders(providerSelect){
+        const keys = Object.keys(window.settings.keys);
+
+        providerSelect.innerHTML = '';
+
+        const defaultOption = document.createElement('option');
+        defaultOption.value = "";
+        defaultOption.textContent = "Wybierz dostawcę";
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+        providerSelect.appendChild(defaultOption);
+
+        keys.forEach(key => {
+            const option = document.createElement('option');
+            option.value = key;
+            option.textContent = key;
+            providerSelect.appendChild(option);
+        });
+    }
+
     addModel() {
         const modelName = document.getElementById('modelName').value;
         const modelText = document.getElementById('modelText').value;
@@ -46,7 +71,10 @@ class AddEditModelMenu{
 
         document.getElementById("editModelMenu").querySelector('#editModelName').value = model.name;
         document.getElementById("editModelMenu").querySelector('#editModelText').value = model.text;
-        document.getElementById("editModelMenu").querySelector('#editModelProvider').value = model.provider;
+        const providerSelect = document.getElementById("editModelMenu").querySelector('#editModelProvider');
+        this.insertProviders(providerSelect);
+        providerSelect.value = model.provider;
+
         document.getElementById("editModelMenu").querySelector('#editModelUrl').value = model.url;
         document.getElementById("editModelMenu").querySelector('#editModelType').value = model.type;
         this.modelId = model.id;
@@ -74,7 +102,10 @@ class AddEditModelMenu{
             body: JSON.stringify(modelDto)
         })
             .then(response => response.text())
-            .then(data => console.log(data))
+            .then(data => {
+            window.modelsView.renderUserModels();
+            this.closeMenu();
+        })
             .catch(error => console.error(error));
     }
 
@@ -85,3 +116,4 @@ document.getElementById("overlay").addEventListener("click", () => {
 });
 
 window.addEditModelMenu = new AddEditModelMenu();
+
