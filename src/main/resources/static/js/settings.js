@@ -276,6 +276,7 @@ class Settings {
             .then((keys) => {
             this.keys = keys;
             this.key = this.keys[this.provider];
+            window.addEditModelMenu.loadProviders();
         })
             .catch((error) => {
             console.error("Error loading keys:", error);

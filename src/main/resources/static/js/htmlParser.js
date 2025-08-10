@@ -91,32 +91,6 @@ class HtmlParser {
         return "NORMAL";
     }
 
-//    toHTML(){
-//        //this.readLines();
-//        this.updateBlocks();
-//        let html = "";
-//        for(const block of this.blocks){
-//            html += this.renderBlock(block);
-//        }
-//        return html;
-//    }
-
-//        getLastBlockHtml(){
-//        this.updateBlocks();
-//        if (this.blocks.length === 0) {
-//            return { index: -1, html: "" };
-//        }
-//
-//        const lastIndex = this.blocks.length - 1;
-//        const lastBlock = this.blocks[lastIndex];
-//        const lastBlockHtml = this.renderBlock(lastBlock);
-//
-//        return {
-//            index: lastIndex,
-//            html: lastBlockHtml
-//        };
-//    }
-
     updateBlocks(){
         this.blocks = [];
         let currentBlock = { type: 'NORMAL', content: '' };
@@ -175,12 +149,7 @@ class HtmlParser {
         return formattedContent;
     }
 
-    renderCurrentLine(){
-
-    }
-
     renderBlock(block){
-//        return `<div id="${index}">${this.getBlockContent(block)}</div>`;
         return `<div id="block-${block.id}">${this.renderBlockToHtmlString(block)}</div>`;
     }
 
@@ -196,7 +165,13 @@ class HtmlParser {
                 withoutHtmlContent = this.escapeHtml(block.content);
                 return `${withoutHtmlContent}`;
             case 'THINKING':
-                return `<div class="thinking"><button class="clear-button p-0 bg-transparent" onclick="collapseThinkingContent(${this.randomId})"><h4>Thinking:</h4></button><p class="thinking-content show" id="thinkingContent-${this.randomId}">${this.escapeHtml(block.content)}</p></div>\n`;
+                return `
+                <div class="thinking">
+                    <button class="clear-button p-0 bg-transparent" onclick="collapseThinkingContent(${this.randomId})">
+                        <h4>Thinking:</h4>
+                    </button>
+                    <p class="thinking-content show" id="thinkingContent-${this.randomId}">${this.escapeHtml(block.content)}</p>
+                </div>\n`;
             case 'CODE':
                 const langClass = block.language ? ` class="language-${block.language}"` : '';
                 return `<div class="code-block"><pre><code${langClass}>${this.escapeHtml(block.content)}</code></pre></div>\n`;
@@ -317,8 +292,6 @@ class HtmlParser {
 
         this.previousBlocks = JSON.parse(JSON.stringify(this.blocks));
     }
-
-
 
     escapeHtml(text) {
         return text
