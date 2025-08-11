@@ -49,7 +49,6 @@ class HtmlParser {
                 text: line,
                 mode: this.getLineMode(previousLine, line)
             };
-
         }
     }
 

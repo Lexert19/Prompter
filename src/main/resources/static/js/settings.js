@@ -18,71 +18,7 @@ class Settings {
 
         this.key = "";
         this.models = [
-            {
-                name: "o4-mini",
-                text: "o4-mini",
-                provider: "OPENAI",
-                url: "https://api.openai.com/v1/chat/completions",
-                type: "vision",
-            },
-            {
-                name: "gpt-4o",
-                text: "gpt-4o",
-                provider: "OPENAI",
-                url: "https://api.openai.com/v1/chat/completions",
-                type: "vision",
-            },
-            {
-                name: "claude-3-7-sonnet-20250219",
-                text: "Claude Sonnet 3.7",
-                provider: "ANTHROPIC",
-                url: "https://api.anthropic.com/v1/messages",
-                type: "vision",
-            },
 
-            {
-                name: "deepseek-ai/DeepSeek-V3-0324",
-                text: "deepinfra/DeepSeek-V3",
-                provider: "DEEPINFRA",
-                type: "text",
-                url: "https://api.deepinfra.com/v1/openai/chat/completions",
-            },
-            {
-                name: "deepseek-ai/DeepSeek-R1-0528",
-                text: "deepseek-ai/DeepSeek-R1-0528",
-                provider: "DEEPINFRA",
-                type: "text",
-                url: "https://api.deepinfra.com/v1/openai/chat/completions",
-            },
-
-            {
-                name: "deepseek-chat",
-                text: "deepseek-v3",
-                provider: "DEEPSEEK",
-                type: "text",
-                url: "https://api.deepseek.com/chat/completions",
-            },
-            {
-                name: "deepseek-reasoner",
-                text: "deepseek-r1",
-                provider: "DEEPSEEK",
-                type: "text",
-                url: "https://api.deepseek.com/chat/completions",
-            },
-            {
-                name: "gemini-2.0-flash",
-                text: "gemini-2.0-flash",
-                provider: "GEMINI",
-                type: "vision",
-                url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
-            },
-            {
-                name: "qwen-qwq-32b",
-                text: "qwen-qwq-32b",
-                provider: "GROQ",
-                type: "text",
-                url: "https://api.groq.com/openai/v1/chat/completions",
-            },
         ];
         this.keys = "";
 
