@@ -50,9 +50,6 @@ class Settings {
         localStorage.setItem("appSettings", JSON.stringify(settingsToSave));
     }
 
-
-
-
     load() {
         const savedSettings = JSON.parse(
             localStorage.getItem("appSettings") || "{}"
@@ -85,11 +82,7 @@ class Settings {
                 break;
             case "temperature":
                 window.settings.temperature = event.target.value / 100;
-//            case "maxTokens":
-//                window.settings.maxTokens = parseInt(event.target.value);
-//                break;
         }
-
 
         this.save();
     }
