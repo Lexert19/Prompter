@@ -156,9 +156,10 @@ class Settings {
             }))];
             const uniqueModels = [...new Map(this.models.map(model => [model.name, model])).values()];
             this.models = uniqueModels;
+            this.models.sort((a, b) => a.text.localeCompare(b.text));
             const modelSelect = document.getElementById("modelOptions");
             modelSelect.innerHTML = this.models
-                .map(model => `<option value="${model.name}">${model.text}</option>`)
+                .map(model => `<option value="${model.name}">${model.text} (${model.provider})</option>`)
                 .join("");
             modelSelect.value = this.model;
         })

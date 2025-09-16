@@ -24,13 +24,6 @@ public class FaviconController {
                 .contentType(MediaType.valueOf("image/svg+xml"))
                 .body(fileContent);
     }
-//    @Bean
-//    public WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> webServerFactoryCustomizer() {
-//        return factory -> {
-//            MimeMappings mappings = new MimeMappings(MimeMappings.DEFAULT);
-//            mappings.add("ico", "image/svg+xml");
-//            factory.setMimeMappings(mappings);
-//        };
-//    }
+
 
 }

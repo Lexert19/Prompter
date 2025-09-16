@@ -31,7 +31,7 @@ public class OAuth2Config implements WebMvcConfigurer {
         http.csrf(csrf -> csrf.disable());
         //http.requiresChannel(channel -> channel.anyRequest().requiresInsecure());
         http.authorizeHttpRequests(exchanges -> exchanges
-                .requestMatchers("/", "/login", "/error", "/static/**", "/auth/**", "/favicon.ico", "/favicon")
+                .requestMatchers("/", "/{lang:(?:pl|en)}/**", "/login", "/error", "/static/**", "/auth/**", "/favicon.ico", "/favicon")
                 .permitAll()
                 .anyRequest().authenticated());
 
@@ -58,9 +58,9 @@ public class OAuth2Config implements WebMvcConfigurer {
                 })
                 .failureHandler(authenticationFailureHandler()));
 
-        http.exceptionHandling(exception -> exception
-                .authenticationEntryPoint(authenticationEntryPoint())
-        );
+//        http.exceptionHandling(exception -> exception
+//                .authenticationEntryPoint(authenticationEntryPoint())
+//        );
         http.logout(customizer -> customizer.logoutUrl("/auth/logout"));
         return http.build();
     }

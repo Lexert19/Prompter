@@ -61,7 +61,7 @@ class Message {
             return "";
         }
 
-        return `systemPrompt:{${window.settings.system}}`
+        return `{${window.settings.system}}`
 
     }
 

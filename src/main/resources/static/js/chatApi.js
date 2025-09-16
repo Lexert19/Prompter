@@ -122,6 +122,9 @@ class ChatApi {
             return;
             if(chunk == "[DONE]")
             return;
+            if (chunk.startsWith(': ping')) {
+                return;
+            }
             const rootNode = JSON.parse(chunk);
             let error = rootNode.error;
             if(error){
@@ -142,27 +145,21 @@ class ChatApi {
             content += reasoningContent;
 
             if(!content)
-                return;
+            return;
 
-            this.parser.parse(content);
-//            hljs.initHighlighting.called = false;
-//            hljs.highlightAll();
+            this.parser.parse(content)
             this.currentMessage.appendText(content);
 
         }catch(error){
             console.error(chunk);
             console.error(error);
-            //console.log(error);
         }
     }
 
     renderHtml(){
         if(this.rerender){
             this.rerender = false;
-
-
         }
-
     }
 
     stopStreaming() {
@@ -215,7 +212,6 @@ class ChatApi {
             reader.releaseLock();
         });
     }
-
 }
 
 document.addEventListener('DOMContentLoaded', function() {
