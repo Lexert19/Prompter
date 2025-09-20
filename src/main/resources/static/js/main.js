@@ -103,4 +103,3 @@ function collapseThinkingContent(id){
   document.getElementById("thinkingContent-"+id).classList.toggle("show");
 }
 
-

@@ -73,7 +73,8 @@ kotlin {
 bootRun {
     sourceResources sourceSets.main
 	jvmArgs = [
-        //"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=127.0.0.1:5005",
+			"-XX:TieredStopAtLevel=1",
+			//"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=127.0.0.1:5005",
         "-Djdk.tls.client.protocols=TLSv1.2",
         "-Dmongodb.ssl.trustAllCertificates=true"
     ]

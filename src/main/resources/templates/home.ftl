@@ -1,7 +1,7 @@
 <#import "/spring.ftl" as spring/>
 <#include "/parts/head.ftl" />
 <div class="center" style="height: 100vh;">
-    <div class="block" style="max-width: 600px; padding: 20px;">
+    <div class="block content-box hidden" style="max-width: 600px; padding: 20px;">
         <div class="chat-header d-flex flex-column align-items-center"
              style="border-radius: 10px; margin-bottom: 24px; text-align: center;">
             <img src="/favicon" class="d-block" width="90px" height="90px"
@@ -22,5 +22,6 @@
         </div>
     </div>
 </div>
+<script src="/static/js/home.js"></script>
 
 <#include "/parts/footer.ftl" />

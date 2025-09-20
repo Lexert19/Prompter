@@ -1,7 +1,7 @@
 
 :root {
     --main-bg: #0f1620;
-    --second-bg: #1c232d;
+    --second-bg: #1c1c2d;
 /*    --accent: #802fff;*/
     --accent: rgba(99, 102, 241, 0.9);
 /*    --accent-darker: #6c26d9;*/
@@ -218,6 +218,7 @@ input {
 }
 
 .background{
+    backdrop-filter: blur(1px);
     background-image: url("/static/images/background.jpg");
     background-size: cover;
     background-repeat: no-repeat;
@@ -756,4 +757,14 @@ input[type="number"]::-ms-spin-button {
 
 .thinking-content.show::after {
     display: none;
+}
+
+
+.content-box {
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.hidden {
+    opacity: 0;
+    transform: translateY(50px);
 }
