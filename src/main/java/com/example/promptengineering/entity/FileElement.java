@@ -2,22 +2,37 @@ package com.example.promptengineering.entity;
 
 import java.util.List;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import jakarta.persistence.*;
 
-
-@Document(collection = "fileElements") 
+@Entity
+@Table(name = "file_element")
 public class FileElement {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id", nullable = false)
+    private Project project;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     private String name;
-    private String project;
-    private String userId;
+
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String content;
+
+    @ElementCollection
+    @CollectionTable(name = "file_element_pages", joinColumns = @JoinColumn(name = "file_element_id"))
+    @Column(name = "page_content")
     private List<String> pages;
+
+    @Transient
     private List<List<Double>> vectors;
 
-    
+
     public String getName() {
         return name;
     }
@@ -42,28 +57,28 @@ public class FileElement {
     public void setVectors(List<List<Double>> vectors) {
         this.vectors = vectors;
     }
-    public String getProject() {
-        return project;
-    }
-    public void setProject(String project) {
-        this.project = project;
-    }
-    public String getUserId() {
-        return userId;
-    }
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-    public String getId() {
+
+    public Long getId() {
         return id;
     }
-    public void setId(String id) {
+
+    public void setId(Long id) {
         this.id = id;
     }
-   
-    
 
-    
+    public Project getProject() {
+        return project;
+    }
 
-    
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }

@@ -1,20 +1,17 @@
 package com.example.promptengineering.repository;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
+import com.example.promptengineering.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.example.promptengineering.entity.Project;
-
-import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ProjectRepository extends MongoRepository<Project, String> {
+public interface ProjectRepository extends JpaRepository<Project, Long> {
 
-    Optional<Project> findByIdAndUserId(String projectId, String userId);
-    List<Project> findAllByUserId(String userId);
+    Optional<Project> findByIdAndUser(Long id, User user);
+    List<Project> findAllByUser(User user);
 }

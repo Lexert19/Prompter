@@ -32,13 +32,10 @@ public class AuthService {
 //                .switchIfEmpty(Mono.error(new RuntimeException("User not found")));
 //    }
 
-    public User updatePassword(String userLogin, String newPassword) throws Exception {
-        Optional<User> user = userRepository.findByEmail(userLogin);
-        if(user.isEmpty())
-            throw new Exception("User not found");
+    public User updatePassword(User user, String newPassword){
         String encryptedPassword = passwordEncoder.encode(newPassword);
-        user.get().setPassword(encryptedPassword);
-        return userRepository.save(user.get());
+        user.setPassword(encryptedPassword);
+        return userRepository.save(user);
     }
 
 }

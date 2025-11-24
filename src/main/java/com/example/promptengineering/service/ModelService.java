@@ -19,7 +19,7 @@ public class ModelService {
     private ModelRepository modelRepository;
 
     public List<Model> getUserModels(User user){
-        List<Model> models = modelRepository.findByUserId(user.getId());
+        List<Model> models = modelRepository.findByUser(user);
         return models;
     }
 
@@ -28,15 +28,15 @@ public class ModelService {
     }
 
     public User addUserModel(ModelDto modelDto, User user){
-        Model model = new Model(modelDto.getName(), modelDto.getText(), modelDto.getProvider(), modelDto.getUrl(), modelDto.getType(), user.getId());
+        Model model = new Model(modelDto.getName(), modelDto.getText(), modelDto.getProvider(), modelDto.getUrl(), modelDto.getType(), user);
         model.setGlobal(false);
         modelRepository.save(model);
         return userRepository.save(user);
     }
 
-    public void deleteUserModel(String id, User user) {
+    public void deleteUserModel(Long id, User user) {
         Model model = this.getModel(id);
-        if (model != null && model.getUserId().equals(user.getId())) {
+        if (model != null && model.getUser().equals(user)) {
             modelRepository.delete(model);
 
         } else {
@@ -52,7 +52,7 @@ public class ModelService {
         model.setType(modelDto.getType());
         modelRepository.save(model);
     }
-    public Model getModel(String id) {
+    public Model getModel(Long id) {
         return modelRepository.findById(id).orElse(null);
     }
 

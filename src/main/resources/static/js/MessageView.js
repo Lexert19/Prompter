@@ -11,6 +11,13 @@ class MessageView{
             const seconds = (durationMs / 1000).toFixed(1);
             duration = `${seconds} s`;
         }
+
+        let htmlContent = "";
+        if(this.message.role == "assistant"){
+            htmlContent = window.chatApi.parser.parseToHtml(this.message.getText());
+        }else{
+            htmlContent = escapeHtml(this.message.getText());
+        }
         var htmlMessage = `
             <div id="${this.message.id}" class="message ${this.message.role}">
                 <div class="assitant-data">
@@ -19,7 +26,7 @@ class MessageView{
                 </div>
                 ${this.message.getHtmlImages()}
                 ${this.message.getHtmlFiles()}
-                <div id="input-${this.message.id}" class="code-wrap">${escapeHtml(this.message.getText())}</div>
+                <div id="input-${this.message.id}" class="code-wrap">${htmlContent}</div>
                 <span id="cached-${this.message.id}">${this.message.cache ? "cached" : ""}<span>
             </div>
             `;

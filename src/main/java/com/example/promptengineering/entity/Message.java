@@ -1,21 +1,48 @@
 package com.example.promptengineering.entity;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
+import java.time.Instant;
+
+@Entity
+@Table(name = "message")
 public class Message {
+
     @Id
-    private String id;
-    private String chatId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "chat_id", nullable = false)
+    private Chat chat;
+
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String text;
+
+    @ElementCollection
+    @CollectionTable(name = "message_documents", joinColumns = @JoinColumn(name = "message_id"))
+    @Column(name = "document_id")
     private List<String> documents;
-    private List<String> images;  
-    private Long createdAt;
+
+    @ElementCollection
+    @CollectionTable(name = "message_images", joinColumns = @JoinColumn(name = "message_id"))
+    @Column(name = "image_url")
+    private List<String> images;
+
+    @Column(name = "created_at")
+    private Instant createdAt;
+
     private long start;
+
+    @Column(name = "end_time")
     private long end;
+
     private String role;
+
     private boolean cache;
 
 
@@ -25,26 +52,7 @@ public class Message {
     public void setRole(String role){
         this.role = role;
     }
-    public String getId() {
-        return id;
-    }
-    public void setId(String id) {
-        this.id = id;
-    }
-    public String getChatId() {
-        return chatId;
-    }
-    public void setChatId(String chatId) {
-        this.chatId = chatId;
-    }
 
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Long createdAt) {
-        this.createdAt = createdAt;
-    }
 
     public boolean isCache() {
         return cache;
@@ -90,5 +98,27 @@ public class Message {
         this.end = end;
     }
 
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
 
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Chat getChat() {
+        return chat;
+    }
+
+    public void setChat(Chat chat) {
+        this.chat = chat;
+    }
 }

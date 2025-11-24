@@ -4,7 +4,8 @@ import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import org.springframework.data.annotation.Id;
+import com.example.promptengineering.converter.HashMapConverter;
+import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,16 +13,35 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import com.nimbusds.oauth2.sdk.Role;
 
-import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "users")
+@Entity
+@Table(name = "app_user")
 public class User implements OAuth2User, Principal, UserDetails {
+
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(unique = true, nullable = false)
     private String email;
+
     private String password;
+
+    @Convert(converter = HashMapConverter.class)
+    @Column(columnDefinition = "TEXT")
     private HashMap<String, String> keys = new HashMap<>();
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role")
+    @Enumerated(EnumType.STRING)
     private List<Role> roles = new ArrayList<>();
+
+    @Transient
+    private Map<String, Object> attributes;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ResetToken> resetTokens = new ArrayList<>();
 
     public User(String email, String password) {
         this.email = email;
@@ -81,14 +101,13 @@ public class User implements OAuth2User, Principal, UserDetails {
         this.keys = keysMap;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
-
 
     public List<Role> getRoles() {
         return roles;
@@ -119,4 +138,11 @@ public class User implements OAuth2User, Principal, UserDetails {
         return true;
     }
 
+    public List<ResetToken> getResetTokens() {
+        return resetTokens;
+    }
+
+    public void setResetTokens(List<ResetToken> resetTokens) {
+        this.resetTokens = resetTokens;
+    }
 }

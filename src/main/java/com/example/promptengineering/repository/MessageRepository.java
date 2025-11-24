@@ -1,17 +1,14 @@
 package com.example.promptengineering.repository;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.promptengineering.entity.Message;
 
-import reactor.core.publisher.Flux;
-
 import java.util.List;
 
-public interface MessageRepository extends MongoRepository<Message, String> {
+public interface MessageRepository extends JpaRepository<Message, Long> {
 
-    List<Message> findByChatId(String chatId);
+    List<Message> findByChatId(Long chatId);
 
-    void deleteByChatId(String chatId);
+    void deleteByChatId(Long chatId);
 }

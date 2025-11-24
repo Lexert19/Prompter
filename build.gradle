@@ -1,7 +1,5 @@
 plugins {
 	id 'java'
-	id 'org.jetbrains.kotlin.jvm' version '1.9.25'
-  	id 'org.jetbrains.kotlin.plugin.spring' version '1.9.25'
 	id 'org.springframework.boot' version '3.3.4'
 	id 'io.spring.dependency-management' version '1.1.6'
 }
@@ -26,17 +24,21 @@ repositories {
 }
 
 dependencies {
-	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.postgresql:postgresql'
 
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	//implementation 'org.springframework.boot:spring-boot-starter-webflux'
+//	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation('org.springframework.boot:spring-boot-starter-webflux') {
+		exclude group: 'io.projectreactor.netty'
+	}
+
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'io.projectreactor:reactor-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
@@ -46,37 +48,22 @@ dependencies {
 
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.18.0'
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-freemarker', version: '3.3.4'
-	implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: '3.2.0'
+//	implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: '3.2.0'
 
-	implementation 'org.jetbrains.kotlin:kotlin-reflect'
-	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.7.1"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core"
-    implementation "io.projectreactor:reactor-core"
-	implementation "org.jetbrains.kotlin:kotlin-stdlib"
+	implementation "io.projectreactor:reactor-core"
 
  	implementation 'com.sun.mail:jakarta.mail:2.0.1'
 	implementation("com.mailersend:java-sdk:1.0.1")
-
-
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
 }
 
-kotlin {
-  compilerOptions {
-    freeCompilerArgs.addAll '-Xjsr305=strict'
-  }
-}
-
 bootRun {
     sourceResources sourceSets.main
 	jvmArgs = [
 			"-XX:TieredStopAtLevel=1",
-			//"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=127.0.0.1:5005",
         "-Djdk.tls.client.protocols=TLSv1.2",
-        "-Dmongodb.ssl.trustAllCertificates=true"
     ]
-	
 }	

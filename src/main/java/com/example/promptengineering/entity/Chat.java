@@ -1,36 +1,48 @@
 package com.example.promptengineering.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.*;
 
-import java.time.LocalDate;
+import java.time.Instant;
 
+@Entity
+@Table(name = "chat")
 public class Chat {
-    private String id;
-    private String userId;
-    private Long createdAt;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @Column(name = "created_at")
+    private Instant createdAt;
+
     private boolean favorite;
 
-    
 
-
-    public String getId() {
+    public Long getId() {
         return id;
     }
-    public void setId(String id) {
+
+    public void setId(Long id) {
         this.id = id;
     }
-    public String getUserId() {
-        return userId;
-    }
-    public void setUserId(String userId) {
-        this.userId = userId;
+
+    public User getUser() {
+        return user;
     }
 
-    public Long getCreatedAt() {
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Long createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 

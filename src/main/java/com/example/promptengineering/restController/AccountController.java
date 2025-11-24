@@ -55,7 +55,7 @@ public class AccountController {
             throw new IllegalArgumentException("Nowe hasło i potwierdzenie nie są identyczne");
         }
 
-        authService.updatePassword(user.getEmail(), request.getNewPassword());
+        authService.updatePassword(user, request.getNewPassword());
         return "Hasło zostało pomyślnie zmienione";
     }
 }

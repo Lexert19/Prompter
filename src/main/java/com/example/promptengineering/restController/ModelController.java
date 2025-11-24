@@ -30,9 +30,9 @@ public class ModelController {
     }
 
     @PutMapping("/user-models/{id}")
-    public ResponseEntity<String> editUserModel(@AuthenticationPrincipal User user, @PathVariable String id, @RequestBody ModelDto modelDto) {
+    public ResponseEntity<String> editUserModel(@AuthenticationPrincipal User user, @PathVariable Long id, @RequestBody ModelDto modelDto) {
         Model model = modelService.getModel(id);
-        if (model != null && model.getUserId().equals(user.getId())) {
+        if (model != null && model.getUser().equals(user)) {
             modelService.editUserModel(model, modelDto);
             return ResponseEntity.ok("Zmieniono model!");
         } else {
@@ -41,7 +41,7 @@ public class ModelController {
     }
 
     @DeleteMapping("/user-models/{id}")
-    public ResponseEntity<String> deleteUserModel(@AuthenticationPrincipal User user, @PathVariable String id) {
+    public ResponseEntity<String> deleteUserModel(@AuthenticationPrincipal User user, @PathVariable Long id) {
         try{
             modelService.deleteUserModel(id, user);
             return ResponseEntity.ok("Usunięto model");

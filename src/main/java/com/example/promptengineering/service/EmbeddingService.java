@@ -39,8 +39,8 @@ public class EmbeddingService {
         String apiKey = user.getKeys().getOrDefault("OPENAI", "");
         List<String> pages = splitContentIntoPages(file.getContent());
         file.setPages(pages);
-        file.setProject(project.getId());
-        file.setUserId(user.getId());
+        file.setProject(project);
+        file.setUser(user);
 
         FileElement fileElement = createEmbeddingForFile(file, apiKey);
         fileElementRepository.save(fileElement);
@@ -91,7 +91,7 @@ public class EmbeddingService {
     }
 
     private List<ScoredFragment> processQueryVectorWithProjectFiles(List<Double> queryVector, Project project) {
-        List<FileElement> fileElements = fileElementRepository.findByProject(project.getId());
+        List<FileElement> fileElements = fileElementRepository.findByProject(project);
         List<ScoredFragment> scoredFragments = new ArrayList<>();
 
         for (FileElement fileElement : fileElements){

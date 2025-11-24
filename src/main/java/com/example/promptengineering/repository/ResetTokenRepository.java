@@ -1,21 +1,22 @@
 package com.example.promptengineering.repository;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
+import com.example.promptengineering.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.promptengineering.entity.ResetToken;
-
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface ResetTokenRepository extends MongoRepository<ResetToken, String> {
+public interface ResetTokenRepository extends JpaRepository<ResetToken, Long> {
 
-    
-    List<ResetToken> findByUserLogin(String userLogin);
+
+    List<ResetToken> findByUser(User user);
     Optional<ResetToken> findByToken(String token);
     void deleteByToken(String token);
-    void deleteByUserLogin(String userLogin);
+    void deleteByUser(User user);
+
+    List<ResetToken> findByUserLogin(String email);
+
+    void deleteByUserLogin(String mail);
 }

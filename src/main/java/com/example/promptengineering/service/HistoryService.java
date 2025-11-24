@@ -1,5 +1,6 @@
 package com.example.promptengineering.service;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -28,14 +29,14 @@ public class HistoryService {
 
     public Chat createChat(User user) {
         Chat chat = new Chat();
-        chat.setUserId(user.getId());
-        chat.setCreatedAt(System.currentTimeMillis());
+        chat.setUser(user);
+        chat.setCreatedAt(Instant.now());
         chat.setFavorite(false);
 
         return chatRepository.save(chat);
     }
 
-    public void deleteChat(String chatId, User user) {
+    public void deleteChat(Long chatId, User user) {
         Optional<Chat> chat = chatRepository.findById(chatId);
         if (chat.isEmpty()) {
             throw new IllegalArgumentException("Chat not found with id: " + chatId);
@@ -62,13 +63,13 @@ public class HistoryService {
     }
 
     private boolean isUserAuthorizedForChat(Chat chat, User user) {
-        return chat.getUserId() != null && chat.getUserId().equals(user.getId());
+        return chat.getUser() != null && chat.getUser().equals(user);
     }
 
     public Message convertAndSaveMessage(MessageBody messageBody, Chat chat) {
         Message messageEntity = new Message();
-        messageEntity.setChatId(messageBody.getChatId());
-        messageEntity.setCreatedAt(System.currentTimeMillis());
+        messageEntity.setChat(chat);
+        messageEntity.setCreatedAt(Instant.now());
         messageEntity.setStart(messageBody.getStart());
         messageEntity.setEnd(messageBody.getEnd());
         messageEntity.setText(messageBody.getText());
@@ -80,13 +81,13 @@ public class HistoryService {
         return messageRepository.save(messageEntity);
     }
 
-    public List<Message> getChatHistory(String chatId, User user) {
+    public List<Message> getChatHistory(Long chatId, User user) {
         Optional<Chat> chat = chatRepository.findById(chatId);
         return this.returnHistory(chat.orElse(null), user);
     }
 
     public List<Message> returnHistory(Chat chat, User user) {
-        if (chat != null && user.getId().equals(chat.getUserId())) {
+        if (chat != null && user.equals(chat.getUser())) {
             return messageRepository.findByChatId(chat.getId());
         } else {
             return null;
@@ -94,7 +95,7 @@ public class HistoryService {
     }
 
     public List<Chat> getChatsForUser(User user) {
-        return chatRepository.findByUserId(user.getId());
+        return chatRepository.findByUser(user);
     }
 
 }

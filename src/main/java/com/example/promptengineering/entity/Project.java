@@ -1,17 +1,21 @@
 package com.example.promptengineering.entity;
 
-import java.util.List;
 
-import jakarta.persistence.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.DocumentReference;
+import jakarta.persistence.*;
 
-@Document(collection = "projects") 
+@Entity
+@Table(name = "project")
 public class Project {
+
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String name;
-    private String userId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
 
     public String getName() {
@@ -19,22 +23,21 @@ public class Project {
     }
     public void setName(String name) {
         this.name = name;
-    } 
+    }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
-    public void setId(String id) {
+
+    public void setId(Long id) {
         this.id = id;
     }
-    public String getUserId() {
-        return userId;
-    }
-    public void setUserId(String userId) {
-        this.userId = userId;
+
+    public User getUser() {
+        return user;
     }
 
-
-    
-    
+    public void setUser(User user) {
+        this.user = user;
+    }
 }

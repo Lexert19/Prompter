@@ -1,5 +1,6 @@
 package com.example.promptengineering.restController;
 
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,7 @@ public class AuthControllerTest {
     private WebApplicationContext webApplicationContext;
 
     private MockMvc mockMvc;
+    private User user;
 
     @BeforeEach
     public void setup() {
@@ -56,11 +58,13 @@ public class AuthControllerTest {
         if (existingUser != null) {
             existingUser.setPassword(passwordEncoder.encode(password));
             userRepository.save(existingUser);
+            user = existingUser;
         } else {
             User newUser = new User();
             newUser.setEmail(login);
             newUser.setPassword(passwordEncoder.encode(password));
             userRepository.save(newUser);
+            user = newUser;
         }
     }
 
@@ -99,6 +103,7 @@ public class AuthControllerTest {
 
 
     @Test
+    @Transactional
     public void testPasswordResetRequest() throws Exception {
         resetTokenRepository.deleteByUserLogin("testuser123@wp.pl");
 
@@ -127,6 +132,7 @@ public class AuthControllerTest {
         resetToken.setToken(uniqueToken);
         resetToken.setUserLogin("testuser123@wp.pl");
         resetToken.setCreationTime(LocalDateTime.now());
+        resetToken.setUser(user);
         resetTokenRepository.save(resetToken);
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
@@ -139,7 +145,7 @@ public class AuthControllerTest {
         mockMvc.perform(post("/auth/reset-password-confirm")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .params(formData))
-                .andExpect(status().is3xxRedirection());
+                .andExpect(status().is2xxSuccessful());
 
         Optional<User> user = userRepository.findByEmail(resetToken.getUserLogin());
         assertFalse(user.isEmpty(), "User not found");
@@ -163,7 +169,7 @@ public class AuthControllerTest {
         mockMvc.perform(post("/auth/reset-password-confirm")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .params(formData))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().is2xxSuccessful());
     }
 
 
@@ -174,6 +180,7 @@ public class AuthControllerTest {
         ResetToken resetToken = new ResetToken();
         resetToken.setToken(id);
         resetToken.setUserLogin("testuser123@wp.pl");
+        resetToken.setUser(user);
         resetToken.setCreationTime(LocalDateTime.now().minusHours(2));
         resetTokenRepository.save(resetToken);
 

@@ -294,6 +294,20 @@ class HtmlParser {
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;");
     }
+
+
+    parseToHtml(fullText) {
+        this.clear();
+        this.bufferedText = fullText;
+        this.readLines();
+        this.updateBlocks();
+
+        const htmlResult = this.blocks.map(block => {
+            return this.renderBlockToHtmlString(block);
+        }).join('');
+
+        return htmlResult;
+    }
 }
 
 

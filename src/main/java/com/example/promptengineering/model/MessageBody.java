@@ -3,7 +3,7 @@ package com.example.promptengineering.model;
 import java.util.List;
 
 public class MessageBody {
-    private String chatId;
+    private Long chatId;
     private String text;
     private List<String> documents;
     private List<String> images;
@@ -12,16 +12,13 @@ public class MessageBody {
     private String role;
     private boolean cache;
 
-
-    public String getChatId() {
+    public Long getChatId() {
         return chatId;
     }
 
-    public void setChatId(String chatId) {
+    public void setChatId(Long chatId) {
         this.chatId = chatId;
     }
-
-   
 
     public String getText() {
         return text;

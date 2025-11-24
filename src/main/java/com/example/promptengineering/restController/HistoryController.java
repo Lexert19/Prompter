@@ -30,14 +30,16 @@ public class HistoryController {
     private UserRepository userRepository;
 
     @PostMapping("/chats")
-    public ResponseEntity<Chat> createChat(@AuthenticationPrincipal User user) {
+    public ResponseEntity<Chat> createChat(
+                                           @AuthenticationPrincipal User user) {
+
         Chat chat = historyService.createChat(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(chat);
     }
 
     @DeleteMapping("/chats/{chatId}")
     public ResponseEntity<Void> deleteChat(
-            @PathVariable String chatId,
+            @PathVariable Long chatId,
             @AuthenticationPrincipal User user) {
         historyService.deleteChat(chatId, user);
         return ResponseEntity.noContent().build();
@@ -54,7 +56,7 @@ public class HistoryController {
 
     @GetMapping("/chats/{chatId}/messages")
     public ResponseEntity<List<Message>> getChatHistory(
-            @PathVariable String chatId,
+            @PathVariable Long chatId,
             @AuthenticationPrincipal User user) {
         List<Message> messages = historyService.getChatHistory(chatId, user);
         return ResponseEntity.ok(messages);

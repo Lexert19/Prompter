@@ -45,6 +45,7 @@ class ChatApi {
             fragments
         );
 
+        window.chat.saveMessage(this.currentMessage);
         const messageView = new MessageView(this.currentMessage);
         messageView.createHtmlElement(document.getElementById("chatMessages"));
         window.data.clearDocumentsAndImages();
@@ -98,6 +99,8 @@ class ChatApi {
         this.read(reader, decoder);
     }
 
+
+
     readChunk(decoder, value) {
         const chunk = decoder.decode(value, { stream: true });
 
@@ -123,6 +126,9 @@ class ChatApi {
             if(chunk == "[DONE]")
             return;
             if (chunk.startsWith(': ping')) {
+                return;
+            }
+            if(chunk.startsWith(': OPENROUTER PROCESSING')){
                 return;
             }
             const rootNode = JSON.parse(chunk);
@@ -192,12 +198,7 @@ class ChatApi {
     read(reader, decoder) {
         reader.read().then(({ done, value }) => {
             if (done) {
-                reader.releaseLock();
-                window.data.setBlockedInput(false);
-                this.currentMessage.end = Date.now();
-                window.chat.saveMessage(this.currentMessage);
-
-                this.parser.parse("\n\n");
+                this.handleStreamEnd(reader);
                 return;
             }
 
@@ -205,12 +206,21 @@ class ChatApi {
 
             this.read(reader, decoder);
         }).catch(error => {
-            window.data.setBlockedInput(false);
-            this.currentMessage.end = Date.now();
-            window.chat.saveMessage(this.currentMessage);
-
-            reader.releaseLock();
+            this.handleStreamEnd(reader);
+//            window.data.setBlockedInput(false);
+//            this.currentMessage.end = Date.now();
+//            window.chat.saveMessage(this.currentMessage);
+//
+//            reader.releaseLock();
         });
+    }
+
+    handleStreamEnd(reader) {
+        reader.releaseLock();
+        window.data.setBlockedInput(false);
+        this.currentMessage.end = Date.now();
+        window.chat.saveMessage(this.currentMessage);
+        //this.parser.parse("\n\n");
     }
 }
 

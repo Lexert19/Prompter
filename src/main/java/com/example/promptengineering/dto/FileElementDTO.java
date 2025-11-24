@@ -1,19 +1,19 @@
 package com.example.promptengineering.dto;
 
 public class FileElementDTO {
-    private String id;
+    private Long id;
     private String name;
 
-    public FileElementDTO(String id, String name) {
+    public FileElementDTO(Long id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

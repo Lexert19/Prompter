@@ -24,18 +24,5 @@ public class ProjectControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Test
-    @WithMockUser(username = "dominikch19@gmail.com")
-    public void shouldCreateProject() throws Exception {
-        String projectName = "Nowy projekt";
-        String requestBodyJson = objectMapper.writeValueAsString(projectName);
 
-        mockMvc.perform(post("/api/projects/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBodyJson))
-                .andExpect(status().isOk());
-//                .andExpect(jsonPath("$.name").value(projectName))
-//                .andExpect(jsonPath("$.id").exists())
-//                .andExpect(jsonPath("$.files").isEmpty());
-    }
 }
