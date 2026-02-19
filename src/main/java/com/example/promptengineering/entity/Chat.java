@@ -1,5 +1,6 @@
 package com.example.promptengineering.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 
 import java.time.Instant;
@@ -17,6 +18,7 @@ public class Chat {
     private User user;
 
     @Column(name = "created_at")
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     private Instant createdAt;
 
     private boolean favorite;

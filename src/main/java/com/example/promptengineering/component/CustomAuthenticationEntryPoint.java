@@ -18,7 +18,12 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
             throws IOException {
-//        String redirectUrl = "https://" + request.getServerName() + ":8080" + request.getContextPath() + loginPath;
-//        response.sendRedirect(redirectUrl);
+        String contextPath = request.getContextPath();
+        if (request.getRequestURI().startsWith(contextPath + "/api")) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+        } else {
+            String redirectUrl = contextPath + loginPath;
+            response.sendRedirect(redirectUrl);
+        }
     }
 }

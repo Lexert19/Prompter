@@ -57,7 +57,7 @@ public class HistoryController {
     @GetMapping("/chats/{chatId}/messages")
     public ResponseEntity<List<Message>> getChatHistory(
             @PathVariable Long chatId,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal User user) throws Exception {
         List<Message> messages = historyService.getChatHistory(chatId, user);
         return ResponseEntity.ok(messages);
     }

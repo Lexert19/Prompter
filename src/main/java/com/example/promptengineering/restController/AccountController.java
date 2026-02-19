@@ -21,7 +21,7 @@ import com.example.promptengineering.service.UserService;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/account")
+@RequestMapping("/api/account")
 public class AccountController {
     @Autowired
     private UserService userService;

@@ -7,13 +7,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.web.*;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -26,10 +31,13 @@ public class OAuth2Config implements WebMvcConfigurer {
     @Autowired
     private CustomOAuth2UserService customOAuth2UserService;
 
+
+
+
     @Bean
     public SecurityFilterChain securityWebFilterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
         http.csrf(csrf -> csrf.disable());
-        //http.requiresChannel(channel -> channel.anyRequest().requiresInsecure());
+
         http.authorizeHttpRequests(exchanges -> exchanges
                 .requestMatchers("/", "/{lang:(?:pl|en)}/**", "/login", "/error", "/static/**", "/auth/**", "/favicon.ico", "/favicon")
                 .permitAll()
@@ -41,7 +49,6 @@ public class OAuth2Config implements WebMvcConfigurer {
                         .oidcUserService(oidcUserService())
                         .userService(customOAuth2UserService))
                 .successHandler((request, response, authentication) -> {
-
                     response.sendRedirect("/");
                 })
                 .failureHandler((request, response, exception) -> {
@@ -56,12 +63,28 @@ public class OAuth2Config implements WebMvcConfigurer {
                 .successHandler((request, response, authentication) -> {
                     response.sendRedirect("/");
                 })
+
                 .failureHandler(authenticationFailureHandler()));
 
-//        http.exceptionHandling(exception -> exception
-//                .authenticationEntryPoint(authenticationEntryPoint())
-//        );
+
         http.logout(customizer -> customizer.logoutUrl("/auth/logout"));
+
+        http.exceptionHandling(exception -> exception
+                .defaultAuthenticationEntryPointFor(
+                        new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
+                        new AntPathRequestMatcher("/api/**")
+                )
+                .defaultAuthenticationEntryPointFor(
+                        new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
+                        new AntPathRequestMatcher("/account/**")
+                )
+                .defaultAuthenticationEntryPointFor(
+                        new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
+                        new AntPathRequestMatcher("/client/**")
+                )
+                .authenticationEntryPoint(authenticationEntryPoint())
+        );
+
         return http.build();
     }
 

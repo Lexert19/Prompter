@@ -7,9 +7,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
 public class JacksonConfig {
-
     @Bean
-    public ObjectMapper objectMapper(){
-        return new ObjectMapper();
+    public ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.findAndRegisterModules();
+        return mapper;
     }
 }

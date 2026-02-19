@@ -78,7 +78,7 @@ public class AccountControllerIntegrationTest {
         String keyName = "OPENAI";
         String keyValue = "sk-1234567890abcdef";
 
-        mockMvc.perform(post("/account/save-key/{keyName}", keyName)
+        mockMvc.perform(post("/api/account/save-key/{keyName}", keyName)
                         .with(user(userService.loadUserByUsername(userEmail)))
                         .contentType(MediaType.TEXT_PLAIN)
                         .content(keyValue))
@@ -99,7 +99,7 @@ public class AccountControllerIntegrationTest {
         user.setKeys(keys);
         userRepository.save(user);
 
-        mockMvc.perform(get("/account/keys")
+        mockMvc.perform(get("/api/account/keys")
                         .with(user(userService.loadUserByUsername(userEmail))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.OPENAI").value("sk-openai-test"))
@@ -112,7 +112,7 @@ public class AccountControllerIntegrationTest {
         user.setKeys(new HashMap<>());
         userRepository.save(user);
 
-        mockMvc.perform(get("/account/keys")
+        mockMvc.perform(get("/api/account/keys")
                         .with(user(userService.loadUserByUsername(userEmail))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
@@ -128,7 +128,7 @@ public class AccountControllerIntegrationTest {
         user.getKeys().put(keyName, initialKeyValue);
         userRepository.save(user);
 
-        mockMvc.perform(post("/account/save-key/{keyName}", keyName)
+        mockMvc.perform(post("/api/account/save-key/{keyName}", keyName)
                         .with(user(userService.loadUserByUsername(userEmail)))
                         .contentType(MediaType.TEXT_PLAIN)
                         .content(newKeyValue))
@@ -144,7 +144,7 @@ public class AccountControllerIntegrationTest {
         String keyName = "CUSTOM_API";
         String keyValue = "api_key_with!@#$%^&*()_+special_chars";
 
-        mockMvc.perform(post("/account/save-key/{keyName}", keyName)
+        mockMvc.perform(post("/api/account/save-key/{keyName}", keyName)
                         .with(user(userService.loadUserByUsername(userEmail)))
                         .contentType(MediaType.TEXT_PLAIN)
                         .content(keyValue))
@@ -159,7 +159,7 @@ public class AccountControllerIntegrationTest {
         String keyName = "EMPTY_KEY";
         String keyValue = "";
 
-        mockMvc.perform(post("/account/save-key/{keyName}", keyName)
+        mockMvc.perform(post("/api/account/save-key/{keyName}", keyName)
                         .with(user(userService.loadUserByUsername(userEmail)))
                         .contentType(MediaType.TEXT_PLAIN)
                         .content(keyValue))
@@ -176,13 +176,13 @@ public class AccountControllerIntegrationTest {
         String keyName = "OPENAI";
         String keyValue = "sk-test";
 
-        mockMvc.perform(post("/account/save-key/{keyName}", keyName)
-                        .contentType(MediaType.TEXT_PLAIN)
+        mockMvc.perform(post("/api/account/save-key/{keyName}", keyName)
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content(keyValue))
-                .andExpect(status().is3xxRedirection());
+                .andExpect(status().isUnauthorized());
 
-        mockMvc.perform(get("/account/keys"))
-                .andExpect(status().is3xxRedirection());
+        mockMvc.perform(get("/api/account/keys"))
+                .andExpect(status().isUnauthorized());
 
         setUp();
     }
@@ -196,7 +196,7 @@ public class AccountControllerIntegrationTest {
         user.setKeys(initialKeys);
         userRepository.save(user);
 
-        mockMvc.perform(post("/account/save-key/{keyName}", "GEMINI")
+        mockMvc.perform(post("/api/account/save-key/{keyName}", "GEMINI")
                         .with(user(userService.loadUserByUsername(userEmail)))
                         .contentType(MediaType.TEXT_PLAIN)
                         .content("sk-gemini"))

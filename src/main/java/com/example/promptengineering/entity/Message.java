@@ -2,6 +2,7 @@ package com.example.promptengineering.entity;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Id;
 import jakarta.persistence.*;
 
@@ -34,6 +35,7 @@ public class Message {
     private List<String> images;
 
     @Column(name = "created_at")
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     private Instant createdAt;
 
     private long start;

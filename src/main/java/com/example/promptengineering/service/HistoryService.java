@@ -81,18 +81,17 @@ public class HistoryService {
         return messageRepository.save(messageEntity);
     }
 
-    public List<Message> getChatHistory(Long chatId, User user) {
+    public List<Message> getChatHistory(Long chatId, User user) throws Exception {
         Optional<Chat> chat = chatRepository.findById(chatId);
-        return this.returnHistory(chat.orElse(null), user);
+        if(chat.isEmpty()){
+            throw new Exception();
+        }
+        if(!chat.get().getUser().equals(user)){
+            throw new Exception();
+        }
+        return messageRepository.findByChatId(chat.get().getId());
     }
 
-    public List<Message> returnHistory(Chat chat, User user) {
-        if (chat != null && user.equals(chat.getUser())) {
-            return messageRepository.findByChatId(chat.getId());
-        } else {
-            return null;
-        }
-    }
 
     public List<Chat> getChatsForUser(User user) {
         return chatRepository.findByUser(user);

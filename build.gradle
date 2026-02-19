@@ -52,6 +52,8 @@ dependencies {
 
 	implementation "io.projectreactor:reactor-core"
 
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
  	implementation 'com.sun.mail:jakarta.mail:2.0.1'
 	implementation("com.mailersend:java-sdk:1.0.1")
 }
