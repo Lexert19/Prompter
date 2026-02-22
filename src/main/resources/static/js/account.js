@@ -10,7 +10,7 @@ function saveKey() {
     const keyName = document.getElementById("keyName");
     const keyValue = document.getElementById("keyValue");
 
-    const url = "/account/save-key/"+keyName.value;
+    const url = "/api/account/save-key/"+keyName.value;
 
     fetch(url, {
         method: 'POST',
@@ -50,7 +50,7 @@ function setNewPassword() {
         return;
     }
 
-    fetch('/account/change-password', {
+    fetch('/api/account/change-password', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

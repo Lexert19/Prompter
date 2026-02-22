@@ -190,7 +190,7 @@ class Settings {
     }
 
     loadKeys() {
-        fetch("/account/keys", {
+        fetch("/api/account/keys", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
