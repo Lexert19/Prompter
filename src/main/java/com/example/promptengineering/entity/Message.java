@@ -20,7 +20,6 @@ public class Message {
     @JoinColumn(name = "chat_id", nullable = false)
     private Chat chat;
 
-    @Lob
     @Column(columnDefinition = "TEXT")
     private String text;
 

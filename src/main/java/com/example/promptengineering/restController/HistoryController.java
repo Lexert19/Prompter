@@ -1,5 +1,7 @@
 package com.example.promptengineering.restController;
 
+import com.example.promptengineering.dto.ChatDto;
+import com.example.promptengineering.dto.MessageDto;
 import com.example.promptengineering.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,11 +32,11 @@ public class HistoryController {
     private UserRepository userRepository;
 
     @PostMapping("/chats")
-    public ResponseEntity<Chat> createChat(
+    public ResponseEntity<ChatDto> createChat(
                                            @AuthenticationPrincipal User user) {
 
         Chat chat = historyService.createChat(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(chat);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ChatDto.fromEntity(chat));
     }
 
     @DeleteMapping("/chats/{chatId}")
@@ -46,25 +48,25 @@ public class HistoryController {
     }
 
     @PostMapping("/messages")
-    public ResponseEntity<Message> saveMessage(
+    public ResponseEntity<MessageDto> saveMessage(
             @RequestBody MessageBody messageBody,
             @AuthenticationPrincipal User user) {
         Message message = historyService.saveMessage(messageBody, user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(message);
+        return ResponseEntity.status(HttpStatus.CREATED).body(MessageDto.fromEntity(message));
 
     }
 
     @GetMapping("/chats/{chatId}/messages")
-    public ResponseEntity<List<Message>> getChatHistory(
+    public ResponseEntity<List<MessageDto>> getChatHistory(
             @PathVariable Long chatId,
             @AuthenticationPrincipal User user) throws Exception {
         List<Message> messages = historyService.getChatHistory(chatId, user);
-        return ResponseEntity.ok(messages);
+        return ResponseEntity.ok(MessageDto.fromEntities(messages));
     }
 
     @GetMapping("/chats")
-    public ResponseEntity<List<Chat>> getChats(@AuthenticationPrincipal User user) {
+    public ResponseEntity<List<ChatDto>> getChats(@AuthenticationPrincipal User user) {
         List<Chat> chats = historyService.getChatsForUser(user);
-        return ResponseEntity.ok(chats);
+        return ResponseEntity.ok(ChatDto.fromEntities(chats));
     }
 }

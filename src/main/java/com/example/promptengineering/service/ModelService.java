@@ -6,10 +6,10 @@ import com.example.promptengineering.entity.User;
 import com.example.promptengineering.repository.ModelRepository;
 import com.example.promptengineering.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ModelService {
@@ -35,9 +35,9 @@ public class ModelService {
     }
 
     public void deleteUserModel(Long id, User user) {
-        Model model = this.getModel(id);
-        if (model != null && model.getUser().equals(user)) {
-            modelRepository.delete(model);
+        Optional<Model> model = this.getModel(id);
+        if (model.isPresent() && model.get().getUser().equals(user)) {
+            modelRepository.delete(model.get());
 
         } else {
             throw new SecurityException("to nie jest twój model.");
@@ -52,8 +52,8 @@ public class ModelService {
         model.setType(modelDto.getType());
         modelRepository.save(model);
     }
-    public Model getModel(Long id) {
-        return modelRepository.findById(id).orElse(null);
+    public Optional<Model> getModel(Long id) {
+        return modelRepository.findById(id);
     }
 
 }

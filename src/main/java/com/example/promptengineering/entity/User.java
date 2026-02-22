@@ -145,4 +145,16 @@ public class User implements OAuth2User, Principal, UserDetails {
     public void setResetTokens(List<ResetToken> resetTokens) {
         this.resetTokens = resetTokens;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }

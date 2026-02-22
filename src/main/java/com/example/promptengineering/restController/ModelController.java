@@ -9,10 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/models")
@@ -21,19 +18,21 @@ public class ModelController {
     private ModelService modelService;
 
     @GetMapping("/user-models")
-    public List<Model> getUserModels(@AuthenticationPrincipal User user) {
-        return modelService.getUserModels(user);
+    public List<ModelDto> getUserModels(@AuthenticationPrincipal User user) {
+        List<Model> models = modelService.getUserModels(user);
+        return ModelDto.toDtoList(models);
     }
     @GetMapping("/global-models")
-    public List<Model> getGlobalModels() {
-        return modelService.getGlobalModels();
+    public List<ModelDto> getGlobalModels() {
+        List<Model> models = modelService.getGlobalModels();
+        return ModelDto.toDtoList(models);
     }
 
     @PutMapping("/user-models/{id}")
     public ResponseEntity<String> editUserModel(@AuthenticationPrincipal User user, @PathVariable Long id, @RequestBody ModelDto modelDto) {
-        Model model = modelService.getModel(id);
-        if (model != null && model.getUser().equals(user)) {
-            modelService.editUserModel(model, modelDto);
+        Optional<Model> model = modelService.getModel(id);
+        if (model.isPresent() && model.get().getUser().equals(user)) {
+            modelService.editUserModel(model.orElse(null), modelDto);
             return ResponseEntity.ok("Zmieniono model!");
         } else {
             return ResponseEntity.notFound().build();
@@ -52,12 +51,12 @@ public class ModelController {
 
 
     @GetMapping("/all-models")
-    public List<Model> getAllModels(@AuthenticationPrincipal User user) {
+    public List<ModelDto> getAllModels(@AuthenticationPrincipal User user) {
         List<Model> userModels = modelService.getUserModels(user);
         List<Model> globalModels = modelService.getGlobalModels();
         Set<Model> allModels = new HashSet<>(userModels);
         allModels.addAll(globalModels);
-        return new ArrayList<>(allModels);
+        return ModelDto.toDtoList(new ArrayList<>(allModels));
     }
 
     @PostMapping("/user-models")
