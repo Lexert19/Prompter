@@ -20,7 +20,7 @@ class History {
     async createChatSession(content) {
         if (window.settings.activeHistory) {
             const chat = await this.createChat();
-            this.saveMessage(chat.id, content);
+            //this.saveMessage(chat.id, content);
 
             const newPath = `/chat/${chat.id}`;
 
@@ -130,6 +130,11 @@ class History {
 
 
                 return message;
+            }).sort((a, b) => {
+                if (a.start === undefined || a.start === null) return 1;
+                if (b.start === undefined || b.start === null) return -1;
+
+                return a.start - b.start;
             });
         } catch (error) {
             console.error("Error getting chat history:", error);
