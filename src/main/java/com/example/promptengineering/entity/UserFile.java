@@ -1,5 +1,6 @@
 package com.example.promptengineering.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.Instant;
 
@@ -28,6 +29,7 @@ public class UserFile {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User owner;
 
     public UserFile() {}

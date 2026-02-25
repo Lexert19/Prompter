@@ -57,15 +57,21 @@ class History {
 
     async saveMessage(chatId, message) {
         try {
-            let duration = 0;
-            if (message.end !== null) {
-                duration = message.end - message.start;
+            const images = [];
+            for (const img of message.images) {
+                if (typeof img === 'string' && img.startsWith('data:image')) {
+                    const fileId = await this.uploadImageBase64(img);
+                    images.push(fileId);
+                } else {
+                    images.push(img);
+                }
             }
+
             const messageBody = {
                 chatId: chatId,
                 text: message.text,
                 documents: message.documents,
-                images: message.images,
+                images: images,
                 end: message.end,
                 start: message.start,
                 cache: message.cache,
@@ -74,21 +80,15 @@ class History {
 
             const response = await fetch(`${this.baseUrl}/messages`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(messageBody),
                 credentials: "include",
             });
 
             if (!response.ok) {
-                if (response.status === 400) {
-                    throw new Error("Bad Request: Invalid message data.");
-                } else if (response.status === 403) {
-                    throw new Error("Forbidden: Not authorized to save message.");
-                } else {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                if (response.status === 400) throw new Error("Bad Request: Invalid message data.");
+                if (response.status === 403) throw new Error("Forbidden: Not authorized to save message.");
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
 
             return await response.json();
@@ -96,6 +96,29 @@ class History {
             console.error("Error saving message:", error);
             throw error;
         }
+    }
+
+    async uploadImageBase64(base64String) {
+        const arr = base64String.split(',');
+        const mime = arr[0].match(/:(.*?);/)[1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) u8arr[n] = bstr.charCodeAt(n);
+        const file = new File([u8arr], `image_${Date.now()}.png`, { type: mime });
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch('/api/files/upload', {
+            method: 'POST',
+            body: formData,
+            credentials: 'include'
+        });
+
+        if (!response.ok) throw new Error(`Upload failed: ${response.status}`);
+        const uploaded = await response.json();
+        return uploaded.id;
     }
 
     async getChatHistory(chatId) {

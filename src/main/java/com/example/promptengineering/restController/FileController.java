@@ -1,5 +1,6 @@
 package com.example.promptengineering.restController;
 
+import com.example.promptengineering.dto.UserFileDTO;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.entity.UserFile;
 import com.example.promptengineering.exception.FileStorageException;
@@ -27,11 +28,11 @@ public class FileController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<UserFile> uploadFile(
+    public ResponseEntity<UserFileDTO> uploadFile(
             @RequestParam("file") MultipartFile file,
             @AuthenticationPrincipal User user) throws IOException {
 
-        UserFile savedFile = fileStorageService.storeFile(file, user);
+        UserFileDTO savedFile = fileStorageService.storeFile(file, user);
         return ResponseEntity.ok(savedFile);
     }
 

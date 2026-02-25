@@ -1,5 +1,6 @@
 package com.example.promptengineering.service;
 
+import com.example.promptengineering.dto.UserFileDTO;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.entity.UserFile;
 import com.example.promptengineering.exception.FileStorageException;
@@ -27,7 +28,18 @@ public class FileStorageService {
         this.userFileRepository = userFileRepository;
     }
 
-    public UserFile storeFile(MultipartFile file, User owner) throws IOException {
+    private UserFileDTO toDto(UserFile userFile) {
+        return new UserFileDTO(
+                userFile.getId(),
+                userFile.getFileName(),
+                userFile.getContentType(),
+                userFile.getSize(),
+                userFile.getOwner().getId()
+        );
+    }
+
+
+    public UserFileDTO storeFile(MultipartFile file, User owner) throws IOException {
         Path userDir = Paths.get(uploadDir, owner.getId().toString());
         if (!Files.exists(userDir)) {
             Files.createDirectories(userDir);
@@ -51,7 +63,8 @@ public class FileStorageService {
         userFile.setUploadedAt(Instant.now());
         userFile.setOwner(owner);
 
-        return userFileRepository.save(userFile);
+        UserFile savedFile = userFileRepository.save(userFile);
+        return toDto(savedFile);
     }
 
     public UserFile getUserFile(Long fileId, User owner) throws FileStorageException {

@@ -67,11 +67,16 @@ class Message {
 
     getHtmlImages() {
         return this.images.map((img) => {
-            const parts = img.split(';');
-            const mediaType = parts[0].split(':')[1];
-            const data = parts[1].split(',')[1];
-
-            return `<img class="image" src="data:${mediaType};base64,${data}" alt="Inline image">`;
+            const isNumeric = (val) => !isNaN(parseFloat(val)) && isFinite(val);
+            if (typeof img === 'number' || (typeof img === 'string' && isNumeric(img) && !img.startsWith('data:image'))) {
+                const id = Number(img);
+                return `<img class="image" src="/api/files/${id}" alt="Image">`;
+            } else {
+                const parts = img.split(';');
+                const mediaType = parts[0].split(':')[1];
+                const data = parts[1].split(',')[1];
+                return `<img class="image" src="data:${mediaType};base64,${data}" alt="Inline image">`;
+            }
         }).join("");
     }
 

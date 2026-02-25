@@ -4,6 +4,8 @@ class MessageView{
         this.message = message;
     }
 
+
+
     createHtmlElement(destination, finish = false){
         let duration = "";
         if (this.message.end !== null) {
