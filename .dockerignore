@@ -1,0 +1,10 @@
+.gradle
+build
+!build/libs/*.jar
+.git
+.github
+README.md
+.dockerignore
+*.log
+Dockerfile
+docker-compose.yml

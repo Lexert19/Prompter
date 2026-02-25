@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: prompt_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: promptdb
+      POSTGRES_USER: promptuser
+      POSTGRES_PASSWORD: promptpass
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - prompt_network
+
+  app:
+    build: .
+    container_name: prompt_app
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/promptdb
+      SPRING_DATASOURCE_USERNAME: promptuser
+      SPRING_DATASOURCE_PASSWORD: promptpass
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    ports:
+      - "8080:8080"
+    networks:
+      - prompt_network
+
+volumes:
+  postgres_data:
+
+networks:
+  prompt_network:

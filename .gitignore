@@ -41,3 +41,10 @@ node_modules/
 src/main/resources/secret.properties
 
 output.txt
+
+
+# Docker
+**/.docker/
+**/docker-compose.override.yml
+**/data/
+**/volumes/
