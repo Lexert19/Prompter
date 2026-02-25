@@ -1,6 +1,7 @@
 package com.example.promptengineering.restController;
 
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
+@Slf4j
 @SpringBootTest
 public class AuthControllerTest {
 
@@ -118,7 +120,7 @@ public class AuthControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andReturn();
 
-        System.out.println("Response body: " + result.getResponse().getContentAsString());
+        log.info("Response body: {}", result.getResponse().getContentAsString());
 
         List<ResetToken> resetTokens = resetTokenRepository.findByUserLogin("testuser123@wp.pl");
         assertFalse(resetTokens.isEmpty(), "Lista tokenów resetowania hasła jest pusta");

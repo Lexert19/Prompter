@@ -47,7 +47,7 @@ public class HistoryService {
     }
 
     public Message saveMessage(MessageBody messageBody, User user) {
-                Optional<Chat> chat = chatRepository.findById(messageBody.getChatId());
+        Optional<Chat> chat = chatRepository.findById(messageBody.getChatId());
                 if(chat.isEmpty())
                     throw new IllegalArgumentException("Chat not found with id: " + messageBody.getChatId());
                 checkUserAuthorization(chat.get(),user);

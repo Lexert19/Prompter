@@ -2,6 +2,7 @@ package com.example.promptengineering.component;
 
 import com.example.promptengineering.repository.UserRepository;
 import com.example.promptengineering.service.CustomOAuth2UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 
+@Slf4j
 @Component
 public class CustomAuthenticationManager implements AuthenticationManager {
 
@@ -55,12 +57,6 @@ public class CustomAuthenticationManager implements AuthenticationManager {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        try {
-            return providerManager.authenticate(authentication);
-        } catch (Exception e) {
-            System.out.println("Authentication error: " + e.getMessage());
-            e.printStackTrace();
-            throw e;
-        }
+        return providerManager.authenticate(authentication);
     }
 }

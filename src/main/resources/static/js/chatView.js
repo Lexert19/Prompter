@@ -97,7 +97,6 @@ class Chat {
     }
 
     clearMessages() {
-        this.modelOptions.innerHTML = "";
         document.getElementById("chatMessages").innerHTML = "";
     }
 
