@@ -15,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
+@ActiveProfiles("test")
 public class AccountControllerIntegrationTest {
 
     @Autowired
@@ -49,10 +51,6 @@ public class AccountControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        resetTokenRepository.deleteAll();
-        userRepository.deleteAll();
-
-        userRepository.deleteAll();
         User testUser = new User();
         testUser.setEmail(userEmail);
         testUser.setPassword(passwordEncoder.encode(userPassword));

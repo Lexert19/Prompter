@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
+@ActiveProfiles("test")
 public class FileControllerIntegrationTest {
 
     @Autowired
@@ -87,8 +89,7 @@ public class FileControllerIntegrationTest {
                 .andExpect(jsonPath("$.fileName").value("test.txt"))
                 .andExpect(jsonPath("$.contentType").value(MediaType.TEXT_PLAIN_VALUE))
                 .andExpect(jsonPath("$.size").value(13))
-                .andExpect(jsonPath("$.owner.id").value(user1.getId()))
-                .andExpect(jsonPath("$.storedPath").exists());
+                .andExpect(jsonPath("$.ownerId").value(user1.getId()));
     }
 
     @Test
