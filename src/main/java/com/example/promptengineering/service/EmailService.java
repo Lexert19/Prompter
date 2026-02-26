@@ -20,6 +20,10 @@ public class EmailService {
     private String domain;
     @Value("${mailersend.api.token}")
     private String apiToken;
+    @Value("${mailersend.from.name:Prompter}")
+    private String fromName;
+    @Value("${mailersend.from.email}")
+    private String fromEmail;
 
 
     private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
@@ -40,7 +44,7 @@ public class EmailService {
                     resetLink, resetLink);
 
             Email emailMessage = new Email();
-            emailMessage.setFrom("Prompter", "no-reply@trial-nrw7gym9kvng2k8e.mlsender.net");
+            emailMessage.setFrom(fromName, fromEmail);
             emailMessage.addRecipient(email, email);
             emailMessage.setSubject("Password Reset Request");
             emailMessage.setPlain(textBody);
