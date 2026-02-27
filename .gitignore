@@ -41,7 +41,7 @@ node_modules/
 src/main/resources/secret.properties
 
 output.txt
-
+.env
 
 # Docker
 **/.docker/
