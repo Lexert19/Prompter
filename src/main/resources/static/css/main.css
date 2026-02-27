@@ -216,7 +216,7 @@ input {
 
 .background{
     backdrop-filter: blur(1px);
-    background-image: url("/static/images/background.jpg");
+/*    background-image: url("/static/images/background.jpg");*/
     background-size: cover;
     background-repeat: no-repeat;
 
@@ -765,4 +765,83 @@ input[type="number"]::-ms-spin-button {
 .hidden {
     opacity: 0;
     transform: translateY(50px);
+}
+
+
+/**/
+.content-wrapper {
+    position: relative;
+    z-index: 1;
+}
+
+.mesh-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    overflow: hidden;
+    background-color: var(--main-bg);
+    filter: blur(90px);
+}
+
+
+
+.cloud {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.6;
+}
+
+.cloud-1 {
+    width: 50vw;
+    height: 50vw;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.7) 0%, rgba(99, 102, 241, 0) 70%);
+    top: -15%;
+    left: -10%;
+    animation: float1 8s infinite alternate steps(60);
+/*    animation: float1 8s infinite alternate ease-in-out;*/
+}
+
+.cloud-2 {
+    width: 65vw;
+    height: 65vw;
+    background: radial-gradient(circle, rgba(79, 70, 229, 0.5) 0%, rgba(79, 70, 229, 0) 70%);
+    bottom: -25%;
+    right: -15%;
+    animation: float1 8s infinite alternate steps(60);
+/*    animation: float2 10s infinite alternate ease-in-out;*/
+}
+
+.cloud-3 {
+    width: 45vw;
+    height: 45vw;
+    background: radial-gradient(circle, rgba(129, 140, 255, 0.4) 0%, rgba(129, 140, 255, 0) 70%);
+    top: 35%;
+    left: 30%;
+    animation: float1 8s infinite alternate steps(60);
+/*    animation: float3 6s infinite alternate ease-in-out;*/
+}
+
+@keyframes float1 {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(8vw, 12vh) scale(1.15); }
+}
+
+@keyframes float2 {
+    0% { transform: translate(0, 0) scale(1.05); }
+    100% { transform: translate(-12vw, -8vh) scale(0.95); }
+}
+
+@keyframes float3 {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(-8vw, 10vh); }
+}
+
+@media (max-width: 768px) {
+    .mesh-background { filter: blur(50px); }
+    .cloud-1 { width: 100vw; height: 100vw; }
+    .cloud-2 { width: 100vw; height: 100vw; }
+    .cloud-3 { width: 100vw; height: 100vw; }
 }

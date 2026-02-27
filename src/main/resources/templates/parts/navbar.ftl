@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg position-fixed w-100 top-0">
+<nav class="navbar navbar-expand-lg position-fixed w-100 top-0" style="z-index: 1000;">
   <div class="container">
     <a class="navbar-brand text-white fs-4 fw-bold" href="/">Prompter</a>
     <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">

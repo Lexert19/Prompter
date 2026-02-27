@@ -6,7 +6,6 @@
     <title>Login</title>
 
     <style>
-        /* Include the provided CSS styles here */
         body {
             font-family: Arial, sans-serif;
             color: white;
@@ -139,32 +138,38 @@
     </style>
 </head>
 <body class="background">
+<div class="mesh-background">
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+</div>
 <#include "/parts/navbar.ftl" />
 
+<div class="content-wrapper px-2">
     <div class="login-container">
         <h2>Login</h2>
 
         <#if error??>
-            <div class="alert-error">
-                ${error}
-            </div>
-        </#if>
+        <div class="alert-error">
+            ${error}
+        </div>
+    </#if>
 
+    <form action="/auth/login" method="POST">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <button type="submit">Login</button>
+    </form>
 
-        <form action="/auth/login" method="POST">
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <button type="submit">Login</button>
-        </form>
+    <button class="google-login-button" onclick="window.location.href='/oauth2/authorization/google'">
+        <img src="https://img.icons8.com/color/20/000000/google-logo.png" alt="Google Logo">
+        Sign in with Google
+    </button>
 
-        <button class="google-login-button" onclick="window.location.href='/oauth2/authorization/google'">
-            <img src="https://img.icons8.com/color/20/000000/google-logo.png" alt="Google Logo">
-            Sign in with Google
-        </button>
-
-         <div class="forgot-password">
-                    <a href="/auth/reset-password-request">Forgot your password?</a>
-                </div>
+    <div class="forgot-password">
+        <a href="/auth/reset-password-request">Forgot your password?</a>
     </div>
+</div>
+</div>
 </body>
 </html>

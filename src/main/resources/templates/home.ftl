@@ -1,13 +1,19 @@
 <#import "/spring.ftl" as spring/>
 <#include "/parts/head.ftl" />
-<div class="center" style="height: 100vh;">
+<div class="mesh-background">
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+</div>
+
+<div class="center content-wrapper" style="height: 100vh;">
     <div class="block content-box hidden" style="max-width: 600px; padding: 20px;">
         <div class="chat-header d-flex flex-column align-items-center"
              style="border-radius: 10px; margin-bottom: 24px; text-align: center;">
             <img src="/favicon" class="d-block" width="90px" height="90px"
                  style="vertical-align: middle; margin-left: 10px; filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.3));">
             <h1 style="margin: 0; font-size: 4rem; font-weight: bold;">
-                <span class="text-shadow-md" style="color: #6366f1;">Prompter</span>
+                <span class="text-shadow-md" style="color: var(--accent);">Prompter</span>
             </h1>
             <p class="text-white fs-5 text-shadow-lg" style="margin-top: 10px; font-size: 1.2rem;">
                 <@spring.message "app.description"/>
