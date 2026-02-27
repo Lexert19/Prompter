@@ -65,6 +65,12 @@ public class RequestBuilder {
 
         List<Map<String, Object>> messagesListDefault = new ArrayList<>();
         for (Message message : messages) {
+            if (message.getContent() == null || message.getContent().isEmpty()) {
+                Content defaultContent = new Content();
+                defaultContent.setType("text");
+                defaultContent.setText("error");
+                message.setContent(List.of(defaultContent));
+            }
             messagesListDefault.add(message.toMap(provider, type));
         }
         request.put("messages", messagesListDefault);

@@ -41,6 +41,7 @@ class Chat {
 
         try {
             this.requestBuilder = await window.chatHistory.getRequestBuilderForChat(this.session);
+            window.chatApi.requestBuilder = this.requestBuilder;
             this.clearMessages();
             this.requestBuilder.messages.forEach(message =>{
                 const messageView = new MessageView(message);
