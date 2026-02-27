@@ -65,16 +65,19 @@ class InputView{
 
                 if (item.kind === "file" && item.type.startsWith("image/")) {
                     event.preventDefault();
-
                     const file = item.getAsFile();
                     const reader = new FileReader();
-
-                    reader.onload = function (event) {
-                        window.data.appendImage(event.target.result);
+                    reader.onload = async function (e) {
+                        const base64 = e.target.result;
+                        try {
+                            const fileId = await window.chatHistory.uploadImageBase64(base64);
+                            window.data.appendImage(fileId);
+                        } catch (error) {
+                            console.error("Error sending image:", error);
+                            window.data.appendImage(base64);
+                        }
                     };
-
                     reader.readAsDataURL(file);
-                    hasImage = true;
                     break;
                 }
             }

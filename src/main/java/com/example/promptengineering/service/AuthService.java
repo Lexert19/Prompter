@@ -20,18 +20,6 @@ public class AuthService {
     private PasswordEncoder passwordEncoder;
 
 
-//    public Mono<User> login(String login, String password) {
-//        return userRepository.findByEmail(login)
-//                .flatMap(user -> {
-//                    if (passwordEncoder.matches(password, user.getPassword())) {
-//                        return Mono.just(user);
-//                    } else {
-//                        return Mono.error(new RuntimeException("Invalid credentials"));
-//                    }
-//                })
-//                .switchIfEmpty(Mono.error(new RuntimeException("User not found")));
-//    }
-
     public User updatePassword(User user, String newPassword){
         String encryptedPassword = passwordEncoder.encode(newPassword);
         user.setPassword(encryptedPassword);

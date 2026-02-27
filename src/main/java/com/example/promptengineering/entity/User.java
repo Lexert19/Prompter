@@ -4,7 +4,6 @@ import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.example.promptengineering.converter.HashMapConverter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -28,9 +27,8 @@ public class User implements OAuth2User, Principal, UserDetails {
 
     private String password;
 
-    @Convert(converter = HashMapConverter.class)
     @Column(columnDefinition = "TEXT")
-    private HashMap<String, String> keys = new HashMap<>();
+    private String encryptedKeys;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
@@ -95,14 +93,6 @@ public class User implements OAuth2User, Principal, UserDetails {
         this.password = password;
     }
 
-    public HashMap<String, String> getKeys() {
-        return keys;
-    }
-
-    public void setKeys(HashMap<String, String> keysMap) {
-        this.keys = keysMap;
-    }
-
     public Long getId() {
         return id;
     }
@@ -158,5 +148,13 @@ public class User implements OAuth2User, Principal, UserDetails {
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
+    }
+
+    public String getEncryptedKeys() {
+        return encryptedKeys;
+    }
+
+    public void setEncryptedKeys(String encryptedKeys) {
+        this.encryptedKeys = encryptedKeys;
     }
 }

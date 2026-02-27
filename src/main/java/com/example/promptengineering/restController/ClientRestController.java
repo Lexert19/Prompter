@@ -35,7 +35,7 @@ public class ClientRestController {
 
         try {
             RequestBuilder request = gson.fromJson(body, RequestBuilder.class);
-            return chatService.makeRequest(request);
+            return chatService.makeRequest(request, user);
         } catch (JsonSyntaxException e) {
             return Flux.just(ServerSentEvent.<String>builder()
                     .event("error")

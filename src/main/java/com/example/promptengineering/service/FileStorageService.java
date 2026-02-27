@@ -10,10 +10,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
+import java.util.Base64;
 import java.util.UUID;
 
 @Service
@@ -45,19 +47,28 @@ public class FileStorageService {
             Files.createDirectories(userDir);
         }
 
+        byte[] fileBytes = file.getBytes();
+
         String originalFilename = file.getOriginalFilename();
         String extension = "";
         if (originalFilename != null && originalFilename.contains(".")) {
             extension = originalFilename.substring(originalFilename.lastIndexOf("."));
         }
-        String storedFilename = UUID.randomUUID() + extension;
-        Path targetPath = userDir.resolve(storedFilename);
 
-        file.transferTo(targetPath.toFile());
+        String binaryFilename = UUID.randomUUID() + extension;
+        Path binaryPath = userDir.resolve(binaryFilename);
+        file.transferTo(binaryPath.toFile());
+
+        String base64Content = Base64.getEncoder().encodeToString(fileBytes);
+
+        String base64Filename = UUID.randomUUID() + ".b64";
+        Path base64Path = userDir.resolve(base64Filename);
+        Files.writeString(base64Path, base64Content, StandardCharsets.UTF_8);
 
         UserFile userFile = new UserFile();
         userFile.setFileName(originalFilename);
-        userFile.setStoredPath(targetPath.toString());
+        userFile.setStoredPath(binaryPath.toString());
+        userFile.setBase64Path(base64Path.toString());
         userFile.setContentType(file.getContentType());
         userFile.setSize(file.getSize());
         userFile.setUploadedAt(Instant.now());

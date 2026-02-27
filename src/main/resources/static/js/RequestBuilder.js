@@ -79,7 +79,7 @@ class RequestBuilder {
         };
 
         switch (content.type) {
-            case "image_url":
+            case "image_id":
                 return {
                     ...baseContent,
                     url: content.url,

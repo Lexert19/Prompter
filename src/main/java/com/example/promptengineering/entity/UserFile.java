@@ -19,6 +19,9 @@ public class UserFile {
     private String storedPath;
 
     @Column(nullable = false)
+    private String base64Path;
+
+    @Column(nullable = false)
     private String contentType;
 
     @Column(nullable = false)
@@ -29,7 +32,6 @@ public class UserFile {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
-    @JsonIgnore
     private User owner;
 
     public UserFile() {}
@@ -88,5 +90,13 @@ public class UserFile {
 
     public void setOwner(User owner) {
         this.owner = owner;
+    }
+
+    public String getBase64Path() {
+        return base64Path;
+    }
+
+    public void setBase64Path(String base64Path) {
+        this.base64Path = base64Path;
     }
 }

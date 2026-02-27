@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.oauth2.sdk.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
@@ -26,13 +28,39 @@ public class UserService implements UserDetailsService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public User saveKeyToMap(User user, String keyName, String keyValue) {
-        user.getKeys().put(keyName, keyValue);
-        return userRepository.save(user);
+    @Autowired
+    private EncryptionService encryptionService;
+
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    public void saveUserKeys(User user, Map<String, String> keys) {
+        try {
+            String json = objectMapper.writeValueAsString(keys);
+            String encrypted = encryptionService.encrypt(json);
+            user.setEncryptedKeys(encrypted);
+            userRepository.save(user);
+        } catch (Exception e) {
+            throw new RuntimeException("Error saving keys", e);
+        }
     }
 
-    public Map<String, String> getKeys(User user) {
-        return user.getKeys();
+    public User saveKeyToMap(User user, String keyName, String keyValue) {
+        Map<String, String> keys = getUserKeys(user);
+        keys.put(keyName, keyValue);
+        saveUserKeys(user, keys);
+        return user;
+    }
+
+    public Map<String, String> getUserKeys(User user) {
+        if (user.getEncryptedKeys() == null || user.getEncryptedKeys().isEmpty()) {
+            return new HashMap<>();
+        }
+        try {
+            String decrypted = encryptionService.decrypt(user.getEncryptedKeys());
+            return objectMapper.readValue(decrypted, new TypeReference<Map<String, String>>() {});
+        } catch (Exception e) {
+            throw new RuntimeException("Error reading keys", e);
+        }
     }
 
     public User findUserByEmail(String email) throws Exception {
@@ -47,7 +75,7 @@ public class UserService implements UserDetailsService {
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
         user.setRoles(roles);
-        user.setKeys(new HashMap<>());
+        user.setEncryptedKeys(null);
         Optional<User> existingUser = userRepository.findByEmail(email);
         if(existingUser.isPresent())
             throw  new RuntimeException("User already exists");

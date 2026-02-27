@@ -33,10 +33,12 @@ public class EmbeddingService {
     @Autowired
     private ProjectRepository projectRepository;
     @Autowired
+    private UserService userService;
+    @Autowired
     private FileElementsRepository fileElementRepository;
 
     public void addFileToProject(Project project, FileElement file, User user) {
-        String apiKey = user.getKeys().getOrDefault("OPENAI", "");
+        String apiKey = userService.getUserKeys(user).getOrDefault("OPENAI", "");
         List<String> pages = splitContentIntoPages(file.getContent());
         file.setPages(pages);
         file.setProject(project);
@@ -84,7 +86,7 @@ public class EmbeddingService {
     }
 
     public List<ScoredFragment> retrieveSimilarFragments(String query, Project project, User user) {
-        String apiKey = user.getKeys().getOrDefault("OPENAI", "");
+        String apiKey = userService.getUserKeys(user).getOrDefault("OPENAI", "");
 
         List<Double> queryVector = getEmbedding(query, apiKey);
         return processQueryVectorWithProjectFiles(queryVector, project);

@@ -8,6 +8,7 @@ public class Content {
     private String text;
     private String mediaType;
     private String data;
+    private Long fileId;
 
     public String getText() { return text; }
     public String getMediaType() { return mediaType; }
@@ -79,5 +80,12 @@ public class Content {
         this.data = data;
     }
 
-    
+
+    public Long getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(Long fileId) {
+        this.fileId = fileId;
+    }
 }

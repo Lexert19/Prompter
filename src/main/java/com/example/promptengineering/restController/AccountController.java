@@ -42,7 +42,7 @@ public class AccountController {
     @GetMapping("/keys")
     public Map<String, String> getAllKeys(
             @AuthenticationPrincipal User user) {
-        return userService.getKeys(user);
+        return userService.getUserKeys(user);
     }
 
 

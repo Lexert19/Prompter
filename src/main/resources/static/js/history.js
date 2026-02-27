@@ -121,6 +121,21 @@ class History {
         return uploaded.id;
     }
 
+    async fetchImageAsBase64(fileId) {
+        const response = await fetch(`/api/files/${fileId}`, {
+            credentials: 'include'
+        });
+        if (!response.ok) throw new Error('Nie udało się pobrać obrazu');
+
+        const blob = await response.blob();
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
+    }
+
     async getChatHistory(chatId) {
         try {
             const response = await fetch(`${this.baseUrl}/chats/${chatId}/messages`, {
@@ -166,20 +181,11 @@ class History {
     }
 
     async getRequestBuilderForChat(chatId) {
-        try {
-            const messages = await this.getChatHistory(chatId);
+        const messages = await this.getChatHistory(chatId);
 
-            const builder = new RequestBuilder();
-
-            messages.forEach(msg => {
-                builder.addMessage(msg);
-            });
-
-            return builder;
-        } catch(err) {
-            console.error("Error creating RequestBuilder from history", err);
-            throw err;
-        }
+        const builder = new RequestBuilder();
+        messages.forEach(msg => builder.addMessage(msg));
+        return builder;
     }
 
     addHtmlHistoryIndex(historyIndex) {
