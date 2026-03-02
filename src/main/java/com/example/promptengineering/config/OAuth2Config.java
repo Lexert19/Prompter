@@ -2,6 +2,7 @@ package com.example.promptengineering.config;
 
 import com.example.promptengineering.component.CustomAuthenticationEntryPoint;
 import com.example.promptengineering.component.CustomAuthenticationManager;
+import com.example.promptengineering.filter.RateLimitingFilter;
 import com.example.promptengineering.service.CustomOAuth2UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -18,6 +19,7 @@ import org.springframework.security.web.*;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.CharacterEncodingFilter;
@@ -30,12 +32,14 @@ public class OAuth2Config implements WebMvcConfigurer {
     private CustomAuthenticationManager authenticationManager;
     @Autowired
     private CustomOAuth2UserService customOAuth2UserService;
-
-
+    @Autowired
+    private RateLimitingFilter rateLimitingFilter;
 
 
     @Bean
     public SecurityFilterChain securityWebFilterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
+        http.addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class);
+
         http.csrf(csrf -> csrf.disable());
 
         http.authorizeHttpRequests(exchanges -> exchanges
