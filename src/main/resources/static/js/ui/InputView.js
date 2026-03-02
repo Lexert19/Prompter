@@ -46,6 +46,19 @@ class InputView{
 
     makeChat() {
         const message = this.chatInput.value;
+
+        if(message == ""){
+            return;
+        }
+
+        if (!window.settings.key) {
+            window.modal.open(
+                'Błąd',
+                '<p>Brak klucza API dla wybranego dostawcy. Skonfiguruj klucz w ustawieniach konta.</p>'
+            );
+            return;
+        }
+
         if (!this.isBlocked) {
             this.chatInput.value = "";
             this.isBlocked = true;
