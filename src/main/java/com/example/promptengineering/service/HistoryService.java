@@ -6,6 +6,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.example.promptengineering.entity.Chat;
@@ -25,6 +30,19 @@ public class HistoryService {
 
     @Autowired
     private ChatRepository chatRepository;
+
+    @Value("${app.chat.page.max-size}")
+    private int maxChatPageSize;
+
+    @Value("${app.message.max-total-size:10485760}")
+    private long maxTotalMessageSize;
+
+    @Value("${app.message.max-images:10}")
+    private int maxImages;
+
+    @Value("${app.message.max-documents:100}")
+    private int maxDocuments;
+
 
 
     public Chat createChat(User user) {
@@ -67,6 +85,14 @@ public class HistoryService {
     }
 
     public Message convertAndSaveMessage(MessageBody messageBody, Chat chat) {
+        if (messageBody.getImages() != null && messageBody.getImages().size() > maxImages) {
+            throw new IllegalArgumentException("Too many images. Max allowed: " + maxImages);
+        }
+
+        if (messageBody.getDocuments() != null && messageBody.getDocuments().size() > maxDocuments) {
+            throw new IllegalArgumentException("Too many documents. Max allowed: " + maxDocuments);
+        }
+
         Message messageEntity = new Message();
         messageEntity.setChat(chat);
         messageEntity.setCreatedAt(Instant.now());
@@ -89,12 +115,37 @@ public class HistoryService {
         if(!chat.get().getUser().equals(user)){
             throw new Exception();
         }
-        return messageRepository.findByChatId(chat.get().getId());
+        List<Message> messages = messageRepository.findByChatId(chatId);
+        long totalSize = messages.stream()
+                .mapToLong(m -> {
+                    long size = m.getText() != null ? m.getText().length() : 0;
+                    if (m.getDocuments() != null) {
+                        size += m.getDocuments().stream()
+                                .mapToLong(d -> d != null ? d.length() : 0)
+                                .sum();
+                    }
+                    if (m.getImages() != null) {
+                        size += m.getImages().stream()
+                                .mapToLong(i -> i != null ? i.length() : 0)
+                                .sum();
+                    }
+                    return size;
+                })
+                .sum();
+        if (totalSize > maxTotalMessageSize) {
+            throw new Exception("Total message size (text + documents + images) too large: " + totalSize + " characters, max allowed: " + maxTotalMessageSize);
+        }
+        return messages;
     }
 
 
-    public List<Chat> getChatsForUser(User user) {
-        return chatRepository.findByUser(user);
+
+    public Page<Chat> getChatsForUser(User user, int page, int size) {
+        if (size > maxChatPageSize) {
+            size = maxChatPageSize;
+        }
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        return chatRepository.findByUserOrderByCreatedAtDesc(user, pageable);
     }
 
 }

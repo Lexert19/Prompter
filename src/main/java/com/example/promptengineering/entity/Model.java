@@ -12,7 +12,7 @@ public class Model {
 
     private String name;
 
-    @Column(columnDefinition = "TEXT")
+    //@Column(columnDefinition = "TEXT")
     private String text;
 
     private String provider;

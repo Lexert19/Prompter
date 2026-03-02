@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface UserFileRepository extends JpaRepository<UserFile, Long> {
     Optional<UserFile> findByIdAndOwner(Long id, User owner);
     ArrayList<UserFile> findByOwner(User owner);
+    long countByOwner(User owner);
 }

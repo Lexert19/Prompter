@@ -12,4 +12,5 @@ public interface ModelRepository extends JpaRepository<Model, Long> {
 
     List<Model> findByGlobal(boolean global);
     List<Model> findByUser(User user);
+    long countByUser(User user);
 }

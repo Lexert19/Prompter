@@ -4,6 +4,10 @@ import com.example.promptengineering.dto.ChatDto;
 import com.example.promptengineering.dto.MessageDto;
 import com.example.promptengineering.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -65,8 +69,12 @@ public class HistoryController {
     }
 
     @GetMapping("/chats")
-    public ResponseEntity<List<ChatDto>> getChats(@AuthenticationPrincipal User user) {
-        List<Chat> chats = historyService.getChatsForUser(user);
-        return ResponseEntity.ok(ChatDto.fromEntities(chats));
+    public ResponseEntity<Page<ChatDto>> getChats(@AuthenticationPrincipal User user,
+                                                  @RequestParam(defaultValue = "0") int page,
+                                                  @RequestParam(defaultValue = "20") int size) {
+
+        Page<Chat> chatPage = historyService.getChatsForUser(user, page, size);
+        Page<ChatDto> dtoPage = chatPage.map(ChatDto::fromEntity);
+        return ResponseEntity.ok(dtoPage);
     }
 }

@@ -6,6 +6,7 @@ import com.example.promptengineering.entity.User;
 import com.example.promptengineering.repository.ModelRepository;
 import com.example.promptengineering.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,8 +19,14 @@ public class ModelService {
     @Autowired
     private ModelRepository modelRepository;
 
+    @Value("${app.max.models.per.user}")
+    private int maxModelsPerUser;
+
     public List<Model> getUserModels(User user){
         List<Model> models = modelRepository.findByUser(user);
+        if (models.size() >= maxModelsPerUser) {
+            throw new IllegalArgumentException("User cannot have more than " + maxModelsPerUser + " models.");
+        }
         return models;
     }
 
@@ -28,6 +35,11 @@ public class ModelService {
     }
 
     public User addUserModel(ModelDto modelDto, User user){
+        long currentCount = modelRepository.countByUser(user);
+        if (currentCount >= maxModelsPerUser) {
+            throw new IllegalArgumentException("User cannot have more than " + maxModelsPerUser + " models.");
+        }
+
         Model model = new Model(modelDto.getName(), modelDto.getText(), modelDto.getProvider(), modelDto.getUrl(), modelDto.getType(), user);
         model.setGlobal(false);
         modelRepository.save(model);

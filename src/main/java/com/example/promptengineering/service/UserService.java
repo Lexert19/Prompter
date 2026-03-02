@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.oauth2.sdk.Role;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -30,10 +31,16 @@ public class UserService implements UserDetailsService {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
+    @Value("${app.max.encrypted.keys.length}")
+    private int maxEncryptedKeysLength;
+
     public void setUserKeys(User user, Map<String, String> keys) {
         try {
             String json = objectMapper.writeValueAsString(keys);
             String encrypted = encryptionService.encrypt(json);
+            if (encrypted.length() > maxEncryptedKeysLength) {
+                throw new IllegalArgumentException("Encrypted keys too long (max " + maxEncryptedKeysLength + " characters)");
+            }
             user.setEncryptedKeys(encrypted);
         } catch (Exception e) {
             throw new RuntimeException("Error saving keys", e);
@@ -43,7 +50,7 @@ public class UserService implements UserDetailsService {
     public User appendKeyToMap(User user, String keyName, String keyValue) {
         Map<String, String> keys = getUserKeys(user);
         keys.put(keyName, keyValue);
-        setUserKeys(user, keys);
+        this.setUserKeys(user, keys);
         return user;
     }
 
@@ -52,6 +59,9 @@ public class UserService implements UserDetailsService {
             return new HashMap<>();
         }
         try {
+            if(user.getEncryptedKeys().length() > maxEncryptedKeysLength){
+                throw new IllegalArgumentException("Encrypted keys too long (max " + maxEncryptedKeysLength + " characters)");
+            }
             String decrypted = encryptionService.decrypt(user.getEncryptedKeys());
             return objectMapper.readValue(decrypted, new TypeReference<Map<String, String>>() {});
         } catch (Exception e) {

@@ -25,7 +25,7 @@ public class Message {
 
     @ElementCollection
     @CollectionTable(name = "message_documents", joinColumns = @JoinColumn(name = "message_id"))
-    @Column(name = "document_id")
+    @Column(columnDefinition = "TEXT")
     private List<String> documents;
 
     @ElementCollection

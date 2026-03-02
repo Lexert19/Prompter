@@ -23,8 +23,15 @@ import java.util.stream.Collectors;
 @Service
 public class FileStorageService {
 
-    @Value("${file.upload-dir:uploads}")
+    @Value("${file.upload-dir}")
     private String uploadDir;
+
+
+    @Value("${file.max-size}")
+    private long maxFileSize;
+
+    @Value("${file.max-count}")
+    private int maxFilesPerUser;
 
     private final UserFileRepository userFileRepository;
 
@@ -44,6 +51,16 @@ public class FileStorageService {
 
 
     public UserFileDTO storeFile(MultipartFile file, User owner) throws IOException {
+        if (file.getSize() > maxFileSize) {
+            throw new IllegalArgumentException("File too large. Max allowed size: " + maxFileSize + " bytes");
+        }
+
+        long currentFileCount = userFileRepository.countByOwner(owner);
+        if (currentFileCount >= maxFilesPerUser) {
+            throw new IllegalArgumentException("User cannot have more than " + maxFilesPerUser + " files.");
+        }
+
+
         Path userDir = Paths.get(uploadDir, owner.getId().toString());
         if (!Files.exists(userDir)) {
             Files.createDirectories(userDir);

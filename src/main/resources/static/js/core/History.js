@@ -5,7 +5,7 @@ class History {
     }
 
     async loadHistory() {
-        const chats = await this.loadChats();
+        const chats = await this.loadChats(0, 20);
         const sortedChats = chats.sort(
             (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
@@ -221,9 +221,9 @@ class History {
         }
     }
 
-    async loadChats() {
+    async loadChats(page = 0, size = 100) {
         try {
-            const response = await fetch(`${this.baseUrl}/chats`, {
+            const response = await fetch(`${this.baseUrl}/chats?page=${page}&size=${size}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -235,8 +235,8 @@ class History {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            const chats = await response.json();
-            return chats;
+            const pageData = await response.json();
+            return pageData.content;
         } catch (error) {
             console.error("Error loading chats:", error);
             throw error;

@@ -117,7 +117,7 @@ class InputView{
             if (!hasImage) {
                 if (pastedText.length > 2000) {
                     event.preventDefault();
-                    window.inputView.push(pastedText);
+                    window.inputView.longTexts.push(pastedText);
                     window.inputView.updateView();
                 } else {
                 }
