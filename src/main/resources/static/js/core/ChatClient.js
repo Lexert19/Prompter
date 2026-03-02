@@ -46,7 +46,7 @@ class ChatClient {
         })
             .then(this.handleStream.bind(this))
             .catch(error => {
-            this.outputInput.textContent += 'Error fetching data:', error;
+            this.outputInput.textContent += t.t("errorFetchingData"), error;
         });
     }
 

@@ -53,8 +53,8 @@ class InputView{
 
         if (!window.settings.key) {
             window.modal.open(
-                'Błąd',
-                '<p>Brak klucza API dla wybranego dostawcy. Skonfiguruj klucz w ustawieniach konta.</p>'
+                t.t("error"),
+                '<p>'+t.t("noApiKey")+'</p>'
             );
             return;
         }

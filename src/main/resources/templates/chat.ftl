@@ -1,3 +1,4 @@
+<#import "/spring.ftl" as spring/>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,7 +20,7 @@
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
-    <title>Prompter</title>
+    <title><@spring.message "app.title"/></title>
 </head>
 
 <body>
@@ -42,7 +43,7 @@
             <div class="cache-container">
             </div>
             <textarea type="text" class="transparent-textarea" onkeydown="window.inputView.appendText(event)" id="input"
-                      placeholder="Wpisz wiadomość..."></textarea>
+                      placeholder="<@spring.message 'input.placeholder'/>"></textarea>
             <button id="send-button" class="send-button" onclick="window.inputView.makeChat()">
                 <div id="send-icon" class="d-flex align-items-center justify-content-center">
                     <svg xmlns="http://www.w3.org/2000/svg" height="16" width="12" viewBox="0 0 384 512">
@@ -61,9 +62,6 @@
     </div>
 </div>
 <div id="overlay" style="display: none;"></div>
-<#include "/parts/deleteModelMenu.ftl" />
-<#include "/parts/addModelMenu.ftl" />
-<#include "/parts/editModelMenu.ftl" />
 <#include "/parts/editMessage.ftl" />
 <#include "/parts/editFile.ftl" />
 

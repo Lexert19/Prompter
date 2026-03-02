@@ -1,13 +1,15 @@
 class DeleteModelMenu {
     showDeleteMenu(model) {
+
+        const confirmDeleteModel = t.t("confirmDeleteModel",  { name: model.name });
         const html = `
-            <p>Czy na pewno chcesz usunąć model <strong>${model.name}</strong>?</p>
+            <p>${confirmDeleteModel}</p>
             <div class="d-flex justify-content-between" style="gap: 10px; margin-top: 20px;">
-                <button id="cancelDeleteBtn">Anuluj</button>
-                <button id="confirmDeleteBtn" class="btn-danger">Usuń</button>
+                <button id="cancelDeleteBtn">${t.t("cancel")}</button>
+                <button id="confirmDeleteBtn" class="btn-danger">${t.t("delete")}</button>
             </div>
         `;
-        window.modal.open('Potwierdzenie usunięcia', html, null);
+        window.modal.open(t.t("confirmDelete"), html, null);
         document.getElementById('confirmDeleteBtn').addEventListener('click', () => this.deleteModel(model.id));
         document.getElementById('cancelDeleteBtn').addEventListener('click', () => window.modal.close());
     }

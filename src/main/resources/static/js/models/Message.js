@@ -74,7 +74,7 @@ class Message {
     getHtmlFiles() {
         let documentsText = "";
         this.documents.forEach((document, index) => {
-            documentsText += `<div class="me-2">Dokument: ${document.length}</div>`;
+            documentsText += `<div class="me-2">${t.t("document")} ${document.length}</div>`;
         });
         return `<div class="d-flex">${documentsText}</div>`;
     }

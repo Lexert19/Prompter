@@ -1,19 +1,30 @@
 class AccountView{
     constructor(){
+        document.addEventListener('DOMContentLoaded', function() {
+            const select = document.getElementById('languageSelect');
+            if (select) {
+                const lang = getCookie('lang') || 'pl';
+                select.value = lang;
+            }
+        });
+    }
 
+    changeLanguage(lang) {
+        document.cookie = `lang=${lang}; path=/; max-age=31536000`;
+        location.reload();
     }
 
     openAddKeyModal() {
         const content = `
             <form id="keyForm" class="d-flex flex-column">
-                <label for="keyName">Nazwa klucza</label>
+                <label for="keyName">${t.t("keyName")}</label>
                 <input type="text" id="keyName" name="keyName" class="mb-05" required>
-                <label for="keyValue">Wartość klucza</label>
+                <label for="keyValue">${t.t("keyValue")}</label>
                 <input type="text" id="keyValue" name="keyValue" class="mb-05" required>
-                <button class="rounded-1 mt-2 ms-auto" type="submit">Zapisz</button>
+                <button class="rounded-1 mt-2 ms-auto" type="submit">${t.t("save")}</button>
             </form>
         `;
-        window.modal.open('Dodaj klucz API', content, (formData) => {
+        window.modal.open(t.t("addApiKey"), content, (formData) => {
             this.saveKey(formData.get('keyName'), formData.get('keyValue'));
         });
     }
@@ -21,14 +32,14 @@ class AccountView{
     openChangePasswordModal() {
         const content = `
             <form  class="d-flex flex-column" id="passwordForm">
-                <label for="newPassword">Nowe hasło</label>
+                <label for="newPassword">${t.t("newPassword")}</label>
                 <input type="password" id="newPassword" name="newPassword" class="mb-05" required>
-                <label for="confirmPassword">Powtórz hasło</label>
+                <label for="confirmPassword">${t.t("confirmPassword")}</label>
                 <input type="password" id="confirmPassword" name="confirmPassword" class="mb-05" required>
-                <button class="rounded-1 mt-2 ms-auto" type="submit">Zmień hasło</button>
+                <button class="rounded-1 mt-2 ms-auto" type="submit">${t.t("changePassword")}</button>
             </form>
         `;
-        window.modal.open('Zmień hasło', content, (formData) => {
+        window.modal.open(t.t("changePassword"), content, (formData) => {
             this.setNewPassword(formData.get('newPassword'), formData.get('confirmPassword'));
         });
     }
@@ -60,7 +71,7 @@ class AccountView{
         })
             .catch(error => {
             console.error('There was a problem with the fetch operation:', error);
-            alert('Error saving key: ' + error.message);
+            alert(t.t("errorSavingKey") + error.message);
         });
     }
 
@@ -70,12 +81,12 @@ class AccountView{
         const confirmPass = document.getElementById('confirmPassword').value;
 
         if (!newPass || !confirmPass) {
-            alert("Proszę wypełnić oba pola.");
+            alert(t.t("fillBothFields"));
             return;
         }
 
         if (newPass !== confirmPass) {
-            alert("Hasła nie są identyczne!");
+            alert(t.t("passwordsNotMatch"));
             return;
         }
 
@@ -98,14 +109,14 @@ class AccountView{
             return response.text();
         })
             .then(data => {
-            alert("Hasło zostało zmienione!");
+            alert(t.t("passwordChanged"));
             window.modal.close();
             document.getElementById('newPassword').value = '';
             document.getElementById('confirmPassword').value = '';
         })
             .catch(error => {
             console.error("Błąd:", error);
-            alert(`Błąd zmiany hasła: ${error.message}`);
+            alert(`${t.t("passwordChangeError")}${error.message}`);
         });
     }
 }

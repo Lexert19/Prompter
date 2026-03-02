@@ -25,7 +25,7 @@ class Projects {
     }
 
     populateProjectSelect(projects) {
-        this.projectSelect.innerHTML = '<option value="">Wybierz projekt</option>';
+        this.projectSelect.innerHTML = '<option value="">'+t.t("selectProject")+'</option>';
         projects.forEach(project => {
             const option = document.createElement('option');
             option.value = project.id;
@@ -43,7 +43,7 @@ class Projects {
     }
 
     async createProject() {
-        const projectName = prompt('Podaj nazwę nowego projektu:');
+        const projectName = prompt(t.t("enterProjectName"));
         if (!projectName) return;
 
         try {
@@ -61,7 +61,7 @@ class Projects {
             await response.json();
             this.loadProjects();
         } catch (error) {
-            this.showError('Nie udało się utworzyć projektu');
+            this.showError(t.t("createProjectFailed"));
             console.error('Error:', error);
         }
     }
@@ -82,7 +82,7 @@ class Projects {
             const project = await response.json();
             this.displayProjectDetails(project);
         } catch (error) {
-            this.showError('Projekt nie istnieje');
+            this.showError(t.t("projectNotExist"));
             console.error('Error:', error);
         }
     }
@@ -106,7 +106,7 @@ class Projects {
             const projects = await response.json();
             this.populateProjectSelect(projects);
         } catch (error) {
-            this.showError('Brak dostępu do projektu');
+            this.showError(t.t("noAccessToProject"));
             console.error('Error:', error);
         }
     }
@@ -160,7 +160,7 @@ class Projects {
             await response.json();
             this.loadProjectFiles(projectId);
         } catch (error) {
-            this.showError('Nie udało się dodać pliku');
+            this.showError(t.t("addFileFailed"));
             console.error('Error:', error);
         }
     }
@@ -183,7 +183,7 @@ class Projects {
             const fragments = await response.json();
             return fragments;
         } catch (error) {
-            this.showError('Nie udało się znaleźć podobnych fragmentów');
+            this.showError(t.t("searchError"));
             console.error('Błąd:', error);
         }
     }
@@ -201,7 +201,7 @@ class Projects {
             const files = await response.json();
             this.displayFiles(files);
         } catch (error) {
-            this.showError('Nie udało się wczytać plików');
+            this.showError(t.t("loadFilesFailed"));
             console.error('Error:', error);
         }
     }
@@ -231,7 +231,7 @@ class Projects {
             const url = URL.createObjectURL(blob);
             window.open(url, '_blank');
         } catch (error) {
-            this.showError('Nie udało się otworzyć pliku');
+            this.showError(t.t("loadFilesFailed"));
             console.error('Błąd:', error);
         }
     }

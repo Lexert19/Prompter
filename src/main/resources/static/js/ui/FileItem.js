@@ -54,7 +54,7 @@ class FileItem{
                 const url = URL.createObjectURL(blob);
                 window.open(url, '_blank');
             } catch (error) {
-                this.showError('Nie udało się otworzyć pliku');
+                this.showError(t.t("openFileFailed"));
                 console.error('Błąd:', error);
             }
         }

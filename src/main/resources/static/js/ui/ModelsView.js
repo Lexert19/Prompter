@@ -44,12 +44,12 @@ class ModelsView{
             html += `
                 <div class="mb-1" style="display: flex; align-items: center;">
                     <span style="flex-grow: 1;">${model.text || model.name}</span>
-                    <button class="me-1 rounded-1" data-id="${model.id}" onclick="window.modelsView.editModel(this)">Edytuj</button>
-                    <button class="rounded-1" data-id="${model.id}" onclick="window.modelsView.deleteModel(this)">Usuń</button>
+                    <button class="me-1 rounded-1" data-id="${model.id}" onclick="window.modelsView.editModel(this)">${t.t("edit")}</button>
+                    <button class="rounded-1" data-id="${model.id}" onclick="window.modelsView.deleteModel(this)">${t.t("delete")}</button>
                 </div>
             `;
         });
-        html += '<button class="rounded-1" onclick="window.addEditModelMenu.showAddMenu()">Dodaj model</button>';
+        html += '<button class="rounded-1" onclick="window.addEditModelMenu.showAddMenu()">'+t.t("addModel")+'</button>';
         modelsDiv.innerHTML = html;
     }
 
@@ -66,4 +66,6 @@ class ModelsView{
     }
 }
 
-window.modelsView = new ModelsView();
+document.addEventListener('DOMContentLoaded', function() {
+    window.modelsView = new ModelsView();
+});

@@ -3,26 +3,26 @@
         <label class="checkbox-container">
             <input type="checkbox" id="memory" name="memory" value="memory" onchange="window.settings.change(event)">
             <label for="memory" class="custom-checkbox"></label>
-            <span>Pamięć (pamięta poprzednie wiadomości)</span>
+            <span><@spring.message "settings.memory"/></span>
         </label>
     </div>
     <div  class="instruction-field ">
         <label class="checkbox-container">
             <input type="checkbox" id="cache" name="cache" value="cache" onchange="window.settings.change(event)">
             <label for="cache" class="custom-checkbox"></label>
-            <span>Cache</span>
+            <span><@spring.message "settings.cache"/></span>
         </label>
     </div>
     <#include "/parts/maxTokenView.ftl" />
 
     <div  class="instruction-field ">
-        <label for="temperature"><span>Temperatura</span></label>
+        <label for="temperature"><span><@spring.message "settings.temperature"/></span></label>
         <input type="range" id="temperature" name="temperature" min="0" max="100" step="1" value="0"
             onchange="window.settings.change(event)">
         
     </div>
     <div  class="instruction-field ">
-        <label for="system">System</label>
+        <label for="system"><@spring.message "settings.system"/></label>
         <div class="d-flex mt-025">
             <textarea id="system" name="system" onchange="window.settings.change(event)"></textarea>
             <label class="checkbox-container">
@@ -32,7 +32,7 @@
         </div>
     </div>
     <div  class="instruction-field ">
-        <label>Projekt</label>
+        <label><@spring.message "settings.project"/></label>
         <div class="d-flex mt-025">
             <select id="project" name="project" onchange="window.settings.change(event)"></select>
              <label class="checkbox-container">
@@ -42,7 +42,7 @@
         </div>
     </div>
     <div class="instruction-field" >
-        <label>Model</label>
+        <label><@spring.message "settings.model"/></label>
         <select id="modelOptions" name="model" class="" onchange="window.settings.changeModel(event)">
         </select>
     </div>
