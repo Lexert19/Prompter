@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/files")
@@ -58,5 +59,11 @@ public class FileController {
                 .contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + userFile.getFileName() + "\"")
                 .body(resource);
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<List<UserFileDTO>> listUserFiles(@AuthenticationPrincipal User user) {
+        List<UserFileDTO> files = fileStorageService.getUserFiles(user);
+        return ResponseEntity.ok(files);
     }
 }

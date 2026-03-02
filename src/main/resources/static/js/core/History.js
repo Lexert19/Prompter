@@ -20,15 +20,16 @@ class History {
     async createChatSession(content) {
         if (window.settings.activeHistory) {
             const chat = await this.createChat();
+            this.updateUrlForChat(chat.id);
             //this.saveMessage(chat.id, content);
 
-            const newPath = `/chat/${chat.id}`;
-
-            if (window.history && typeof window.history.pushState === "function") {
-                window.history.pushState({ chatId: chat.id }, document.title, newPath);
-            } else {
-                console.warn("History API not supported");
-            }
+//            const newPath = `/chat/${chat.id}`;
+//
+//            if (window.history && typeof window.history.pushState === "function") {
+//                window.history.pushState({ chatId: chat.id }, document.title, newPath);
+//            } else {
+//                console.warn("History API not supported");
+//            }
             return chat.id;
         }
         return "";
@@ -194,8 +195,8 @@ class History {
         const formatted = `${date.toLocaleDateString()} ${date.toLocaleTimeString([], options)}`;
         let index = `
       <div style="display: flex; align-items: center;">
-        <button onclick="window.chat.loadChat('${historyIndex.id}')">${formatted}</button>
-        <button onclick="window.chatHistory.deleteChat('${historyIndex.id}')" style="margin-left: 10px; background-color: transparent; border: none; cursor: pointer;">
+        <button class="rounded-1" onclick="window.chat.loadChat('${historyIndex.id}')">${formatted}</button>
+        <button class="d-flex rounded-1 justify-content-end" onclick="window.chatHistory.deleteChat('${historyIndex.id}')" style="margin-left: 10px; background-color: transparent; border: none; cursor: pointer;">
           <i class="fa fa-trash" aria-hidden="true"></i>
         </button>
       </div>
@@ -241,6 +242,16 @@ class History {
             throw error;
         }
     }
+
+    updateUrlForChat(chatId) {
+        const newPath = `/chat/${chatId}`;
+        if (window.history && typeof window.history.pushState === "function") {
+            window.history.pushState({ chatId: chatId }, document.title, newPath);
+        } else {
+            console.warn("History API not supported");
+        }
+    }
+
 }
 
 window.chatHistory = new History();

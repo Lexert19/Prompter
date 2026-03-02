@@ -1,6 +1,5 @@
 package com.example.promptengineering.restController;
 
-import java.security.Principal;
 import java.util.Map;
 
 import com.example.promptengineering.entity.User;
@@ -18,8 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.promptengineering.repository.UserRepository;
 import com.example.promptengineering.service.UserService;
 
-import reactor.core.publisher.Mono;
-
 @RestController
 @RequestMapping("/api/account")
 public class AccountController {
@@ -35,7 +32,7 @@ public class AccountController {
             @AuthenticationPrincipal User user,
             @PathVariable String keyName,
             @RequestBody String keyValue) {
-        userService.saveKeyToMap(user, keyName, keyValue);
+        userService.appendKeyToMap(user, keyName, keyValue);
         return String.format("Key '%s' saved to map for user with email: %s", keyName, user.getEmail());
     }
 

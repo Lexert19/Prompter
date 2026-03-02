@@ -1,3 +1,5 @@
+<#import "/spring.ftl" as spring />
+
 <nav class="navbar navbar-expand-lg position-fixed w-100 top-0" style="z-index: 1000;">
   <div class="container">
     <a class="navbar-brand text-white fs-4 fw-bold" href="/">Prompter</a>
@@ -6,7 +8,8 @@
     </button>
     <div class="collapse navbar-collapse py-3 py-lg-0" id="navbarSupportedContent">
         <a class="text-white ms-auto open_chat py-2 px-3 text-decoration-none rounded-pill" href="/auth/login">
-        Zaloguj się
+            <@spring.message "app.login" />
+
 </a>
     </div>
   </div>

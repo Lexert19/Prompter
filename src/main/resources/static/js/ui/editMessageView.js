@@ -2,7 +2,7 @@ class EditMessageView {
     constructor() {
         this.editMessageHtml = document.getElementById("edit-menu");
         this.cachedButton = document.getElementById("edit-menu-cached");
-        this.continueButton = document.getElementById("edit-menu-continue");
+        this.rerunButton = document.getElementById("edit-menu-rerun");
 
         document.addEventListener("click", (event) => {
             if (!this.editMessageHtml.contains(event.target)) {
@@ -11,18 +11,16 @@ class EditMessageView {
         });
         this.messageId = "";
         this.addCachedButtonListener();
-        this.addContinueButtonListener();
+        this.addRerunButtonListener();
     }
 
-    addContinueButtonListener(){
-        this.continueButton.addEventListener("click", () => {
-            const message = window.chat.requestBuilder.messages.find(
-                (msg) => msg.id === this.messageId
-            );
-            window.chatApi.continueMessage();
+    addRerunButtonListener() {
+        this.rerunButton.addEventListener("click", () => {
+            if (this.messageId) {
+                window.chatClient.rerunMessage(this.messageId);
+            }
             this.hideEditMenu();
         });
-
     }
 
     showEditMenu(event, messageId) {

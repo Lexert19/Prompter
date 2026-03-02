@@ -2,23 +2,39 @@ class InputView{
     constructor(){
         this.chatInput = document.getElementById("input");
         this.documentsHtml = document.getElementById("documents");
-
+        this.images = [];
+        this.longTexts = [];
         this.addPasteListener();
+        this.isBlocked = false;
+    }
+
+    removeImage(index) {
+        this.images.splice(index, 1);
+        this.updateView();
+    }
+
+    removeLongText(index) {
+        this.longTexts.splice(index, 1);
+        this.updateView();
+    }
+
+
+    setIsBlocked(state){
+        this.isBlocked = state;
+        this.updateView();
     }
 
     updateDocumentsView() {
-        const docElement = this.documentsHtml;
-        let content = '';
         const texts = [];
-        window.data.documents.forEach((doc, index) => {
-            texts.push(`<span id="doc-${index}"><i class="fas fa-file-alt" style="margin-right:5px;"></i> ${doc.length} <i class="fas fa-times" style="cursor: pointer;" onclick="window.data.removeDocument(${index})"></i></span>`);
+        this.longTexts.forEach((text, index) => {
+            texts.push(`<span id="doc-${index}"><i class="fas fa-file-alt" style="margin-right:5px;"></i> ${text.length} <i class="fas fa-times" style="cursor: pointer;" onclick="window.inputView.removeLongText(${index})"></i></span>`);
         });
-        window.data.images.forEach((img, index) => {
-            texts.push(`<span id="img-${index}"><i class="fas fa-image" style="margin-right:5px;"></i> ${img.length} <i class="fas fa-times" style="cursor: pointer;" onclick="window.data.removeImage(${index})"></i></span>`);
+        this.images.forEach((img, index) => {
+            texts.push(`<span id="img-${index}"><i class="fas fa-image" style="margin-right:5px;"></i> ${img.length} <i class="fas fa-times" style="cursor: pointer;" onclick="window.inputView.removeImage(${index})"></i></span>`);
         });
-        if (texts.length) content += ' ' + texts.join(' ');
-        docElement.innerHTML = content;
+        this.documentsHtml.innerHTML = texts.join(' ');
     }
+
 
 
     appendText(event) {
@@ -28,21 +44,24 @@ class InputView{
         }
     }
 
-    makeChat(){
-        const messgae = this.chatInput.value;
-        if (window.data.blockedInput == false){
+    makeChat() {
+        const message = this.chatInput.value;
+        if (!this.isBlocked) {
             this.chatInput.value = "";
+            this.isBlocked = true;
+            window.chat.sendMessage(message, "user", this.images, this.longTexts);
+            this.images = [];
+            this.longTexts = [];
+            this.updateView();
+        } else {
+            window.chat.stopStreaming();
+            this.isBlocked = false;
+            this.updateView();
         }
-        const sended = window.chatApi.chat(
-            messgae,
-            "user"
-        );
-
-
     }
 
     updateView(){
-        if(window.data.blockedInput){
+        if(this.isBlocked){
             document.getElementById('send-icon').classList.add("d-none");
             document.getElementById('stop-icon').classList.remove("d-none");
         }else{
@@ -71,11 +90,11 @@ class InputView{
                         const base64 = e.target.result;
                         try {
                             const fileId = await window.chatHistory.uploadImageBase64(base64);
-                            window.data.appendImage(fileId);
+                            window.inputView.images.push(fileId);
                         } catch (error) {
                             console.error("Error sending image:", error);
-                            window.data.appendImage(base64);
                         }
+                        window.inputView.updateView();
                     };
                     reader.readAsDataURL(file);
                     break;
@@ -85,7 +104,8 @@ class InputView{
             if (!hasImage) {
                 if (pastedText.length > 2000) {
                     event.preventDefault();
-                    window.data.appendDocument(pastedText);
+                    window.inputView.push(pastedText);
+                    window.inputView.updateView();
                 } else {
                 }
             }

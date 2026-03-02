@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Locale;
+import java.util.Optional;
+
 @Controller
 @RequestMapping("/auth")
 public class AuthController {
@@ -27,6 +30,11 @@ public class AuthController {
 
     @GetMapping("/login")
     public String showLoginForm(Model model) {
+//        Locale newLocale = Optional.ofNullable("pl")
+//                .map(Locale::forLanguageTag)
+//                .orElse(Locale.ENGLISH);
+//
+//        localeResolver.setLocale(request, response, newLocale);
         return "login-form";
     }
 

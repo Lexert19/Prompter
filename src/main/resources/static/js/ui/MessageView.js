@@ -6,7 +6,7 @@ class MessageView{
 
 
 
-    createHtmlElement(destination, finish = false){
+    createHtmlElement(destination, finished = false){
         let duration = "";
         if (this.message.end !== null) {
             const durationMs = this.message.end - this.message.start;
@@ -16,7 +16,7 @@ class MessageView{
 
         let htmlContent = "";
         if(this.message.role == "assistant"){
-            htmlContent = window.chatApi.parser.parseToHtml(this.message.getText());
+            htmlContent = window.chatClient.parser.parseToHtml(this.message.getText());
         }else{
             htmlContent = escapeHtml(this.message.getText());
         }
@@ -40,7 +40,7 @@ class MessageView{
             this.editMenu.showEditMenu(event, this.message.id);
         });
 
-        if(this.message.role == "assistant" && finish == false)
+        if(this.message.role == "assistant" && finished == false)
             this.startDurationCounter();
         return document.getElementById("input-" + this.message.id);
     }

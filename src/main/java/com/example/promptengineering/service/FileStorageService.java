@@ -16,7 +16,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class FileStorageService {
@@ -76,6 +78,13 @@ public class FileStorageService {
 
         UserFile savedFile = userFileRepository.save(userFile);
         return toDto(savedFile);
+    }
+
+    public List<UserFileDTO> getUserFiles(User user) {
+        List<UserFile> userFiles = userFileRepository.findByOwner(user);
+        return userFiles.stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 
     public UserFile getUserFile(Long fileId, User owner) throws FileStorageException {

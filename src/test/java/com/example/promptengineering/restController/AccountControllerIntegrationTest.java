@@ -54,7 +54,7 @@ public class AccountControllerIntegrationTest {
         User testUser = new User();
         testUser.setEmail(userEmail);
         testUser.setPassword(passwordEncoder.encode(userPassword));
-        testUser.setKeys(new HashMap<>());
+        userService.setUserKeys(testUser, new HashMap<>());
         userRepository.save(testUser);
 
         UserDetails userDetails = userService.loadUserByUsername(userEmail);
@@ -84,8 +84,8 @@ public class AccountControllerIntegrationTest {
                 .andExpect(content().string(String.format("Key '%s' saved to map for user with email: %s", keyName, userEmail)));
 
         User updatedUser = userRepository.findByEmail(userEmail).orElseThrow();
-        assert updatedUser.getKeys().containsKey(keyName);
-        assert updatedUser.getKeys().get(keyName).equals(keyValue);
+        assert userService.getUserKeys(updatedUser).containsKey(keyName);
+        assert userService.getUserKeys(updatedUser).get(keyName).equals(keyValue);
     }
 
     @Test
@@ -94,7 +94,7 @@ public class AccountControllerIntegrationTest {
         keys.put("OPENAI", "sk-openai-test");
         keys.put("ANTHROPIC", "sk-anthropic-test");
         User user = userRepository.findByEmail(userEmail).orElseThrow();
-        user.setKeys(keys);
+        userService.setUserKeys(user, keys);
         userRepository.save(user);
 
         mockMvc.perform(get("/api/account/keys")
@@ -107,7 +107,7 @@ public class AccountControllerIntegrationTest {
     @Test
     void shouldReturnEmptyMapWhenNoKeysExist() throws Exception {
         User user = userRepository.findByEmail(userEmail).orElseThrow();
-        user.setKeys(new HashMap<>());
+        userService.setUserKeys(user, new HashMap<>());
         userRepository.save(user);
 
         mockMvc.perform(get("/api/account/keys")
@@ -123,7 +123,7 @@ public class AccountControllerIntegrationTest {
         String newKeyValue = "sk-updated";
 
         User user = userRepository.findByEmail(userEmail).orElseThrow();
-        user.getKeys().put(keyName, initialKeyValue);
+        userService.getUserKeys(user).put(keyName, initialKeyValue);
         userRepository.save(user);
 
         mockMvc.perform(post("/api/account/save-key/{keyName}", keyName)
@@ -133,8 +133,8 @@ public class AccountControllerIntegrationTest {
                 .andExpect(status().isOk());
 
         User updatedUser = userRepository.findByEmail(userEmail).orElseThrow();
-        assert updatedUser.getKeys().get(keyName).equals(newKeyValue);
-        assert updatedUser.getKeys().size() == 1;
+        assert userService.getUserKeys(updatedUser).get(keyName).equals(newKeyValue);
+        assert userService.getUserKeys(updatedUser).size() == 1;
     }
 
     @Test
@@ -149,7 +149,7 @@ public class AccountControllerIntegrationTest {
                 .andExpect(status().isOk());
 
         User updatedUser = userRepository.findByEmail(userEmail).orElseThrow();
-        assert updatedUser.getKeys().get(keyName).equals(keyValue);
+        assert userService.getUserKeys(updatedUser).get(keyName).equals(keyValue);
     }
 
     @Test
@@ -164,7 +164,7 @@ public class AccountControllerIntegrationTest {
                 .andExpect(status().is4xxClientError());
 
         User updatedUser = userRepository.findByEmail(userEmail).orElseThrow();
-        assert updatedUser.getKeys().get(keyName) == null;
+        assert userService.getUserKeys(updatedUser).get(keyName) == null;
     }
 
     @Test
@@ -182,7 +182,6 @@ public class AccountControllerIntegrationTest {
         mockMvc.perform(get("/api/account/keys"))
                 .andExpect(status().isUnauthorized());
 
-        setUp();
     }
 
     @Test
@@ -191,7 +190,7 @@ public class AccountControllerIntegrationTest {
         initialKeys.put("OPENAI", "sk-openai");
         initialKeys.put("ANTHROPIC", "sk-anthropic");
         User user = userRepository.findByEmail(userEmail).orElseThrow();
-        user.setKeys(initialKeys);
+        userService.setUserKeys(user, initialKeys);
         userRepository.save(user);
 
         mockMvc.perform(post("/api/account/save-key/{keyName}", "GEMINI")
@@ -201,9 +200,9 @@ public class AccountControllerIntegrationTest {
                 .andExpect(status().isOk());
 
         User updatedUser = userRepository.findByEmail(userEmail).orElseThrow();
-        assert updatedUser.getKeys().size() == 3;
-        assert updatedUser.getKeys().get("OPENAI").equals("sk-openai");
-        assert updatedUser.getKeys().get("ANTHROPIC").equals("sk-anthropic");
-        assert updatedUser.getKeys().get("GEMINI").equals("sk-gemini");
+        assert userService.getUserKeys(updatedUser).size() == 3;
+        assert userService.getUserKeys(updatedUser).get("OPENAI").equals("sk-openai");
+        assert userService.getUserKeys(updatedUser).get("ANTHROPIC").equals("sk-anthropic");
+        assert userService.getUserKeys(updatedUser).get("GEMINI").equals("sk-gemini");
     }
 }

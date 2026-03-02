@@ -214,4 +214,6 @@ class Settings {
     }
 }
 
-window.settings = new Settings();
+document.addEventListener('DOMContentLoaded', function() {
+    window.settings = new Settings();
+});

@@ -1,9 +1,11 @@
 package com.example.promptengineering.restController;
 
+import com.example.promptengineering.dto.UserFileDTO;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.repository.UserFileRepository;
 import com.example.promptengineering.repository.UserRepository;
 import com.example.promptengineering.service.UserService;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +21,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.Path;
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -177,4 +182,69 @@ public class FileControllerIntegrationTest {
         mockMvc.perform(multipart("/api/files/upload").file(file))
                 .andExpect(status().isUnauthorized());
     }
+
+
+    @Test
+    void listFiles_shouldReturnOnlyUserOwnFiles() throws Exception {
+        MockMultipartFile file1 = new MockMultipartFile(
+                "file", "file1.txt", MediaType.TEXT_PLAIN_VALUE, "user1 file1".getBytes());
+        MockMultipartFile file2 = new MockMultipartFile(
+                "file", "file2.txt", MediaType.TEXT_PLAIN_VALUE, "user1 file2".getBytes());
+        MockMultipartFile file3 = new MockMultipartFile(
+                "file", "file3.txt", MediaType.TEXT_PLAIN_VALUE, "user2 file".getBytes());
+
+        mockMvc.perform(multipart("/api/files/upload").file(file1)
+                        .with(user(userService.loadUserByUsername(user1Email))))
+                .andExpect(status().isOk());
+        mockMvc.perform(multipart("/api/files/upload").file(file2)
+                        .with(user(userService.loadUserByUsername(user1Email))))
+                .andExpect(status().isOk());
+        mockMvc.perform(multipart("/api/files/upload").file(file3)
+                        .with(user(userService.loadUserByUsername(user2Email))))
+                .andExpect(status().isOk());
+
+        String user1Response = mockMvc.perform(get("/api/files/list")
+                        .with(user(userService.loadUserByUsername(user1Email))))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        List<UserFileDTO> user1Files = objectMapper.readValue(user1Response,
+                new TypeReference<List<UserFileDTO>>() {});
+        assertEquals(2, user1Files.size());
+        assertTrue(user1Files.stream().anyMatch(dto -> "file1.txt".equals(dto.getFileName())));
+        assertTrue(user1Files.stream().anyMatch(dto -> "file2.txt".equals(dto.getFileName())));
+        assertTrue(user1Files.stream().allMatch(dto -> dto.getOwnerId().equals(user1.getId())));
+
+        String user2Response = mockMvc.perform(get("/api/files/list")
+                        .with(user(userService.loadUserByUsername(user2Email))))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        List<UserFileDTO> user2Files = objectMapper.readValue(user2Response,
+                new TypeReference<List<UserFileDTO>>() {});
+        assertEquals(1, user2Files.size());
+        assertEquals("file3.txt", user2Files.get(0).getFileName());
+        assertEquals(user2.getId(), user2Files.get(0).getOwnerId());
+    }
+
+    @Test
+    void listFiles_withoutAuthentication_shouldReturn401() throws Exception {
+        mockMvc.perform(get("/api/files/list"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void listFiles_whenNoFiles_shouldReturnEmptyList() throws Exception {
+        mockMvc.perform(get("/api/files/list")
+                        .with(user(userService.loadUserByUsername(user1Email))))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json("[]"));
+    }
+
 }

@@ -9,7 +9,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.oauth2.sdk.Role;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,8 +17,6 @@ import org.springframework.stereotype.Service;
 
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.repository.UserRepository;
-
-import reactor.core.publisher.Mono;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -33,21 +30,20 @@ public class UserService implements UserDetailsService {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public void saveUserKeys(User user, Map<String, String> keys) {
+    public void setUserKeys(User user, Map<String, String> keys) {
         try {
             String json = objectMapper.writeValueAsString(keys);
             String encrypted = encryptionService.encrypt(json);
             user.setEncryptedKeys(encrypted);
-            userRepository.save(user);
         } catch (Exception e) {
             throw new RuntimeException("Error saving keys", e);
         }
     }
 
-    public User saveKeyToMap(User user, String keyName, String keyValue) {
+    public User appendKeyToMap(User user, String keyName, String keyValue) {
         Map<String, String> keys = getUserKeys(user);
         keys.put(keyName, keyValue);
-        saveUserKeys(user, keys);
+        setUserKeys(user, keys);
         return user;
     }
 

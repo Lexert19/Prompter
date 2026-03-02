@@ -1,4 +1,4 @@
-class ChatApi {
+class ChatClient {
     constructor() {
         this.url = "/client/chat";
         this.parser = new HtmlParser();
@@ -13,48 +13,6 @@ class ChatApi {
     getProvider(){
         return window.settings.provider;
     }
-
-    async continueMessage(){
-        if (window.data.blockedInput == true){
-            this.stopStreaming();
-            return;
-        }
-        window.data.setBlockedInput(true);
-        this.sendStreamingMessage(this.requestBuilder);
-
-    }
-
-    async chat(text, role){
-        if (window.data.blockedInput == true){
-            this.stopStreaming();
-            return false;
-        }
-        if(text == ""){
-            return false;
-        }
-        window.data.setBlockedInput(true);
-
-        const fragments = await window.projects.getContext(text);
-
-
-        this.currentMessage = new Message(
-            role,
-            text,
-            window.data.images,
-            window.data.documents,
-            fragments
-        );
-
-        window.chat.saveMessage(this.currentMessage);
-        const messageView = new MessageView(this.currentMessage);
-        messageView.createHtmlElement(document.getElementById("chatMessages"));
-        window.data.clearDocumentsAndImages();
-
-        this.requestBuilder.addMessage(this.currentMessage);
-        this.sendStreamingMessage(this.requestBuilder);
-    }
-
-
 
     newMessage(){
         this.currentMessage = new Message("assistant");
@@ -172,7 +130,7 @@ class ChatApi {
         if (this.abortController) {
             this.abortController.abort();
             this.abortController = null;
-            window.chat.setBlockedInput(false);
+            window.inputView.setIsBlocked(false);
             this.currentMessage.end = Date.now();
             window.chat.saveMessage(this.currentMessage);
         }
@@ -207,17 +165,17 @@ class ChatApi {
             this.read(reader, decoder);
         }).catch(error => {
             this.handleStreamEnd(reader);
-//            window.data.setBlockedInput(false);
-//            this.currentMessage.end = Date.now();
-//            window.chat.saveMessage(this.currentMessage);
-//
-//            reader.releaseLock();
+            //            window.data.setBlockedInput(false);
+            //            this.currentMessage.end = Date.now();
+            //            window.chat.saveMessage(this.currentMessage);
+            //
+            //            reader.releaseLock();
         });
     }
 
     handleStreamEnd(reader) {
         reader.releaseLock();
-        window.data.setBlockedInput(false);
+        window.inputView.setIsBlocked(false);
         this.currentMessage.end = Date.now();
         window.chat.saveMessage(this.currentMessage);
         //this.parser.parse("\n\n");
@@ -225,5 +183,5 @@ class ChatApi {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    window.chatApi = new ChatApi();
+    window.chatClient = new ChatClient();
 });
