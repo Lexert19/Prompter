@@ -8,6 +8,7 @@ class ChatClient {
         this.requestBuilder = new RequestBuilder();
         setInterval(this.renderHtml.bind(this), 100);
         this.rerender = false;
+        this.buffer = '';
     }
 
     getProvider(){
@@ -60,21 +61,25 @@ class ChatClient {
 
 
     readChunk(decoder, value) {
-        const chunk = decoder.decode(value, { stream: true });
 
-        this.readJsonChunk(chunk);
+        this.buffer += decoder.decode(value, { stream: true });
 
-        //this.outputInput.innerHTML = this.parser.toHTML();
+        let lines = this.buffer.split('\n');
+        this.buffer = lines.pop();
+
+        for (let line of lines) {
+            this.processLine(line);
+        }
     }
 
-    readJsonChunk(chunksString){
-        const chunks = chunksString.split("\n");
-        chunks.forEach(chunk => {
-            if (chunk.startsWith('data:')) {
-                chunk = chunk.slice(5).trim();
-            }
-            this.readChunkData(chunk);
-        });
+    processLine(line) {
+        if (!line.trim()) return;
+
+        if (line.startsWith('data:')) {
+            line = line.slice(5).trim();
+        }
+
+        this.readChunkData(line);
     }
 
     readChunkData(chunk){
@@ -173,12 +178,17 @@ class ChatClient {
         });
     }
 
+
     handleStreamEnd(reader) {
+        if (this.buffer) {
+            this.processLine(this.buffer);
+            this.buffer = '';
+        }
+
         reader.releaseLock();
         window.inputView.setIsBlocked(false);
         this.currentMessage.end = Date.now();
         window.chat.saveMessage(this.currentMessage);
-        //this.parser.parse("\n\n");
     }
 }
 
