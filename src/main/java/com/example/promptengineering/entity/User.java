@@ -4,6 +4,7 @@ import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.example.promptengineering.model.AppRole;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -34,7 +35,7 @@ public class User implements OAuth2User, Principal, UserDetails {
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
-    private List<Role> roles = new ArrayList<>();
+    private List<AppRole> roles = new ArrayList<>();
 
     @Transient
     private Map<String, Object> attributes;
@@ -63,7 +64,7 @@ public class User implements OAuth2User, Principal, UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.name()))
+                .map(role -> new SimpleGrantedAuthority("ROLE_"+role.name()))
                 .collect(Collectors.toList());
     }
 
@@ -101,12 +102,12 @@ public class User implements OAuth2User, Principal, UserDetails {
         this.id = id;
     }
 
-    public List<Role> getRoles() {
+    public List<AppRole> getRoles() {
         return roles;
     }
 
 
-    public void setRoles(List<Role> roles) {
+    public void setRoles(List<AppRole> roles) {
         this.roles = roles;
     }
 

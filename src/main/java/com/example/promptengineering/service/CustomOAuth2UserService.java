@@ -1,5 +1,7 @@
 package com.example.promptengineering.service;
 
+import com.example.promptengineering.exception.UserAlreadyExistsException;
+import com.example.promptengineering.model.AppRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -14,10 +16,14 @@ import com.example.promptengineering.repository.UserRepository;
 
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @Service
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UserService userService;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -28,8 +34,11 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> {
-                    User newUser = new User(email, "");
-                    return userRepository.save(newUser);
+                    try {
+                        return userService.createUser(email, List.of(AppRole.USER));
+                    } catch (UserAlreadyExistsException e) {
+                        throw new RuntimeException(e);
+                    }
                 });
 
         return user;

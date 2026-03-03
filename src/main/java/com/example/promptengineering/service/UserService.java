@@ -1,10 +1,9 @@
 package com.example.promptengineering.service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
+import com.example.promptengineering.exception.UserAlreadyExistsException;
+import com.example.promptengineering.model.AppRole;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.oauth2.sdk.Role;
@@ -76,16 +75,32 @@ public class UserService implements UserDetailsService {
         return user.get();
     }
 
-    public Object createUser(String email, String password, List<Role> roles) {
+    private void checkUserNotExists(String email) throws UserAlreadyExistsException {
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new UserAlreadyExistsException("User already exists with email: " + email);
+        }
+    }
+
+    private User createAndSaveUser(String email, String encodedPassword, List<AppRole> roles) {
         User user = new User();
         user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(password));
+        user.setPassword(encodedPassword);
         user.setRoles(roles);
         user.setEncryptedKeys(null);
-        Optional<User> existingUser = userRepository.findByEmail(email);
-        if(existingUser.isPresent())
-            throw  new RuntimeException("User already exists");
         return userRepository.save(user);
+    }
+
+    public User createUser(String email, String rawPassword, List<AppRole> roles) throws UserAlreadyExistsException {
+        checkUserNotExists(email);
+        String encodedPassword = passwordEncoder.encode(rawPassword);
+        return createAndSaveUser(email, encodedPassword, roles);
+    }
+
+    public User createUser(String email, List<AppRole> roles) throws UserAlreadyExistsException {
+        checkUserNotExists(email);
+        String randomPassword = UUID.randomUUID().toString();
+        String encodedPassword = passwordEncoder.encode(randomPassword);
+        return createAndSaveUser(email, encodedPassword, roles);
     }
 
     @Override

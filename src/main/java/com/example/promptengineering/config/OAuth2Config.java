@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -18,7 +17,6 @@ import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.web.*;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
-import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.client.RestTemplate;
@@ -43,8 +41,9 @@ public class OAuth2Config implements WebMvcConfigurer {
         http.csrf(csrf -> csrf.disable());
 
         http.authorizeHttpRequests(exchanges -> exchanges
-                .requestMatchers("/", "/{lang:(?:pl|en)}/**", "/login", "/error", "/static/**", "/auth/**", "/favicon.ico", "/favicon")
+                .requestMatchers("/", "/{lang:(?:pl|en)}/**", "/login","/debug", "/error", "/static/**", "/auth/**", "/favicon.ico", "/favicon")
                 .permitAll()
+                .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
                 .anyRequest().authenticated());
 
         http.oauth2Login(oauth2 -> oauth2
