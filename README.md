@@ -4,4 +4,4 @@ A modern web application for interacting with Large Language Models (LLMs) from 
 
 🔗 Live demo: [dominik-chyziak.pl](https://dominik-chyziak.pl)
 
-Technologies: SpringBoot, SQL, Java
+Technologies: SpringBoot, PostgreSQL, Java, JUnit, Jenkins (CI/CD), vanilla JavaScript
