@@ -48,3 +48,6 @@ output.txt
 **/docker-compose.override.yml
 **/data/
 **/volumes/
+
+
+gradle.properties
