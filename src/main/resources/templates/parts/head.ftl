@@ -6,7 +6,7 @@
 
     <title>Prompter</title>
 </head>
-<body class="background">
+<body class="background single-page-body">
 
 
 <#include "/parts/navbar.ftl" />

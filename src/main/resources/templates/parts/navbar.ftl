@@ -7,7 +7,17 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse py-3 py-lg-0" id="navbarSupportedContent">
-        <a class="text-white ms-auto open_chat py-2 px-3 text-decoration-none rounded-pill" href="/auth/login">
+        <div class="language-dropdown me-3 ms-auto">
+            <button class="dropdown-toggle" id="langDropdownBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span id="currentLangFlag"></span>
+                <span id="currentLangText">PL</span>
+            </button>
+            <div class="dropdown-menu" id="langDropdownMenu" aria-labelledby="langDropdownBtn">
+                <button class="dropdown-item" data-lang="pl">PL</button>
+                <button class="dropdown-item" data-lang="en">EN</button>
+            </div>
+        </div>
+        <a class="text-white open_chat py-2 px-3 text-decoration-none rounded-pill" href="/auth/login">
             <@spring.message "app.login" />
 
 </a>

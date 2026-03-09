@@ -41,7 +41,7 @@ public class OAuth2Config implements WebMvcConfigurer {
         http.csrf(csrf -> csrf.disable());
 
         http.authorizeHttpRequests(exchanges -> exchanges
-                .requestMatchers("/", "/{lang:(?:pl|en)}/**", "/login","/debug", "/error", "/static/**", "/auth/**", "/favicon.ico", "/favicon")
+                .requestMatchers("/", "/{lang:(?:pl|en)}/**", "/public/**", "/login","/debug", "/error", "/terms", "/privacy", "/static/**", "/auth/**", "/favicon.ico", "/favicon")
                 .permitAll()
                 .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
                 .anyRequest().authenticated());

@@ -42,8 +42,8 @@
                         <div class="d-flex align-items-start">
                             <i class="fas fa-key fa-2x me-3" style="color: var(--accent);"></i>
                             <div>
-                                <h5>Bring Your Own Key</h5>
-                                <p class="text-white-50">Use your own API keys from OpenAI, Anthropic, or other providers.</p>
+                                <h5><@spring.message "home.feature.byok.title"/></h5>
+                                <p class="text-white-50"><@spring.message "home.feature.byok.desc"/></p>
                             </div>
                         </div>
                     </div>
@@ -51,8 +51,8 @@
                         <div class="d-flex align-items-start">
                             <i class="fas fa-robot fa-2x me-3" style="color: var(--accent);"></i>
                             <div>
-                                <h5>Multiple Model Support</h5>
-                                <p class="text-white-50">Connect to various LLMs – GPT, Claude, and custom models.</p>
+                                <h5><@spring.message "home.feature.models.title"/></h5>
+                                <p class="text-white-50"><@spring.message "home.feature.models.desc"/></p>
                             </div>
                         </div>
                     </div>
@@ -60,8 +60,8 @@
                         <div class="d-flex align-items-start">
                             <i class="fas fa-history fa-2x me-3" style="color: var(--accent);"></i>
                             <div>
-                                <h5>Chat History</h5>
-                                <p class="text-white-50">Save and revisit your conversations anytime.</p>
+                                <h5><@spring.message "home.feature.history.title"/></h5>
+                                <p class="text-white-50"><@spring.message "home.feature.history.desc"/></p>
                             </div>
                         </div>
                     </div>
@@ -69,8 +69,8 @@
                         <div class="d-flex align-items-start">
                             <i class="fas fa-project-diagram fa-2x me-3" style="color: var(--accent);"></i>
                             <div>
-                                <h5>Projects & RAG</h5>
-                                <p class="text-white-50">Upload documents and retrieve context via embeddings.</p>
+                                <h5><@spring.message "home.feature.projects.title"/></h5>
+                                <p class="text-white-50"><@spring.message "home.feature.projects.desc"/></p>
                             </div>
                         </div>
                     </div>
