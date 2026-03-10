@@ -1,10 +1,16 @@
 package com.example.promptengineering.dto;
 
 import com.example.promptengineering.entity.Model;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Setter
+@Getter
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ModelDto {
     private Long id;
     private String name;
@@ -19,24 +25,6 @@ public class ModelDto {
         this.provider = provider;
         this.url = url;
         this.type = type;
-    }
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    public String getText() { return text; }
-    public void setText(String text) { this.text = text; }
-    public String getProvider() { return provider; }
-    public void setProvider(String provider) { this.provider = provider; }
-    public String getUrl() { return url; }
-    public void setUrl(String url) { this.url = url; }
-    public String getType() { return type; }
-    public void setType(String type) { this.type = type; }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public static ModelDto toDto(Model model) {

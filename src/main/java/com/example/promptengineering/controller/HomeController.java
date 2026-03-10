@@ -25,10 +25,12 @@ public class HomeController {
             HttpServletRequest request,
             HttpServletResponse response) {
 
-        Locale newLocale = Optional.ofNullable(lang)
-                .map(Locale::forLanguageTag)
-                .orElse(Locale.ENGLISH);
-
+        Locale newLocale;
+        if (lang != null) {
+            newLocale = Locale.forLanguageTag(lang);
+        } else {
+            newLocale = Locale.forLanguageTag("pl");
+        }
         localeResolver.setLocale(request, response, newLocale);
 
         return "home";

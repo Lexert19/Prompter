@@ -3,6 +3,7 @@ package com.example.promptengineering.component;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.model.AppRole;
 import com.example.promptengineering.repository.UserRepository;
+import com.example.promptengineering.service.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -26,8 +27,13 @@ public class DataInitializer implements CommandLineRunner {
     @Value("${admin.password}")
     private String adminPassword;
 
+    @Autowired
+    private ModelService modelService;
+
     @Override
     public void run(String... args) throws Exception {
+        modelService.loadDefaultModelsFromJson();
+
         if (userRepository.findByEmail(adminEmail).isEmpty()) {
             User admin = new User();
             admin.setEmail(adminEmail);

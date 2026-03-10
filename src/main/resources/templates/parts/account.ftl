@@ -16,6 +16,10 @@
         <button class="rounded-1" onclick="window.accountView.openChangePasswordModal()"><@spring.message "account.change.password"/></button>
     </div>
 
+    <div class="mb-2">
+        <button class="rounded-1" onclick="window.accountView.openAddSharedKeyModal()"><@spring.message "addSharedApiKey"/></button>
+    </div>
+
     <div class="mb-1">
         <label class="checkbox-container">
             <input type="checkbox" id="chatHistoryInput" name="chatHistoryInput" value="chatHistoryInput" onchange="window.settings.change(event)">

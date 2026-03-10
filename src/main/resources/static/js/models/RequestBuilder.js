@@ -68,6 +68,7 @@ class RequestBuilder {
                 reasoningEffort: window.settings.thinkingEffort
             }),
             system: this.getSystem(),
+            useSharedKeys: window.settings.useSharedKeys
         });
     }
 

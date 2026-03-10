@@ -47,5 +47,12 @@
         </select>
     </div>
     <#include "/parts/instructionThinkingEffort.ftl" />
+    <div class="instruction-field">
+        <label class="checkbox-container">
+            <input type="checkbox" id="useSharedKeys" name="useSharedKeys" onchange="window.settings.change(event)">
+            <span class="custom-checkbox"></span>
+            <span><@spring.message "settings.use.shared.keys"/></span>
+        </label>
+    </div>
 </div>
 

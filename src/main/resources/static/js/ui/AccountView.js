@@ -44,6 +44,41 @@ class AccountView{
         });
     }
 
+    openAddSharedKeyModal() {
+        const content = `
+        <form id="sharedKeyForm" class="d-flex flex-column">
+            <label for="sharedKeyProvider">${t.t("provider")}</label>
+            <input type="text" id="sharedKeyProvider" name="provider" class="mb-05" required placeholder="np. GROQ, OPENAI">
+
+            <label for="sharedKeyValue">${t.t("keyValue")}</label>
+            <input type="text" id="sharedKeyValue" name="keyValue" class="mb-05" required placeholder="klucz API">
+
+            <button class="rounded-1 mt-2 ms-auto" type="submit">${t.t("add")}</button>
+        </form>
+    `;
+        window.modal.open(t.t("addSharedApiKey"), content, (formData) => {
+            this.saveSharedKey(formData.get('provider'), formData.get('keyValue'));
+        });
+    }
+
+    async saveSharedKey(provider, keyValue) {
+        try {
+            const response = await fetch('/api/admin/shared-keys', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ provider, keyValue })
+            });
+            if (!response.ok) throw new Error('Błąd zapisu');
+            const data = await response.json();
+            alert(t.t("keySaved"));
+            window.modal.close();
+            if (window.adminSharedKeys) window.adminSharedKeys.loadKeys();
+        } catch (error) {
+            alert(t.t("errorSavingKey") + error.message);
+        }
+    }
+
+
     saveKey(){
         const keyName = document.getElementById("keyName");
         const keyValue = document.getElementById("keyValue");

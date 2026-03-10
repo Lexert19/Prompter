@@ -1,15 +1,14 @@
 package com.example.promptengineering.service;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 
+import com.example.promptengineering.entity.SharedKey;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.entity.UserFile;
-import com.example.promptengineering.exception.FileStorageException;
 import com.example.promptengineering.model.Content;
 import com.example.promptengineering.model.Message;
 import lombok.extern.slf4j.Slf4j;
@@ -31,12 +30,14 @@ public class ChatService {
     private final Gson gson = new Gson();
     private final WebClient webClient;
     private final FileStorageService fileStorageService;
+    private final SharedKeyService sharedKeyService;
 
-    public ChatService(WebClient.Builder webClientBuilder, FileStorageService fileStorageService) {
+    public ChatService(WebClient.Builder webClientBuilder, FileStorageService fileStorageService, SharedKeyService sharedKeyService) {
         this.webClient = webClientBuilder
                 .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(16 * 1024 * 1024))
                 .build();
         this.fileStorageService = fileStorageService;
+        this.sharedKeyService = sharedKeyService;
     }
 
     private Mono<Void> attachBase64Images(RequestBuilder request, User user) {
@@ -110,10 +111,29 @@ public class ChatService {
         return "image".equals(content.getType()) && content.getFileId() != null;
     }
 
+//    public Flux<ServerSentEvent<String>> makeRequest(RequestBuilder request, User user) {
+//        return attachBase64Images(request, user)
+//                .then(buildRequestBodyJson(request))
+//                .flatMapMany(json -> executeRequest(request, json))
+//                .onErrorResume(this::handleError);
+//    }
+
     public Flux<ServerSentEvent<String>> makeRequest(RequestBuilder request, User user) {
-        return attachBase64Images(request, user)
-                .then(buildRequestBodyJson(request))
-                .flatMapMany(json -> executeRequest(request, json))
+        Mono<RequestBuilder> requestWithKeyMono;
+        if (request.isUseSharedKeys()) {
+            requestWithKeyMono = Mono.fromCallable(() -> {
+                SharedKey sharedKey = sharedKeyService.getRandomWorkingKey(request.getProvider());
+                request.setKey(sharedKey.getKeyValue());
+                return request;
+            }).subscribeOn(Schedulers.boundedElastic());
+        } else {
+            requestWithKeyMono = Mono.just(request);
+        }
+
+        return requestWithKeyMono
+                .flatMapMany(req -> attachBase64Images(req, user)
+                        .then(buildRequestBodyJson(req))
+                        .flatMapMany(json -> executeRequest(req, json)))
                 .onErrorResume(this::handleError);
     }
 

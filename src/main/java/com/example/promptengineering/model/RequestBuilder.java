@@ -1,10 +1,15 @@
 package com.example.promptengineering.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Getter
+@Setter
 public class RequestBuilder {
     private String model;
     private List<Message> messages = new ArrayList<>();
@@ -18,6 +23,7 @@ public class RequestBuilder {
     private String reasoningEffort = "";
     private String type = "";
     private String system = "";
+    private boolean useSharedKeys = false;
 
     public RequestBuilder model(String model) {
         this.model = model;
@@ -77,7 +83,7 @@ public class RequestBuilder {
         request.put("model", model);
         request.put("stream", stream);
 
-        if(!this.reasoningEffort.equals("")){
+        if(!this.reasoningEffort.isEmpty()){
             request.put("response_format", Map.of("type", "text"));
             request.put("reasoning_effort", this.reasoningEffort);
         }
@@ -86,103 +92,4 @@ public class RequestBuilder {
 
         return request;
     }
-
-    public String getModel() {
-        return model;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
-    }
-
-    public List<Message> getMessages() {
-        return messages;
-    }
-
-    public void setMessages(List<Message> messages) {
-        this.messages = messages;
-    }
-
-    public Integer getMaxTokens() {
-        return maxTokens;
-    }
-
-    public void setMaxTokens(Integer maxTokens) {
-        this.maxTokens = maxTokens;
-    }
-
-    public Boolean getStream() {
-        return stream;
-    }
-
-    public void setStream(Boolean stream) {
-        this.stream = stream;
-    }
-
-    public Double getTemperature() {
-        return temperature;
-    }
-
-    public void setTemperature(Double temperature) {
-        this.temperature = temperature;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getSessionId() {
-        return sessionId;
-    }
-
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
-    }
-
-   
-
-    public String getProvider() {
-        return provider;
-    }
-
-    public void setProvider(String provider) {
-        this.provider = provider;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getReasoningEffort() {
-        return reasoningEffort;
-    }
-
-    public void setReasoningEffort(String reasoningEffort) {
-        this.reasoningEffort = reasoningEffort;
-    }
-
-    public String getSystem() {
-        return system;
-    }
-
-    public void setSystem(String system) {
-        this.system = system;
-    }
-
 }

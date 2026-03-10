@@ -10,6 +10,7 @@ class Settings {
         this.projectsSwitch = false;
         this.activeHistory = false;
         this.thinkingEffort = "normal"
+        this.useSharedKeys = false;
 
         this.provider = "OPENAI";
         this.url = "https://api.openai.com/v1/chat/completions";
@@ -46,6 +47,7 @@ class Settings {
             projectSwitch: this.projectSwitch,
             activeHistory: this.activeHistory,
             thinkingEffort: this.thinkingEffort,
+            useSharedKeys: this.useSharedKeys,
         };
         localStorage.setItem("appSettings", JSON.stringify(settingsToSave));
     }
@@ -82,6 +84,10 @@ class Settings {
                 break;
             case "temperature":
                 window.settings.temperature = event.target.value / 100;
+                break;
+            case "useSharedKeys":
+                window.settings.useSharedKeys = event.target.checked;
+                break;
         }
 
         this.save();
@@ -187,6 +193,11 @@ class Settings {
             .map((model) => `<option value="${model.name}">${model.name}</option>`)
             .join("");
         modelSelect.value = this.model;
+
+        const useSharedKeysCheckbox = document.getElementById("useSharedKeys");
+        if (useSharedKeysCheckbox) {
+            useSharedKeysCheckbox.checked = this.useSharedKeys;
+        }
     }
 
     loadKeys() {

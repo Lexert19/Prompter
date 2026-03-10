@@ -51,7 +51,7 @@ class InputView{
             return;
         }
 
-        if (!window.settings.key) {
+        if (!window.settings.key && !window.settings.useSharedKeys) {
             window.modal.open(
                 t.t("error"),
                 '<p>'+t.t("noApiKey")+'</p>'
