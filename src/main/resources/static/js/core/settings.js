@@ -26,7 +26,6 @@ class Settings {
         this.load();
         this.loadKeys();
 
-        this.loadProjects();
         this.initModels();
         this.initUI();
     }
@@ -108,37 +107,36 @@ class Settings {
         this.save();
     }
 
-    loadProjects() {
-        fetch("/api/projects", {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            credentials: "include",
-        })
-            .then((response) => {
-            if (!response.ok) {
-                throw new Error("Failed to fetch projects: " + response.statusText);
-            }
-            return response.json();
-        })
-            .then((projects) => {
-            const projectSelect = document.getElementById("project");
-            projectSelect.innerHTML = "";
-
-            projects.forEach((project) => {
-                const option = document.createElement("option");
-                option.value = project.id;
-                option.textContent = project.name;
-                projectSelect.appendChild(option);
-            });
-
-            projectSelect.value = this.project;
-        })
-            .catch((error) => {
-            console.error("Error loading projects:", error);
-        });
-    }
+//    loadProjects() {
+//        fetch("/api/projects", {
+//            method: "GET",
+//            headers: {
+//                "Content-Type": "application/json",
+//            },
+//            credentials: "include",
+//        })
+//            .then((response) => {
+//            if (!response.ok) {
+//                throw new Error("Failed to fetch projects: " + response.statusText);
+//            }
+//            return response.json();
+//        })
+//            .then((projects) => {
+//            const projectSelect = document.getElementById("project");
+//            projectSelect.innerHTML = "";
+//
+//            projects.forEach((project) => {
+//                const option = document.createElement("option");
+//                option.value = project.id;
+//                option.textContent = project.name;
+//                projectSelect.appendChild(option);
+//            });
+//
+//        })
+//            .catch((error) => {
+//            console.error("Error loading projects:", error);
+//        });
+//    }
 
     initModels() {
         hidePages();
@@ -184,17 +182,10 @@ class Settings {
         document.getElementById("memory").checked = this.memory;
         document.getElementById("chatHistoryInput").checked = this.activeHistory;
         document.getElementById("cache").checked = this.cache;
-        document.getElementById("projectSwitch").checked = this.projectSwitch;
 
-        //document.querySelector('input[name="maxTokens"]').value = this.maxTokens;
 
         document.getElementById("temperature").value = this.temperature * 100;
 
-//        const modelSelect = document.getElementById("modelOptions");
-//        modelSelect.innerHTML = this.models
-//            .map((model) => `<option value="${model.name}">${model.name}</option>`)
-//            .join("");
-//        modelSelect.value = this.model;
 
         const useSharedKeysCheckbox = document.getElementById("useSharedKeys");
         if (useSharedKeysCheckbox) {

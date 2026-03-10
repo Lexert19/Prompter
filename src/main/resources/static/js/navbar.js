@@ -28,6 +28,7 @@
         const dropdownBtn = document.getElementById('langDropdownBtn');
         const dropdownMenu = document.getElementById('langDropdownMenu');
         const items = document.querySelectorAll('.dropdown-item');
+        if (!dropdownBtn || !dropdownMenu) return;
 
         if (btnText) btnText.textContent = currentLang.toUpperCase();
 
