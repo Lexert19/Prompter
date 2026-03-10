@@ -38,18 +38,24 @@ class ModelsView{
 
 
     renderModels(models) {
-        const modelsDiv = document.getElementById('models');
+        const modelsDiv = document.getElementById('models-list');
         let html = '';
         models.forEach(model => {
             html += `
-                <div class="mb-1" style="display: flex; align-items: center;">
-                    <span style="flex-grow: 1;">${model.text || model.name}</span>
-                    <button class="me-1 rounded-1" data-id="${model.id}" onclick="window.modelsView.editModel(this)">${t.t("edit")}</button>
-                    <button class="rounded-1" data-id="${model.id}" onclick="window.modelsView.deleteModel(this)">${t.t("delete")}</button>
-                </div>
-            `;
+    <div class="model-item">
+        <span class="model-name">${model.text || model.name}</span>
+        <div class="model-actions">
+            <button class="btn-edit" data-id="${model.id}" onclick="window.modelsView.editModel(this)" title="${t.t("edit")}">
+                <i class="fas fa-pencil-alt"></i>
+            </button>
+            <button class="btn-delete" data-id="${model.id}" onclick="window.modelsView.deleteModel(this)" title="${t.t("delete")}">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </div>
+    </div>
+`;
         });
-        html += '<button class="rounded-1" onclick="window.addEditModelMenu.showAddMenu()">'+t.t("addModel")+'</button>';
+        //html += '<button class="rounded-1" onclick="window.addEditModelMenu.showAddMenu()">'+t.t("addModel")+'</button>';
         modelsDiv.innerHTML = html;
     }
 

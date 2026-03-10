@@ -339,13 +339,10 @@ input {
 input, textarea, select {
     color: #ffffff;
     font-size: 16px;
-    /* border: 1px solid rgba(79, 70, 229, 0.3);  */
-/*    background-color: #333340;*/
-    background-color: #2A2D3F;
-    border-radius: 1.5rem;
+    background-color: var(--second-bg);
+    border-radius: 0.25rem;
     padding: 8px 16px;
     border: 1px solid #555866;
-/*    background-color: #374151;*/
 }
 
 input:active, textarea:active, select:active,
@@ -421,20 +418,17 @@ p {
     display: flex;
 }
 
-
-/* input range */
 input[type="range"] {
     -webkit-appearance: none;
     margin: 5px 0;
     margin-right: 5px;
     width: 100%; 
-    height: 10px; 
-/*    background-color: rgba(55, 65, 81, 0.95);*/
-/*    background-color: rgb(51, 51, 64);*/
-    border-radius: 50px;
+    height: 10px;
+    border-radius: 0.25rem;
     box-sizing: border-box;
     padding: 1rem 0.25rem;
-    outline: none; 
+    outline: none;
+    border: none;
 }
 
 input[type="range"]::-webkit-slider-thumb {
@@ -794,3 +788,181 @@ input[type="number"]::-ms-spin-button {
     border-radius: 10px;
 }
 
+
+/* model item*/
+#models-list {
+    max-width: 600px;
+}
+
+.model-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--second-bg);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin-bottom: 8px;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.model-item:hover {
+    background-color: rgba(99, 102, 241, 0.1);
+    border-color: var(--accent);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.model-name {
+    font-size: 1rem;
+    color: #fff;
+    word-break: break-word;
+    flex: 1;
+    margin-right: 16px;
+}
+
+.model-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.model-actions button {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-edit {
+    background-color: var(--accent);
+    color: white;
+}
+
+.btn-edit:hover {
+    background-color: var(--accent-darker);
+}
+
+.btn-delete {
+    background-color: #b91c1c;
+    color: white;
+}
+
+.btn-delete:hover {
+    background-color: #991b1b;
+}
+
+.model-actions button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.model-actions button i {
+    font-size: 0.875rem;
+}
+
+/**/
+
+.model-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.model-item-selectable {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.2s;
+}
+
+.model-item-selectable:hover {
+    background-color: var(--accent-darker);
+}
+
+.model-item-selectable.selected {
+    background-color: var(--accent);
+}
+
+.model-item-name {
+    font-weight: 600;
+}
+
+.model-item-provider {
+    font-size: 0.85rem;
+    opacity: 0.7;
+    background: rgba(0,0,0,0.2);
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+
+.model-selector-button {
+    background-color: var(--second-bg);
+    border: 1px solid #555866;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.model-selector-button:hover {
+    background-color: var(--accent-darker);
+}
+
+.model-selector-button i {
+    margin-left: 10px;
+    font-size: 0.9rem;
+}
+
+/* system prompt*/
+
+.system-prompt-button {
+    background-color: var(--second-bg);
+    border: 1px solid #555866;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.system-prompt-button:hover {
+    background-color: var(--accent-darker);
+}
+
+.system-prompt-preview {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.system-prompt-status {
+    font-size: 0.8rem;
+    background: rgba(255,255,255,0.1);
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-left: 10px;
+}
+
+#systemPromptForm textarea {
+    background-color: var(--second-bg);
+    border: 1px solid var(--accent);
+    color: white;
+    border-radius: 6px;
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#systemPromptForm textarea:focus {
+    outline: none;
+    border-color: var(--accent-darker);
+}

@@ -37,5 +37,14 @@
   "fillBothFields": "Please fill both fields.",
   "passwordsNotMatch": "Passwords do not match!",
   "passwordChanged": "Password has been changed!",
-  "passwordChangeError": "Password change error: "
+  "passwordChangeError": "Password change error: ",
+  "settings.model": "Model",
+  "selectModel": "Select model",
+  "settings.system": "System prompt",
+  "systemPromptEmpty": "(empty)",
+  "enabled": "enabled",
+  "disabled": "disabled",
+  "editSystemPrompt": "Edit system prompt",
+  "systemPrompt": "System prompt content",
+  "enableSystemPrompt": "Enable system prompt"
 }

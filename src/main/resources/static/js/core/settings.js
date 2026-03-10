@@ -163,11 +163,11 @@ class Settings {
             const uniqueModels = [...new Map(this.models.map(model => [model.name, model])).values()];
             this.models = uniqueModels;
             this.models.sort((a, b) => a.text.localeCompare(b.text));
-            const modelSelect = document.getElementById("modelOptions");
-            modelSelect.innerHTML = this.models
-                .map(model => `<option value="${model.name}">${model.text} (${model.provider})</option>`)
-                .join("");
-            modelSelect.value = this.model;
+//            const modelSelect = document.getElementById("modelOptions");
+//            modelSelect.innerHTML = this.models
+//                .map(model => `<option value="${model.name}">${model.text} (${model.provider})</option>`)
+//                .join("");
+//            modelSelect.value = this.model;
         })
             .catch(error => console.error('Error loading models:', error));
     }
@@ -177,22 +177,24 @@ class Settings {
             modelOptions.innerHTML += `<option value="${model.name}">${model.text}</option>`;
         });
 
+        if (window.systemPromptSelector) {
+            window.systemPromptSelector.render();
+        }
+
         document.getElementById("memory").checked = this.memory;
         document.getElementById("chatHistoryInput").checked = this.activeHistory;
         document.getElementById("cache").checked = this.cache;
-        document.getElementById("system").value = this.system;
-        document.getElementById("systemSwitch").checked = this.systemSwitch;
         document.getElementById("projectSwitch").checked = this.projectSwitch;
 
         //document.querySelector('input[name="maxTokens"]').value = this.maxTokens;
 
         document.getElementById("temperature").value = this.temperature * 100;
 
-        const modelSelect = document.getElementById("modelOptions");
-        modelSelect.innerHTML = this.models
-            .map((model) => `<option value="${model.name}">${model.name}</option>`)
-            .join("");
-        modelSelect.value = this.model;
+//        const modelSelect = document.getElementById("modelOptions");
+//        modelSelect.innerHTML = this.models
+//            .map((model) => `<option value="${model.name}">${model.name}</option>`)
+//            .join("");
+//        modelSelect.value = this.model;
 
         const useSharedKeysCheckbox = document.getElementById("useSharedKeys");
         if (useSharedKeysCheckbox) {

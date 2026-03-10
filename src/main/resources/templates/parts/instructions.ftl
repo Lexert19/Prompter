@@ -21,16 +21,7 @@
             onchange="window.settings.change(event)">
         
     </div>
-    <div  class="instruction-field ">
-        <label for="system"><@spring.message "settings.system"/></label>
-        <div class="d-flex mt-025">
-            <textarea id="system" name="system" onchange="window.settings.change(event)"></textarea>
-            <label class="checkbox-container">
-                <input type="checkbox" id="systemSwitch" name="systemSwitch" onchange="window.settings.change(event)">
-                <label for="systemSwitch" class="custom-checkbox"></label>
-            </label>
-        </div>
-    </div>
+    <div id="systemPromptContainer"></div>
     <div  class="instruction-field ">
         <label><@spring.message "settings.project"/></label>
         <div class="d-flex mt-025">
@@ -41,11 +32,7 @@
             </label>
         </div>
     </div>
-    <div class="instruction-field" >
-        <label><@spring.message "settings.model"/></label>
-        <select id="modelOptions" name="model" class="" onchange="window.settings.changeModel(event)">
-        </select>
-    </div>
+    <div id="modelSelectorContainer"></div>
     <#include "/parts/instructionThinkingEffort.ftl" />
     <div class="instruction-field">
         <label class="checkbox-container">

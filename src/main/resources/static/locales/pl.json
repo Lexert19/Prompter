@@ -37,5 +37,14 @@
   "fillBothFields": "Proszę wypełnić oba pola.",
   "passwordsNotMatch": "Hasła nie są identyczne!",
   "passwordChanged": "Hasło zostało zmienione!",
-  "passwordChangeError": "Błąd zmiany hasła: "
+  "passwordChangeError": "Błąd zmiany hasła: ",
+  "settings.model": "Model",
+  "selectModel": "Wybierz model",
+  "settings.system": "System prompt",
+  "systemPromptEmpty": "(pusty)",
+  "enabled": "włączony",
+  "disabled": "wyłączony",
+  "editSystemPrompt": "Edytuj system prompt",
+  "systemPrompt": "Treść prompta systemowego",
+  "enableSystemPrompt": "Włącz system prompt"
 }
