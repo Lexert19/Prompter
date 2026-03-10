@@ -6,7 +6,7 @@ class RequestBuilder {
     }
 
     getSystem() {
-        if (document.getElementById("systemSwitch").checked) {
+        if (window.settings.systemSwitch) {
             return window.settings.system;
         }
         return "";

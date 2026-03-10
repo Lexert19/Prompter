@@ -161,36 +161,22 @@ class Settings {
             const uniqueModels = [...new Map(this.models.map(model => [model.name, model])).values()];
             this.models = uniqueModels;
             this.models.sort((a, b) => a.text.localeCompare(b.text));
-//            const modelSelect = document.getElementById("modelOptions");
-//            modelSelect.innerHTML = this.models
-//                .map(model => `<option value="${model.name}">${model.text} (${model.provider})</option>`)
-//                .join("");
-//            modelSelect.value = this.model;
         })
             .catch(error => console.error('Error loading models:', error));
     }
 
     initUI() {
-        this.models.forEach((model) => {
-            modelOptions.innerHTML += `<option value="${model.name}">${model.text}</option>`;
-        });
+//        this.models.forEach((model) => {
+//            modelOptions.innerHTML += `<option value="${model.name}">${model.text}</option>`;
+//        });
 
-        if (window.systemPromptSelector) {
-            window.systemPromptSelector.render();
-        }
+        //window.systemPromptSelector.render();
 
         document.getElementById("memory").checked = this.memory;
         document.getElementById("chatHistoryInput").checked = this.activeHistory;
         document.getElementById("cache").checked = this.cache;
-
-
         document.getElementById("temperature").value = this.temperature * 100;
-
-
-        const useSharedKeysCheckbox = document.getElementById("useSharedKeys");
-        if (useSharedKeysCheckbox) {
-            useSharedKeysCheckbox.checked = this.useSharedKeys;
-        }
+        document.getElementById("useSharedKeys").checked = this.useSharedKeys;
     }
 
     loadKeys() {
