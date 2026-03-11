@@ -1,4 +1,4 @@
-<div class="panel">
+<div class="button-panel">
     <button onclick="openUserPanel()">
         <div class="center">
             <svg xmlns="http://www.w3.org/2000/svg"

@@ -238,11 +238,11 @@ input {
     display: none;
 }
 
-.panel{
+.button-panel{
     display: flex;
 }
 
-.panel button{
+.button-panel button{
     margin-right: 5px;
     width: 20%;
 }
