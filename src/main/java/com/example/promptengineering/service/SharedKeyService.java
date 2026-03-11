@@ -23,9 +23,9 @@ public class SharedKeyService {
     }
 
     public SharedKey getRandomWorkingKey(String provider) {
-        List<SharedKey> workingKeys = sharedKeyRepository.findByProviderAndWorkingTrue(provider);
+        List<SharedKey> workingKeys = sharedKeyRepository.findByProvider(provider);
         if (workingKeys.isEmpty()) {
-            throw new RuntimeException("No working keys for provider: " + provider);
+            //throw new RuntimeException("No working keys for provider: " + provider);
         }
         SharedKey key = workingKeys.get(random.nextInt(workingKeys.size()));
         key.setUsageCount(key.getUsageCount() + 1);

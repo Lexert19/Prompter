@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface SharedKeyRepository extends JpaRepository<SharedKey, Long> {
     List<SharedKey> findByProviderAndWorkingTrue(String provider);
+    List<SharedKey> findByProvider(String provider);
+
 }
