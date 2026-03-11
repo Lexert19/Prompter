@@ -31,7 +31,7 @@
                         <@spring.message "app.description" />
                     </p>
                 </div>
-                <div class="panel center mb-1">
+                <div class=" center mb-1">
                     <a href="/chat"
                        class="open_chat text-decoration-none rounded-pill"
                        style="padding: 15px 30px;
