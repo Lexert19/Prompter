@@ -17,7 +17,7 @@ class EditMessageView {
     addRerunButtonListener() {
         this.rerunButton.addEventListener("click", () => {
             if (this.messageId) {
-                window.chatClient.rerunMessage(this.messageId);
+                window.chat.rerunMessage(this.messageId);
             }
             this.hideEditMenu();
         });

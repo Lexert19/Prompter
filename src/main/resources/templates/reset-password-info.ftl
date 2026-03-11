@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Password Reset Requested</title>
-    <style>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Password Reset Requested</title>
+        <style>
         body {
             font-family: Arial, sans-serif;
             color: white;
@@ -70,27 +70,26 @@
             color: rgba(99, 102, 241, 0.9);
             text-decoration: underline;
         }
-    </style>
-</head>
-<body>
-    <div class="info-container">
-        <div class="alert-warning">
-            <h3>
-                <i class="fas fa-envelope"></i>
-                Check Your Email
-            </h3>
-            <p>
-                If an account with the provided email exists, we've sent a password reset link.
-                Please check your inbox and follow the instructions to reset your password.
-            </p>
+        </style>
+    </head>
+    <body>
+        <div class="info-container">
+            <div class="alert-warning">
+                <h3>
+                    <i class="fas fa-envelope"></i>
+                    Check Your Email
+                </h3>
+                <p>
+                    If an account with the provided email exists, we've sent a password reset link.
+                    Please check your inbox and follow the instructions to reset your password.
+                </p>
+            </div>
+            <div class="back-to-login">
+                <a href="/auth/login">← Return to Login Page</a>
+            </div>
         </div>
-
-        <div class="back-to-login">
-            <a href="/auth/login">← Return to Login Page</a>
-        </div>
-    </div>
-
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-</body>
+        <!-- Font Awesome for icons -->
+        <link rel="stylesheet"
+              href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    </body>
 </html>

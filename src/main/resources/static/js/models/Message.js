@@ -6,7 +6,7 @@ class Message {
         this.cache = false;
         this.documents = documents;
         this.context = context;
-        this.text = text;
+        this.text = text + this.getSystemPrompt(role);
         this.time = Date.now();
         this.start = Date.now();
         this.end = null;
@@ -35,7 +35,7 @@ class Message {
 
             content.push({
                 type: "text",
-                text: textContent + this.text + this.getSystemPrompt(),
+                text: textContent + this.text,
                 cache: this.cache,
             });
         }
@@ -51,8 +51,8 @@ class Message {
         return content;
     }
 
-    getSystemPrompt(){
-        if(window.settings.systemSwitch == false){
+    getSystemPrompt(role){
+        if(window.settings.systemSwitch == false || role == "assistant"){
             return "";
         }
 

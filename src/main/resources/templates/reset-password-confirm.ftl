@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reset Password</title>
-    <style>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Reset Password</title>
+        <style>
         body {
             font-family: Arial, sans-serif;
             color: white;
@@ -90,35 +90,33 @@
             color: rgba(99, 102, 241, 0.9);
             text-decoration: underline;
         }
-    </style>
-</head>
-<body>
-    <div class="info-container">
-        <#if error??>
+        </style>
+    </head>
+    <body>
+        <div class="info-container">
+            <#if error??>
             <div class="alert-error">
                 <p>${error}</p>
             </div>
-        </#if>
-
-        <form method="post" action="/auth/reset-password-confirm">
-            <input type="hidden" name="token" value="${token}"/>
-
-            <div class="form-group">
-                <label for="password">New Password</label>
-                <input type="password" id="password" name="password" required>
+            </#if>
+            <form method="post" action="/auth/reset-password-confirm">
+                <input type="hidden" name="token" value="${token}" />
+                <div class="form-group">
+                    <label for="password">New Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="password_confirmation">Confirm Password</label>
+                    <input type="password"
+                           id="password_confirmation"
+                           name="password_confirmation"
+                           required>
+                </div>
+                <button type="submit">Reset Password</button>
+            </form>
+            <div class="back-to-login">
+                <a href="/auth/login">← Return to Login Page</a>
             </div>
-
-            <div class="form-group">
-                <label for="password_confirmation">Confirm Password</label>
-                <input type="password" id="password_confirmation" name="password_confirmation" required>
-            </div>
-
-            <button type="submit">Reset Password</button>
-        </form>
-
-        <div class="back-to-login">
-            <a href="/auth/login">← Return to Login Page</a>
         </div>
-    </div>
-</body>
+    </body>
 </html>

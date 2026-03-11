@@ -190,6 +190,9 @@ class ChatClient {
         this.currentMessage.end = Date.now();
         window.chat.saveMessage(this.currentMessage);
     }
+
+
+
 }
 
 document.addEventListener('DOMContentLoaded', function() {

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Password Reset Successful</title>
-    <style>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Password Reset Successful</title>
+        <style>
         body {
 font-family: Arial, sans-serif;
 color: white;
@@ -73,26 +73,23 @@ transition: background-color 0.2s;
 background-color: rgba(79, 70, 229, 0.9);
 text-decoration: none;
 }
-</style>
-</head>
-<body>
-<div class="info-container">
-        <div class="alert-success">
-            <h3>
-                <i class="fas fa-check-circle"></i>
-                Password Reset Successful
-            </h3>
-            <p>
-                Your password has been successfully updated. You can now log in with your new password.
-            </p>
+        </style>
+    </head>
+    <body>
+        <div class="info-container">
+            <div class="alert-success">
+                <h3>
+                    <i class="fas fa-check-circle"></i>
+                    Password Reset Successful
+                </h3>
+                <p>Your password has been successfully updated. You can now log in with your new password.</p>
+            </div>
+            <div class="back-to-login">
+                <a href="/auth/login">Continue to Login Page</a>
+            </div>
         </div>
-
-        <div class="back-to-login">
-            <a href="/auth/login">Continue to Login Page</a>
-        </div>
-    </div>
-
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-</body>
+        <!-- Font Awesome for icons -->
+        <link rel="stylesheet"
+              href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    </body>
 </html>
