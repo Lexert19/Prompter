@@ -24,6 +24,14 @@
     "global": true
   },
   {
+    "name": "nvidia/nemotron-3-super-120b-a12b",
+    "text": "Nemotron 3 Super 120B",
+    "provider": "nvidia",
+    "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+    "type": "text",
+    "global": true
+  },
+  {
     "name": "moonshotai/kimi-k2.5",
     "text": "Kimi K2.5",
     "provider": "nvidia",
