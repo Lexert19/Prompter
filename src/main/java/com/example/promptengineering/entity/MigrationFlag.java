@@ -1,8 +1,13 @@
 package com.example.promptengineering.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "migration_flag")
 public class MigrationFlag {
@@ -25,12 +30,4 @@ public class MigrationFlag {
         this.executed = false;
     }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    public boolean isExecuted() { return executed; }
-    public void setExecuted(boolean executed) { this.executed = executed; }
-    public LocalDateTime getExecutedAt() { return executedAt; }
-    public void setExecutedAt(LocalDateTime executedAt) { this.executedAt = executedAt; }
 }

@@ -1,8 +1,13 @@
 package com.example.promptengineering.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.HashMap;
 import java.util.Map;
 
+@Setter
+@Getter
 public class Content {
     private String type;
     private String text;
@@ -10,10 +15,6 @@ public class Content {
     private String data;
     private Long fileId;
 
-    public String getText() { return text; }
-    public String getMediaType() { return mediaType; }
-    public String getData() { return data; }
-    
 
     public Map<String, Object> toMap(String provider, boolean cached) {
         switch(type) {
@@ -64,28 +65,6 @@ public class Content {
        
         //throw new UnsupportedOperationException("Base64 images not supported for " + provider);
     }
-    public String getType() {
-        return type;
-    }
-    public void setType(String type) {
-        this.type = type;
-    }
-    public void setText(String text) {
-        this.text = text;
-    }
-    public void setMediaType(String mediaType) {
-        this.mediaType = mediaType;
-    }
-    public void setData(String data) {
-        this.data = data;
-    }
 
 
-    public Long getFileId() {
-        return fileId;
-    }
-
-    public void setFileId(Long fileId) {
-        this.fileId = fileId;
-    }
 }

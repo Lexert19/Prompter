@@ -1,25 +1,41 @@
 package com.example.promptengineering.restController;
 
-import com.example.promptengineering.entity.SharedKey;
-import com.example.promptengineering.repository.SharedKeyRepository;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.example.promptengineering.dto.SharedKeyDto;
+import com.example.promptengineering.dto.SharedKeyInfoDto;
+import com.example.promptengineering.service.SharedKeyService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin/shared-keys")
 public class AdminSharedKeyController {
-    private final SharedKeyRepository repository;
+    private final SharedKeyService sharedKeyService;
 
-    public AdminSharedKeyController(SharedKeyRepository repository) {
-        this.repository = repository;
+    public AdminSharedKeyController(SharedKeyService sharedKeyService) {
+        this.sharedKeyService = sharedKeyService;
     }
 
     @PostMapping
-    public SharedKey addSharedKey(@RequestBody SharedKey key) {
-        key.setWorking(true);
-        key.setUsageCount(0);
-        return repository.save(key);
+    public ResponseEntity<Map<String, String>> addSharedKey(@RequestBody SharedKeyDto dto) {
+        sharedKeyService.addKey(dto.getProvider(), dto.getKeyValue());
+        return ResponseEntity.ok(Map.of("message", "Added"));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<SharedKeyInfoDto>> getAllSharedKeys() {
+        return ResponseEntity.ok(sharedKeyService.getAllKeys());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteSharedKey(@PathVariable Long id) {
+        if (sharedKeyService.deleteKey(id)) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

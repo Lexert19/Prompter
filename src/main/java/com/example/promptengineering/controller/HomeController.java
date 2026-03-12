@@ -2,14 +2,13 @@ package com.example.promptengineering.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.LocaleResolver;
 
 import java.util.Locale;
-import java.util.Optional;
+import java.util.Objects;
 
 @Controller
 public class HomeController {
@@ -26,11 +25,7 @@ public class HomeController {
             HttpServletResponse response) {
 
         Locale newLocale;
-        if (lang != null) {
-            newLocale = Locale.forLanguageTag(lang);
-        } else {
-            newLocale = Locale.forLanguageTag("pl");
-        }
+        newLocale = Locale.forLanguageTag(Objects.requireNonNullElse(lang, "pl"));
         localeResolver.setLocale(request, response, newLocale);
 
         return "home";

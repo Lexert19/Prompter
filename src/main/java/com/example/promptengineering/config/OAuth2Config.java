@@ -1,10 +1,9 @@
 package com.example.promptengineering.config;
 
 import com.example.promptengineering.component.CustomAuthenticationEntryPoint;
-import com.example.promptengineering.component.CustomAuthenticationManager;
 import com.example.promptengineering.filter.RateLimitingFilter;
 import com.example.promptengineering.service.CustomOAuth2UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +12,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.web.*;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -25,20 +25,22 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
+@Slf4j
 public class OAuth2Config implements WebMvcConfigurer {
-    @Autowired
-    private CustomAuthenticationManager authenticationManager;
-    @Autowired
-    private CustomOAuth2UserService customOAuth2UserService;
-    @Autowired
-    private RateLimitingFilter rateLimitingFilter;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final RateLimitingFilter rateLimitingFilter;
+
+    public OAuth2Config(CustomOAuth2UserService customOAuth2UserService, RateLimitingFilter rateLimitingFilter) {
+        this.customOAuth2UserService = customOAuth2UserService;
+        this.rateLimitingFilter = rateLimitingFilter;
+    }
 
 
     @Bean
     public SecurityFilterChain securityWebFilterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
         http.addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class);
 
-        http.csrf(csrf -> csrf.disable());
+        http.csrf(AbstractHttpConfigurer::disable);
 
         http.authorizeHttpRequests(exchanges -> exchanges
                 .requestMatchers(
@@ -66,11 +68,9 @@ public class OAuth2Config implements WebMvcConfigurer {
                 .userInfoEndpoint(userInfo -> userInfo
                         .oidcUserService(oidcUserService())
                         .userService(customOAuth2UserService))
-                .successHandler((request, response, authentication) -> {
-                    response.sendRedirect("/");
-                })
+                .successHandler((request, response, authentication) -> response.sendRedirect("/"))
                 .failureHandler((request, response, exception) -> {
-                    exception.printStackTrace();
+                    log.error("OAuth2 login failed for request: {}", request.getRequestURI(), exception);
                     response.sendRedirect("/auth/login?error=true");
                 }));
 
@@ -78,10 +78,7 @@ public class OAuth2Config implements WebMvcConfigurer {
 
         http.formLogin(customizer -> customizer
                 .loginPage("/auth/login")
-                .successHandler((request, response, authentication) -> {
-                    response.sendRedirect("/");
-                })
-
+                .successHandler((request, response, authentication) -> response.sendRedirect("/"))
                 .failureHandler(authenticationFailureHandler()));
 
 
@@ -120,9 +117,7 @@ public class OAuth2Config implements WebMvcConfigurer {
 
     @Bean
     public AuthenticationFailureHandler authenticationFailureHandler() {
-        return (request, response, exception) -> {
-            response.sendRedirect("/auth/login?error=true");
-        };
+        return (request, response, exception) -> response.sendRedirect("/auth/login?error=true");
     }
 
     @Bean

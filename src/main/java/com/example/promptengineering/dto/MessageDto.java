@@ -1,11 +1,16 @@
 package com.example.promptengineering.dto;
 
 import com.example.promptengineering.entity.Message;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Setter
+@Getter
 public class MessageDto {
     private Long id;
     private String text;
@@ -32,7 +37,7 @@ public class MessageDto {
         dto.setStart(message.getStart());
         dto.setEnd(message.getEnd());
         dto.setRole(message.getRole());
-        dto.setCache(message.isCache());
+        dto.setCache(message.getCache());
         if (message.getChat() != null) {
             dto.setChatId(message.getChat().getId());
         }
@@ -43,26 +48,4 @@ public class MessageDto {
         return messages.stream().map(MessageDto::fromEntity).collect(Collectors.toList());
     }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public String getText() { return text; }
-    public void setText(String text) { this.text = text; }
-    public List<String> getDocuments() { return documents; }
-    public void setDocuments(List<String> documents) { this.documents = documents; }
-    public List<String> getImages() { return images; }
-    public void setImages(List<String> images) { this.images = images; }
-    public Instant getCreatedAt() { return createdAt; }
-    public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
-    public long getStart() { return start; }
-    public void setStart(long start) { this.start = start; }
-    public long getEnd() { return end; }
-    public void setEnd(long end) { this.end = end; }
-    public String getRole() { return role; }
-    public void setRole(String role) { this.role = role; }
-    public boolean isCache() { return cache; }
-    public void setCache(boolean cache) { this.cache = cache; }
-    public Long getChatId() { return chatId; }
-    public void setChatId(Long chatId) { this.chatId = chatId; }
-    public String getChatName() { return chatName; }
-    public void setChatName(String chatName) { this.chatName = chatName; }
 }

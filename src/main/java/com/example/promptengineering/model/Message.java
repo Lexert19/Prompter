@@ -1,11 +1,16 @@
 package com.example.promptengineering.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 
 
+@Getter
+@Setter
 public class Message {
     private Long id;
     private String role;
@@ -44,70 +49,6 @@ public class Message {
             }
         }
 
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public List<Content> getContent() {
-        return content;
-    }
-
-    public void setContent(List<Content> content) {
-        this.content = content;
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getSessionId() {
-        return sessionId;
-    }
-
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
-    }
-
-    public String getProvider() {
-        return provider;
-    }
-
-    public void setProvider(String provider) {
-        this.provider = provider;
-    }
-
-    public boolean isCached() {
-        return cached;
-    }
-
-    public void setCached(boolean cached) {
-        this.cached = cached;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
 }

@@ -3,10 +3,8 @@ package com.example.promptengineering.model;
 import java.util.Map;
 
 class CacheControl {
-    private String type = "ephemeral";
-
-
     public Map<String, Object> toMap() {
+        String type = "ephemeral";
         return Map.of("type", type);
     }
 }

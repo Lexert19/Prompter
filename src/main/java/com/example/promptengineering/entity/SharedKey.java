@@ -2,9 +2,12 @@ package com.example.promptengineering.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-@Data
+@Setter
+@Getter
 public class SharedKey {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

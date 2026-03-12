@@ -14,8 +14,11 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/models")
 public class ModelController {
-    @Autowired
-    private ModelService modelService;
+    private final ModelService modelService;
+
+    public ModelController(ModelService modelService) {
+        this.modelService = modelService;
+    }
 
     @GetMapping("/user-models")
     public List<ModelDto> getUserModels(@AuthenticationPrincipal User user) {
@@ -33,7 +36,7 @@ public class ModelController {
         Optional<Model> model = modelService.getModel(id);
         if (model.isPresent() && model.get().getUser().equals(user)) {
             modelService.editUserModel(model.orElse(null), modelDto);
-            return ResponseEntity.ok("Zmieniono model!");
+            return ResponseEntity.ok("Model updated successfully");
         } else {
             return ResponseEntity.notFound().build();
         }
@@ -41,12 +44,8 @@ public class ModelController {
 
     @DeleteMapping("/user-models/{id}")
     public ResponseEntity<String> deleteUserModel(@AuthenticationPrincipal User user, @PathVariable Long id) {
-        try{
-            modelService.deleteUserModel(id, user);
-            return ResponseEntity.ok("Usunięto model");
-        }catch (Exception e){
-            return ResponseEntity.notFound().build();
-        }
+        modelService.deleteUserModel(id, user);
+        return ResponseEntity.ok("Model deleted successfully");
     }
 
 
@@ -62,7 +61,7 @@ public class ModelController {
     @PostMapping("/user-models")
     public ResponseEntity<String> addUserModel(@AuthenticationPrincipal User user, @RequestBody ModelDto modelDto) {
         modelService.addUserModel(modelDto, user);
-        return ResponseEntity.ok("Zapisano model!");
+        return ResponseEntity.ok("Model saved successfully");
     }
 
 }

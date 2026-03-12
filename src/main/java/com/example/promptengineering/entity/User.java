@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 import com.example.promptengineering.model.AppRole;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +18,8 @@ import com.nimbusds.oauth2.sdk.Role;
 
 
 @Entity
+@Setter
+@Getter
 @Table(name = "app_user")
 public class User implements OAuth2User, Principal, UserDetails {
 
@@ -73,42 +77,9 @@ public class User implements OAuth2User, Principal, UserDetails {
         return this.email;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
     @Override
     public String getUsername() {
         return this.email;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public List<AppRole> getRoles() {
-        return roles;
-    }
-
-
-    public void setRoles(List<AppRole> roles) {
-        this.roles = roles;
     }
 
     @Override
@@ -131,14 +102,6 @@ public class User implements OAuth2User, Principal, UserDetails {
         return true;
     }
 
-    public List<ResetToken> getResetTokens() {
-        return resetTokens;
-    }
-
-    public void setResetTokens(List<ResetToken> resetTokens) {
-        this.resetTokens = resetTokens;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -151,11 +114,4 @@ public class User implements OAuth2User, Principal, UserDetails {
         return Objects.hashCode(id);
     }
 
-    public String getEncryptedKeys() {
-        return encryptedKeys;
-    }
-
-    public void setEncryptedKeys(String encryptedKeys) {
-        this.encryptedKeys = encryptedKeys;
-    }
 }

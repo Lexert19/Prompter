@@ -8,14 +8,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class IpRateLimiter {
-
-    @Value("${rate.limit.max-requests}")
-    private int maxRequests;
-
-    @Value("${rate.limit.time-window-seconds}")
-    private long timeWindowSeconds;
+    private final int maxRequests;
+    private final long timeWindowSeconds;
 
     private final ConcurrentHashMap<String, RequestCounter> counters = new ConcurrentHashMap<>();
+
+    public IpRateLimiter(@Value("${rate.limit.max-requests}") int maxRequests,@Value("${rate.limit.time-window-seconds}") long timeWindowSeconds) {
+        this.maxRequests = maxRequests;
+        this.timeWindowSeconds = timeWindowSeconds;
+    }
 
     public boolean isAllowed(HttpServletRequest request) {
         String clientIp = getClientIp(request);

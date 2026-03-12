@@ -29,7 +29,7 @@ public class ContentListConverter implements AttributeConverter<List<Content>, S
     @Override
     public List<Content> convertToEntityAttribute(String contentJson) {
         try {
-            return objectMapper.readValue(contentJson, new TypeReference<List<Content>>() {
+            return objectMapper.readValue(contentJson, new TypeReference<>() {
             });
         } catch (IOException e) {
             throw new IllegalArgumentException("Error converting JSON to list", e);

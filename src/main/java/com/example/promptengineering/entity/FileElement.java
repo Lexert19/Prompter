@@ -3,7 +3,11 @@ package com.example.promptengineering.entity;
 import java.util.List;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "file_element")
 public class FileElement {
@@ -33,52 +37,4 @@ public class FileElement {
     private List<List<Double>> vectors;
 
 
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public String getContent() {
-        return content;
-    }
-    public void setContent(String content) {
-        this.content = content;
-    }
-    public List<String> getPages() {
-        return pages;
-    }
-    public void setPages(List<String> pages) {
-        this.pages = pages;
-    }
-    public List<List<Double>> getVectors() {
-        return vectors;
-    }
-    public void setVectors(List<List<Double>> vectors) {
-        this.vectors = vectors;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Project getProject() {
-        return project;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
 }

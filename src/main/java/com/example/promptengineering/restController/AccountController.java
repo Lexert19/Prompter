@@ -5,7 +5,7 @@ import java.util.Map;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.model.PasswordChangeRequest;
 import com.example.promptengineering.service.AuthService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,18 +14,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.promptengineering.repository.UserRepository;
 import com.example.promptengineering.service.UserService;
 
 @RestController
 @RequestMapping("/api/account")
 public class AccountController {
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private AuthService authService;
+    private final UserService userService;
+    private final AuthService authService;
+
+    public AccountController(UserService userService, AuthService authService) {
+        this.userService = userService;
+        this.authService = authService;
+    }
 
     @PostMapping("/save-key/{keyName}")
     public String saveKeyToMap(
@@ -44,15 +44,16 @@ public class AccountController {
 
 
     @PostMapping("/change-password")
-    public String changePassword(
+    public ResponseEntity<String> changePassword(
             @AuthenticationPrincipal User user,
-            @RequestBody PasswordChangeRequest request) throws Exception {
+            @RequestBody PasswordChangeRequest request) {
 
         if (!request.getNewPassword().equals(request.getConfirmPassword())) {
-            throw new IllegalArgumentException("Nowe hasło i potwierdzenie nie są identyczne");
+            return ResponseEntity.badRequest()
+                    .body("New password and confirmation do not match");
         }
 
         authService.updatePassword(user, request.getNewPassword());
-        return "Hasło zostało pomyślnie zmienione";
+        return ResponseEntity.ok("Password has been changed successfully");
     }
 }

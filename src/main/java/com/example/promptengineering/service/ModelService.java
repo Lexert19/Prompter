@@ -59,9 +59,8 @@ public class ModelService {
         Optional<Model> model = this.getModel(id);
         if (model.isPresent() && model.get().getUser().equals(user)) {
             modelRepository.delete(model.get());
-
         } else {
-            throw new SecurityException("to nie jest twój model.");
+            throw new SecurityException("This is not your model.");
         }
     }
 

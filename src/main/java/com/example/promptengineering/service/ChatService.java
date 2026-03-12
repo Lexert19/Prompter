@@ -5,21 +5,23 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
-import com.example.promptengineering.entity.SharedKey;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.entity.UserFile;
 import com.example.promptengineering.model.Content;
 import com.example.promptengineering.model.Message;
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
 
 import com.example.promptengineering.model.RequestBuilder;
-import com.nimbusds.jose.shaded.gson.Gson;
 
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -27,14 +29,15 @@ import reactor.core.scheduler.Schedulers;
 @Slf4j
 @Service
 public class ChatService {
-    private final Gson gson = new Gson();
+    private final Gson gson;
     private final WebClient webClient;
     private final FileStorageService fileStorageService;
     private final SharedKeyService sharedKeyService;
 
-    public ChatService(WebClient.Builder webClientBuilder, FileStorageService fileStorageService, SharedKeyService sharedKeyService) {
+    public ChatService(Gson gson, WebClient.Builder webClientBuilder, FileStorageService fileStorageService, SharedKeyService sharedKeyService) {
+        this.gson = gson;
         this.webClient = webClientBuilder
-                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(16 * 1024 * 1024))
+                .codecs(configure -> configure.defaultCodecs().maxInMemorySize(16 * 1024 * 1024))
                 .build();
         this.fileStorageService = fileStorageService;
         this.sharedKeyService = sharedKeyService;
@@ -100,7 +103,19 @@ public class ChatService {
     }
 
     private Flux<ServerSentEvent<String>> handleError(Throwable e) {
-        String errorJson = "{\"error\": \"" + e.getMessage() + "\"}";
+        String errorDetails;
+
+        if (e instanceof WebClientResponseException webClientEx) {
+            String responseBody = webClientEx.getResponseBodyAsString();
+            errorDetails = "API Error: " + responseBody;
+        } else {
+            errorDetails = e.getMessage();
+        }
+
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("error", errorDetails);
+        String errorJson = gson.toJson(errorMap);
+
         return Flux.just(ServerSentEvent.<String>builder()
                 .event("error")
                 .data(errorJson)
@@ -111,19 +126,12 @@ public class ChatService {
         return "image".equals(content.getType()) && content.getFileId() != null;
     }
 
-//    public Flux<ServerSentEvent<String>> makeRequest(RequestBuilder request, User user) {
-//        return attachBase64Images(request, user)
-//                .then(buildRequestBodyJson(request))
-//                .flatMapMany(json -> executeRequest(request, json))
-//                .onErrorResume(this::handleError);
-//    }
-
     public Flux<ServerSentEvent<String>> makeRequest(RequestBuilder request, User user) {
         Mono<RequestBuilder> requestWithKeyMono;
         if (request.isUseSharedKeys()) {
             requestWithKeyMono = Mono.fromCallable(() -> {
-                SharedKey sharedKey = sharedKeyService.getRandomWorkingKey(request.getProvider());
-                request.setKey(sharedKey.getKeyValue());
+                String sharedKey = sharedKeyService.getRandomWorkingKey(request.getProvider());
+                request.setKey(sharedKey);
                 return request;
             }).subscribeOn(Schedulers.boundedElastic());
         } else {
@@ -133,6 +141,7 @@ public class ChatService {
         return requestWithKeyMono
                 .flatMapMany(req -> attachBase64Images(req, user)
                         .then(buildRequestBodyJson(req))
+                        .doOnNext(json -> log.debug("Request JSON to be sent: {}", json))
                         .flatMapMany(json -> executeRequest(req, json)))
                 .onErrorResume(this::handleError);
     }

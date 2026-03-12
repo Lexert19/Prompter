@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 public class ProjectController {
 
     private final ProjectRepository projectRepository;
-    private final UserRepository userRepository;
     private final EmbeddingService embeddingService;
     private final FileElementsRepository fileElementRepository;
 
@@ -36,7 +35,6 @@ public class ProjectController {
                              EmbeddingService embeddingService,
                              FileElementsRepository fileElementRepository) {
         this.projectRepository = projectRepository;
-        this.userRepository = userRepository;
         this.embeddingService = embeddingService;
         this.fileElementRepository = fileElementRepository;
     }
@@ -122,10 +120,10 @@ public class ProjectController {
             @PathVariable Long fileId) {
 
         Project project = projectRepository.findByIdAndUser(projectId, user)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nie istnieje lub nie należy do Ciebie"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,  "Project not found or you are not the owner"));
 
         FileElement file = fileElementRepository.findByIdAndProject(fileId, project)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Plik nie znaleziony"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,  "File not found"));
 
         fileElementRepository.delete(file);
 
@@ -138,7 +136,7 @@ public class ProjectController {
             @PathVariable Long projectId) {
 
         Project project = projectRepository.findByIdAndUser(projectId, user)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nie istnieje lub nie należy do Ciebie"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,  "Project not found or you are not the owner"));
 
         List<FileElement> files = fileElementRepository.findByProject(project);
 
@@ -152,10 +150,10 @@ public class ProjectController {
             @PathVariable Long fileId) {
 
         Project project = projectRepository.findByIdAndUser(projectId, user)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nie istnieje lub nie należy do Ciebie"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,  "Project not found or you are not the owner"));
 
         FileElement file = fileElementRepository.findByIdAndProject(fileId, project)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Plik nie znaleziony"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found"));
 
         return ResponseEntity.ok(file.getContent());
     }
@@ -167,7 +165,7 @@ public class ProjectController {
             @RequestParam String query) {
 
         Project project = projectRepository.findByIdAndUser(projectId, user)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt nie znaleziony"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found"));
 
         List<ScoredFragment> similarFragments = embeddingService.retrieveSimilarFragments(query, project, user);
         return ResponseEntity.ok(similarFragments);

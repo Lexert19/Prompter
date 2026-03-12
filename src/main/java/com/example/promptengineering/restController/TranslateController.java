@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class TranslateController {
-
-
     @GetMapping("/public/translate-url")
     public ResponseEntity<String> translateUrl(@RequestParam String url, @RequestParam String targetLang){
         String path = url.replaceFirst("^/(pl|en)(/|$)", "/");

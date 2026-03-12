@@ -1,7 +1,6 @@
 package com.example.promptengineering.controller;
 
 import com.example.promptengineering.dto.PostDto;
-import com.example.promptengineering.entity.Post;
 import com.example.promptengineering.exception.ResourceNotFoundException;
 import com.example.promptengineering.service.PostService;
 import org.springframework.stereotype.Controller;

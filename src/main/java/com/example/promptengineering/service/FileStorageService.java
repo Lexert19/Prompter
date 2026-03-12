@@ -22,20 +22,19 @@ import java.util.stream.Collectors;
 
 @Service
 public class FileStorageService {
-
-    @Value("${file.upload-dir}")
-    private String uploadDir;
-
-
-    @Value("${file.max-size}")
-    private long maxFileSize;
-
-    @Value("${file.max-count}")
-    private int maxFilesPerUser;
+    private final String uploadDir;
+    private final long maxFileSize;
+    private final int maxFilesPerUser;
 
     private final UserFileRepository userFileRepository;
 
-    public FileStorageService(UserFileRepository userFileRepository) {
+    public FileStorageService(@Value("${file.upload-dir}") String uploadDir,
+                              @Value("${file.max-size}") long maxFileSize,
+                              @Value("${file.max-count}") int maxFilesPerUser,
+                               UserFileRepository userFileRepository) {
+        this.uploadDir = uploadDir;
+        this.maxFileSize = maxFileSize;
+        this.maxFilesPerUser = maxFilesPerUser;
         this.userFileRepository = userFileRepository;
     }
 

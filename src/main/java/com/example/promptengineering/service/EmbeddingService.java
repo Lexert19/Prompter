@@ -5,11 +5,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -19,23 +16,21 @@ import com.example.promptengineering.entity.Project;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.model.ScoredFragment;
 import com.example.promptengineering.repository.FileElementsRepository;
-import com.example.promptengineering.repository.ProjectRepository;
-
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @Service
 public class EmbeddingService {
     private static final String EMBEDDINGS_URL = "https://api.openai.com/v1/embeddings";
 
-    @Autowired
-    private RestTemplate restTemplate;
-    @Autowired
-    private ProjectRepository projectRepository;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private FileElementsRepository fileElementRepository;
+    private final RestTemplate restTemplate;
+    private final UserService userService;
+    private final FileElementsRepository fileElementRepository;
+
+    public EmbeddingService(RestTemplate restTemplate, UserService userService, FileElementsRepository fileElementRepository) {
+        this.restTemplate = restTemplate;
+        this.userService = userService;
+        this.fileElementRepository = fileElementRepository;
+    }
+
 
     public void addFileToProject(Project project, FileElement file, User user) {
         String apiKey = userService.getUserKeys(user).getOrDefault("OPENAI", "");

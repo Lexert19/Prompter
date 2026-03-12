@@ -24,6 +24,38 @@
     "global": true
   },
   {
+    "name": "moonshotai/kimi-k2.5",
+    "text": "Kimi K2.5",
+    "provider": "nvidia",
+    "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+    "type": "text",
+    "global": true
+  },
+  {
+    "name": "qwen/qwen3.5-397b-a17b",
+    "text": "Qwen 3.5 397B",
+    "provider": "nvidia",
+    "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+    "type": "text",
+    "global": true
+  },
+  {
+    "name": "minimaxai/minimax-m2.5",
+    "text": "MiniMax M2.5",
+    "provider": "nvidia",
+    "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+    "type": "text",
+    "global": true
+  },
+  {
+    "name": "openai/gpt-oss-120b",
+    "text": "GPT OSS 120B",
+    "provider": "nvidia",
+    "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+    "type": "text",
+    "global": true
+  },
+  {
     "name": "claude-3-haiku-20240307",
     "text": "Claude 3 Haiku",
     "provider": "anthropic",

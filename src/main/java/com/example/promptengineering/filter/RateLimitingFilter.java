@@ -4,7 +4,6 @@ import com.example.promptengineering.security.IpRateLimiter;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
@@ -13,8 +12,11 @@ import java.io.IOException;
 @Order(1)
 public class RateLimitingFilter implements Filter {
 
-    @Autowired
-    private IpRateLimiter rateLimiter;
+    private final IpRateLimiter rateLimiter;
+
+    public RateLimitingFilter(IpRateLimiter rateLimiter) {
+        this.rateLimiter = rateLimiter;
+    }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)

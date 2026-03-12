@@ -5,35 +5,27 @@ import com.example.promptengineering.dto.MessageDto;
 import com.example.promptengineering.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.promptengineering.entity.Chat;
 import com.example.promptengineering.entity.Message;
 import com.example.promptengineering.model.MessageBody;
-import com.example.promptengineering.repository.UserRepository;
 import com.example.promptengineering.service.HistoryService;
 
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
-import java.security.Principal;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/history")
 public class HistoryController {
     @Autowired
-    private HistoryService historyService;
+    private final HistoryService historyService;
 
-    @Autowired
-    private UserRepository userRepository;
+    public HistoryController(HistoryService historyService) {
+        this.historyService = historyService;
+    }
 
     @PostMapping("/chats")
     public ResponseEntity<ChatDto> createChat(

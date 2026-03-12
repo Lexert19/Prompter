@@ -16,20 +16,24 @@ import java.util.concurrent.CompletableFuture;
 
 @Service
 public class EmailService {
-    @Value("${app.domain}")
-    private String domain;
-    @Value("${mailersend.api.token}")
-    private String apiToken;
-    @Value("${mailersend.from.name:Prompter}")
-    private String fromName;
-    @Value("${mailersend.from.email}")
-    private String fromEmail;
-
-
+    private final String domain;
+    private final String apiToken;
+    private final String fromName;
+    private final String fromEmail;
     private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
 
+    public EmailService(@Value("${app.domain}") String domain,
+                        @Value("${mailersend.api.token}") String apiToken,
+                        @Value("${mailersend.from.name:Prompter}") String fromName,
+                        @Value("${mailersend.from.email}") String fromEmail) {
+        this.domain = domain;
+        this.apiToken = apiToken;
+        this.fromName = fromName;
+        this.fromEmail = fromEmail;
+    }
+
     @Async("taskExecutor")
-    public CompletableFuture<Void> sendPasswordResetEmail(String email, String token) {
+    public void sendPasswordResetEmail(String email, String token) {
         try {
             logger.debug("Starting to send password reset email to: {}", email);
 
@@ -54,14 +58,14 @@ public class EmailService {
             MailerSendResponse response = ms.emails().send(emailMessage);
 
             logger.debug("Email sent successfully to: {}", email);
-            return CompletableFuture.completedFuture(null);
+            CompletableFuture.completedFuture(null);
 
         } catch (MailerSendException e) {
-            logger.error("Failed to send password reset email to: " + email, e);
-            return CompletableFuture.failedFuture(e);
+            logger.error("Failed to send password reset email to: {}", email, e);
+            CompletableFuture.failedFuture(e);
         } catch (Exception e) {
-            logger.error("Unexpected error while sending email to: " + email, e);
-            return CompletableFuture.failedFuture(new RuntimeException("Email sending failed", e));
+            logger.error("Unexpected error while sending email to: {}", email, e);
+            CompletableFuture.failedFuture(new RuntimeException("Email sending failed", e));
         }
     }
 

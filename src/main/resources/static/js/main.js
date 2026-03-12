@@ -115,3 +115,33 @@ function base64ToFile(base64String, filename) {
   }
   return new File([u8arr], filename, { type: mime });
 }
+
+async function listSharedKeys() {
+  try {
+    const res = await fetch('/api/admin/shared-keys');
+    if (!res.ok) throw new Error(`Błąd ${res.status}`);
+    const keys = await res.json();
+    if (keys.length === 0) return console.log('Brak kluczy.');
+    console.table(keys, ['id', 'provider', 'working', 'usageCount']);
+  } catch (e) {
+    console.error('Nie udało się pobrać listy:', e);
+  }
+}
+
+async function deleteSharedKey(id) {
+  if (!confirm(`Usunąć klucz ${id}?`)) return;
+  try {
+    const res = await fetch(`/api/admin/shared-keys/${id}`, { method: 'DELETE' });
+    if (res.status === 204) console.log(`Klucz ${id} usunięty.`);
+    else if (res.status === 404) console.log(`Klucz ${id} nie istnieje.`);
+    else throw new Error(`Błąd ${res.status}`);
+  } catch (e) {
+    console.error('Błąd usuwania:', e);
+  }
+}
+
+async function deleteSharedKeyInteractive() {
+  await listSharedKeys();
+  const id = prompt('Podaj ID klucza do usunięcia:');
+  if (id) await deleteSharedKey(parseInt(id));
+}

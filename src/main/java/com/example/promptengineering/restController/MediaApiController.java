@@ -21,13 +21,13 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/admin/media")
 public class MediaApiController {
-    @Value("${media.upload-dir}")
-    private String uploadDir;
 
+    private final String uploadDir;
     private final MediaRepository mediaRepository;
 
 
-    public MediaApiController(MediaRepository mediaRepository) {
+    public MediaApiController(@Value("${media.upload-dir}") String uploadDir, MediaRepository mediaRepository) {
+        this.uploadDir = uploadDir;
         this.mediaRepository = mediaRepository;
     }
 

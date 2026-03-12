@@ -1,7 +1,5 @@
 package com.example.promptengineering.converter;
 
-
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,9 +34,9 @@ public class HashMapConverter implements AttributeConverter<HashMap<String, Stri
             return new HashMap<>(); 
         }
         try {
-            return objectMapper.readValue(dbData, new TypeReference<HashMap<String, String>>() {});
+            return objectMapper.readValue(dbData, new TypeReference<>() {});
         } catch (IOException e) {
-            throw new IllegalArgumentException("Błąd konwersji JSON na HashMap", e);
+            throw new IllegalArgumentException("", e);
         }
     }
 }

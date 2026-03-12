@@ -1,9 +1,14 @@
 package com.example.promptengineering.model;
 
 import com.example.promptengineering.dto.FileElementDTO;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Setter
+@Getter
 public class ProjectResponse {
 
     private Long id;
@@ -21,27 +26,4 @@ public class ProjectResponse {
     }
 
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<FileElementDTO> getFiles() {
-        return files;
-    }
-
-    public void setFiles(List<FileElementDTO> files) {
-        this.files = files;
-    }
 }

@@ -1,7 +1,11 @@
 package com.example.promptengineering.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "model")
 public class Model {
@@ -39,38 +43,4 @@ public class Model {
         this.user = user;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public boolean isGlobal() {
-        return global;
-    }
-
-    public void setGlobal(boolean global) {
-        this.global = global;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    public String getText() { return text; }
-    public void setText(String text) { this.text = text; }
-    public String getProvider() { return provider; }
-    public void setProvider(String provider) { this.provider = provider; }
-    public String getUrl() { return url; }
-    public void setUrl(String url) { this.url = url; }
-    public String getType() { return type; }
-    public void setType(String type) { this.type = type; }
 }

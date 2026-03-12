@@ -19,6 +19,7 @@ public class ModelDto {
     private String url;
     private String type;
     public ModelDto() {}
+
     public ModelDto(String name, String text, String provider, String url, String type) {
         this.name = name;
         this.text = text;

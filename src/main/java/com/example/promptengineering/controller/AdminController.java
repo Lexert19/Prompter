@@ -3,7 +3,6 @@ package com.example.promptengineering.controller;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.model.AppRole;
 import com.example.promptengineering.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +16,11 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    public AdminController(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @GetMapping("/users")
     public ModelAndView listUsers() {

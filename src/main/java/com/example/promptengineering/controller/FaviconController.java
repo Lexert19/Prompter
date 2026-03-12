@@ -1,9 +1,5 @@
 package com.example.promptengineering.controller;
 
-import org.springframework.boot.web.server.MimeMappings;
-import org.springframework.boot.web.server.WebServerFactoryCustomizer;
-import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
-import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -24,6 +20,4 @@ public class FaviconController {
                 .contentType(MediaType.valueOf("image/svg+xml"))
                 .body(fileContent);
     }
-
-
 }

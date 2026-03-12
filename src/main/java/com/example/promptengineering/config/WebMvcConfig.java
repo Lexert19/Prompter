@@ -17,8 +17,11 @@ import java.util.Locale;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
-    @Value("${media.upload-dir}")
-    private String mediaUploadDir;
+    private final String mediaUploadDir;
+
+    public WebMvcConfig(@Value("${media.upload-dir}") String mediaUploadDir) {
+        this.mediaUploadDir = mediaUploadDir;
+    }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -29,9 +32,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Bean
     public LocaleResolver localeResolver() {
-        CookieLocaleResolver clr = new CookieLocaleResolver();
+        CookieLocaleResolver clr = new CookieLocaleResolver("lang");
         clr.setDefaultLocale(Locale.ENGLISH);
-        clr.setCookieName("lang");
         clr.setCookieMaxAge(Duration.ofDays(30));
         clr.setCookiePath("/");
         return clr;
