@@ -62,5 +62,29 @@
     "url": "https://integrate.api.nvidia.com/v1/chat/completions",
     "type": "text",
     "global": true
+  },
+  {
+    "name": "z-ai/glm4.7",
+    "text": "GLM 4.7",
+    "provider": "nvidia",
+    "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+    "type": "text",
+    "global": true
+  },
+  {
+    "name": "moonshotai/kimi-k2-instruct-0905",
+    "text": "Kimi K2 Instruct 0905",
+    "provider": "nvidia",
+    "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+    "type": "text",
+    "global": true
+  },
+  {
+    "name": "moonshotai/kimi-k2-thinking",
+    "text": "Kimi K2 Thinking",
+    "provider": "nvidia",
+    "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+    "type": "text",
+    "global": true
   }
 ]

@@ -3,7 +3,6 @@ package com.example.promptengineering.controller;
 import com.example.promptengineering.entity.Media;
 import com.example.promptengineering.repository.MediaRepository;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,12 +18,11 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/admin/media")
-@PreAuthorize("hasRole('ADMIN')")
-public class MediaController {
+public class AdminMediaController {
 
     private final MediaRepository mediaRepository;
 
-    public MediaController(MediaRepository mediaRepository) {
+    public AdminMediaController(MediaRepository mediaRepository) {
         this.mediaRepository = mediaRepository;
     }
 

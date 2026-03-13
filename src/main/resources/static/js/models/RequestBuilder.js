@@ -16,6 +16,10 @@ class RequestBuilder {
         return window.settings.type;
     }
 
+    getTopP(){
+        return window.settings.top_p;
+    }
+
     getProvider() {
         return window.settings.provider;
     }
@@ -60,7 +64,7 @@ class RequestBuilder {
                 content: message.buildContent()
             })),
             maxTokens: this.getMaxTokens(),
-            top_p: 0.95,
+            top_p: this.getTopP(),
             temperature: this.getTemperature(),
             stream: this.stream,
             type: this.getType(),

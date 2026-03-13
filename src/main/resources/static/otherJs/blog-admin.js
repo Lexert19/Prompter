@@ -114,20 +114,17 @@ function attachDeleteHandlers() {
 
 async function openMediaPicker() {
     try {
-        // Pobierz listę mediów z API
         const response = await fetch('/api/admin/media', {
             credentials: 'include'
         });
         if (!response.ok) throw new Error('Nie udało się pobrać mediów');
         const mediaList = await response.json();
 
-        // Generuj zawartość modala – siatka obrazków
         let contentHtml = '<div class="media-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; max-height: 60vh; overflow-y: auto;">';
 
         mediaList.forEach(media => {
-            // Z pełnej ścieżki filePath wyciągnij nazwę pliku
             const fileName = media.filePath.substring(media.filePath.lastIndexOf('/') + 1);
-            const imgUrl = `/media/${fileName}`; // URL do statycznego zasobu
+            const imgUrl = `/media/${fileName}`;
 
             contentHtml += `
                 <div class="media-item-selectable"
@@ -141,23 +138,18 @@ async function openMediaPicker() {
         });
         contentHtml += '</div>';
 
-        // Otwórz istniejący modal
         window.modal.open('Wybierz miniaturkę', contentHtml, null);
 
-        // Obsługa kliknięcia na element
         document.querySelectorAll('.media-item-selectable').forEach(el => {
             el.addEventListener('click', () => {
                 const mediaId = el.dataset.id;
                 const imgUrl = el.dataset.url;
 
-                // Ustaw ID w polu formularza
                 document.getElementById('thumbnailId').value = mediaId;
 
-                // Zaktualizuj podgląd
                 const previewDiv = document.getElementById('thumbnailPreview');
                 previewDiv.innerHTML = `<img src="${imgUrl}" style="max-width: 200px; max-height: 200px; border-radius: 4px;">`;
 
-                // Zamknij modal
                 window.modal.close();
             });
         });

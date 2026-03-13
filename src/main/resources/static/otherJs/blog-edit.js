@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             slug: formData.get('slug') || '',
             content: formData.get('content'),
             lang: formData.get('lang') || 'pl',
-            shortDescription: formData.get('shortDescription') || ''
+            shortDescription: formData.get('shortDescription') || '',
             thumbnailId: formData.get('thumbnailId') ? parseInt(formData.get('thumbnailId')) : null
         };
 

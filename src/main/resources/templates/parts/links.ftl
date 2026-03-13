@@ -21,4 +21,3 @@
 <link rel="stylesheet" href="/static/css/navbar.css">
 <link rel="stylesheet" href="/static/css/auth.css">
 <link rel="stylesheet" href="/static/css/modal.css">
-

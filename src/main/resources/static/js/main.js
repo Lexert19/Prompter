@@ -90,13 +90,22 @@ function escapeHtml(content) {
 
 const chatNavigation = document.getElementById('ChatNavigation');
 
-document.addEventListener('mousemove', (e) => {
+const mouseMoveHandler = function(e) {
   if (e.clientX < 400) {
     chatNavigation.classList.add('chat-navigation-show');
   } else {
     chatNavigation.classList.remove('chat-navigation-show');
   }
-});
+};
+
+function handleResize() {
+  if (window.innerWidth > 768) {
+    document.addEventListener('mousemove', mouseMoveHandler);
+  } else {
+    document.removeEventListener('mousemove', mouseMoveHandler);
+    chatNavigation.classList.remove('chat-navigation-show');
+  }
+}
 
 
 function collapseThinkingContent(id){
@@ -145,3 +154,56 @@ async function deleteSharedKeyInteractive() {
   const id = prompt('Podaj ID klucza do usunięcia:');
   if (id) await deleteSharedKey(parseInt(id));
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+  const toggleBtn = document.getElementById('toggle-nav-button');
+  const chatNav = document.getElementById('ChatNavigation');
+  const closeNavBtn = document.getElementById('closeNavBtn');
+
+  function updateButtonZIndex() {
+    if (toggleBtn) {
+      if (chatNav.classList.contains('chat-navigation-show')) {
+        toggleBtn.classList.add('nav-open');
+      } else {
+        toggleBtn.classList.remove('nav-open');
+      }
+    }
+  }
+
+  if (toggleBtn && chatNav) {
+    toggleBtn.addEventListener('click', function() {
+      chatNav.classList.toggle('chat-navigation-show');
+      updateButtonZIndex();
+    });
+  }
+
+  if (closeNavBtn && chatNav) {
+    closeNavBtn.addEventListener('click', function() {
+      chatNav.classList.remove('chat-navigation-show');
+      updateButtonZIndex();
+    });
+  }
+
+  const mouseMoveHandler = function(e) {
+    if (e.clientX < 400) {
+      chatNav.classList.add('chat-navigation-show');
+    } else {
+      chatNav.classList.remove('chat-navigation-show');
+    }
+    updateButtonZIndex();
+  };
+
+  function handleResize() {
+    if (window.innerWidth > 768) {
+      document.addEventListener('mousemove', mouseMoveHandler);
+    } else {
+      document.removeEventListener('mousemove', mouseMoveHandler);
+      chatNav.classList.remove('chat-navigation-show');
+      updateButtonZIndex();
+    }
+  }
+
+  handleResize();
+  window.addEventListener('resize', handleResize);
+  updateButtonZIndex();
+});

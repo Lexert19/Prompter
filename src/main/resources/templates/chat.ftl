@@ -18,6 +18,7 @@
               crossorigin="anonymous"
               referrerpolicy="no-referrer" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.7/js/bootstrap.min.js"
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.7/js/bootstrap.min.js"
                 integrity="sha512-zKeerWHHuP3ar7kX2WKBSENzb+GJytFSBL6HrR2nPSR1kOX1qjm+oHooQtbDpDBSITgyl7QXZApvDfDWvKjkUw=="
                 crossorigin="anonymous"
                 referrerpolicy="no-referrer"></script>
@@ -26,6 +27,9 @@
         <title><@spring.message "app.title" /></title>
     </head>
     <body>
+        <button id="toggle-nav-button" class="toggle-nav-btn" aria-label="Otwórz nawigację">
+            <i class="fas fa-bars"></i>
+        </button>
         <div id="modalOverlay" class="overlay"></div>
         <div id="modal" class="modal-menu">
             <div class="modal-header">

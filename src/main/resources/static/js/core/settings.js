@@ -11,6 +11,7 @@ class Settings {
         this.activeHistory = false;
         this.thinkingEffort = "normal"
         this.useSharedKeys = false;
+        this.top_p = 0.95;
 
         this.provider = "OPENAI";
         this.url = "https://api.openai.com/v1/chat/completions";
@@ -42,6 +43,7 @@ class Settings {
             type: this.type,
             system: this.system,
             systemSwitch: this.systemSwitch,
+            top_p: this.top_p,
             project: this.project,
             projectSwitch: this.projectSwitch,
             activeHistory: this.activeHistory,
@@ -83,6 +85,9 @@ class Settings {
                 break;
             case "temperature":
                 window.settings.temperature = event.target.value / 100;
+                break;
+            case "top_p":
+                this.top_p = parseFloat(event.target.value);
                 break;
             case "useSharedKeys":
                 window.settings.useSharedKeys = event.target.checked;

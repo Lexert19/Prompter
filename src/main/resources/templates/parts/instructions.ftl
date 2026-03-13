@@ -1,5 +1,5 @@
 <div class="chat-settings" id="chatSettings">
-    <div class="instruction-field ">
+    <div class="instruction-field pe-4">
         <label class="checkbox-container">
             <input type="checkbox"
                    id="memory"
@@ -33,6 +33,19 @@
                max="100"
                step="1"
                value="0"
+               onchange="window.settings.change(event)">
+    </div>
+    <div class="instruction-field ">
+        <label for="top_p">
+            <span><@spring.message "settings.top_p" /></span>
+        </label>
+        <input type="range"
+               id="top_p"
+               name="top_p"
+               min="0"
+               max="1"
+               step="0.01"
+               value="0.95"
                onchange="window.settings.change(event)">
     </div>
     <div id="systemPromptContainer"></div>

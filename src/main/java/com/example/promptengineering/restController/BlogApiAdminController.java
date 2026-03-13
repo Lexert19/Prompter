@@ -1,4 +1,4 @@
-package com.example.promptengineering.controller;
+package com.example.promptengineering.restController;
 
 import com.example.promptengineering.dto.PostDto;
 import com.example.promptengineering.exception.ResourceNotFoundException;
@@ -11,11 +11,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/blog")
-public class BlogApiController {
+public class BlogApiAdminController {
 
     private final PostService postService;
 
-    public BlogApiController(PostService postService) {
+    public BlogApiAdminController(PostService postService) {
         this.postService = postService;
     }
 
