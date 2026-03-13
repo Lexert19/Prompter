@@ -112,12 +112,13 @@ class ChatClient {
                 if (candidate?.content?.parts?.[0]?.text) content = candidate.content.parts[0].text;
             }
 
-            let reasoningContent = this.parseReasoningContent(rootNode);
-            if(reasoningContent){
-                content += reasoningContent;
-            }else if(reasoningContent && this.firstReason == false){
-                content = reasoningContent + content;
-            }
+//            let reasoningContent = this.parseReasoningContent(rootNode);
+//            if(reasoningContent){
+//                content += reasoningContent;
+//            }else if(reasoningContent && this.firstReason == false){
+//                content = reasoningContent + content;
+//            }
+            content = this.appendReasoningContent(rootNode, content);
 
             if(!content)
             return;
@@ -147,21 +148,24 @@ class ChatClient {
         }
     }
 
-    parseReasoningContent(rootNode){
+
+    appendReasoningContent(rootNode, content){
         const choice = rootNode.choices?.[0];
-        const content = choice?.delta?.reasoning_content;
-        if(content != null){
-            if(this.firstReason===false){
+        let reasoningContent = choice?.delta?.reasoning_content;
+        if(!reasoningContent)
+                reasoningContent="";
+        if(content == ""){
+            if(this.firstReason===false && reasoningContent != ""){
                 this.firstReason=true;
-                return "\n<think>\n"+content;
+                return "\n<think>\n"+reasoningContent;
             }
-            return content;
+            return reasoningContent;
         } else {
             if(this.firstReason===true){
                 this.firstReason=false;
-                return "\n</think>\n";
+                return reasoningContent + "\n</think>" + content;
             }
-            return "";
+            return content;
         }
     }
 
