@@ -60,6 +60,7 @@ class RequestBuilder {
                 content: message.buildContent()
             })),
             maxTokens: this.getMaxTokens(),
+            top_p: 0.95,
             temperature: this.getTemperature(),
             stream: this.stream,
             type: this.getType(),

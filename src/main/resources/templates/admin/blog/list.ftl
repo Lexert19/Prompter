@@ -31,7 +31,7 @@
                 </div>
             </div>
         </div>
-        <script src="/static/js/blog-admin.js"></script>
+        <script src="/static/otherJs/blog-admin.js"></script>
         <#include "/parts/footer.ftl" />
     </body>
 </html>

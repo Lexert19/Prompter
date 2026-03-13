@@ -27,7 +27,7 @@
                 <div id="mediaGrid" class="media-grid"></div>
             </div>
         </div>
-        <script src="/static/js/media.js"></script>
+        <script src="/static/otherJs/media.js"></script>
         <#include "/parts/footer.ftl" />
     </body>
 </html>

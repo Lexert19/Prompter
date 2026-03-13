@@ -16,14 +16,6 @@
     "global": true
   },
   {
-    "name": "gpt-4o-mini",
-    "text": "GPT-4o Mini",
-    "provider": "openai",
-    "url": "https://api.openai.com/v1/chat/completions",
-    "type": "text",
-    "global": true
-  },
-  {
     "name": "nvidia/nemotron-3-super-120b-a12b",
     "text": "Nemotron 3 Super 120B",
     "provider": "nvidia",
@@ -64,10 +56,10 @@
     "global": true
   },
   {
-    "name": "claude-3-haiku-20240307",
-    "text": "Claude 3 Haiku",
-    "provider": "anthropic",
-    "url": "https://api.anthropic.com/v1/messages",
+    "name": "qwen/qwen3.5-122b-a10b",
+    "text": "Qwen 3.5 122B",
+    "provider": "nvidia",
+    "url": "https://integrate.api.nvidia.com/v1/chat/completions",
     "type": "text",
     "global": true
   }

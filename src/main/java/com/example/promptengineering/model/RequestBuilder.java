@@ -19,6 +19,7 @@ public class RequestBuilder {
     private String key;
     private String provider;
     private String url;
+    private Double top_p = 0.95;
     private String sessionId;
     private String reasoningEffort = "";
     private String type = "";
@@ -89,6 +90,8 @@ public class RequestBuilder {
         }
         request.put("max_tokens", maxTokens);
         request.put("temperature", temperature);
+        request.put("top_p", top_p);
+
 
         return request;
     }

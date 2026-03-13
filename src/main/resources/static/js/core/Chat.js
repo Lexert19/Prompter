@@ -101,6 +101,7 @@ class Chat {
             this.chatView.clearMessages();
             this.chatView.renderMessages(this.requestBuilder);
             await this._sendRequest();
+            window.inputView.setIsBlocked(true);
         }
     }
 

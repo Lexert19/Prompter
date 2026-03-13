@@ -84,16 +84,14 @@ class ChatClient {
 
     readChunkData(chunk){
         try{
-            if(!chunk.trim())
-            return;
-            if(chunk == "[DONE]")
-            return;
-            if (chunk.startsWith(': ping')) {
+            //event:error
+            if (!chunk.trim() || chunk === "[DONE]" ||
+            chunk.startsWith(': ping') ||
+            chunk.startsWith('event:error') ||
+            chunk.startsWith(': OPENROUTER PROCESSING')) {
                 return;
             }
-            if(chunk.startsWith(': OPENROUTER PROCESSING')){
-                return;
-            }
+
             const rootNode = JSON.parse(chunk);
             let error = rootNode.error;
             if(error){
@@ -104,9 +102,12 @@ class ChatClient {
             let content = "";
             if(this.getProvider() == "ANTHROPIC"){
                 content = rootNode.delta.text;
-            }else{
-                if(rootNode.choices[0].delta.content)
-                content += rootNode.choices[0].delta.content;
+            } else if (rootNode.choices && rootNode.choices.length > 0) {
+                const choice = rootNode.choices[0];
+                if (choice?.delta?.content) content = choice.delta.content;
+            } else if (rootNode.candidates && rootNode.candidates.length > 0) {
+                const candidate = rootNode.candidates[0];
+                if (candidate?.content?.parts?.[0]?.text) content = candidate.content.parts[0].text;
             }
 
             let reasoningContent = this.parseReasoningContent(rootNode);
@@ -142,20 +143,21 @@ class ChatClient {
     }
 
     parseReasoningContent(rootNode){
-        let content = rootNode.choices[0].delta.reasoning_content;
-
+        const choice = rootNode.choices?.[0];
+        const content = choice?.delta?.reasoning_content;
         if(content != null){
-            if(this.firstReason == false){
-                this.firstReason = true
-                content = "<think>\n" + content;
+            if(this.firstReason===false){
+                this.firstReason=true;
+                return "<think>\n"+content;
             }
-        } else{
-            if(this.firstReason == true){
-                this.firstReason = false;
-                content = "\n</think>\n";
+            return content;
+        } else {
+            if(this.firstReason===true){
+                this.firstReason=false;
+                return "\n</think>\n";
             }
+            return "";
         }
-        return content;
     }
 
     read(reader, decoder) {

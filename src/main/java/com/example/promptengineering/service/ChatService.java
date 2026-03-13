@@ -141,8 +141,9 @@ public class ChatService {
         return requestWithKeyMono
                 .flatMapMany(req -> attachBase64Images(req, user)
                         .then(buildRequestBodyJson(req))
-                        .doOnNext(json -> log.debug("Request JSON to be sent: {}", json))
-                        .flatMapMany(json -> executeRequest(req, json)))
+                        .flatMapMany(json -> executeRequest(req, json))
+                )
+                .doOnCancel(() -> log.debug("SSE stream cancelled by client"))
                 .onErrorResume(this::handleError);
     }
 

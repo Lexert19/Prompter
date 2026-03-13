@@ -47,7 +47,14 @@ class InputView{
     makeChat() {
         const message = this.chatInput.value;
 
-        if(message == ""){
+        if (this.isBlocked) {
+            window.chat.stopStreaming();
+            this.isBlocked = false;
+            this.updateView();
+            return;
+        }
+
+        if (!message.trim()) {
             return;
         }
 
@@ -59,18 +66,12 @@ class InputView{
             return;
         }
 
-        if (!this.isBlocked) {
-            this.chatInput.value = "";
-            this.isBlocked = true;
-            window.chat.sendMessage(message, "user", this.images, this.longTexts);
-            this.images = [];
-            this.longTexts = [];
-            this.updateView();
-        } else {
-            window.chat.stopStreaming();
-            this.isBlocked = false;
-            this.updateView();
-        }
+        this.chatInput.value = "";
+        this.isBlocked = true;
+        window.chat.sendMessage(message, "user", this.images, this.longTexts);
+        this.images = [];
+        this.longTexts = [];
+        this.updateView();
     }
 
     updateView(){
