@@ -92,6 +92,8 @@ class ChatClient {
                 return;
             }
 
+            console.log(chunk);
+
             const rootNode = JSON.parse(chunk);
             let error = rootNode.error;
             if(error){
@@ -111,8 +113,11 @@ class ChatClient {
             }
 
             let reasoningContent = this.parseReasoningContent(rootNode);
-            if(reasoningContent)
-            content += reasoningContent;
+            if(reasoningContent){
+                content += reasoningContent;
+            }else if(reasoningContent && this.firstReason == false){
+                content = reasoningContent + content;
+            }
 
             if(!content)
             return;
@@ -148,7 +153,7 @@ class ChatClient {
         if(content != null){
             if(this.firstReason===false){
                 this.firstReason=true;
-                return "<think>\n"+content;
+                return "\n<think>\n"+content;
             }
             return content;
         } else {
