@@ -1,5 +1,6 @@
 package com.example.promptengineering.restController;
 
+import com.example.promptengineering.dto.MediaDto;
 import com.example.promptengineering.entity.Media;
 import com.example.promptengineering.exception.ResourceNotFoundException;
 import com.example.promptengineering.repository.MediaRepository;
@@ -17,6 +18,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin/media")
@@ -32,9 +34,22 @@ public class MediaApiController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Media>> listMedia() {
+    public ResponseEntity<List<MediaDto>> listMedia() {
         List<Media> mediaList = mediaRepository.findAll(Sort.by(Sort.Direction.DESC, "uploadedAt"));
-        return ResponseEntity.ok(mediaList);
+        List<MediaDto> dtos = mediaList.stream()
+                .map(media -> {
+                    MediaDto dto = new MediaDto();
+                    dto.setId(media.getId());
+                    dto.setFileName(media.getFileName());
+                    String storedFilename = Paths.get(media.getFilePath()).getFileName().toString();
+                    dto.setUrl("/media/" + storedFilename);
+                    dto.setContentType(media.getContentType());
+                    dto.setSize(media.getSize());
+                    dto.setUploadedAt(media.getUploadedAt());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
     }
 
     @DeleteMapping("/{id}")
@@ -45,6 +60,13 @@ public class MediaApiController {
         Files.deleteIfExists(filePath);
         mediaRepository.delete(media);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Media> getMedia(@PathVariable Long id) throws ResourceNotFoundException {
+        Media media = mediaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Media not found"));
+        return ResponseEntity.ok(media);
     }
 
 

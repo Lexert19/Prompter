@@ -41,4 +41,7 @@ public class Post {
     @JoinColumn(name = "parent_id")
     private Post parent;
 
+    @Column(name = "thumbnail_id")
+    private Long thumbnailId;
+
 }

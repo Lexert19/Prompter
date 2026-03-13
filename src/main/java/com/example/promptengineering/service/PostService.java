@@ -96,6 +96,7 @@ public class PostService {
         dto.setCreatedAt(post.getCreatedAt());
         dto.setUpdatedAt(post.getUpdatedAt());
         dto.setLang(post.getLang());
+        dto.setThumbnailId(post.getThumbnailId());
         if (post.getParent() != null) {
             dto.setParentId(post.getParent().getId());
         }
@@ -108,6 +109,7 @@ public class PostService {
         post.setSlug(dto.getSlug());
         post.setContent(dto.getContent());
         post.setLang(dto.getLang());
+        post.setThumbnailId(dto.getThumbnailId());
         return post;
     }
 

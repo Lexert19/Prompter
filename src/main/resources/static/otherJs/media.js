@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         const formData = new FormData();
         formData.append('file', document.getElementById('fileInput').files[0]);
         try {
-            const response = await fetch('/admin/media/upload', { method: 'POST', body: formData });
+            const response = await fetch('/api/admin/media/upload', { method: 'POST', body: formData });
             if (response.ok) {
                 const imageUrl = await response.text();
                 document.getElementById('imageUrl').value = window.location.origin + imageUrl;
@@ -58,19 +58,18 @@ document.addEventListener('DOMContentLoaded', async function() {
             return;
         }
         mediaList.forEach(media => {
-            const fileName = media.filePath.substring(media.filePath.lastIndexOf('/') + 1);
             const item = document.createElement('div');
             item.className = 'media-item';
             item.innerHTML = `
-                <img src="/media/${fileName}" alt="${media.fileName}">
-                <div class="media-info">
-                    <div>${media.fileName}</div>
-                    <div>${new Date(media.uploadedAt).toLocaleString()}</div>
-                </div>
-                <form class="delete-form" onsubmit="deleteMedia(event, ${media.id})">
-                    <button type="submit" class="delete-btn" title="Usuń">×</button>
-                </form>
-            `;
+            <img src="${media.url}" alt="${media.fileName}">
+            <div class="media-info">
+                <div>${media.fileName}</div>
+                <div>${new Date(media.uploadedAt).toLocaleString()}</div>
+            </div>
+            <form class="delete-form" onsubmit="deleteMedia(event, ${media.id})">
+                <button type="submit" class="delete-btn" title="Usuń">×</button>
+            </form>
+        `;
             grid.appendChild(item);
         });
     }

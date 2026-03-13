@@ -20,6 +20,7 @@
                     <table class="admin-table">
                         <thead>
                             <tr>
+                                <th>Miniaturka</th>
                                 <th>Tytuł</th>
                                 <th>Data</th>
                                 <th style="width: 10%">Akcje</th>

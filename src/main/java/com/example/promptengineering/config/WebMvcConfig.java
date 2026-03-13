@@ -23,15 +23,15 @@ import java.util.Locale;
 public class WebMvcConfig implements WebMvcConfigurer {
     private final String mediaUploadDir;
 
-    @Autowired
-    @Qualifier("taskExecutor")
-    private ThreadPoolTaskExecutor taskExecutor;
-
-    @Override
-    public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
-        configurer.setTaskExecutor(taskExecutor);
-        configurer.setDefaultTimeout(30000);
-    }
+//    @Autowired
+//    @Qualifier("taskExecutor")
+//    private ThreadPoolTaskExecutor taskExecutor;
+//
+//    @Override
+//    public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
+//        configurer.setTaskExecutor(taskExecutor);
+//        configurer.setDefaultTimeout(30000);
+//    }
 
     public WebMvcConfig(@Value("${media.upload-dir}") String mediaUploadDir) {
         this.mediaUploadDir = mediaUploadDir;

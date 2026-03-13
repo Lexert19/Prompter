@@ -26,6 +26,9 @@
     position: absolute;
     top: 5px;
     right: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .delete-btn {
     background: #dc3545;
@@ -36,6 +39,7 @@
     height: 30px;
     cursor: pointer;
     font-weight: bold;
+    padding: 0px;
 }
 .upload-section {
     background: rgba(45,45,49,0.9);

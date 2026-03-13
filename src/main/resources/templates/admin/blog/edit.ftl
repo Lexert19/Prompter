@@ -38,6 +38,28 @@
                         <label>Treść</label>
                         <textarea name="content" rows="15" required class="form-control">${post.content!}</textarea>
                     </div>
+                    <div class="mb-2">
+                        <label>Miniaturka (ID obrazka)</label>
+                        <div class="d-flex align-items-center">
+                            <input type="number"
+                                   name="thumbnailId"
+                                   id="thumbnailId"
+                                   value="${post.thumbnailId!}"
+                                   class="form-control"
+                                   style="width: 150px;"
+                                   placeholder="ID">
+                            <button type="button"
+                                    class="btn btn-secondary ms-2"
+                                    onclick="openMediaPicker()">
+                                Wybierz z biblioteki
+                            </button>
+                        </div>
+                        <div id="thumbnailPreview" class="mt-2">
+                            <#if post.thumbnailId??>
+                            <img src="/api/files/${post.thumbnailId}" style="max-width: 200px; max-height: 200px;">
+                        </#if>
+                    </div>
+            </div>
                     <button type="submit" class="btn btn-primary">Zapisz</button>
                     <a href="/admin/blog" class="btn btn-secondary">Anuluj</a>
                 </form>

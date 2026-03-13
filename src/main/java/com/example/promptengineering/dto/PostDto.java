@@ -19,4 +19,5 @@ public class PostDto {
     private LocalDateTime updatedAt;
     private String lang;
     private Long parentId;
+    private Long thumbnailId;
 }

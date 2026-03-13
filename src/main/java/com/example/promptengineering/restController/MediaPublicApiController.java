@@ -4,8 +4,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/admin/media")
-public class MediaUploadController {
-
-
+@RequestMapping("/public/media")
+public class MediaPublicApiController {
 }
