@@ -58,8 +58,8 @@ function renderPosts(posts) {
 
     posts.forEach(post => {
         const row = document.createElement('tr');
-        const thumbnailHtml = post.thumbnailId
-            ? `<img src="/api/files/${post.thumbnailId}" style="width: 50px; height: 50px; object-fit: cover;">`
+        const thumbnailHtml = post.thumbnailUrl
+            ? `<img src="${post.thumbnailUrl}" style="width: 50px; height: 50px; object-fit: cover;">`
             : '';
         row.innerHTML = `
             <td>${thumbnailHtml}</td>

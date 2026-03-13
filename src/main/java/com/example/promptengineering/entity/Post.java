@@ -24,6 +24,9 @@ public class Post {
     @Column(nullable = false, length = 10000)
     private String content;
 
+    @Column(name = "short_description", length = 500)
+    private String shortDescription;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 

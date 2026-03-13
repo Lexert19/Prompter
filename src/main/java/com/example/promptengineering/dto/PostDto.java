@@ -20,4 +20,6 @@ public class PostDto {
     private String lang;
     private Long parentId;
     private Long thumbnailId;
+    private String thumbnailUrl;
+    private String shortDescription;
 }

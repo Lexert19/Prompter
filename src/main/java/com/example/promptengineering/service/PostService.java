@@ -1,11 +1,14 @@
 package com.example.promptengineering.service;
 
 import com.example.promptengineering.dto.PostDto;
+import com.example.promptengineering.entity.Media;
 import com.example.promptengineering.entity.Post;
 import com.example.promptengineering.exception.ResourceNotFoundException;
+import com.example.promptengineering.repository.MediaRepository;
 import com.example.promptengineering.repository.PostRepository;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,9 +16,11 @@ import java.util.stream.Collectors;
 @Service
 public class PostService {
     private final PostRepository postRepository;
+    private final MediaRepository mediaRepository;
 
-    public PostService(PostRepository postRepository) {
+    public PostService(PostRepository postRepository, MediaRepository mediaRepository) {
         this.postRepository = postRepository;
+        this.mediaRepository = mediaRepository;
     }
 
     public List<PostDto> getAllPosts() {
@@ -40,6 +45,8 @@ public class PostService {
         post.setCreatedAt(LocalDateTime.now());
         post.setSlug(postDto.getSlug());
         post.setContent(postDto.getContent());
+        post.setThumbnailId(postDto.getThumbnailId());
+        post.setShortDescription(postDto.getShortDescription());
         if (postDto.getParentId() != null) {
             Post parent = postRepository.findById(postDto.getParentId())
                     .orElseThrow(() -> new ResourceNotFoundException("Parent post not found"));
@@ -55,6 +62,8 @@ public class PostService {
         post.setTitle(postDto.getTitle());
         post.setSlug(postDto.getSlug());
         post.setContent(postDto.getContent());
+        post.setThumbnailId(postDto.getThumbnailId());
+        post.setShortDescription(postDto.getShortDescription());
         if(postDto.getParentId() != null){
             Post parent = postRepository.findById(postDto.getParentId())
                     .orElseThrow(() -> new ResourceNotFoundException("Parent post not found"));
@@ -97,8 +106,16 @@ public class PostService {
         dto.setUpdatedAt(post.getUpdatedAt());
         dto.setLang(post.getLang());
         dto.setThumbnailId(post.getThumbnailId());
+        dto.setShortDescription(post.getShortDescription());
         if (post.getParent() != null) {
             dto.setParentId(post.getParent().getId());
+        }
+        if (post.getThumbnailId() != null) {
+            Media media = mediaRepository.findById(post.getThumbnailId()).orElse(null);
+            if (media != null) {
+                String storedFilename = Paths.get(media.getFilePath()).getFileName().toString();
+                dto.setThumbnailUrl("/media/" + storedFilename);
+            }
         }
         return dto;
     }

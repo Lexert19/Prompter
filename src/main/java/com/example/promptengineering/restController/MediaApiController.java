@@ -63,10 +63,18 @@ public class MediaApiController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Media> getMedia(@PathVariable Long id) throws ResourceNotFoundException {
+    public ResponseEntity<MediaDto> getMedia(@PathVariable Long id) throws ResourceNotFoundException {
         Media media = mediaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Media not found"));
-        return ResponseEntity.ok(media);
+        MediaDto dto = new MediaDto();
+        dto.setId(media.getId());
+        dto.setFileName(media.getFileName());
+        String storedFilename = Paths.get(media.getFilePath()).getFileName().toString();
+        dto.setUrl("/media/" + storedFilename);
+        dto.setContentType(media.getContentType());
+        dto.setSize(media.getSize());
+        dto.setUploadedAt(media.getUploadedAt());
+        return ResponseEntity.ok(dto);
     }
 
 
