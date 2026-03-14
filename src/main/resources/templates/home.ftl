@@ -13,16 +13,15 @@
                      style="text-align: center">
                     <img src="/favicon"
                          class="d-block"
-                         width="90px"
-                         height="90px"
+                         width="70px"
+                         height="70px"
                          style="vertical-align: middle;
                                 margin-left: 10px;
                                 filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.3))">
-                    <h1 style="margin: 0; font-size: 3rem; font-weight: bold;">
+                    <h1 style="margin: 0;font-weight: bold;">
                         <span class="text-shadow-md" style="color: var(--accent);">Prompter</span>
                     </h1>
-                    <p class="text-white mt-3 fs-5 text-shadow-lg"
-                       style="font-size: 1.2rem">
+                    <p class="text-white mt-3 text-shadow-lg">
                         <@spring.message "app.description" />
                     </p>
                     <div class="center mt-4 mb-1">
@@ -95,7 +94,7 @@
                     </div>
                     <div class="col-md-6 ps-md-5">
                         <h2 class="text-center mb-4" style="color: var(--accent);">How It Works</h2>
-                        <div class="d-flex flex-column gap-4">
+                        <div class="d-flex flex-column gap-2">
                             <div class="d-flex align-items-start">
                                 <div>
                                     <h5>
