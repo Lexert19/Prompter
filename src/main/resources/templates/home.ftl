@@ -8,7 +8,7 @@
 <div class="slides-container">
     <section class="slide" id="slide1">
         <div class="center content-wrapper" style="height: 100vh;">
-            <div class="block content-box p-0 pt-5 w-100 hidden">
+            <div class="block content-box p-0 pt-md-5 w-100 hidden">
                 <div class="chat-header d-flex mb-3 flex-column align-items-center"
                      style="text-align: center">
                     <img src="/favicon"
@@ -119,14 +119,6 @@
                                         <i class="fas fa-history me-3 flex-shrink-0" style="color: var(--accent);"></i>
                                         <@spring.message "home.feature.history.title" /></h5>
                                     <p class="text-white-50 mb-0"><@spring.message "home.feature.history.desc" /></p>
-                                </div>
-                            </div>
-                            <div class="d-flex align-items-start">
-                                <div>
-                                    <h5>
-                                        <i class="fas fa-project-diagram me-3 flex-shrink-0" style="color: var(--accent);"></i>
-                                        <@spring.message "home.feature.projects.title" /></h5>
-                                    <p class="text-white-50 mb-0"><@spring.message "home.feature.projects.desc" /></p>
                                 </div>
                             </div>
                         </div>

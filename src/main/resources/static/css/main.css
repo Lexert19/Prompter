@@ -601,7 +601,7 @@ input[type="range"]::-moz-range-progress {
 }
 
 .navbar{
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgba(0, 0, 0, 0.60);
 }
 
 .open_chat:hover {
