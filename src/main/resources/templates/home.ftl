@@ -8,7 +8,7 @@
 <div class="slides-container">
     <section class="slide" id="slide1">
         <div class="center content-wrapper" style="height: 100vh;">
-            <div class="block content-box p-0 pt-md-5 w-100 hidden">
+            <div class="block content-box p-0 pt-5 w-100 hidden">
                 <div class="chat-header d-flex mb-3 flex-column align-items-center"
                      style="text-align: center">
                     <img src="/favicon"
@@ -18,14 +18,14 @@
                          style="vertical-align: middle;
                                 margin-left: 10px;
                                 filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.3))">
-                    <h1 style="margin: 0; font-size: 4rem; font-weight: bold;">
+                    <h1 style="margin: 0; font-size: 3rem; font-weight: bold;">
                         <span class="text-shadow-md" style="color: var(--accent);">Prompter</span>
                     </h1>
                     <p class="text-white mt-3 fs-5 text-shadow-lg"
                        style="font-size: 1.2rem">
                         <@spring.message "app.description" />
                     </p>
-                    <div class="center mt-5 mb-1">
+                    <div class="center mt-4 mb-1">
                         <a href="/chat"
                            class="open_chat text-decoration-none rounded-pill"
                            style="padding: 15px 30px;
@@ -35,7 +35,7 @@
                         </a>
                     </div>
                     <div class="container">
-                    <div class="row g-4 my-4">
+                    <div class="row g-4 my-md-4 my-2">
                         <div class="col-md-4">
                             <div class="card glass-card h-100 text-center">
                                 <div class="card-body">
