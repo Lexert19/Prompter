@@ -92,8 +92,6 @@ class ChatClient {
                 return;
             }
 
-            console.log(chunk);
-
             const rootNode = JSON.parse(chunk);
             let error = rootNode.error;
             if(error){
@@ -112,12 +110,6 @@ class ChatClient {
                 if (candidate?.content?.parts?.[0]?.text) content = candidate.content.parts[0].text;
             }
 
-//            let reasoningContent = this.parseReasoningContent(rootNode);
-//            if(reasoningContent){
-//                content += reasoningContent;
-//            }else if(reasoningContent && this.firstReason == false){
-//                content = reasoningContent + content;
-//            }
             content = this.appendReasoningContent(rootNode, content);
 
             if(!content)
@@ -163,7 +155,7 @@ class ChatClient {
         } else {
             if(this.firstReason===true){
                 this.firstReason=false;
-                return reasoningContent + "\n</think>" + content;
+                return reasoningContent + "\n</think>\n" + content;
             }
             return content;
         }
@@ -181,11 +173,6 @@ class ChatClient {
             this.read(reader, decoder);
         }).catch(error => {
             this.handleStreamEnd(reader);
-            //            window.data.setBlockedInput(false);
-            //            this.currentMessage.end = Date.now();
-            //            window.chat.saveMessage(this.currentMessage);
-            //
-            //            reader.releaseLock();
         });
     }
 
