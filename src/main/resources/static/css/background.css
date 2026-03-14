@@ -13,7 +13,7 @@
     height: 100vh;
     z-index: -1;
     overflow: hidden;
-    background-color: var(--main-bg);
+    background-color: black;
     filter: blur(90px);
 }
 
