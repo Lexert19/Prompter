@@ -8,5 +8,5 @@ import lombok.Setter;
 public class SharedKeyDto {
     private String provider;
     private String keyValue;
-
+    private Long ownerId;
 }

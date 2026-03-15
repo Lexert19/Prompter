@@ -14,6 +14,7 @@
         </button>
         <div class="collapse navbar-collapse py-3 py-lg-0"
              id="navbarSupportedContent">
+            <a href="/blog" class="text-white text-decoration-none">Blog</a>
             <div class="language-dropdown me-3 ms-auto">
                 <button class="dropdown-toggle"
                         id="langDropdownBtn"

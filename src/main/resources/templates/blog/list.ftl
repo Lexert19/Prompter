@@ -17,7 +17,7 @@
             <div class="panel blog-panel">
                 <div class="row g-4">
                     <#list posts as p>
-                    <div class="col-md-6 px-5">
+                    <div class="col-md-6">
                         <article class="post-item h-100">
                             <#if p.thumbnailUrl??>
                             <div class="post-thumbnail">

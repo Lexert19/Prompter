@@ -25,14 +25,6 @@ public class BlogE2ETest extends BaseE2ETest {
         blogEditPage = new AdminBlogEditPage(driver);
     }
 
-    @Value("${spring.datasource.url}")
-    private String dbUrl;
-
-    @PostConstruct
-    public void logDbUrl() {
-        System.out.println("Testy używają bazy: " + dbUrl);
-    }
-
     @Test
     void fullPostLifecycle() {
         driver.get(baseUrl + "/auth/login");
@@ -40,13 +32,13 @@ public class BlogE2ETest extends BaseE2ETest {
         driver.get(baseUrl + "/admin/blog");
         blogListPage.clickNewPost();
         String uniqueTitle = "Test E2E " + System.currentTimeMillis();
-        blogEditPage.fillForm(uniqueTitle, System.currentTimeMillis()+"", "Krótki opis", "Treść posta");
+        blogEditPage.fillForm(uniqueTitle, System.currentTimeMillis()+"", "Short description", "Post content");
         blogEditPage.submit();
         driver.get(baseUrl + "/admin/blog");
         assertTrue(blogListPage.isPostPresent(uniqueTitle));
         blogListPage.clickEditForPost(uniqueTitle);
-        String editedTitle = "(edytowany)";
-        blogEditPage.fillForm(editedTitle, System.currentTimeMillis()+"", "Zaktualizowany opis", "Nowa treść");
+        String editedTitle = "(edited)";
+        blogEditPage.fillForm(editedTitle, System.currentTimeMillis()+"", "Update short description", "New content");
         blogEditPage.submit();
         driver.get(baseUrl + "/admin/blog");
         assertTrue(blogListPage.isPostPresent(editedTitle));

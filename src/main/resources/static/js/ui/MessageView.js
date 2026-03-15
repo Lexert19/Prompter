@@ -4,8 +4,6 @@ class MessageView{
         this.message = message;
     }
 
-
-
     createHtmlElement(destination, finished = false){
         let duration = "";
         if (this.message.end !== null) {
@@ -22,9 +20,12 @@ class MessageView{
         }
         var htmlMessage = `
             <div id="${this.message.id}" class="message ${this.message.role}">
-                <div class="assitant-data">
+                <div class="assitant-data d-flex align-items-center">
                     <div class="date"></div>
                     <div class="duration" id="duration-${this.message.id}">${duration}</div>
+                    <div class="loading-dots" id="loading-${this.message.id}" style="display: ${finished ? 'none' : 'inline-flex'};">
+                        <span></span><span></span><span></span>
+                    </div>
                 </div>
                 ${this.message.getHtmlImages()}
                 ${this.message.getHtmlFiles()}
@@ -51,12 +52,13 @@ class MessageView{
         const intervalId = setInterval(() => {
             if (this.message.end !== null) {
                 clearInterval(intervalId);
+                const loadingEl = document.getElementById(`loading-${this.message.id}`);
+                if (loadingEl) loadingEl.style.display = 'none';
                 return;
             }
             this.updateDurationCounter();
         }, 100);
     }
-
 
     updateDurationCounter(){
         const durationElement = document.getElementById(`duration-${this.message.id}`);

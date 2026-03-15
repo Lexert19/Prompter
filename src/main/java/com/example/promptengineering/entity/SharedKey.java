@@ -18,6 +18,10 @@ public class SharedKey {
     private boolean working;
     private int usageCount;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
+    private User owner;
+
     public SharedKey(String provider, String keyValue) {
         this.provider = provider;
         this.keyValue = keyValue;

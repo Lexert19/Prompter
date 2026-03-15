@@ -27,8 +27,7 @@
                     <div class="center mt-4 mb-1">
                         <a href="/chat"
                            class="open_chat text-decoration-none rounded-pill"
-                           style="padding: 15px 30px;
-                              font-size: 1.1rem">
+                           style="padding: 15px 30px;">
                             <i class="fas fa-comment-dots"></i>
                             <@spring.message "start_chat" />
                         </a>
