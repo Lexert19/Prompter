@@ -2,6 +2,7 @@ package com.example.promptengineering.service;
 
 import java.util.*;
 
+import com.example.promptengineering.dto.UserDto;
 import com.example.promptengineering.exception.UserAlreadyExistsException;
 import com.example.promptengineering.model.AppRole;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -108,5 +109,12 @@ public class UserService implements UserDetailsService {
         if(user.isEmpty())
             throw new UsernameNotFoundException("User not found with email: " + username);
         return user.get();
+    }
+
+
+    public UserDto mapUserToDto(User user){
+        UserDto userDto = new UserDto();
+        userDto.setPoints(user.getPoints());
+        return userDto;
     }
 }

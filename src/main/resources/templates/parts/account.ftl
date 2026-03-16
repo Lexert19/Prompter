@@ -11,6 +11,9 @@
         </select>
     </div>
     <div class="mb-2">
+        <label><@spring.message "account.points" />: <span id="userPoints">0</span></label>
+    </div>
+    <div class="mb-2">
         <button class="rounded-1" onclick="window.accountView.openAddKeyModal()">
             <@spring.message "account.add.api.key" />
         </button>

@@ -5,7 +5,9 @@
     "provider": "GEMINI",
     "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
     "type": "text",
-    "global": true
+    "global": true,
+    "pointsPerInput": 0.5,
+    "pointsPerOutput": 0.5
   },
   {
     "name": "gemini-3-flash-preview",
@@ -13,7 +15,9 @@
     "provider": "GEMINI",
     "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
     "type": "text",
-    "global": true
+    "global": true,
+    "pointsPerInput": 0.5,
+    "pointsPerOutput": 0.5
   },
   {
     "name": "nvidia/nemotron-3-super-120b-a12b",
@@ -21,7 +25,9 @@
     "provider": "nvidia",
     "url": "https://integrate.api.nvidia.com/v1/chat/completions",
     "type": "text",
-    "global": true
+    "global": true,
+    "pointsPerInput": 0.10,
+    "pointsPerOutput": 0.50
   },
   {
     "name": "moonshotai/kimi-k2.5",
@@ -29,7 +35,9 @@
     "provider": "nvidia",
     "url": "https://integrate.api.nvidia.com/v1/chat/completions",
     "type": "text",
-    "global": true
+    "global": true,
+    "pointsPerInput": 0.574,
+    "pointsPerOutput": 3.011
   },
   {
     "name": "qwen/qwen3.5-397b-a17b",
@@ -37,7 +45,9 @@
     "provider": "nvidia",
     "url": "https://integrate.api.nvidia.com/v1/chat/completions",
     "type": "text",
-    "global": true
+    "global": true,
+    "pointsPerInput": 0.60,
+    "pointsPerOutput": 3.60
   },
   {
     "name": "minimaxai/minimax-m2.5",
@@ -45,7 +55,9 @@
     "provider": "nvidia",
     "url": "https://integrate.api.nvidia.com/v1/chat/completions",
     "type": "text",
-    "global": true
+    "global": true,
+    "pointsPerInput": 0.27,
+    "pointsPerOutput": 0.95
   },
   {
     "name": "openai/gpt-oss-120b",
@@ -53,7 +65,9 @@
     "provider": "nvidia",
     "url": "https://integrate.api.nvidia.com/v1/chat/completions",
     "type": "text",
-    "global": true
+    "global": true,
+    "pointsPerInput": 0.039,
+    "pointsPerOutput": 0.19
   },
   {
     "name": "qwen/qwen3.5-122b-a10b",
@@ -61,7 +75,9 @@
     "provider": "nvidia",
     "url": "https://integrate.api.nvidia.com/v1/chat/completions",
     "type": "text",
-    "global": true
+    "global": true,
+    "pointsPerInput": 0.26,
+    "pointsPerOutput": 2.08
   },
   {
     "name": "z-ai/glm4.7",
@@ -69,7 +85,9 @@
     "provider": "nvidia",
     "url": "https://integrate.api.nvidia.com/v1/chat/completions",
     "type": "text",
-    "global": true
+    "global": true,
+    "pointsPerInput": 0.07,
+    "pointsPerOutput": 0.40
   },
   {
     "name": "moonshotai/kimi-k2-instruct-0905",
@@ -77,7 +95,9 @@
     "provider": "nvidia",
     "url": "https://integrate.api.nvidia.com/v1/chat/completions",
     "type": "text",
-    "global": true
+    "global": true,
+    "pointsPerInput": 0.574,
+    "pointsPerOutput": 2.294
   },
   {
     "name": "moonshotai/kimi-k2-thinking",
@@ -85,6 +105,8 @@
     "provider": "nvidia",
     "url": "https://integrate.api.nvidia.com/v1/chat/completions",
     "type": "text",
-    "global": true
+    "global": true,
+    "pointsPerInput": 0.574,
+    "pointsPerOutput": 2.294
   }
 ]

@@ -6,12 +6,28 @@ class AccountView{
                 const lang = getCookie('lang') || 'pl';
                 select.value = lang;
             }
+            this.loadUserStats();
         });
     }
 
     changeLanguage(lang) {
         document.cookie = `lang=${lang}; path=/; max-age=31536000`;
         location.reload();
+    }
+
+    async loadUserStats() {
+        try {
+            const response = await fetch('/api/user', { credentials: 'include' });
+            if (response.ok) {
+                const data = await response.json();
+                const pointsSpan = document.getElementById('userPoints');
+                if (pointsSpan) {
+                    pointsSpan.textContent = data.points;
+                }
+            }
+        } catch (error) {
+            console.error('Nie udało się pobrać punktów:', error);
+        }
     }
 
     openAddKeyModal() {

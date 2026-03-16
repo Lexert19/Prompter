@@ -18,6 +18,9 @@ public class ModelDto {
     private String provider;
     private String url;
     private String type;
+    private double pointsPerInput;
+    private double pointsPerOutput;
+
     public ModelDto() {}
 
     public ModelDto(String name, String text, String provider, String url, String type) {
@@ -39,6 +42,8 @@ public class ModelDto {
         dto.setProvider(model.getProvider());
         dto.setUrl(model.getUrl());
         dto.setType(model.getType());
+        dto.setPointsPerInput(model.getPointsPerInput());
+        dto.setPointsPerOutput(model.getPointsPerOutput());
         return dto;
     }
 

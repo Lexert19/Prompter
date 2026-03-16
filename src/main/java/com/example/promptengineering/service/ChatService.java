@@ -8,10 +8,13 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.example.promptengineering.entity.SharedKey;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.entity.UserFile;
 import com.example.promptengineering.model.Content;
 import com.example.promptengineering.model.Message;
+import com.example.promptengineering.repository.SharedKeyRepository;
+import com.example.promptengineering.repository.UserRepository;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -24,6 +27,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.SignalType;
 import reactor.core.scheduler.Schedulers;
 
 @Slf4j
@@ -33,14 +37,20 @@ public class ChatService {
     private final WebClient webClient;
     private final FileStorageService fileStorageService;
     private final SharedKeyService sharedKeyService;
+    private final EncryptionService encryptionService;
+    private final SharedKeyRepository sharedKeyRepository;
+    private final UserRepository userRepository;
 
-    public ChatService(Gson gson, WebClient.Builder webClientBuilder, FileStorageService fileStorageService, SharedKeyService sharedKeyService) {
+    public ChatService(Gson gson, WebClient.Builder webClientBuilder, FileStorageService fileStorageService, SharedKeyService sharedKeyService, EncryptionService encryptionService, SharedKeyRepository sharedKeyRepository, UserRepository userRepository) {
         this.gson = gson;
         this.webClient = webClientBuilder
                 .codecs(configure -> configure.defaultCodecs().maxInMemorySize(16 * 1024 * 1024))
                 .build();
         this.fileStorageService = fileStorageService;
         this.sharedKeyService = sharedKeyService;
+        this.encryptionService = encryptionService;
+        this.sharedKeyRepository = sharedKeyRepository;
+        this.userRepository = userRepository;
     }
 
     private Mono<Void> attachBase64Images(RequestBuilder request, User user) {
@@ -130,8 +140,9 @@ public class ChatService {
         Mono<RequestBuilder> requestWithKeyMono;
         if (request.isUseSharedKeys()) {
             requestWithKeyMono = Mono.fromCallable(() -> {
-                String sharedKey = sharedKeyService.getRandomWorkingKey(request.getProvider());
-                request.setKey(sharedKey);
+                SharedKey sharedKey = sharedKeyService.getRandomWorkingKeyEntity(request.getProvider());
+                request.setKey(encryptionService.decrypt(sharedKey.getKeyValue()));
+                request.setSharedKeyId(sharedKey.getId());
                 return request;
             }).subscribeOn(Schedulers.boundedElastic());
         } else {
@@ -142,9 +153,25 @@ public class ChatService {
                 .flatMapMany(req -> attachBase64Images(req, user)
                         .then(buildRequestBodyJson(req))
                         .flatMapMany(json -> executeRequest(req, json))
+                        .doFinally(signalType -> {
+                            if (signalType == SignalType.ON_COMPLETE && req.getSharedKeyId() != null) {
+                                addPointsForSharedKey(req.getSharedKeyId(), 1.0);
+                            }
+                        })
                 )
                 .doOnCancel(() -> log.debug("SSE stream cancelled by client"))
                 .onErrorResume(this::handleError);
+    }
+
+    private void addPointsForSharedKey(Long sharedKeyId, double points) {
+        sharedKeyRepository.findById(sharedKeyId).ifPresent(key -> {
+            if (key.getOwner() != null) {
+                User owner = key.getOwner();
+                owner.setPoints(owner.getPoints() + points);
+                userRepository.save(owner);
+                log.debug("Added {} points to user {} for using shared key {}", points, owner.getEmail(), sharedKeyId);
+            }
+        });
     }
 
 }

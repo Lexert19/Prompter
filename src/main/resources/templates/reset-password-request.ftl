@@ -12,7 +12,7 @@
         </div>
         <#include "/parts/navbar.ftl" />
         <div class="content-wrapper px-2">
-            <div class="login-container panel">
+            <div class="login-container p-4 panel">
                 <h2>Reset Password</h2>
                 <#if error??>
                 <div class="alert-error">${error}</div>

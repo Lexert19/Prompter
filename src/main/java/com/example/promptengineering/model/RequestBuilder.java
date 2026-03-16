@@ -25,6 +25,7 @@ public class RequestBuilder {
     private String type = "";
     private String system = "";
     private boolean useSharedKeys = false;
+    private Long sharedKeyId;
 
     public RequestBuilder model(String model) {
         this.model = model;

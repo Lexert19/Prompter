@@ -35,6 +35,17 @@ public class SharedKeyService {
         return encryptionService.decrypt(key.getKeyValue());
     }
 
+    public SharedKey getRandomWorkingKeyEntity(String provider) {
+        List<SharedKey> workingKeys = sharedKeyRepository.findByProviderAndWorkingTrue(provider);
+        if (workingKeys.isEmpty()) {
+            throw new RuntimeException("No working keys for provider: " + provider);
+        }
+        SharedKey key = workingKeys.get(random.nextInt(workingKeys.size()));
+        key.setUsageCount(key.getUsageCount() + 1);
+        sharedKeyRepository.save(key);
+        return key;
+    }
+
     public List<SharedKeyInfoDto> getAllKeys() {
         return sharedKeyRepository.findAll().stream()
                 .map(key -> new SharedKeyInfoDto(

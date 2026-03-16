@@ -16,7 +16,6 @@ public class Model {
 
     private String name;
 
-    //@Column(columnDefinition = "TEXT")
     private String text;
 
     private String provider;
@@ -27,13 +26,17 @@ public class Model {
 
     private String type;
 
+    private double pointsPerOutput;
+    private double pointsPerInput;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = true)
     private User user;
 
 
+    public Model() {
 
-    public Model() {}
+    }
     public Model(String name, String text, String provider, String url, String type, User user) {
         this.name = name;
         this.text = text;

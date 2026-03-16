@@ -81,7 +81,8 @@ public class ModelService {
         try {
             modelRepository.deleteByGlobalTrue();
             InputStream is = getClass().getResourceAsStream("/default-models.json");
-            List<ModelDto> defaultModels = objectMapper.readValue(is, new TypeReference<List<ModelDto>>() {});
+            List<ModelDto> defaultModels = objectMapper.readValue(is, new TypeReference<>() {
+            });
 
             for (ModelDto dto : defaultModels) {
                 boolean exists = modelRepository.existsByProviderAndName(dto.getProvider(), dto.getName());
@@ -92,6 +93,8 @@ public class ModelService {
                     model.setProvider(dto.getProvider());
                     model.setUrl(dto.getUrl());
                     model.setType(dto.getType());
+                    model.setPointsPerInput(dto.getPointsPerInput());
+                    model.setPointsPerOutput(dto.getPointsPerOutput());
                     model.setGlobal(true);
                     model.setUser(null);
                     modelRepository.save(model);

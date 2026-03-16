@@ -6,7 +6,7 @@
     </head>
     <body class="background">
         <#include "/parts/navbar.ftl" />
-        <div class="login-container panel">
+        <div class="login-container p-4 panel">
             <h2>Reset Password</h2>
             <#if error??>
             <div class="alert-error">${error}</div>

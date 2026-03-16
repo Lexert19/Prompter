@@ -48,6 +48,8 @@ public class User implements OAuth2User, Principal, UserDetails {
     @JsonIgnore
     private List<ResetToken> resetTokens = new ArrayList<>();
 
+    private double points;
+
     public User(String email, String password) {
         this.email = email;
         this.password = password;
