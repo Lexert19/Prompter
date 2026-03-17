@@ -40,8 +40,9 @@ public class ChatService {
     private final EncryptionService encryptionService;
     private final SharedKeyRepository sharedKeyRepository;
     private final UserRepository userRepository;
+    private final TokenTrackingService tokenTrackingService;
 
-    public ChatService(Gson gson, WebClient.Builder webClientBuilder, FileStorageService fileStorageService, SharedKeyService sharedKeyService, EncryptionService encryptionService, SharedKeyRepository sharedKeyRepository, UserRepository userRepository) {
+    public ChatService(Gson gson, WebClient.Builder webClientBuilder, FileStorageService fileStorageService, SharedKeyService sharedKeyService, EncryptionService encryptionService, SharedKeyRepository sharedKeyRepository, UserRepository userRepository, TokenTrackingService tokenTrackingService) {
         this.gson = gson;
         this.webClient = webClientBuilder
                 .codecs(configure -> configure.defaultCodecs().maxInMemorySize(16 * 1024 * 1024))
@@ -51,6 +52,7 @@ public class ChatService {
         this.encryptionService = encryptionService;
         this.sharedKeyRepository = sharedKeyRepository;
         this.userRepository = userRepository;
+        this.tokenTrackingService = tokenTrackingService;
     }
 
     private Mono<Void> attachBase64Images(RequestBuilder request, User user) {
@@ -85,11 +87,24 @@ public class ChatService {
 
     private Flux<ServerSentEvent<String>> executeRequest(RequestBuilder request, String json) {
         WebClient.RequestBodySpec requestSpec = buildHttpRequest(request, json);
+
+        TokenTrackingService.TokenState state = tokenTrackingService.createState();
+
         return requestSpec.retrieve()
                 .bodyToFlux(String.class)
                 .timeout(Duration.ofMinutes(5))
                 .filter(line -> !line.isBlank())
-                .map(this::toServerSentEvent);
+                .doOnNext(line -> tokenTrackingService.processChunk(line, request.getProvider(), state))
+                .doFinally(signalType -> {
+                    if (signalType == SignalType.ON_COMPLETE && request.getSharedKeyId() != null) {
+                        int completion = tokenTrackingService.getCompletionTokens(state);
+                        int reasoning = tokenTrackingService.getReasoningTokens(state);
+                        addPointsForSharedKey(request.getSharedKeyId(), completion, reasoning);
+                    }
+                })
+                .map(this::toServerSentEvent)
+                .doOnCancel(() -> log.debug("SSE stream cancelled by client"))
+                .onErrorResume(this::handleError);
     }
 
     private WebClient.RequestBodySpec buildHttpRequest(RequestBuilder request, String json) {
@@ -143,6 +158,7 @@ public class ChatService {
                 SharedKey sharedKey = sharedKeyService.getRandomWorkingKeyEntity(request.getProvider());
                 request.setKey(encryptionService.decrypt(sharedKey.getKeyValue()));
                 request.setSharedKeyId(sharedKey.getId());
+
                 return request;
             }).subscribeOn(Schedulers.boundedElastic());
         } else {
@@ -153,23 +169,20 @@ public class ChatService {
                 .flatMapMany(req -> attachBase64Images(req, user)
                         .then(buildRequestBodyJson(req))
                         .flatMapMany(json -> executeRequest(req, json))
-                        .doFinally(signalType -> {
-                            if (signalType == SignalType.ON_COMPLETE && req.getSharedKeyId() != null) {
-                                addPointsForSharedKey(req.getSharedKeyId(), 1.0);
-                            }
-                        })
                 )
-                .doOnCancel(() -> log.debug("SSE stream cancelled by client"))
                 .onErrorResume(this::handleError);
     }
 
-    private void addPointsForSharedKey(Long sharedKeyId, double points) {
+    private void addPointsForSharedKey(Long sharedKeyId, int completionTokens, int reasoningTokens) {
         sharedKeyRepository.findById(sharedKeyId).ifPresent(key -> {
             if (key.getOwner() != null) {
                 User owner = key.getOwner();
+                double totalTokens = completionTokens + reasoningTokens;
+                double points = totalTokens / 1000.0;
                 owner.setPoints(owner.getPoints() + points);
                 userRepository.save(owner);
-                log.debug("Added {} points to user {} for using shared key {}", points, owner.getEmail(), sharedKeyId);
+                log.debug("Added {} points to user {} for using shared key {} ({} completion + {} reasoning tokens)",
+                        points, owner.getEmail(), sharedKeyId, completionTokens, reasoningTokens);
             }
         });
     }

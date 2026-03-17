@@ -1,14 +1,29 @@
 pipeline {
     agent any
-
+    tools {
+        gradle 'gradle-7.6'
+        jdk 'jdk17'
+    }
     stages {
-        stage('Pull and restart') {
+        stage('Checkout') {
+            steps { checkout scm }
+        }
+        stage('Build') {
+            steps { sh './gradlew clean assemble' }
+        }
+        stage('Test') {
+            steps { sh './gradlew test' }
+            post { always { junit 'build/test-results/test/**/*.xml' } }
+        }
+        stage('Package') {
+            steps { sh './gradlew bootJar' }
+        }
+        stage('Deploy to Production') {
+            when { branch 'master' }
             steps {
                 script {
-                    def projectDir = '/home/lexert/_projects/Prompter'
-
                     sh """
-                        cd ${projectDir}
+                        cd /home/lexert/_projects/Prompter
                         git pull origin master
                         sudo systemctl restart prompter.service
                     """
@@ -16,13 +31,8 @@ pipeline {
             }
         }
     }
-
     post {
-        success {
-            echo 'Service restarted successfully.'
-        }
-        failure {
-            echo 'Failed to pull or restart service.'
-        }
+        success { echo 'Pipeline succeeded.' }
+        failure { echo 'Pipeline failed.' }
     }
 }

@@ -9,7 +9,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -21,15 +20,23 @@ import java.util.Optional;
 @Service
 @Slf4j
 public class ModelService {
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private ModelRepository modelRepository;
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final UserRepository userRepository;
+    private final ModelRepository modelRepository;
+    private final ObjectMapper objectMapper;
+    private final int maxModelsPerUser;
+    private final String adminEmail;
 
-    @Value("${app.max.models.per.user}")
-    private int maxModelsPerUser;
+    public ModelService(UserRepository userRepository,
+                        ModelRepository modelRepository,
+                        ObjectMapper objectMapper,
+                        @Value("${app.max.models.per.user}") int maxModelsPerUser,
+                        @Value("${admin.email}") String adminEmail) {
+        this.userRepository = userRepository;
+        this.modelRepository = modelRepository;
+        this.objectMapper = objectMapper;
+        this.maxModelsPerUser = maxModelsPerUser;
+        this.adminEmail = adminEmail;
+    }
 
     public List<Model> getUserModels(User user){
         List<Model> models = modelRepository.findByUser(user);
@@ -87,6 +94,7 @@ public class ModelService {
             for (ModelDto dto : defaultModels) {
                 boolean exists = modelRepository.existsByProviderAndName(dto.getProvider(), dto.getName());
                 if (!exists) {
+                    Optional<User> user = userRepository.findByEmail(adminEmail);
                     Model model = new Model();
                     model.setName(dto.getName());
                     model.setText(dto.getText());
@@ -96,7 +104,7 @@ public class ModelService {
                     model.setPointsPerInput(dto.getPointsPerInput());
                     model.setPointsPerOutput(dto.getPointsPerOutput());
                     model.setGlobal(true);
-                    model.setUser(null);
+                    model.setUser(user.get());
                     modelRepository.save(model);
                     log.info("Added model: {} ({})", dto.getName(), dto.getProvider());
                 } else {

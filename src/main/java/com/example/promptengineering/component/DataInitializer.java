@@ -49,7 +49,6 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        modelService.loadDefaultModelsFromJson();
 
         if (userRepository.findByEmail(adminEmail).isEmpty()) {
             User admin = new User();
@@ -59,6 +58,9 @@ public class DataInitializer implements CommandLineRunner {
             userRepository.save(admin);
             log.debug("Admin created: {}", adminEmail);
         }
+
+        modelService.loadDefaultModelsFromJson();
+
 
         addGeminiSharedKeyIfNeeded();
     }
