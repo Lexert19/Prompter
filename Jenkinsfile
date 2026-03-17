@@ -1,9 +1,5 @@
 pipeline {
     agent any
-    tools {
-        gradle 'gradle-7.6'
-        jdk 'jdk17'
-    }
     stages {
         stage('Checkout') {
             steps { checkout scm }
