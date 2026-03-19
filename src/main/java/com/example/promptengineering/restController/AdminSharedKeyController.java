@@ -2,9 +2,10 @@ package com.example.promptengineering.restController;
 
 import com.example.promptengineering.dto.SharedKeyDto;
 import com.example.promptengineering.dto.SharedKeyInfoDto;
+import com.example.promptengineering.entity.User;
 import com.example.promptengineering.service.SharedKeyService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,8 +21,10 @@ public class AdminSharedKeyController {
     }
 
     @PostMapping
-    public ResponseEntity<Map<String, String>> addSharedKey(@RequestBody SharedKeyDto dto) {
-        sharedKeyService.addKey(dto.getProvider(), dto.getKeyValue());
+    public ResponseEntity<Map<String, String>> addSharedKey(
+            @RequestBody SharedKeyDto dto,
+            @AuthenticationPrincipal User user) {
+        sharedKeyService.addKey(dto.getProvider(), dto.getKeyValue(), user);
         return ResponseEntity.ok(Map.of("message", "Added"));
     }
 

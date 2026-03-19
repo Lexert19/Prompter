@@ -49,30 +49,32 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-
-        if (userRepository.findByEmail(adminEmail).isEmpty()) {
-            User admin = new User();
-            admin.setEmail(adminEmail);
-            admin.setPassword(passwordEncoder.encode(adminPassword));
-            admin.setRoles(List.of(AppRole.ADMIN));
-            userRepository.save(admin);
-            log.debug("Admin created: {}", adminEmail);
+        User admin = userRepository.findByEmail(adminEmail).orElse(null);
+        if (admin == null) {
+            User newAdmin = new User();
+            newAdmin.setEmail(adminEmail);
+            newAdmin.setPassword(passwordEncoder.encode(adminPassword));
+            newAdmin.setRoles(List.of(AppRole.ADMIN));
+            admin = userRepository.save(newAdmin);
+            log.info("Admin created: {}", adminEmail);
+        } else {
+            log.debug("Admin already exists: {}", adminEmail);
         }
 
         modelService.loadDefaultModelsFromJson();
 
 
-        addGeminiSharedKeyIfNeeded();
+        addGeminiSharedKeyIfNeeded(admin);
     }
 
-    private void addGeminiSharedKeyIfNeeded() {
+    private void addGeminiSharedKeyIfNeeded(User user) {
         Optional<MigrationFlag> flag = migrationFlagRepository.findByName("gemini_shared_key_added");
         if (flag.isPresent() && flag.get().isExecuted()) {
             return;
         }
 
         if (geminiApiKey != null && !geminiApiKey.isBlank()) {
-            sharedKeyService.addKey("GEMINI", geminiApiKey);
+            sharedKeyService.addKey("GEMINI", geminiApiKey, user);
 
             MigrationFlag newFlag = flag.orElse(new MigrationFlag("gemini_shared_key_added"));
             newFlag.setExecuted(true);

@@ -5,10 +5,9 @@ pipeline {
             steps { checkout scm }
         }
         stage('Build') {
-
             steps {
-            sh 'chmod +x gradlew'
-            sh './gradlew clean assemble'
+                sh 'chmod +x gradlew'
+                sh './gradlew clean assemble'
             }
         }
         stage('Test') {

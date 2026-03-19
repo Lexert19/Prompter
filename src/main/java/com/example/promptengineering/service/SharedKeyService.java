@@ -65,10 +65,11 @@ public class SharedKeyService {
     }
 
     @Transactional
-    public void addKey(String provider, String rawKey) {
+    public void addKey(String provider, String rawKey, User user) {
         String encrypted = encryptionService.encrypt(rawKey);
         SharedKey key = new SharedKey(provider, encrypted);
         key.setWorking(true);
+        key.setOwner(user);
         key.setUsageCount(0);
         sharedKeyRepository.save(key);
     }
