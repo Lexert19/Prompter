@@ -140,6 +140,7 @@ public class ChatService {
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put("error", errorDetails);
         String errorJson = gson.toJson(errorMap);
+        log.debug("API request error: {}", errorJson);
 
         return Flux.just(ServerSentEvent.<String>builder()
                 .event("error")
@@ -152,29 +153,39 @@ public class ChatService {
     }
 
     public Flux<ServerSentEvent<String>> makeRequest(RequestBuilder request, User user) {
-        Mono<RequestBuilder> requestWithKeyMono;
-        if (request.isUseSharedKeys()) {
-            requestWithKeyMono = Mono.fromCallable(() -> {
-                SharedKey sharedKey = sharedKeyService.getRandomWorkingKeyEntity(request.getProvider());
-                request.setKey(encryptionService.decrypt(sharedKey.getKeyValue()));
-                request.setSharedKeyId(sharedKey.getId());
+        Mono<RequestBuilder> preparedRequest = request.isUseSharedKeys()
+                ? Mono.fromCallable(() -> prepareWithSharedKey(request))
+                .subscribeOn(Schedulers.boundedElastic())
+                : Mono.just(request);
 
-                return request;
-            }).subscribeOn(Schedulers.boundedElastic());
-        } else {
-            requestWithKeyMono = Mono.just(request);
-        }
-
-        return requestWithKeyMono
+        return preparedRequest
                 .flatMapMany(req -> attachBase64Images(req, user)
                         .then(buildRequestBodyJson(req))
                         .flatMapMany(json -> executeRequest(req, json))
                 )
+                .doOnError(e -> blockSharedKeyIfUsed(request))
                 .onErrorResume(this::handleError);
     }
 
+    private RequestBuilder prepareWithSharedKey(RequestBuilder request) {
+        SharedKey sharedKey = sharedKeyService.getRandomWorkingKeyEntity(request.getProvider());
+        request.setKey(encryptionService.decrypt(sharedKey.getKeyValue()));
+        request.setSharedKeyId(sharedKey.getId());
+        return request;
+    }
+
+    private void blockSharedKeyIfUsed(RequestBuilder request) {
+        if (request.isUseSharedKeys() && request.getSharedKeyId() != null) {
+            sharedKeyRepository.findById(request.getSharedKeyId()).ifPresent(key -> {
+                key.block(5);
+                sharedKeyRepository.save(key);
+                log.warn("Shared key {} blocked for 5 minutes due to error", request.getSharedKeyId());
+            });
+        }
+    }
+
     private void addPointsForSharedKey(Long sharedKeyId, int completionTokens, int reasoningTokens) {
-        sharedKeyRepository.findById(sharedKeyId).ifPresent(key -> {
+        sharedKeyRepository.findByIdWithOwner(sharedKeyId).ifPresent(key -> {
             if (key.getOwner() != null) {
                 User owner = key.getOwner();
                 double totalTokens = completionTokens + reasoningTokens;

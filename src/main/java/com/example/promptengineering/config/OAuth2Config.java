@@ -78,6 +78,7 @@ public class OAuth2Config implements WebMvcConfigurer {
 
         http.formLogin(customizer -> customizer
                 .loginPage("/auth/login")
+                .loginProcessingUrl("/auth/login")
                 .successHandler((request, response, authentication) -> response.sendRedirect("/"))
                 .failureHandler(authenticationFailureHandler()));
 

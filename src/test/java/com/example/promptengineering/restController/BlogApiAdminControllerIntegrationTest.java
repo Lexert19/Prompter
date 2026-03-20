@@ -58,35 +58,51 @@ public class BlogApiAdminControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        adminUser = new User();
-        adminUser.setEmail("admin@example.com");
-        adminUser.setPassword(passwordEncoder.encode("password"));
-        adminUser.setRoles(List.of(AppRole.ADMIN));
-        adminUser = userRepository.save(adminUser);
+        if (userRepository.findByEmail("admin@example.com").isEmpty()) {
+            adminUser = new User();
+            adminUser.setEmail("admin@example.com");
+            adminUser.setPassword(passwordEncoder.encode("password"));
+            adminUser.setRoles(List.of(AppRole.ADMIN));
+            adminUser = userRepository.save(adminUser);
+        } else {
+            adminUser = userRepository.findByEmail("admin@example.com").get();
+        }
 
-        normalUser = new User();
-        normalUser.setEmail("user@example.com");
-        normalUser.setPassword(passwordEncoder.encode("password"));
-        normalUser.setRoles(List.of(AppRole.USER));
-        normalUser = userRepository.save(normalUser);
+        if (userRepository.findByEmail("user@example.com").isEmpty()) {
+            normalUser = new User();
+            normalUser.setEmail("user@example.com");
+            normalUser.setPassword(passwordEncoder.encode("password"));
+            normalUser.setRoles(List.of(AppRole.USER));
+            normalUser = userRepository.save(normalUser);
+        } else {
+            normalUser = userRepository.findByEmail("user@example.com").get();
+        }
 
-        testPost1 = new Post();
-        testPost1.setTitle("First Post");
-        testPost1.setSlug("first-post");
-        testPost1.setContent("Content of first post");
-        testPost1.setLang("pl");
-        testPost1.setCreatedAt(LocalDateTime.now());
-        testPost1.setUpdatedAt(LocalDateTime.now());
-        testPost1 = postRepository.save(testPost1);
+        if (postRepository.findBySlug("first-post").isEmpty()) {
+            testPost1 = new Post();
+            testPost1.setTitle("First Post");
+            testPost1.setSlug("first-post");
+            testPost1.setContent("Content of first post");
+            testPost1.setLang("pl");
+            testPost1.setCreatedAt(LocalDateTime.now());
+            testPost1.setUpdatedAt(LocalDateTime.now());
+            testPost1 = postRepository.save(testPost1);
+        } else {
+            testPost1 = postRepository.findBySlug("first-post").get();
+        }
 
-        testPost2 = new Post();
-        testPost2.setTitle("Second Post");
-        testPost2.setSlug("second-post");
-        testPost2.setContent("Content of second post");
-        testPost2.setLang("en");
-        testPost2.setCreatedAt(LocalDateTime.now());
-        testPost2.setUpdatedAt(LocalDateTime.now());
-        testPost2 = postRepository.save(testPost2);
+        if (postRepository.findBySlug("second-post").isEmpty()) {
+            testPost2 = new Post();
+            testPost2.setTitle("Second Post");
+            testPost2.setSlug("second-post");
+            testPost2.setContent("Content of second post");
+            testPost2.setLang("en");
+            testPost2.setCreatedAt(LocalDateTime.now());
+            testPost2.setUpdatedAt(LocalDateTime.now());
+            testPost2 = postRepository.save(testPost2);
+        } else {
+            testPost2 = postRepository.findBySlug("second-post").get();
+        }
     }
 
     @Test

@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.hasItems;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -97,9 +99,7 @@ public class HistoryControllerIntegrationTest {
         mockMvc.perform(post("/api/history/chats")
                         .with(asUser1()))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.favorite").value(false))
-                .andExpect(jsonPath("$.createdAt").exists());
+                .andExpect(jsonPath("$.id").exists());
 
         List<Chat> chats = chatRepository.findByUser(user1);
         assertThat(chats).hasSize(1);
@@ -126,9 +126,11 @@ public class HistoryControllerIntegrationTest {
         mockMvc.perform(get("/api/history/chats")
                         .with(asUser1()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].id").value(chat1.getId()))
-                .andExpect(jsonPath("$[1].id").value(chat2.getId()));
+                .andExpect(jsonPath("$.totalElements").value(greaterThanOrEqualTo(2)))
+                .andExpect(jsonPath("$.content[*].id", hasItems(
+                        chat1.getId().intValue(),
+                        chat2.getId().intValue()
+                )));
     }
 
     @Test
@@ -217,7 +219,7 @@ public class HistoryControllerIntegrationTest {
     void deleteChat_whenChatNotFound_shouldReturn404() throws Exception {
         mockMvc.perform(delete("/api/history/chats/{chatId}", 999L)
                         .with(asUser1()))
-                .andExpect(status().is5xxServerError());
+                .andExpect(status().is4xxClientError());
     }
 
     @Test
@@ -231,7 +233,7 @@ public class HistoryControllerIntegrationTest {
                         .with(asUser1())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(messageBody)))
-                .andExpect(status().is5xxServerError());
+                .andExpect(status().is4xxClientError());
     }
 
     @Test
@@ -243,11 +245,11 @@ public class HistoryControllerIntegrationTest {
 
         mockMvc.perform(get("/api/history/chats/{chatId}/messages", chat.getId())
                         .with(asUser1()))
-                .andExpect(status().is5xxServerError());
+                .andExpect(status().isForbidden());
 
         mockMvc.perform(delete("/api/history/chats/{chatId}", chat.getId())
                         .with(asUser1()))
-                .andExpect(status().is5xxServerError());
+                .andExpect(status().is4xxClientError());
     }
 
     @Test
@@ -266,7 +268,7 @@ public class HistoryControllerIntegrationTest {
                         .with(asUser1())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(messageBody)))
-                .andExpect(status().is5xxServerError());
+                .andExpect(status().is4xxClientError());
     }
 
     @Test

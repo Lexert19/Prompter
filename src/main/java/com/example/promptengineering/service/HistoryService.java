@@ -4,6 +4,9 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.promptengineering.exception.ResourceNotFoundException;
+import com.example.promptengineering.exception.UserSecurityException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -51,28 +54,29 @@ public class HistoryService {
         return chatRepository.save(chat);
     }
 
-    public void deleteChat(Long chatId, User user) {
+    @Transactional
+    public void deleteChat(Long chatId, User user) throws ResourceNotFoundException, UserSecurityException {
         Optional<Chat> chat = chatRepository.findById(chatId);
         if (chat.isEmpty()) {
-            throw new IllegalArgumentException("Chat not found with id: " + chatId);
+            throw new ResourceNotFoundException("Chat not found with id: " + chatId);
         }
         checkUserAuthorization(chat.get(), user);
-        chatRepository.delete(chat.get());
         messageRepository.deleteByChatId(chatId);
+        chatRepository.delete(chat.get());
     }
 
-    public Message saveMessage(MessageBody messageBody, User user) {
+    public Message saveMessage(MessageBody messageBody, User user) throws UserSecurityException, ResourceNotFoundException {
         Optional<Chat> chat = chatRepository.findById(messageBody.getChatId());
                 if(chat.isEmpty())
-                    throw new IllegalArgumentException("Chat not found with id: " + messageBody.getChatId());
+                    throw new ResourceNotFoundException("Chat not found with id: " + messageBody.getChatId());
                 checkUserAuthorization(chat.get(),user);
                 return convertAndSaveMessage(messageBody, chat.get());
 
     }
 
-    private Chat checkUserAuthorization(Chat chat, User user) {
+    private Chat checkUserAuthorization(Chat chat, User user) throws UserSecurityException {
         if (!isUserAuthorizedForChat(chat, user)) {
-            throw new SecurityException("User is not authorized to send messages to this chat.");
+            throw new UserSecurityException("User is not authorized to send messages to this chat.");
         }
         return chat;
     }
@@ -104,13 +108,13 @@ public class HistoryService {
         return messageRepository.save(messageEntity);
     }
 
-    public List<Message> getChatHistory(Long chatId, User user) throws Exception {
+    public List<Message> getChatHistory(Long chatId, User user) throws ResourceNotFoundException, UserSecurityException {
         Optional<Chat> chat = chatRepository.findById(chatId);
         if(chat.isEmpty()){
-            throw new Exception();
+            throw new ResourceNotFoundException("");
         }
         if(!chat.get().getUser().equals(user)){
-            throw new Exception();
+            throw new UserSecurityException("");
         }
         List<Message> messages = messageRepository.findByChatId(chatId);
         long totalSize = messages.stream()
@@ -130,7 +134,7 @@ public class HistoryService {
                 })
                 .sum();
         if (totalSize > maxTotalMessageSize) {
-            throw new Exception("Total message size (text + documents + images) too large: " + totalSize + " characters, max allowed: " + maxTotalMessageSize);
+            throw new UserSecurityException("Total message size (text + documents + images) too large: " + totalSize + " characters, max allowed: " + maxTotalMessageSize);
         }
         return messages;
     }

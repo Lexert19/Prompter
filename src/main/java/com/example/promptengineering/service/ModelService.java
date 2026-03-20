@@ -3,6 +3,7 @@ package com.example.promptengineering.service;
 import com.example.promptengineering.dto.ModelDto;
 import com.example.promptengineering.entity.Model;
 import com.example.promptengineering.entity.User;
+import com.example.promptengineering.exception.ResourceNotFoundException;
 import com.example.promptengineering.repository.ModelRepository;
 import com.example.promptengineering.repository.UserRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -62,12 +63,12 @@ public class ModelService {
         return userRepository.save(user);
     }
 
-    public void deleteUserModel(Long id, User user) {
+    public void deleteUserModel(Long id, User user) throws ResourceNotFoundException {
         Optional<Model> model = this.getModel(id);
         if (model.isPresent() && model.get().getUser().equals(user)) {
             modelRepository.delete(model.get());
         } else {
-            throw new SecurityException("This is not your model.");
+            throw new ResourceNotFoundException("This is not your model.");
         }
     }
 

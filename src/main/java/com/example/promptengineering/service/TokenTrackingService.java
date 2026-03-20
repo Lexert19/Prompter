@@ -95,7 +95,7 @@ public class TokenTrackingService {
     }
 
     public int getCompletionTokens(TokenState state) {
-        return state.usageReceived ? state.completionTokens.get() : 0;
+        return state.usageReceived ? state.completionTokens.get() : 1000;
     }
 
     public int getReasoningTokens(TokenState state) {

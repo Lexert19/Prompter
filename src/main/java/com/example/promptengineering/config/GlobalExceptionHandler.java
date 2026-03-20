@@ -3,6 +3,7 @@ package com.example.promptengineering.config;
 import com.example.promptengineering.exception.FileStorageException;
 import com.example.promptengineering.exception.ResourceNotFoundException;
 import com.example.promptengineering.exception.TokenValidationException;
+import com.example.promptengineering.exception.UserSecurityException;
 import com.google.gson.JsonSyntaxException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleTokenValidationException(TokenValidationException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(UserSecurityException.class)
+    public ResponseEntity<String> handleUserSecurityException(UserSecurityException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.FORBIDDEN);
+    }
+
 
     @ExceptionHandler(FileStorageException.class)
     public ResponseEntity<String> handleFileStorageException(FileStorageException ex) {

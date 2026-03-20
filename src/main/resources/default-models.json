@@ -4,7 +4,7 @@
     "text": "Gemini 3.1 Flash Lite",
     "provider": "GEMINI",
     "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
-    "type": "text",
+    "type": "vision",
     "global": true,
     "pointsPerInput": 0.5,
     "pointsPerOutput": 0.5
@@ -14,10 +14,30 @@
     "text": "Gemini 3 Flash",
     "provider": "GEMINI",
     "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
-    "type": "text",
+    "type": "vision",
     "global": true,
     "pointsPerInput": 0.5,
     "pointsPerOutput": 0.5
+  },
+  {
+    "name": "gemini-2.5-pro",
+    "text": "Gemini 2.5 Pro",
+    "provider": "GEMINI",
+    "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+    "type": "vision",
+    "global": true,
+    "pointsPerInput": 1.25,
+    "pointsPerOutput": 10
+  },
+  {
+    "name": "gemini-3.1-pro-preview",
+    "text": "Gemini 3.1 Pro Preview",
+    "provider": "GEMINI",
+    "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+    "type": "vision",
+    "global": true,
+    "pointsPerInput": 2,
+    "pointsPerOutput": 12
   },
   {
     "name": "nvidia/nemotron-3-super-120b-a12b",

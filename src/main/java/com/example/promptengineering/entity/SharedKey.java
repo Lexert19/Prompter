@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Setter
 @Getter
@@ -21,6 +23,7 @@ public class SharedKey {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
     private User owner;
+    private LocalDateTime blockedUntil;
 
     public SharedKey(String provider, String keyValue) {
         this.provider = provider;
@@ -38,5 +41,20 @@ public class SharedKey {
 
     public String getProvider() {
         return provider != null ? provider.toLowerCase() : null;
+    }
+
+    public void block(int minutes) {
+        this.blockedUntil = LocalDateTime.now().plusMinutes(minutes);
+        this.working = false;
+    }
+
+    public boolean isBlocked() {
+        if (blockedUntil == null) return false;
+        return LocalDateTime.now().isBefore(blockedUntil);
+    }
+
+    public void markWorking() {
+        this.working = true;
+        this.blockedUntil = null;
     }
 }

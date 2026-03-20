@@ -25,18 +25,16 @@ public class SharedKeyService {
     }
 
     public String getRandomWorkingKey(String provider) {
-        List<SharedKey> workingKeys = sharedKeyRepository.findByProviderAndWorkingTrue(provider);
-        if (workingKeys.isEmpty()) {
-            throw new RuntimeException("No working keys for provider: " + provider);
-        }
-        SharedKey key = workingKeys.get(random.nextInt(workingKeys.size()));
-        key.setUsageCount(key.getUsageCount() + 1);
-        sharedKeyRepository.save(key);
+        SharedKey key = getRandomWorkingKeyEntity(provider);
         return encryptionService.decrypt(key.getKeyValue());
     }
 
     public SharedKey getRandomWorkingKeyEntity(String provider) {
         List<SharedKey> workingKeys = sharedKeyRepository.findByProviderAndWorkingTrue(provider);
+        List<SharedKey> availableKeys = workingKeys.stream()
+                .filter(key -> !key.isBlocked())
+                .toList();
+
         if (workingKeys.isEmpty()) {
             throw new RuntimeException("No working keys for provider: " + provider);
         }
@@ -71,6 +69,22 @@ public class SharedKeyService {
         key.setWorking(true);
         key.setOwner(user);
         key.setUsageCount(0);
+        sharedKeyRepository.save(key);
+    }
+
+    @Transactional
+    public void blockKey(Long keyId, int minutes) {
+        SharedKey key = sharedKeyRepository.findById(keyId)
+                .orElseThrow(() -> new RuntimeException("Key not found with id: " + keyId));
+        key.block(minutes);
+        sharedKeyRepository.save(key);
+    }
+
+    @Transactional
+    public void markKeyWorking(Long keyId) {
+        SharedKey key = sharedKeyRepository.findById(keyId)
+                .orElseThrow(() -> new RuntimeException("Key not found with id: " + keyId));
+        key.markWorking();
         sharedKeyRepository.save(key);
     }
 }

@@ -3,6 +3,7 @@ package com.example.promptengineering.restController;
 import com.example.promptengineering.dto.ModelDto;
 import com.example.promptengineering.entity.Model;
 import com.example.promptengineering.entity.User;
+import com.example.promptengineering.exception.ResourceNotFoundException;
 import com.example.promptengineering.service.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +44,7 @@ public class ModelController {
     }
 
     @DeleteMapping("/user-models/{id}")
-    public ResponseEntity<String> deleteUserModel(@AuthenticationPrincipal User user, @PathVariable Long id) {
+    public ResponseEntity<String> deleteUserModel(@AuthenticationPrincipal User user, @PathVariable Long id) throws ResourceNotFoundException {
         modelService.deleteUserModel(id, user);
         return ResponseEntity.ok("Model deleted successfully");
     }

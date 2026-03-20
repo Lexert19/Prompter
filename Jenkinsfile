@@ -11,7 +11,7 @@ pipeline {
             }
         }
         stage('Test') {
-            steps { sh './gradlew test' }
+            steps { sh './gradlew test --rerun-tasks' }
             post { always { junit 'build/test-results/test/**/*.xml' } }
         }
         stage('Package') {
