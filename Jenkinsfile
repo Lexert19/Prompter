@@ -11,7 +11,10 @@ pipeline {
             }
         }
         stage('Test') {
-            steps { sh './gradlew test --rerun-tasks' }
+            steps {
+            sh '''export $(grep -v '^#' /home/lexert/_projects/Prompter/.env | xargs)'''
+            sh './gradlew test --rerun-tasks'
+            }
             post { always { junit 'build/test-results/test/**/*.xml' } }
         }
         stage('Package') {
