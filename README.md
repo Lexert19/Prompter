@@ -1,6 +1,6 @@
 Prompt Engineering Platform
 
-A modern web application for interacting with Large Language Models (LLMs) from multiple providers, managing prompt history, and leveraging RAG (Retrieval-Augmented Generation) through document embeddings.
+A modern web application for interacting with Large Language Models (LLMs) from multiple providers, managing prompt history.
 
 🔗 Live demo: [dominik-chyziak.pl](https://dominik-chyziak.pl)
 
