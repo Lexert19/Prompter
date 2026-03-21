@@ -21,7 +21,6 @@ pipeline {
             steps { sh './gradlew bootJar' }
         }
         stage('Deploy to Production') {
-            when { branch 'master' }
             steps {
                 script {
                     sh """
