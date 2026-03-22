@@ -14,13 +14,12 @@
             <div class="cloud cloud-3"></div>
         </div>
         <div class="container main-container">
-            <div class="panel post-panel p-md-4 p-2">
+            <div class="panel post-panel p-md-4 mb-5 p-2">
                 <#if post.thumbnailUrl??>
                 <div class="post-featured-image">
                     <img src="${post.thumbnailUrl}" alt="${post.title}">
                 </div>
                 </#if>
-                <h1 class="post-title">${post.title}</h1>
                 <div class="post-meta">
                     <span class="post-date">${post.createdAt?datetime.iso?string('dd-MM-yyyy HH:mm')}</span>
                     <span class="post-lang">Język: ${post.lang}</span>

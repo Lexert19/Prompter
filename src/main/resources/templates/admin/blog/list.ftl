@@ -14,7 +14,7 @@
         </div>
         <div class="container main-container">
             <div class="content-wrapper px-2">
-                <div class="panel d-flex flex-column w-100">
+                <div class="panel p-3 d-flex flex-column w-100">
                     <h2 style="color: var(--accent);">Zarządzanie wpisami</h2>
                     <a href="/admin/blog/new" class="pb-3">+ Nowy wpis</a>
                     <table class="admin-table">

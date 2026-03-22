@@ -88,18 +88,15 @@ public class ChatService {
     private Flux<ServerSentEvent<String>> executeRequest(RequestBuilder request, String json) {
         WebClient.RequestBodySpec requestSpec = buildHttpRequest(request, json);
 
-        TokenTrackingService.TokenState state = tokenTrackingService.createState();
 
         return requestSpec.retrieve()
                 .bodyToFlux(String.class)
                 .timeout(Duration.ofMinutes(5))
                 .filter(line -> !line.isBlank())
-                .doOnNext(line -> tokenTrackingService.processChunk(line, request.getProvider(), state))
                 .doFinally(signalType -> {
                     if (signalType == SignalType.ON_COMPLETE && request.getSharedKeyId() != null) {
-                        int completion = tokenTrackingService.getCompletionTokens(state);
-                        int reasoning = tokenTrackingService.getReasoningTokens(state);
-                        addPointsForSharedKey(request.getSharedKeyId(), completion, reasoning);
+                        int completion = tokenTrackingService.getCompletionTokens();
+                        addPointsForSharedKey(request.getSharedKeyId(), completion);
                     }
                 })
                 .map(this::toServerSentEvent)
@@ -177,23 +174,22 @@ public class ChatService {
     private void blockSharedKeyIfUsed(RequestBuilder request) {
         if (request.isUseSharedKeys() && request.getSharedKeyId() != null) {
             sharedKeyRepository.findById(request.getSharedKeyId()).ifPresent(key -> {
-                key.block(5);
+                key.block(1);
                 sharedKeyRepository.save(key);
                 log.warn("Shared key {} blocked for 5 minutes due to error", request.getSharedKeyId());
             });
         }
     }
 
-    private void addPointsForSharedKey(Long sharedKeyId, int completionTokens, int reasoningTokens) {
+    private void addPointsForSharedKey(Long sharedKeyId, int completionTokens) {
         sharedKeyRepository.findByIdWithOwner(sharedKeyId).ifPresent(key -> {
             if (key.getOwner() != null) {
                 User owner = key.getOwner();
-                double totalTokens = completionTokens + reasoningTokens;
-                double points = totalTokens / 1000.0;
+                double points = (double) completionTokens / 1000.0;
                 owner.setPoints(owner.getPoints() + points);
                 userRepository.save(owner);
-                log.debug("Added {} points to user {} for using shared key {} ({} completion + {} reasoning tokens)",
-                        points, owner.getEmail(), sharedKeyId, completionTokens, reasoningTokens);
+                log.debug("Added {} points to user {} for using shared key {} ({} completion)",
+                        points, owner.getEmail(), sharedKeyId, completionTokens);
             }
         });
     }

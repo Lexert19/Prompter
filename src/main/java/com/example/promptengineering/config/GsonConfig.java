@@ -1,5 +1,6 @@
 package com.example.promptengineering.config;
 
+import com.example.promptengineering.model.Content;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.Strictness;
@@ -14,6 +15,7 @@ public class GsonConfig {
                 .setStrictness(Strictness.LENIENT)
                 .serializeNulls()
                 .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+                .registerTypeAdapter(Content.class, new ContentDeserializer())
                 .create();
     }
 }

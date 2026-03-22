@@ -54,6 +54,9 @@
     max-width: 400px;
 }
 
+.login-container h2{
+    text-align: center;
+}
 
 .google-login-button {
     background-color: #4285f4;

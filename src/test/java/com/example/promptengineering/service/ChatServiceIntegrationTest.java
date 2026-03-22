@@ -6,6 +6,7 @@ import com.example.promptengineering.entity.User;
 import com.example.promptengineering.model.Content;
 import com.example.promptengineering.model.Message;
 import com.example.promptengineering.model.RequestBuilder;
+import com.example.promptengineering.model.TextContent;
 import com.example.promptengineering.repository.ModelRepository;
 import com.example.promptengineering.repository.SharedKeyRepository;
 import com.example.promptengineering.repository.UserRepository;
@@ -76,7 +77,7 @@ public class ChatServiceIntegrationTest {
         request.setMaxTokens(100);
         request.setTemperature(0.0);
 
-        Content content = new Content();
+        TextContent content = new TextContent();
         content.setType("text");
         content.setText("Cześć, jak się nazywasz?");
         Message message = new Message("user", List.of(content));
@@ -132,7 +133,7 @@ public class ChatServiceIntegrationTest {
         request.setMaxTokens(100);
         request.setTemperature(0.0);
 
-        Content content = new Content();
+        TextContent content = new TextContent();
         content.setType("text");
         content.setText("Hello");
         Message message = new Message("user", List.of(content));

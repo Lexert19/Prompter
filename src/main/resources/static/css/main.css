@@ -1,6 +1,7 @@
 
 :root {
-    --main-bg: #0f1620;
+/*    --main-bg: #0f1620;*/
+    --main-bg: #14131b;
     --second-bg: #1c1c2d;
 /*    --accent: #802fff;*/
     --accent: rgba(99, 102, 241, 0.9);
@@ -218,7 +219,6 @@ input {
 }
 
 .background{
-/*    background-image: url("/static/images/background.jpg");*/
     background-size: cover;
     background-repeat: no-repeat;
 
@@ -1033,7 +1033,6 @@ input[type="number"]::-ms-spin-button {
 }
 
 .panel h2 {
-    text-align: center;
     margin-bottom: 1.5rem;
     color: #e0e7ff;
 }

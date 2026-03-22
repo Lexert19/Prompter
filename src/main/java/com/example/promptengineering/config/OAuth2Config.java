@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.web.*;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.client.RestTemplate;
@@ -41,6 +42,9 @@ public class OAuth2Config implements WebMvcConfigurer {
         http.addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class);
 
         http.csrf(AbstractHttpConfigurer::disable);
+
+        SavedRequestAwareAuthenticationSuccessHandler successHandler = new SavedRequestAwareAuthenticationSuccessHandler();
+        successHandler.setDefaultTargetUrl("/");
 
         http.authorizeHttpRequests(exchanges -> exchanges
                 .requestMatchers(
@@ -68,18 +72,17 @@ public class OAuth2Config implements WebMvcConfigurer {
                 .userInfoEndpoint(userInfo -> userInfo
                         .oidcUserService(oidcUserService())
                         .userService(customOAuth2UserService))
-                .successHandler((request, response, authentication) -> response.sendRedirect("/"))
+                .successHandler(successHandler)
                 .failureHandler((request, response, exception) -> {
                     log.error("OAuth2 login failed for request: {}", request.getRequestURI(), exception);
                     response.sendRedirect("/auth/login?error=true");
                 }));
 
-        //http.authenticationManager(authenticationManager);
 
         http.formLogin(customizer -> customizer
                 .loginPage("/auth/login")
                 .loginProcessingUrl("/auth/login")
-                .successHandler((request, response, authentication) -> response.sendRedirect("/"))
+                .successHandler(successHandler)
                 .failureHandler(authenticationFailureHandler()));
 
 

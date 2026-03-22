@@ -128,5 +128,15 @@
     "global": true,
     "pointsPerInput": 0.574,
     "pointsPerOutput": 2.294
+  },
+  {
+    "name": "z-ai/glm5",
+    "text": "glm5",
+    "provider": "nvidia",
+    "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+    "type": "text",
+    "global": true,
+    "pointsPerInput": 1,
+    "pointsPerOutput": 3
   }
 ]

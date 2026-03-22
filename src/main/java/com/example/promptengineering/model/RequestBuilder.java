@@ -26,6 +26,23 @@ public class RequestBuilder {
     private String system = "";
     private boolean useSharedKeys = false;
     private Long sharedKeyId;
+    private ProviderStrategy providerStrategy;
+
+    public void setProvider(String providerName) {
+        this.provider = providerName;
+        if ("ANTHROPIC".equals(providerName)) {
+            this.providerStrategy = new AnthropicStrategy();
+        } else {
+            this.providerStrategy = new OpenAIStrategy();
+        }
+    }
+
+    public ProviderStrategy getProviderStrategy(){
+        if(providerStrategy == null){
+            this.setProvider(this.provider);
+        }
+        return providerStrategy;
+    }
 
     public RequestBuilder model(String model) {
         this.model = model;
@@ -54,32 +71,45 @@ public class RequestBuilder {
 
     public Map<String, Object> build() {
         Map<String, Object> request = new HashMap<>();
+        List<Message> messagesCopy = new ArrayList<>(this.messages);
 
-        if (this.provider.equals("ANTHROPIC")) {
-            if (this.system != null && !this.system.trim().isEmpty()) {
-                request.put("system", system);
-            }
-        } else {
-            if (this.system != null && !this.system.trim().isEmpty()) {
-                Content systemContent = new Content();
-                systemContent.setType("text");
-                systemContent.setText(this.system);
-                ArrayList<Content> systemContentList = new ArrayList<>();
-                systemContentList.add(systemContent);
-                Message systemMessage = new Message("system", systemContentList);
-                this.messages.add(0, systemMessage);
-            }
-        }
+        getProviderStrategy().applySystemPrompt(request, messagesCopy, this.system);
+
+//        if (this.provider.equals("ANTHROPIC")) {
+//            if (this.system != null && !this.system.trim().isEmpty()) {
+//                request.put("system", system);
+//            }
+//        } else {
+//            if (this.system != null && !this.system.trim().isEmpty()) {
+//                Content systemContent = new Content();
+//                systemContent.setType("text");
+//                systemContent.setText(this.system);
+//                ArrayList<Content> systemContentList = new ArrayList<>();
+//                systemContentList.add(systemContent);
+//                Message systemMessage = new Message("system", systemContentList);
+//                this.messages.add(0, systemMessage);
+//            }
+//        }
 
         List<Map<String, Object>> messagesListDefault = new ArrayList<>();
         for (Message message : messages) {
-            if (message.getContent() == null || message.getContent().isEmpty()) {
-                Content defaultContent = new Content();
-                defaultContent.setType("text");
-                defaultContent.setText("error");
-                message.setContent(List.of(defaultContent));
+//            if (message.getContent() == null || message.getContent().isEmpty()) {
+//                Content defaultContent = new Content();
+//                defaultContent.setType("text");
+//                defaultContent.setText("error");
+//                message.setContent(List.of(defaultContent));
+//            }
+//            messagesListDefault.add(message.toMap(provider, type));
+
+            List<Map<String, Object>> contentList = new ArrayList<>();
+            for (Content content : message.getContent()) {
+                contentList.add(content.toMap(providerStrategy, message.isCached()));
             }
-            messagesListDefault.add(message.toMap(provider, type));
+
+            Map<String, Object> msgMap = new HashMap<>();
+            msgMap.put("role", message.getRole());
+            msgMap.put("content", contentList);
+            messagesListDefault.add(msgMap);
         }
         request.put("messages", messagesListDefault);
         request.put("model", model);
@@ -88,6 +118,7 @@ public class RequestBuilder {
         if(!this.reasoningEffort.isEmpty()){
             request.put("response_format", Map.of("type", "text"));
             request.put("reasoning_effort", this.reasoningEffort);
+            request.put("chat_template_kwargs", Map.of("enable_thinking", true));
         }
         request.put("max_tokens", maxTokens);
         request.put("temperature", temperature);
@@ -95,5 +126,24 @@ public class RequestBuilder {
 
 
         return request;
+    }
+
+    public int estimateTokenCount() {
+        int totalTokens = 0;
+
+        if (this.system != null && !this.system.trim().isEmpty()) {
+            totalTokens += this.system.length() / 4;
+        }
+
+        for (Message message : messages) {
+            if (message.getContent() == null || message.getContent().isEmpty()) {
+                continue;
+            }
+            for (Content content : message.getContent()) {
+                totalTokens += content.estimateTokens();
+            }
+        }
+
+        return totalTokens;
     }
 }

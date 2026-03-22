@@ -30,7 +30,7 @@ public class SharedKeyService {
     }
 
     public SharedKey getRandomWorkingKeyEntity(String provider) {
-        List<SharedKey> workingKeys = sharedKeyRepository.findByProviderAndWorkingTrue(provider);
+        List<SharedKey> workingKeys = sharedKeyRepository.findByProvider(provider);
         List<SharedKey> availableKeys = workingKeys.stream()
                 .filter(key -> !key.isBlocked())
                 .toList();
