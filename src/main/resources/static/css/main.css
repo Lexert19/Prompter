@@ -1,8 +1,10 @@
 
 :root {
 /*    --main-bg: #0f1620;*/
-    --main-bg: #14131b;
-    --second-bg: #1c1c2d;
+/*    --main-bg: #14131b;*/
+    --main-bg: #0f0f0f;
+/*    --second-bg: #1c1c2d;*/
+    --second-bg: #191919;
 /*    --accent: #802fff;*/
     --accent: rgba(99, 102, 241, 0.9);
 /*    --accent-darker: #6c26d9;*/
@@ -184,6 +186,8 @@ textarea {
 
 .pages{
     height: 96%;
+    overflow: auto;
+    overflow-x: hidden;
 }
 
 select {
@@ -1164,16 +1168,18 @@ input[type="number"]::-ms-spin-button {
 
 .chat-navigation .close-nav-btn {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 0px;
+    right: -38px;
     background: transparent;
     border: none;
     color: white;
     font-size: 1.4rem;
     cursor: pointer;
     z-index: 1100;
-    padding: 5px;
+    padding: 5px 12px;
     transition: opacity 0.2s;
+    background-color: var(--second-bg);
+    border-radius: 0px 0px 12px 0px;
 }
 
 .chat-navigation .close-nav-btn:hover {

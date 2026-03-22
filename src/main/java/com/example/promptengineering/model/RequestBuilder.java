@@ -71,36 +71,11 @@ public class RequestBuilder {
 
     public Map<String, Object> build() {
         Map<String, Object> request = new HashMap<>();
-        List<Message> messagesCopy = new ArrayList<>(this.messages);
 
-        getProviderStrategy().applySystemPrompt(request, messagesCopy, this.system);
-
-//        if (this.provider.equals("ANTHROPIC")) {
-//            if (this.system != null && !this.system.trim().isEmpty()) {
-//                request.put("system", system);
-//            }
-//        } else {
-//            if (this.system != null && !this.system.trim().isEmpty()) {
-//                Content systemContent = new Content();
-//                systemContent.setType("text");
-//                systemContent.setText(this.system);
-//                ArrayList<Content> systemContentList = new ArrayList<>();
-//                systemContentList.add(systemContent);
-//                Message systemMessage = new Message("system", systemContentList);
-//                this.messages.add(0, systemMessage);
-//            }
-//        }
+        getProviderStrategy().applySystemPrompt(request, this.messages, this.system);
 
         List<Map<String, Object>> messagesListDefault = new ArrayList<>();
         for (Message message : messages) {
-//            if (message.getContent() == null || message.getContent().isEmpty()) {
-//                Content defaultContent = new Content();
-//                defaultContent.setType("text");
-//                defaultContent.setText("error");
-//                message.setContent(List.of(defaultContent));
-//            }
-//            messagesListDefault.add(message.toMap(provider, type));
-
             List<Map<String, Object>> contentList = new ArrayList<>();
             for (Content content : message.getContent()) {
                 contentList.add(content.toMap(providerStrategy, message.isCached()));
