@@ -48,6 +48,32 @@
                value="0.95"
                onchange="window.settings.change(event)">
     </div>
+    <div class="instruction-field">
+        <label for="frequencyPenalty">
+            <span><@spring.message "settings.frequency_penalty" /></span>
+        </label>
+        <input type="range"
+               id="frequencyPenalty"
+               name="frequencyPenalty"
+               min="-2.0"
+               max="2.0"
+               step="0.01"
+               value="0"
+               onchange="window.settings.change(event)">
+    </div>
+    <div class="instruction-field">
+        <label for="presencePenalty">
+            <span><@spring.message "settings.presence_penalty" /></span>
+        </label>
+        <input type="range"
+               id="presencePenalty"
+               name="presencePenalty"
+               min="-2.0"
+               max="2.0"
+               step="0.01"
+               value="0"
+               onchange="window.settings.change(event)">
+    </div>
     <div id="systemPromptContainer"></div>
     <div id="projectSelectorContainer"></div>
     <div id="modelSelectorContainer"></div>

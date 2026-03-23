@@ -12,6 +12,14 @@ class RequestBuilder {
         return "";
     }
 
+    getFrequencyPenalty() {
+        return window.settings.frequencyPenalty;
+    }
+
+    getPresencePenalty() {
+        return window.settings.presencePenalty;
+    }
+
     getType() {
         return window.settings.type;
     }
@@ -65,6 +73,8 @@ class RequestBuilder {
             })),
             maxTokens: this.getMaxTokens(),
             top_p: this.getTopP(),
+            frequency_penalty: this.getFrequencyPenalty(),
+            presence_penalty: this.getPresencePenalty(),
             temperature: this.getTemperature(),
             stream: this.stream,
             type: this.getType(),

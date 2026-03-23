@@ -12,6 +12,8 @@ class Settings {
         this.thinkingEffort = "normal"
         this.useSharedKeys = false;
         this.top_p = 0.95;
+        this.frequencyPenalty = 0.0;
+        this.presencePenalty = 0.0;
 
         this.provider = "OPENAI";
         this.url = "https://api.openai.com/v1/chat/completions";
@@ -49,6 +51,8 @@ class Settings {
             activeHistory: this.activeHistory,
             thinkingEffort: this.thinkingEffort,
             useSharedKeys: this.useSharedKeys,
+            frequencyPenalty: this.frequencyPenalty,
+            presencePenalty: this.presencePenalty,
         };
         localStorage.setItem("appSettings", JSON.stringify(settingsToSave));
     }
@@ -91,6 +95,12 @@ class Settings {
                 break;
             case "useSharedKeys":
                 window.settings.useSharedKeys = event.target.checked;
+                break;
+            case "frequencyPenalty":
+                this.frequencyPenalty = parseFloat(event.target.value);
+                break;
+            case "presencePenalty":
+                this.presencePenalty = parseFloat(event.target.value);
                 break;
         }
 

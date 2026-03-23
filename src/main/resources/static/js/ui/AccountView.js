@@ -1,6 +1,6 @@
 class AccountView{
     constructor(){
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', () => {
             const select = document.getElementById('languageSelect');
             if (select) {
                 const lang = getCookie('lang') || 'pl';
@@ -26,7 +26,7 @@ class AccountView{
                 }
             }
         } catch (error) {
-            console.error('Nie udało się pobrać punktów:', error);
+            console.error('Failed to load points:', error);
         }
     }
 
