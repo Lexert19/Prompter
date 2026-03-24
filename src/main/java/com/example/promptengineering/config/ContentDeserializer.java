@@ -22,7 +22,7 @@ public class ContentDeserializer implements JsonDeserializer<Content> {
         switch (type) {
             case "text":
                 return context.deserialize(jsonObject, TextContent.class);
-            case "image_url":
+            case "image":
                 return context.deserialize(jsonObject, ImageContent.class);
             default:
                 throw new JsonParseException("Undefined content type: " + type);

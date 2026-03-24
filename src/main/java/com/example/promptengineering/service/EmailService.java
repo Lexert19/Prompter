@@ -1,73 +1,65 @@
 package com.example.promptengineering.service;
 
-import com.mailersend.sdk.MailerSend;
-import com.mailersend.sdk.MailerSendResponse;
-import com.mailersend.sdk.emails.Email;
-import com.mailersend.sdk.exceptions.MailerSendException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-
-import java.util.concurrent.CompletableFuture;
-
+import jakarta.mail.internet.MimeMessage;
 
 @Service
 public class EmailService {
-    private final String domain;
-    private final String apiToken;
-    private final String fromName;
-    private final String fromEmail;
+
     private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
 
-    public EmailService(@Value("${app.domain}") String domain,
-                        @Value("${mailersend.api.token}") String apiToken,
-                        @Value("${mailersend.from.name:Prompter}") String fromName,
-                        @Value("${mailersend.from.email}") String fromEmail) {
-        this.domain = domain;
-        this.apiToken = apiToken;
-        this.fromName = fromName;
-        this.fromEmail = fromEmail;
-    }
+    @Autowired
+    private JavaMailSender mailSender;
+
+    @Value("${spring.mail.username}")
+    private String fromEmail;
 
     @Async("taskExecutor")
-    public void sendPasswordResetEmail(String email, String token) {
+    public void sendPasswordResetEmail(String toEmail, String token) {
         try {
-            logger.debug("Starting to send password reset email to: {}", email);
+            String resetLink = "https://dominik-chyziak.pl/auth/reset-password-confirm?token=" + token;
+            String html = "<p>Password reset requested. <a href=\"" + resetLink + "\">Click here to reset your password</a></p>" +
+                    "<p>" + resetLink + "</p><p>If you didn't request this, ignore this email.</p>";
 
-            MailerSend ms = new MailerSend();
-            ms.setToken(apiToken);
+            MimeMessage mime = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mime, true);
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject("Password Reset Request");
+            helper.setText(html, true);
 
-            String resetLink = domain + "/auth/reset-password-confirm?token=" + token;
-            String textBody = String.format(
-                    "Password reset requested. Click the link: %s%nIf you didn't request this, ignore this email.",
-                    resetLink);
-            String htmlBody = String.format("<p>Password reset requested. <a href=\"%s\">Click here to reset your password</a></p><p>%s</p><p>If you didn't request this, ignore this email.</p>",
-                    resetLink, resetLink);
-
-            Email emailMessage = new Email();
-            emailMessage.setFrom(fromName, fromEmail);
-            emailMessage.addRecipient(email, email);
-            emailMessage.setSubject("Password Reset Request");
-            emailMessage.setPlain(textBody);
-            emailMessage.setHtml(htmlBody);
-
-            logger.debug("Sending email with reset link: {}", resetLink);
-            MailerSendResponse response = ms.emails().send(emailMessage);
-
-            logger.debug("Email sent successfully to: {}", email);
-            CompletableFuture.completedFuture(null);
-
-        } catch (MailerSendException e) {
-            logger.error("Failed to send password reset email to: {}", email, e);
-            CompletableFuture.failedFuture(e);
+            mailSender.send(mime);
+            logger.debug("Password reset email sent to {}", toEmail);
         } catch (Exception e) {
-            logger.error("Unexpected error while sending email to: {}", email, e);
-            CompletableFuture.failedFuture(new RuntimeException("Email sending failed", e));
+            logger.error("Failed to send password reset email to {}", toEmail, e);
         }
     }
 
+    @Async("taskExecutor")
+    public void sendTwoFactorCode(String toEmail, String code) {
+        try {
+            String subject = "Twój kod logowania";
+            String html = "<p>Twój kod do logowania: <strong>" + code + "</strong></p><p>Kod ważny jest 10 minut.</p>";
 
+            MimeMessage mime = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mime, true);
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject(subject);
+            helper.setText(html, true);
+
+            mailSender.send(mime);
+            logger.debug("2FA code sent to {}", toEmail);
+        } catch (Exception e) {
+            logger.error("Failed to send 2FA code to {}", toEmail, e);
+        }
+    }
 }

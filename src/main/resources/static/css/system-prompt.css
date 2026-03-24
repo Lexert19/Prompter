@@ -1,0 +1,43 @@
+
+.system-prompt-button {
+    background-color: var(--second-bg);
+    border: 1px solid #555866;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.system-prompt-button:hover {
+    background-color: var(--accent-darker);
+}
+
+.system-prompt-preview {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.system-prompt-status {
+    font-size: 0.8rem;
+    background: rgba(255,255,255,0.1);
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-left: 10px;
+}
+
+#systemPromptForm textarea {
+    background-color: var(--second-bg);
+    border: 1px solid var(--accent);
+    color: white;
+    border-radius: 6px;
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#systemPromptForm textarea:focus {
+    outline: none;
+    border-color: var(--accent-darker);
+}

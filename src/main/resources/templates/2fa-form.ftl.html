@@ -1,0 +1,56 @@
+<#import "/spring.ftl" as spring />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <#include "/parts/links.ftl" />
+    <title><@spring.message "2fa.title" /></title>
+</head>
+<body class="background single-page-body">
+<div class="mesh-background">
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+</div>
+<#include "/parts/navbar.ftl" />
+<div class="single-page-container">
+    <div class="content-wrapper px-2">
+        <div class="login-container p-4 panel">
+            <h2><@spring.message "2fa.heading" /></h2>
+            <p class="text-muted mb-3">
+                <@spring.message "2fa.instruction" />
+            </p>
+            <#if error??>
+            <div class="alert-error">${error}</div>
+        </#if>
+        <#if success??>
+        <div class="alert-success">${success}</div>
+    </#if>
+    <form id="twoFactorForm" action="/auth/2fa" method="POST">
+        <input type="text"
+               name="code"
+               placeholder="<@spring.message '2fa.code.placeholder' />"
+               required
+               autofocus
+               pattern="[0-9]{6}"
+               maxlength="6">
+        <button type="submit">
+            <@spring.message "2fa.submit" />
+        </button>
+    </form>
+    <div class="text-center mt-3">
+        <a href="#" id="resendCodeLink" class="small" data-resend-label="<@spring.message '2fa.resend' />" data-sending-label="<@spring.message '2fa.resending' />" data-success-msg="<@spring.message '2fa.resend.success' />" data-error-msg="<@spring.message '2fa.resend.error' />">
+            <@spring.message "2fa.resend" />
+        </a>
+    </div>
+    <div class="forgot-password mt-3 text-center">
+        <a href="/auth/login">
+            <@spring.message "2fa.backToLogin" />
+        </a>
+    </div>
+</div>
+</div>
+</div>
+
+<script src="/static/otherJs/2fa.js"></script>
+</body>
+</html>

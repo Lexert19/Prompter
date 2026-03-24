@@ -21,3 +21,8 @@
 <link rel="stylesheet" href="/static/css/navbar.css">
 <link rel="stylesheet" href="/static/css/auth.css">
 <link rel="stylesheet" href="/static/css/modal.css">
+
+<link rel="stylesheet" href="/static/css/model.css">
+<link rel="stylesheet" href="/static/css/panel.css">
+<link rel="stylesheet" href="/static/css/project.css">
+<link rel="stylesheet" href="/static/css/system-prompt.css">

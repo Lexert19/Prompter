@@ -6,8 +6,8 @@
     <div class="cloud cloud-3"></div>
 </div>
 <div class="slides-container">
-    <section class="slide" id="slide1">
-        <div class="center content-wrapper" style="height: 100vh;">
+    <section class="slide pt-5 pt-md-0" id="slide1">
+        <div class="center content-wrapper">
             <div class="block content-box p-0 pt-5 w-100 hidden">
                 <div class="chat-header d-flex mb-3 flex-column align-items-center"
                      style="text-align: center">
@@ -47,7 +47,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4 d-none d-md-block">
+                        <div class="col-md-4">
                             <div class="card glass-card h-100 text-center">
                                 <div class="card-body">
                                     <i class="fas fa-leaf fa-3x mb-3" style="color: var(--accent);"></i>
@@ -60,7 +60,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4 d-none d-md-block">
+                        <div class="col-md-4">
                             <div class="card glass-card h-100 text-center">
                                 <div class="card-body">
                                     <i class="fab fa-js fa-3x mb-3" style="color: var(--accent);"></i>
@@ -80,8 +80,8 @@
             </div>
         </div>
     </section>
-    <section class="slide" id="slide2">
-        <div class="center content-wrapper" style="height: 100vh;">
+    <section class="slide pt-5 pt-md-0" id="slide2">
+        <div class="center content-wrapper">
             <div class="block content-box hidden">
                 <div class="container">
                 <div class="row g-4 align-items-center">

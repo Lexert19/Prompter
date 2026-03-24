@@ -207,3 +207,13 @@ document.addEventListener('DOMContentLoaded', function() {
   window.addEventListener('resize', handleResize);
   updateButtonZIndex();
 });
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  const newChatBtn = document.getElementById('newChatBtn');
+  if (newChatBtn) {
+    newChatBtn.addEventListener('click', function() {
+      window.location.href = '/chat';
+    });
+  }
+});

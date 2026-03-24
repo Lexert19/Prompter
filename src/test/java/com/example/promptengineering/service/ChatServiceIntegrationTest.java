@@ -168,6 +168,6 @@ public class ChatServiceIntegrationTest {
         SharedKey refreshedKey = sharedKeyRepository.findById(geminiSharedKey.getId()).orElseThrow();
 
         assertThat(refreshedOwner.getPoints()).isEqualTo(initialPoints);
-        //assertThat(refreshedKey.getUsageCount()).isEqualTo(initialUsage);
+        assertThat(refreshedKey.getUsageCount()).isEqualTo(initialUsage);
     }
 }

@@ -12,6 +12,7 @@ import com.example.promptengineering.entity.SharedKey;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.entity.UserFile;
 import com.example.promptengineering.model.Content;
+import com.example.promptengineering.model.ImageContent;
 import com.example.promptengineering.model.Message;
 import com.example.promptengineering.repository.SharedKeyRepository;
 import com.example.promptengineering.repository.UserRepository;
@@ -27,7 +28,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.SignalType;
 import reactor.core.scheduler.Schedulers;
 
 @Slf4j
@@ -60,14 +60,14 @@ public class ChatService {
             for (Message msg : request.getMessages()) {
                 for (Content content : msg.getContent()) {
                     if (isImageWithFileId(content)) {
-                        enrichContentWithBase64(content, user);
+                        enrichContentWithBase64((ImageContent) content, user);
                     }
                 }
             }
         }).subscribeOn(Schedulers.boundedElastic()).then();
     }
 
-    private void enrichContentWithBase64(Content content, User user) {
+    private void enrichContentWithBase64(ImageContent content, User user) {
         try {
             UserFile userFile = fileStorageService.getUserFile(content.getFileId(), user);
             Path base64Path = Paths.get(userFile.getBase64Path());
@@ -94,10 +94,8 @@ public class ChatService {
                 .timeout(Duration.ofMinutes(5))
                 .filter(line -> !line.isBlank())
                 .doFinally(signalType -> {
-                    if (signalType == SignalType.ON_COMPLETE && request.getSharedKeyId() != null) {
-                        int completion = tokenTrackingService.getCompletionTokens();
-                        addPointsForSharedKey(request.getSharedKeyId(), completion);
-                    }
+                    int completion = tokenTrackingService.getCompletionTokens();
+                    addPointsForSharedKey(request.getSharedKeyId(), completion);
                 })
                 .map(this::toServerSentEvent)
                 .doOnCancel(() -> log.debug("SSE stream cancelled by client"))
@@ -174,7 +172,7 @@ public class ChatService {
     private void blockSharedKeyIfUsed(RequestBuilder request) {
         if (request.isUseSharedKeys() && request.getSharedKeyId() != null) {
             sharedKeyRepository.findById(request.getSharedKeyId()).ifPresent(key -> {
-                key.block(1);
+                key.block(5);
                 sharedKeyRepository.save(key);
                 log.warn("Shared key {} blocked for 5 minutes due to error", request.getSharedKeyId());
             });
@@ -185,7 +183,7 @@ public class ChatService {
         sharedKeyRepository.findByIdWithOwner(sharedKeyId).ifPresent(key -> {
             if (key.getOwner() != null) {
                 User owner = key.getOwner();
-                double points = (double) completionTokens / 1000.0;
+                double points = (double) completionTokens / 1000000.0;
                 owner.setPoints(owner.getPoints() + points);
                 userRepository.save(owner);
                 log.debug("Added {} points to user {} for using shared key {} ({} completion)",

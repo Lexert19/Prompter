@@ -95,13 +95,17 @@ public class RequestBuilder {
         if(!this.reasoningEffort.isEmpty()){
             request.put("response_format", Map.of("type", "text"));
             request.put("reasoning_effort", this.reasoningEffort);
-            request.put("chat_template_kwargs", Map.of("enable_thinking", true));
+            if(!provider.equalsIgnoreCase("gemini")){
+                request.put("chat_template_kwargs", Map.of("enable_thinking", true));
+            }
         }
         request.put("max_tokens", maxTokens);
         request.put("temperature", temperature);
         request.put("top_p", top_p);
-        request.put("frequency_penalty", frequencyPenalty);
-        request.put("presence_penalty", presencePenalty);
+        if(!provider.equalsIgnoreCase("gemini")) {
+            request.put("frequency_penalty", frequencyPenalty);
+            request.put("presence_penalty", presencePenalty);
+        }
 
 
         return request;

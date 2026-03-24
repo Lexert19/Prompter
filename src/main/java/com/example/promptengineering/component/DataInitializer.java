@@ -55,6 +55,8 @@ public class DataInitializer implements CommandLineRunner {
             newAdmin.setEmail(adminEmail);
             newAdmin.setPassword(passwordEncoder.encode(adminPassword));
             newAdmin.setRoles(List.of(AppRole.ADMIN));
+            newAdmin.setTwoFactorEnabled(true);
+            newAdmin.setTwoFactorEmail(adminEmail);
             admin = userRepository.save(newAdmin);
             log.info("Admin created: {}", adminEmail);
         } else {

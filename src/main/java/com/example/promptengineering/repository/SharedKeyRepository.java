@@ -11,6 +11,7 @@ import java.util.Optional;
 public interface SharedKeyRepository extends JpaRepository<SharedKey, Long> {
     List<SharedKey> findByProviderAndWorkingTrue(String provider);
     List<SharedKey> findByProvider(String provider);
+
     @Query("SELECT sk FROM SharedKey sk JOIN FETCH sk.owner WHERE sk.id = :id")
     Optional<SharedKey> findByIdWithOwner(@Param("id") Long id);
 }

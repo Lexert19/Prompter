@@ -81,7 +81,7 @@
 }
 
 .alert-error {
-    background-color: rgba(220, 53, 69, 0.2);
-    border: 1px solid #dc3545;
-    color: #ff8b8b;
+    background-color: var(--error-bg);
+    border: 1px solid var(--error-border);
+    color: var(--error-text);
 }
