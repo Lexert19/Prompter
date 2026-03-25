@@ -2,9 +2,12 @@ package com.example.promptengineering.restController;
 
 import com.example.promptengineering.exception.TokenValidationException;
 import com.example.promptengineering.exception.UserNotFoundException;
+import com.example.promptengineering.security.IpRateLimiter;
 import com.example.promptengineering.service.AuthService;
 import com.example.promptengineering.service.ResetTokenService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.amqp.RabbitRetryTemplateCustomizer;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,10 +20,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class AuthController {
 
     private final ResetTokenService resetTokenService;
-
+    private final IpRateLimiter rateLimiter;
     @Autowired
-    public AuthController(AuthService authService, ResetTokenService resetTokenService) {
+    public AuthController(AuthService authService, ResetTokenService resetTokenService, IpRateLimiter rateLimiter) {
         this.resetTokenService = resetTokenService;
+        this.rateLimiter = rateLimiter;
     }
 
     @GetMapping("/login")
@@ -39,7 +43,13 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password-request")
-    public String handleForgotPassword(@RequestParam(value = "email", defaultValue = "") String email, Model model) {
+    public String handleForgotPassword(@RequestParam(value = "email", defaultValue = "") String email,
+                                       Model model,
+                                       HttpServletRequest request) {
+        if (!rateLimiter.isAllowed(request)) {
+            model.addAttribute("error", "Zbyt wiele prób. Spróbuj ponownie za chwilę.");
+            return "reset-password-request";
+        }
         try {
             resetTokenService.createPasswordResetToken(email);
         } catch (UserNotFoundException e) {
