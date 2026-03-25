@@ -5,7 +5,7 @@ class Translator {
     }
 
     async load(lang) {
-        const response = await fetch(`/static/locales/${lang}.json`);
+        const response = await fetchWithCsrf(`/static/locales/${lang}.json`);
         this.translations = await response.json();
         this.currentLang = lang;
         //this.updateDOM();

@@ -26,6 +26,7 @@
         <div class="alert-success">${success}</div>
     </#if>
     <form id="twoFactorForm" action="/auth/2fa" method="POST">
+        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
         <input type="text"
                name="code"
                placeholder="<@spring.message '2fa.code.placeholder' />"

@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             const method = postId ? 'PUT' : 'POST';
 
             try {
-                const response = await fetch(url, {
+                const response = await fetchWithCsrf(url, {
                     method: method,
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(postData)
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 async function loadPosts() {
     try {
-        const response = await fetch('/api/admin/blog/posts');
+        const response = await fetchWithCsrf('/api/admin/blog/posts');
         if (!response.ok) throw new Error('Failed to load posts');
         const posts = await response.json();
         renderPosts(posts);
@@ -97,7 +97,7 @@ function attachDeleteHandlers() {
             if (!confirm('Czy na pewno usunąć ten wpis?')) return;
             const postId = btn.dataset.id;
             try {
-                const response = await fetch(`/api/admin/blog/posts/${postId}`, {
+                const response = await fetchWithCsrf(`/api/admin/blog/posts/${postId}`, {
                     method: 'DELETE'
                 });
                 if (response.ok) {
@@ -114,7 +114,7 @@ function attachDeleteHandlers() {
 
 async function openMediaPicker() {
     try {
-        const response = await fetch('/api/admin/media', {
+        const response = await fetchWithCsrf('/api/admin/media', {
             credentials: 'include'
         });
         if (!response.ok) throw new Error('Nie udało się pobrać mediów');

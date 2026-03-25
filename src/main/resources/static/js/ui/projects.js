@@ -47,7 +47,7 @@ class Projects {
         if (!projectName) return;
 
         try {
-            const response = await fetch(`${this.controllerUrl}/create`, {
+            const response = await fetchWithCsrf(`${this.controllerUrl}/create`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ class Projects {
         if (!projectId) return;
 
         try {
-            const response = await fetch(`${this.controllerUrl}/${projectId}`, {
+            const response = await fetchWithCsrf(`${this.controllerUrl}/${projectId}`, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -95,7 +95,7 @@ class Projects {
 
     async loadProjects() {
         try {
-            const response = await fetch(`${this.controllerUrl}`, {
+            const response = await fetchWithCsrf(`${this.controllerUrl}`, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -143,7 +143,7 @@ class Projects {
         if (!projectId) return;
 
         try {
-            const response = await fetch(`${this.controllerUrl}/${projectId}/files`, {
+            const response = await fetchWithCsrf(`${this.controllerUrl}/${projectId}/files`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -167,7 +167,7 @@ class Projects {
 
     async searchSimilarFragments(projectId, query) {
         try {
-            const response = await fetch(
+            const response = await fetchWithCsrf(
                 `${this.controllerUrl}/${projectId}/similar-fragments?query=${encodeURIComponent(query)}`,
                 {
                     method: 'POST',
@@ -190,7 +190,7 @@ class Projects {
 
     async loadProjectFiles(projectId) {
         try {
-            const response = await fetch(`${this.controllerUrl}/${projectId}/files`, {
+            const response = await fetchWithCsrf(`${this.controllerUrl}/${projectId}/files`, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -215,7 +215,7 @@ class Projects {
     }
     async showFileContent(projectId, fileId) {
         try {
-            const response = await fetch(`/api/projects/${projectId}/files/${fileId}`, {
+            const response = await fetchWithCsrf(`/api/projects/${projectId}/files/${fileId}`, {
                 headers: {
                     'Content-Type': 'application/json',
                 },

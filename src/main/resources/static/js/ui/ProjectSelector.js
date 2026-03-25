@@ -35,7 +35,7 @@ class ProjectSelector {
 
     async loadProjects() {
         try {
-            const response = await fetch('/api/projects', {
+            const response = await fetchWithCsrf('/api/projects', {
                 credentials: 'include'
             });
             if (!response.ok) throw new Error('Failed to load projects');

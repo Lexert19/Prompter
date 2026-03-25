@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         const formData = new FormData();
         formData.append('file', document.getElementById('fileInput').files[0]);
         try {
-            const response = await fetch('/api/admin/media/upload', { method: 'POST', body: formData });
+            const response = await fetchWithCsrf('/api/admin/media/upload', { method: 'POST', body: formData });
             if (response.ok) {
                 const imageUrl = await response.text();
                 document.getElementById('imageUrl').value = window.location.origin + imageUrl;
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         event.preventDefault();
         if (!confirm('Czy na pewno usunąć?')) return;
         try {
-            const response = await fetch(`/api/admin/media/${id}`, { method: 'DELETE' });
+            const response = await fetchWithCsrf(`/api/admin/media/${id}`, { method: 'DELETE' });
             if (response.ok) location.reload();
             else alert('Błąd usuwania');
         } catch (error) {
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     async function loadMediaList() {
         try {
-            const response = await fetch('/api/admin/media');
+            const response = await fetchWithCsrf('/api/admin/media');
             if (!response.ok) throw new Error();
             const mediaList = await response.json();
             renderMediaGrid(mediaList);

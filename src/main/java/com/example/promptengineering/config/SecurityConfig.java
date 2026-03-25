@@ -19,6 +19,9 @@ import org.springframework.security.web.*;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.CharacterEncodingFilter;
@@ -43,8 +46,13 @@ public class SecurityConfig implements WebMvcConfigurer {
     public SecurityFilterChain securityWebFilterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
         http.addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class);
 
-        http.csrf(AbstractHttpConfigurer::disable);
+        CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+        requestHandler.setCsrfRequestAttributeName(null);
 
+        http.csrf(csrf -> csrf
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .csrfTokenRequestHandler(requestHandler)
+        );
 
         http.authorizeHttpRequests(exchanges -> exchanges
                 .requestMatchers(

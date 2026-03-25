@@ -10,7 +10,7 @@
         document.cookie = `lang=${lang}; path=/; max-age=31536000`;
         const currentPath = window.location.pathname;
         try {
-            const response = await fetch(`/public/translate-url?url=${encodeURIComponent(currentPath)}&targetLang=${lang}`);
+            const response = await fetchWithCsrf(`/public/translate-url?url=${encodeURIComponent(currentPath)}&targetLang=${lang}`);
             if (response.ok) {
                 const newPath = await response.text();
                 window.location.href = window.location.origin + newPath + window.location.search + window.location.hash;

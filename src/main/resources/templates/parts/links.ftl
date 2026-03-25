@@ -16,6 +16,8 @@
         crossorigin="anonymous"
         referrerpolicy="no-referrer"></script>
 <script src="/static/js/navbar.js"></script>
+<script src="/static/otherJs/global.js"></script>
+
 <link rel="stylesheet" href="/static/css/main.css">
 <link rel="stylesheet" href="/static/css/background.css">
 <link rel="stylesheet" href="/static/css/navbar.css">

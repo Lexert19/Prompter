@@ -20,6 +20,7 @@
                     <div class="alert-error">${error}</div>
                     </#if>
                     <form action="/auth/login" method="POST">
+                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                         <input type="text"
                                name="username"
                                placeholder="<@spring.message 'login.username.placeholder'/>"

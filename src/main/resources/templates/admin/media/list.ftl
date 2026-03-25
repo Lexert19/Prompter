@@ -14,6 +14,7 @@
                 <div class="upload-section">
                     <h4>Dodaj nowe zdjęcie</h4>
                     <form id="uploadForm" enctype="multipart/form-data">
+                        <input type="hidden" name="_csrf" class="csrfToken"/>
                         <input type="file" id="fileInput" name="file" accept="image/*" required>
                         <button type="submit" class="btn btn-primary">Prześlij</button>
                     </form>

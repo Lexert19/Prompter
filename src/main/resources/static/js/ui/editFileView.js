@@ -29,7 +29,7 @@ class EditFileView {
 
     addDeleteButtonListener() {
         this.deleteButton.addEventListener("click", () => {
-                fetch(`/api/projects/${this.selectedProject}/files/${this.selectedFile}`, {
+                fetchWithCsrf(`/api/projects/${this.selectedProject}/files/${this.selectedFile}`, {
                     method: "DELETE",
                 })
                     .then((response) => {

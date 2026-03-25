@@ -18,6 +18,7 @@
                 <div class="alert-error">${error}</div>
                 </#if>
                 <form action="/auth/reset-password-request" method="post">
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                     <input type="email" name="email" placeholder="Email address" required>
                     <button type="submit">Request Password Reset</button>
                 </form>

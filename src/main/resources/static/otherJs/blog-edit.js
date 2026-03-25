@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let post = null;
     if (isEdit) {
         try {
-            const res = await fetch(`/api/admin/blog/posts/${postId}`, { credentials: 'include' });
+            const res = await fetchWithCsrf(`/api/admin/blog/posts/${postId}`, { credentials: 'include' });
             if (!res.ok) throw new Error('Nie udało się pobrać danych');
             post = await res.json();
         } catch (err) {
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const method = postId ? 'PUT' : 'POST';
 
         try {
-            const res = await fetch(url, {
+            const res = await fetchWithCsrf(url, {
                 method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data),
@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function openMediaPicker() {
     try {
-        const response = await fetch('/api/admin/media', { credentials: 'include' });
+        const response = await fetchWithCsrf('/api/admin/media', { credentials: 'include' });
         if (!response.ok) throw new Error('Nie udało się pobrać mediów');
         const mediaList = await response.json();
 
@@ -125,7 +125,7 @@ async function loadThumbnailPreview() {
     const thumbnailId = document.getElementById('thumbnailId').value;
     if (thumbnailId) {
         try {
-            const response = await fetch(`/api/admin/media/${thumbnailId}`, { credentials: 'include' });
+            const response = await fetchWithCsrf(`/api/admin/media/${thumbnailId}`, { credentials: 'include' });
             if (response.ok) {
                 const media = await response.json();
                 document.getElementById('thumbnailPreview').innerHTML = `<img src="${media.url}" style="max-width: 200px; max-height: 200px; border-radius: 4px;">`;

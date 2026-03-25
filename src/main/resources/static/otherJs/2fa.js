@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
         link.style.pointerEvents = 'none';
 
         try {
-            const response = await fetch('/auth/2fa/resend', { method: 'POST' });
+            const response = await fetchWithCsrf('/auth/2fa/resend', { method: 'POST' });
             if (response.ok) {
                 const msgDiv = document.createElement('div');
                 msgDiv.className = 'alert-success';

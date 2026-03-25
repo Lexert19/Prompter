@@ -19,6 +19,7 @@
         </div>
     </#if>
     <form method="post" action="/auth/reset-password-confirm">
+        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
         <input type="hidden" name="token" value="${token}" />
         <div class="form-group">
             <label for="password">New Password</label>

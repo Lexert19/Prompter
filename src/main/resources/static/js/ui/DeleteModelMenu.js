@@ -15,7 +15,7 @@ class DeleteModelMenu {
     }
 
     deleteModel(id) {
-        fetch(`/api/models/user-models/${id}`, {
+        fetchWithCsrf(`/api/models/user-models/${id}`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' }
         })

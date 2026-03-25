@@ -122,42 +122,13 @@ class Settings {
         this.save();
     }
 
-//    loadProjects() {
-//        fetch("/api/projects", {
-//            method: "GET",
-//            headers: {
-//                "Content-Type": "application/json",
-//            },
-//            credentials: "include",
-//        })
-//            .then((response) => {
-//            if (!response.ok) {
-//                throw new Error("Failed to fetch projects: " + response.statusText);
-//            }
-//            return response.json();
-//        })
-//            .then((projects) => {
-//            const projectSelect = document.getElementById("project");
-//            projectSelect.innerHTML = "";
-//
-//            projects.forEach((project) => {
-//                const option = document.createElement("option");
-//                option.value = project.id;
-//                option.textContent = project.name;
-//                projectSelect.appendChild(option);
-//            });
-//
-//        })
-//            .catch((error) => {
-//            console.error("Error loading projects:", error);
-//        });
-//    }
+
 
     initModels() {
         hidePages();
         this.chatSettings = document.getElementById("chatSettings");
         this.chatSettings.classList.add("active");
-        fetch('/api/models/all-models', {
+        fetchWithCsrf('/api/models/all-models', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -195,7 +166,7 @@ class Settings {
     }
 
     loadKeys() {
-        fetch("/api/account/keys", {
+        fetchWithCsrf("/api/account/keys", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",

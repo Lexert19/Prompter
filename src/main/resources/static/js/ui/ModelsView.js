@@ -5,30 +5,8 @@ class ModelsView{
     }
 
 
-//    renderUserModels(){
-//        fetch('/api/models/user-models', {
-//            method: 'GET',
-//            headers: {
-//                'Content-Type': 'application/json'
-//            },
-//            credentials: 'include'
-//        })
-//            .then(response => response.json())
-//            .then(models => {
-//            this.models = models.map(model => ({
-//                id: model.id,
-//                name: model.name,
-//                text: model.text || model.name,
-//                provider: model.provider,
-//                url: model.url,
-//                type: model.type
-//            }));
-//            this.renderModels(models);
-//        })
-//    }
-
     renderUserModels() {
-        fetch('/api/models/user-models', { credentials: 'include' })
+        fetchWithCsrf('/api/models/user-models', { credentials: 'include' })
             .then(res => res.json())
             .then(models => {
             this.models = models;

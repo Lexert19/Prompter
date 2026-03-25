@@ -31,6 +31,8 @@
                         </td>
                         <td class="admin-actions">
                             <form action="/admin/users/${user.id}/role" method="post" class="d-flex">
+                                <input type="hidden" name="_csrf" class="csrfToken"/>
+
                                 <select name="role" class="me-2">
                                     <#list availableRoles as r>
                                     <option value="${r}" <#if user.roles?seq_contains(r)>
@@ -44,6 +46,7 @@
                                   method="post"
                                   style="display: inline-block"
                                   onsubmit="return confirm('Czy na pewno chcesz usunąć tego użytkownika?');">
+                                <input type="hidden" name="_csrf" class="csrfToken"/>
                                 <button type="submit" class="btn-small btn-danger">Usuń</button>
                             </form>
                         </td>

@@ -29,7 +29,7 @@ class ChatClient {
         this.abortController = new AbortController();
         console.log(request.toRequestJSON());
         this.newMessage();
-        fetch(this.url, {
+        fetchWithCsrf(this.url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

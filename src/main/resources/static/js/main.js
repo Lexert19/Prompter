@@ -9,7 +9,7 @@ function switchCacheField() {
 }
 
 function includeHTML(url, elementId) {
-  fetch(url)
+  fetchWithCsrf(url)
     .then((response) => response.text())
     .then((data) => {
       document.getElementById(elementId).innerHTML = data;
@@ -127,7 +127,7 @@ function base64ToFile(base64String, filename) {
 
 async function listSharedKeys() {
   try {
-    const res = await fetch('/api/admin/shared-keys');
+    const res = await fetchWithCsrf('/api/admin/shared-keys');
     if (!res.ok) throw new Error(`Błąd ${res.status}`);
     const keys = await res.json();
     if (keys.length === 0) return console.log('Brak kluczy.');
@@ -140,7 +140,7 @@ async function listSharedKeys() {
 async function deleteSharedKey(id) {
   if (!confirm(`Usunąć klucz ${id}?`)) return;
   try {
-    const res = await fetch(`/api/admin/shared-keys/${id}`, { method: 'DELETE' });
+    const res = await fetchWithCsrf(`/api/admin/shared-keys/${id}`, { method: 'DELETE' });
     if (res.status === 204) console.log(`Klucz ${id} usunięty.`);
     else if (res.status === 404) console.log(`Klucz ${id} nie istnieje.`);
     else throw new Error(`Błąd ${res.status}`);
