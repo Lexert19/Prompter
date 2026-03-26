@@ -1,5 +1,6 @@
 package com.example.promptengineering.restController;
 
+import com.example.promptengineering.component.EmailRateLimiter;
 import com.example.promptengineering.exception.TokenValidationException;
 import com.example.promptengineering.exception.UserNotFoundException;
 import com.example.promptengineering.security.IpRateLimiter;
@@ -21,10 +22,13 @@ public class AuthController {
 
     private final ResetTokenService resetTokenService;
     private final IpRateLimiter rateLimiter;
+    private final EmailRateLimiter emailRateLimiter;
+
     @Autowired
-    public AuthController(AuthService authService, ResetTokenService resetTokenService, IpRateLimiter rateLimiter) {
+    public AuthController(AuthService authService, ResetTokenService resetTokenService, IpRateLimiter rateLimiter, EmailRateLimiter emailRateLimiter) {
         this.resetTokenService = resetTokenService;
         this.rateLimiter = rateLimiter;
+        this.emailRateLimiter = emailRateLimiter;
     }
 
     @GetMapping("/login")
@@ -48,6 +52,10 @@ public class AuthController {
                                        HttpServletRequest request) {
         if (!rateLimiter.isAllowed(request)) {
             model.addAttribute("error", "Zbyt wiele prób. Spróbuj ponownie za chwilę.");
+            return "reset-password-request";
+        }
+        if (!emailRateLimiter.canSend(email)) {
+            model.addAttribute("error", "Daily limit reached for this email address. Please try again later.");
             return "reset-password-request";
         }
         try {

@@ -2,6 +2,7 @@ package com.example.promptengineering.restController;
 
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.repository.UserRepository;
+import com.example.promptengineering.security.IpRateLimiter;
 import com.example.promptengineering.service.TwoFactorEmailService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -20,11 +21,13 @@ public class TwoFactorAuthController {
 
     private final TwoFactorEmailService twoFactorService;
     private final UserRepository userRepository;
+    private final IpRateLimiter rateLimiter;
 
     public TwoFactorAuthController(TwoFactorEmailService twoFactorService,
-                                   UserRepository userRepository) {
+                                   UserRepository userRepository, IpRateLimiter rateLimiter) {
         this.twoFactorService = twoFactorService;
         this.userRepository = userRepository;
+        this.rateLimiter = rateLimiter;
     }
 
     @GetMapping("/auth/2fa")
@@ -63,6 +66,9 @@ public class TwoFactorAuthController {
 
     @PostMapping("/auth/2fa/resend")
     public ResponseEntity<?> resendCode(HttpServletRequest request) {
+        if (!rateLimiter.isAllowed(request)) {
+            return ResponseEntity.status(429).body("Too many requests. Please try again later.");
+        }
         HttpSession session = request.getSession();
         Long userId = (Long) session.getAttribute("2fa_user_id");
         if (userId == null) {
