@@ -12,11 +12,14 @@ public class EmailRateLimiter {
     private final ConcurrentMap<String, AtomicInteger> attempts = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, Instant> lastSent = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, Instant> blockedUntil = new ConcurrentHashMap<>();
-    @Value("${app.rate-limit.email.max-attempts:3}")
-    private int maxAttemptsPerDay;
 
-    @Value("${app.rate-limit.email.cooldown-seconds:60}")
-    private int cooldownSeconds;
+    private final int maxAttemptsPerDay;
+    private final int cooldownSeconds;
+
+    public EmailRateLimiter(@Value("${app.rate-limit.email.max-attempts:3}") int maxAttemptsPerDay, @Value("${app.rate-limit.email.cooldown-seconds:60}") int cooldownSeconds) {
+        this.maxAttemptsPerDay = maxAttemptsPerDay;
+        this.cooldownSeconds = cooldownSeconds;
+    }
 
     public boolean canSend(String email) {
         Instant blocked = blockedUntil.get(email);

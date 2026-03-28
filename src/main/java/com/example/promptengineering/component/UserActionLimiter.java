@@ -12,11 +12,14 @@ public class UserActionLimiter {
     private final ConcurrentMap<Long, AtomicInteger> attempts = new ConcurrentHashMap<>();
     private final ConcurrentMap<Long, Instant> lastAction = new ConcurrentHashMap<>();
     private final ConcurrentMap<Long, Instant> blockedUntil = new ConcurrentHashMap<>();
-    @Value("${app.rate-limit.user.max-attempts:3}")
-    private int maxAttemptsPerDay;
 
-    @Value("${app.rate-limit.user.cooldown-seconds:60}")
-    private int cooldownSeconds;
+    private final int maxAttemptsPerDay;
+    private final int cooldownSeconds;
+
+    public UserActionLimiter(@Value("${app.rate-limit.user.max-attempts:3}") int maxAttemptsPerDay, @Value("${app.rate-limit.user.cooldown-seconds:60}") int cooldownSeconds) {
+        this.maxAttemptsPerDay = maxAttemptsPerDay;
+        this.cooldownSeconds = cooldownSeconds;
+    }
 
     public boolean canPerform(User user) {
         if (user == null || user.getId() == null) return false;
