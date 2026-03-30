@@ -23,7 +23,8 @@ public class MigrationFlag {
 
     private LocalDateTime executedAt;
 
-    public MigrationFlag() {}
+    public MigrationFlag() {
+    }
 
     public MigrationFlag(String name) {
         this.name = name;

@@ -13,7 +13,8 @@ public class IpRateLimiter {
 
     private final ConcurrentHashMap<String, RequestCounter> counters = new ConcurrentHashMap<>();
 
-    public IpRateLimiter(@Value("${rate.limit.max-requests}") int maxRequests,@Value("${rate.limit.time-window-seconds}") long timeWindowSeconds) {
+    public IpRateLimiter(@Value("${rate.limit.max-requests}") int maxRequests,
+            @Value("${rate.limit.time-window-seconds}") long timeWindowSeconds) {
         this.maxRequests = maxRequests;
         this.timeWindowSeconds = timeWindowSeconds;
     }
@@ -23,8 +24,6 @@ public class IpRateLimiter {
         RequestCounter counter = counters.computeIfAbsent(clientIp, k -> new RequestCounter());
         return counter.record();
     }
-
-
 
     private String getClientIp(HttpServletRequest request) {
         String realIp = request.getHeader("X-Real-IP");

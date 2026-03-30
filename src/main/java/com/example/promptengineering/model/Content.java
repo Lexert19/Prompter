@@ -3,7 +3,6 @@ package com.example.promptengineering.model;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Setter

@@ -39,8 +39,8 @@ public class RequestBuilder {
         }
     }
 
-    public ProviderStrategy getProviderStrategy(){
-        if(providerStrategy == null){
+    public ProviderStrategy getProviderStrategy() {
+        if (providerStrategy == null) {
             this.setProvider(this.provider);
         }
         return providerStrategy;
@@ -92,21 +92,20 @@ public class RequestBuilder {
         request.put("model", model);
         request.put("stream", stream);
 
-        if(!this.reasoningEffort.isEmpty()){
+        if (!this.reasoningEffort.isEmpty()) {
             request.put("response_format", Map.of("type", "text"));
             request.put("reasoning_effort", this.reasoningEffort);
-            if(!provider.equalsIgnoreCase("gemini")){
+            if (!provider.equalsIgnoreCase("gemini")) {
                 request.put("chat_template_kwargs", Map.of("enable_thinking", true));
             }
         }
         request.put("max_tokens", maxTokens);
         request.put("temperature", temperature);
         request.put("top_p", top_p);
-        if(!provider.equalsIgnoreCase("gemini")) {
+        if (!provider.equalsIgnoreCase("gemini")) {
             request.put("frequency_penalty", frequencyPenalty);
             request.put("presence_penalty", presencePenalty);
         }
-
 
         return request;
     }

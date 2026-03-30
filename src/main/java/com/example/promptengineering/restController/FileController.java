@@ -29,8 +29,7 @@ public class FileController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<UserFileDTO> uploadFile(
-            @RequestParam("file") MultipartFile file,
+    public ResponseEntity<UserFileDTO> uploadFile(@RequestParam("file") MultipartFile file,
             @AuthenticationPrincipal User user) throws IOException {
 
         UserFileDTO savedFile = fileStorageService.storeFile(file, user);
@@ -38,9 +37,8 @@ public class FileController {
     }
 
     @GetMapping("/{fileId}")
-    public ResponseEntity<Resource> downloadFile(
-            @PathVariable Long fileId,
-            @AuthenticationPrincipal User user) throws IOException, FileStorageException {
+    public ResponseEntity<Resource> downloadFile(@PathVariable Long fileId, @AuthenticationPrincipal User user)
+            throws IOException, FileStorageException {
 
         UserFile userFile = fileStorageService.getUserFile(fileId, user);
         Path filePath = fileStorageService.getFilePath(userFile);
@@ -55,8 +53,7 @@ public class FileController {
             contentType = "application/octet-stream";
         }
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
+        return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + userFile.getFileName() + "\"")
                 .body(resource);
     }

@@ -72,25 +72,19 @@ public class ModelControllerIntegrationTest {
 
     @Test
     void shouldGetUserModels() throws Exception {
-        mockMvc.perform(get("/api/models/user-models")
-                        .with(user(testUser)))
-                .andExpect(status().isOk())
+        mockMvc.perform(get("/api/models/user-models").with(user(testUser))).andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("My Model"))
                 .andExpect(jsonPath("$[0].provider").value("OPENAI"));
     }
 
     @Test
     void shouldGetGlobalModels() throws Exception {
-        mockMvc.perform(get("/api/models/global-models")
-                        .with(user(testUser)))
-                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/models/global-models").with(user(testUser))).andExpect(status().isOk());
     }
 
     @Test
     void shouldGetAllModels() throws Exception {
-        mockMvc.perform(get("/api/models/all-models")
-                        .with(user(testUser)))
-                .andExpect(status().isOk())
+        mockMvc.perform(get("/api/models/all-models").with(user(testUser))).andExpect(status().isOk())
                 .andExpect(jsonPath("$[*].name", hasItems("My Model", "Global Model")));
     }
 
@@ -101,11 +95,8 @@ public class ModelControllerIntegrationTest {
         newModel.setProvider("OPENAI");
         newModel.setType("text");
 
-        mockMvc.perform(post("/api/models/user-models")
-                        .with(user(testUser))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newModel)))
-                .andExpect(status().isOk())
+        mockMvc.perform(post("/api/models/user-models").with(user(testUser)).contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(newModel))).andExpect(status().isOk())
                 .andExpect(content().string("Model saved successfully"));
 
         assertThat(modelRepository.findByUser(testUser)).hasSize(2);
@@ -117,12 +108,9 @@ public class ModelControllerIntegrationTest {
         editDto.setName("Updated Name");
         editDto.setProvider("ANTHROPIC");
 
-        mockMvc.perform(put("/api/models/user-models/{id}", userModel.getId())
-                        .with(user(testUser))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(editDto)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Model updated successfully"));
+        mockMvc.perform(put("/api/models/user-models/{id}", userModel.getId()).with(user(testUser))
+                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(editDto)))
+                .andExpect(status().isOk()).andExpect(content().string("Model updated successfully"));
 
         Model updated = modelRepository.findById(userModel.getId()).orElseThrow();
         assertThat(updated.getName()).isEqualTo("Updated Name");
@@ -144,10 +132,8 @@ public class ModelControllerIntegrationTest {
         ModelDto editDto = new ModelDto();
         editDto.setName("Hacked");
 
-        mockMvc.perform(put("/api/models/user-models/{id}", otherModel.getId())
-                        .with(user(testUser))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(editDto)))
+        mockMvc.perform(put("/api/models/user-models/{id}", otherModel.getId()).with(user(testUser))
+                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(editDto)))
                 .andExpect(status().isNotFound());
 
         Model unchanged = modelRepository.findById(otherModel.getId()).orElseThrow();
@@ -156,10 +142,8 @@ public class ModelControllerIntegrationTest {
 
     @Test
     void shouldDeleteUserModel() throws Exception {
-        mockMvc.perform(delete("/api/models/user-models/{id}", userModel.getId())
-                        .with(user(testUser)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Model deleted successfully"));
+        mockMvc.perform(delete("/api/models/user-models/{id}", userModel.getId()).with(user(testUser)))
+                .andExpect(status().isOk()).andExpect(content().string("Model deleted successfully"));
 
         assertThat(modelRepository.findById(userModel.getId())).isEmpty();
     }
@@ -177,8 +161,7 @@ public class ModelControllerIntegrationTest {
         otherModel.setUser(otherUser);
         otherModel = modelRepository.save(otherModel);
 
-        mockMvc.perform(delete("/api/models/user-models/{id}", otherModel.getId())
-                        .with(user(testUser)))
+        mockMvc.perform(delete("/api/models/user-models/{id}", otherModel.getId()).with(user(testUser)))
                 .andExpect(status().isNotFound());
 
         assertThat(modelRepository.findById(otherModel.getId())).isPresent();
@@ -186,12 +169,9 @@ public class ModelControllerIntegrationTest {
 
     @Test
     void shouldReturn401WhenNotAuthenticated() throws Exception {
-        mockMvc.perform(get("/api/models/user-models"))
-                .andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/models/user-models")).andExpect(status().isUnauthorized());
 
-        mockMvc.perform(post("/api/models/user-models")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new ModelDto())))
-                .andExpect(status().isUnauthorized());
+        mockMvc.perform(post("/api/models/user-models").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new ModelDto()))).andExpect(status().isUnauthorized());
     }
 }

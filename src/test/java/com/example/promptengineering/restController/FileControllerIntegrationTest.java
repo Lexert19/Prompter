@@ -80,44 +80,29 @@ public class FileControllerIntegrationTest {
 
     @Test
     void uploadFile_shouldReturnSavedFile() throws Exception {
-        MockMultipartFile file = new MockMultipartFile(
-                "file",
-                "test.txt",
-                MediaType.TEXT_PLAIN_VALUE,
-                "Hello, World!".getBytes()
-        );
+        MockMultipartFile file = new MockMultipartFile("file", "test.txt", MediaType.TEXT_PLAIN_VALUE,
+                "Hello, World!".getBytes());
 
-        mockMvc.perform(multipart("/api/files/upload")
-                        .file(file)
-                        .with(user(userService.loadUserByUsername(user1Email))))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.fileName").value("test.txt"))
+        mockMvc.perform(
+                multipart("/api/files/upload").file(file).with(user(userService.loadUserByUsername(user1Email))))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.fileName").value("test.txt"))
                 .andExpect(jsonPath("$.contentType").value(MediaType.TEXT_PLAIN_VALUE))
-                .andExpect(jsonPath("$.size").value(13))
-                .andExpect(jsonPath("$.ownerId").value(user1.getId()));
+                .andExpect(jsonPath("$.size").value(13)).andExpect(jsonPath("$.ownerId").value(user1.getId()));
     }
 
     @Test
     void downloadFile_ownFile_shouldReturnFile() throws Exception {
-        MockMultipartFile file = new MockMultipartFile(
-                "file",
-                "data.bin",
-                MediaType.APPLICATION_OCTET_STREAM_VALUE,
-                new byte[]{1, 2, 3, 4, 5}
-        );
+        MockMultipartFile file = new MockMultipartFile("file", "data.bin", MediaType.APPLICATION_OCTET_STREAM_VALUE,
+                new byte[]{1, 2, 3, 4, 5});
 
-        String uploadResponse = mockMvc.perform(multipart("/api/files/upload")
-                        .file(file)
+        String uploadResponse = mockMvc
+                .perform(multipart("/api/files/upload").file(file)
                         .with(user(userService.loadUserByUsername(user1Email))))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         Long fileId = objectMapper.readTree(uploadResponse).get("id").asLong();
 
-        mockMvc.perform(get("/api/files/{fileId}", fileId)
-                        .with(user(userService.loadUserByUsername(user1Email))))
+        mockMvc.perform(get("/api/files/{fileId}", fileId).with(user(userService.loadUserByUsername(user1Email))))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Disposition", "attachment; filename=\"data.bin\""))
                 .andExpect(content().bytes(new byte[]{1, 2, 3, 4, 5}));
@@ -125,108 +110,80 @@ public class FileControllerIntegrationTest {
 
     @Test
     void downloadFile_otherUserFile_shouldReturn404() throws Exception {
-        MockMultipartFile file = new MockMultipartFile(
-                "file",
-                "secret.txt",
-                MediaType.TEXT_PLAIN_VALUE,
-                "for user1 only".getBytes()
-        );
+        MockMultipartFile file = new MockMultipartFile("file", "secret.txt", MediaType.TEXT_PLAIN_VALUE,
+                "for user1 only".getBytes());
 
-        String uploadResponse = mockMvc.perform(multipart("/api/files/upload")
-                        .file(file)
+        String uploadResponse = mockMvc
+                .perform(multipart("/api/files/upload").file(file)
                         .with(user(userService.loadUserByUsername(user1Email))))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         Long fileId = objectMapper.readTree(uploadResponse).get("id").asLong();
 
-        mockMvc.perform(get("/api/files/{fileId}", fileId)
-                        .with(user(userService.loadUserByUsername(user2Email))))
+        mockMvc.perform(get("/api/files/{fileId}", fileId).with(user(userService.loadUserByUsername(user2Email))))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void downloadFile_notAuthenticated_shouldReturn401() throws Exception {
-        MockMultipartFile file = new MockMultipartFile(
-                "file",
-                "public.txt",
-                MediaType.TEXT_PLAIN_VALUE,
-                "content".getBytes()
-        );
+        MockMultipartFile file = new MockMultipartFile("file", "public.txt", MediaType.TEXT_PLAIN_VALUE,
+                "content".getBytes());
 
-        String uploadResponse = mockMvc.perform(multipart("/api/files/upload")
-                        .file(file)
+        String uploadResponse = mockMvc
+                .perform(multipart("/api/files/upload").file(file)
                         .with(user(userService.loadUserByUsername(user1Email))))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         Long fileId = objectMapper.readTree(uploadResponse).get("id").asLong();
 
-        mockMvc.perform(get("/api/files/{fileId}", fileId))
-                .andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/files/{fileId}", fileId)).andExpect(status().isUnauthorized());
     }
 
     @Test
     void uploadFile_withoutAuthentication_shouldReturn401() throws Exception {
-        MockMultipartFile file = new MockMultipartFile(
-                "file",
-                "test.txt",
-                MediaType.TEXT_PLAIN_VALUE,
-                "content".getBytes()
-        );
+        MockMultipartFile file = new MockMultipartFile("file", "test.txt", MediaType.TEXT_PLAIN_VALUE,
+                "content".getBytes());
 
-        mockMvc.perform(multipart("/api/files/upload").file(file))
-                .andExpect(status().isUnauthorized());
+        mockMvc.perform(multipart("/api/files/upload").file(file)).andExpect(status().isUnauthorized());
     }
-
 
     @Test
     void listFiles_shouldReturnOnlyUserOwnFiles() throws Exception {
-        MockMultipartFile file1 = new MockMultipartFile(
-                "file", "file1.txt", MediaType.TEXT_PLAIN_VALUE, "user1 file1".getBytes());
-        MockMultipartFile file2 = new MockMultipartFile(
-                "file", "file2.txt", MediaType.TEXT_PLAIN_VALUE, "user1 file2".getBytes());
-        MockMultipartFile file3 = new MockMultipartFile(
-                "file", "file3.txt", MediaType.TEXT_PLAIN_VALUE, "user2 file".getBytes());
+        MockMultipartFile file1 = new MockMultipartFile("file", "file1.txt", MediaType.TEXT_PLAIN_VALUE,
+                "user1 file1".getBytes());
+        MockMultipartFile file2 = new MockMultipartFile("file", "file2.txt", MediaType.TEXT_PLAIN_VALUE,
+                "user1 file2".getBytes());
+        MockMultipartFile file3 = new MockMultipartFile("file", "file3.txt", MediaType.TEXT_PLAIN_VALUE,
+                "user2 file".getBytes());
 
-        mockMvc.perform(multipart("/api/files/upload").file(file1)
-                        .with(user(userService.loadUserByUsername(user1Email))))
+        mockMvc.perform(
+                multipart("/api/files/upload").file(file1).with(user(userService.loadUserByUsername(user1Email))))
                 .andExpect(status().isOk());
-        mockMvc.perform(multipart("/api/files/upload").file(file2)
-                        .with(user(userService.loadUserByUsername(user1Email))))
+        mockMvc.perform(
+                multipart("/api/files/upload").file(file2).with(user(userService.loadUserByUsername(user1Email))))
                 .andExpect(status().isOk());
-        mockMvc.perform(multipart("/api/files/upload").file(file3)
-                        .with(user(userService.loadUserByUsername(user2Email))))
+        mockMvc.perform(
+                multipart("/api/files/upload").file(file3).with(user(userService.loadUserByUsername(user2Email))))
                 .andExpect(status().isOk());
 
-        String user1Response = mockMvc.perform(get("/api/files/list")
-                        .with(user(userService.loadUserByUsername(user1Email))))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
+        String user1Response = mockMvc
+                .perform(get("/api/files/list").with(user(userService.loadUserByUsername(user1Email))))
+                .andExpect(status().isOk()).andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse().getContentAsString();
 
-        List<UserFileDTO> user1Files = objectMapper.readValue(user1Response,
-                new TypeReference<List<UserFileDTO>>() {});
+        List<UserFileDTO> user1Files = objectMapper.readValue(user1Response, new TypeReference<List<UserFileDTO>>() {
+        });
         assertEquals(2, user1Files.size());
         assertTrue(user1Files.stream().anyMatch(dto -> "file1.txt".equals(dto.getFileName())));
         assertTrue(user1Files.stream().anyMatch(dto -> "file2.txt".equals(dto.getFileName())));
         assertTrue(user1Files.stream().allMatch(dto -> dto.getOwnerId().equals(user1.getId())));
 
-        String user2Response = mockMvc.perform(get("/api/files/list")
-                        .with(user(userService.loadUserByUsername(user2Email))))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
+        String user2Response = mockMvc
+                .perform(get("/api/files/list").with(user(userService.loadUserByUsername(user2Email))))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        List<UserFileDTO> user2Files = objectMapper.readValue(user2Response,
-                new TypeReference<List<UserFileDTO>>() {});
+        List<UserFileDTO> user2Files = objectMapper.readValue(user2Response, new TypeReference<List<UserFileDTO>>() {
+        });
         assertEquals(1, user2Files.size());
         assertEquals("file3.txt", user2Files.get(0).getFileName());
         assertEquals(user2.getId(), user2Files.get(0).getOwnerId());
@@ -234,16 +191,13 @@ public class FileControllerIntegrationTest {
 
     @Test
     void listFiles_withoutAuthentication_shouldReturn401() throws Exception {
-        mockMvc.perform(get("/api/files/list"))
-                .andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/files/list")).andExpect(status().isUnauthorized());
     }
 
     @Test
     void listFiles_whenNoFiles_shouldReturnEmptyList() throws Exception {
-        mockMvc.perform(get("/api/files/list")
-                        .with(user(userService.loadUserByUsername(user1Email))))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/files/list").with(user(userService.loadUserByUsername(user1Email))))
+                .andExpect(status().isOk()).andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("[]"));
     }
 

@@ -1,7 +1,6 @@
 package com.example.promptengineering.dto;
 
 import com.example.promptengineering.entity.Message;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,10 +23,12 @@ public class MessageDto {
     private Long chatId;
     private String chatName;
 
-    public MessageDto() {}
+    public MessageDto() {
+    }
 
     public static MessageDto fromEntity(Message message) {
-        if (message == null) return null;
+        if (message == null)
+            return null;
         MessageDto dto = new MessageDto();
         dto.setId(message.getId());
         dto.setText(message.getText());

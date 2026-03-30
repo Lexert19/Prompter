@@ -39,16 +39,15 @@ class TwoFactorAuthControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        testUser = userRepository.findByEmail("test@example.com")
-                .orElseGet(() -> {
-                    User u = new User();
-                    u.setEmail("test@example.com");
-                    u.setPassword("encoded");
-                    u.setTwoFactorEnabled(true);
-                    u.setTwoFactorEmail("test@example.com");
-                    u.setEncryptedKeys("some-encrypted-keys");
-                    return userRepository.save(u);
-                });
+        testUser = userRepository.findByEmail("test@example.com").orElseGet(() -> {
+            User u = new User();
+            u.setEmail("test@example.com");
+            u.setPassword("encoded");
+            u.setTwoFactorEnabled(true);
+            u.setTwoFactorEmail("test@example.com");
+            u.setEncryptedKeys("some-encrypted-keys");
+            return userRepository.save(u);
+        });
         session = new MockHttpSession();
     }
 
@@ -56,16 +55,13 @@ class TwoFactorAuthControllerIntegrationTest {
     void show2faForm_withValidSession_shouldReturnForm() throws Exception {
         session.setAttribute("2fa_user_id", testUser.getId());
 
-        mockMvc.perform(get("/auth/2fa").session(session))
-                .andExpect(status().isOk())
-                .andExpect(view().name("2fa-form"))
+        mockMvc.perform(get("/auth/2fa").session(session)).andExpect(status().isOk()).andExpect(view().name("2fa-form"))
                 .andExpect(model().attributeDoesNotExist("error"));
     }
 
     @Test
     void show2faForm_withoutUserIdInSession_shouldRedirectToLogin() throws Exception {
-        mockMvc.perform(get("/auth/2fa").session(session))
-                .andExpect(status().is3xxRedirection())
+        mockMvc.perform(get("/auth/2fa").session(session)).andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/auth/login"));
     }
 
@@ -74,11 +70,8 @@ class TwoFactorAuthControllerIntegrationTest {
         session.setAttribute("2fa_user_id", testUser.getId());
         when(twoFactorEmailService.verifyCode(anyString(), eq("123456"))).thenReturn(true);
 
-        mockMvc.perform(post("/auth/2fa")
-                        .session(session)
-                        .param("code", "123456"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"));
+        mockMvc.perform(post("/auth/2fa").session(session).param("code", "123456"))
+                .andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/"));
     }
 
     @Test
@@ -86,11 +79,8 @@ class TwoFactorAuthControllerIntegrationTest {
         session.setAttribute("2fa_user_id", testUser.getId());
         when(twoFactorEmailService.verifyCode(anyString(), eq("000000"))).thenReturn(false);
 
-        mockMvc.perform(post("/auth/2fa")
-                        .session(session)
-                        .param("code", "000000"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/auth/2fa"));
+        mockMvc.perform(post("/auth/2fa").session(session).param("code", "000000"))
+                .andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/auth/2fa"));
     }
 
     @Test
@@ -98,16 +88,14 @@ class TwoFactorAuthControllerIntegrationTest {
         session.setAttribute("2fa_user_id", testUser.getId());
         doNothing().when(twoFactorEmailService).createAndSendCode(anyString(), anyString());
 
-        mockMvc.perform(post("/auth/2fa/resend").session(session))
-                .andExpect(status().isOk());
+        mockMvc.perform(post("/auth/2fa/resend").session(session)).andExpect(status().isOk());
 
         verify(twoFactorEmailService).createAndSendCode(session.getId(), testUser.getTwoFactorEmail());
     }
 
     @Test
     void resendCode_withoutUserId_shouldReturnBadRequest() throws Exception {
-        mockMvc.perform(post("/auth/2fa/resend").session(session))
-                .andExpect(status().isBadRequest());
+        mockMvc.perform(post("/auth/2fa/resend").session(session)).andExpect(status().isBadRequest());
 
         verifyNoInteractions(twoFactorEmailService);
     }

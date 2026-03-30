@@ -8,7 +8,8 @@ import java.lang.reflect.Type;
 
 public class ContentDeserializer implements JsonDeserializer<Content> {
     @Override
-    public Content deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public Content deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+            throws JsonParseException {
         JsonObject jsonObject = json.getAsJsonObject();
 
         JsonElement typeElement = jsonObject.get("type");
@@ -20,11 +21,11 @@ public class ContentDeserializer implements JsonDeserializer<Content> {
         String type = typeElement.getAsString();
 
         switch (type) {
-            case "text":
+            case "text" :
                 return context.deserialize(jsonObject, TextContent.class);
-            case "image":
+            case "image" :
                 return context.deserialize(jsonObject, ImageContent.class);
-            default:
+            default :
                 throw new JsonParseException("Undefined content type: " + type);
         }
     }

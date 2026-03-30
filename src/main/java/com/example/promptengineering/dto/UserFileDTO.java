@@ -12,7 +12,8 @@ public class UserFileDTO {
     private long size;
     private Long ownerId;
 
-    public UserFileDTO() {}
+    public UserFileDTO() {
+    }
 
     public UserFileDTO(Long id, String fileName, String contentType, long size, Long ownerId) {
         this.id = id;

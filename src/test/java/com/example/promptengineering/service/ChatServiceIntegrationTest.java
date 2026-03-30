@@ -3,7 +3,6 @@ package com.example.promptengineering.service;
 import com.example.promptengineering.entity.Model;
 import com.example.promptengineering.entity.SharedKey;
 import com.example.promptengineering.entity.User;
-import com.example.promptengineering.model.Content;
 import com.example.promptengineering.model.Message;
 import com.example.promptengineering.model.RequestBuilder;
 import com.example.promptengineering.model.TextContent;
@@ -17,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -54,8 +52,7 @@ public class ChatServiceIntegrationTest {
         adminUser = userRepository.findByEmail(adminEmail)
                 .orElseThrow(() -> new IllegalStateException("Admin user not found"));
 
-        geminiModel = modelRepository.findByProviderAndGlobalTrue("GEMINI").stream()
-                .findFirst()
+        geminiModel = modelRepository.findByProviderAndGlobalTrue("GEMINI").stream().findFirst()
                 .orElseThrow(() -> new IllegalStateException("No global Gemini model found"));
 
         SharedKey tempKey = sharedKeyRepository.findByProvider("GEMINI").get(0);
@@ -89,33 +86,30 @@ public class ChatServiceIntegrationTest {
         AtomicReference<String> lastData = new AtomicReference<>();
         AtomicReference<Throwable> error = new AtomicReference<>();
 
-        result.subscribe(
-                event -> {
-                    if (event.data() != null && !event.data().equals("[DONE]")) {
-                        lastData.set(event.data());
-                    }
-                    if ("[DONE]".equals(event.data())) {
-                        latch.countDown();
-                    }
-                },
-                err -> {
-                    error.set(err);
-                    latch.countDown();
-                },
-                latch::countDown
-        );
+        result.subscribe(event -> {
+            if (event.data() != null && !event.data().equals("[DONE]")) {
+                lastData.set(event.data());
+            }
+            if ("[DONE]".equals(event.data())) {
+                latch.countDown();
+            }
+        }, err -> {
+            error.set(err);
+            latch.countDown();
+        }, latch::countDown);
 
         boolean completed = latch.await(60, TimeUnit.SECONDS);
-//        assertThat(completed).isTrue();
-//        assertThat(error.get()).isNull();
-        //assertThat(lastData.get()).isNotNull().contains("Gemini");
-//
-//        Thread.sleep(5000);
-//        User refreshedOwner = userRepository.findById(owner.getId()).orElseThrow();
-//        SharedKey refreshedKey = sharedKeyRepository.findById(geminiSharedKey.getId()).orElseThrow();
-//
-//        assertThat(refreshedOwner.getPoints()).isGreaterThan(initialPoints);
-//        assertThat(refreshedKey.getUsageCount()).isEqualTo(initialUsage + 1);
+        // assertThat(completed).isTrue();
+        // assertThat(error.get()).isNull();
+        // assertThat(lastData.get()).isNotNull().contains("Gemini");
+        //
+        // Thread.sleep(5000);
+        // User refreshedOwner = userRepository.findById(owner.getId()).orElseThrow();
+        // SharedKey refreshedKey =
+        // sharedKeyRepository.findById(geminiSharedKey.getId()).orElseThrow();
+        //
+        // assertThat(refreshedOwner.getPoints()).isGreaterThan(initialPoints);
+        // assertThat(refreshedKey.getUsageCount()).isEqualTo(initialUsage + 1);
     }
 
     @Test
@@ -145,19 +139,15 @@ public class ChatServiceIntegrationTest {
         AtomicReference<String> errorEvent = new AtomicReference<>();
         AtomicReference<Throwable> error = new AtomicReference<>();
 
-        result.subscribe(
-                event -> {
-                    if ("error".equals(event.event())) {
-                        errorEvent.set(event.data());
-                        latch.countDown();
-                    }
-                },
-                err -> {
-                    error.set(err);
-                    latch.countDown();
-                },
-                latch::countDown
-        );
+        result.subscribe(event -> {
+            if ("error".equals(event.event())) {
+                errorEvent.set(event.data());
+                latch.countDown();
+            }
+        }, err -> {
+            error.set(err);
+            latch.countDown();
+        }, latch::countDown);
 
         boolean completed = latch.await(30, TimeUnit.SECONDS);
         assertThat(completed).isTrue();

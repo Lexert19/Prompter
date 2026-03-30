@@ -1,6 +1,5 @@
 package com.example.promptengineering.service;
 
-import com.example.promptengineering.service.EmailService;
 import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -43,7 +42,8 @@ public class TwoFactorEmailService {
 
     public boolean verifyCode(String sessionId, String code) {
         TwoFactorCode stored = codeStore.get(sessionId);
-        if (stored == null) return false;
+        if (stored == null)
+            return false;
         if (!stored.isValid()) {
             codeStore.remove(sessionId);
             return false;

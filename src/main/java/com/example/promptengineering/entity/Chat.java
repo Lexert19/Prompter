@@ -27,5 +27,4 @@ public class Chat {
 
     private boolean favorite;
 
-
 }

@@ -27,9 +27,7 @@ public class ClientRestController {
     }
 
     @PostMapping(value = "/chat", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ServerSentEvent<String>> chat(
-            @AuthenticationPrincipal User user,
-            @RequestBody String body) {
+    public Flux<ServerSentEvent<String>> chat(@AuthenticationPrincipal User user, @RequestBody String body) {
         RequestBuilder request = gson.fromJson(body, RequestBuilder.class);
         return chatService.makeRequest(request, user);
     }

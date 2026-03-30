@@ -21,8 +21,8 @@ public class TwoFactorSetupController {
     private final IpRateLimiter rateLimiter;
     private final UserActionLimiter userActionLimiter;
 
-    public TwoFactorSetupController(TwoFactorEmailService twoFactorService,
-                                    UserRepository userRepository, IpRateLimiter rateLimiter, UserActionLimiter userActionLimiter) {
+    public TwoFactorSetupController(TwoFactorEmailService twoFactorService, UserRepository userRepository,
+            IpRateLimiter rateLimiter, UserActionLimiter userActionLimiter) {
         this.twoFactorService = twoFactorService;
         this.userRepository = userRepository;
         this.rateLimiter = rateLimiter;
@@ -34,9 +34,8 @@ public class TwoFactorSetupController {
     }
 
     @PostMapping("/send-test")
-    public ResponseEntity<?> sendTestCode(@AuthenticationPrincipal User user,
-                                          @RequestParam String email,
-                                          HttpServletRequest request) {
+    public ResponseEntity<?> sendTestCode(@AuthenticationPrincipal User user, @RequestParam String email,
+            HttpServletRequest request) {
         if (!rateLimiter.isAllowed(request)) {
             return ResponseEntity.status(429).body("Too many requests. Please try again later.");
         }
@@ -49,10 +48,8 @@ public class TwoFactorSetupController {
     }
 
     @PostMapping("/enable")
-    public ResponseEntity<?> enableTwoFactor(@AuthenticationPrincipal User user,
-                                             @RequestParam String email,
-                                             @RequestParam String code,
-                                             HttpServletRequest request) {
+    public ResponseEntity<?> enableTwoFactor(@AuthenticationPrincipal User user, @RequestParam String email,
+            @RequestParam String code, HttpServletRequest request) {
         if (!rateLimiter.isAllowed(request)) {
             return ResponseEntity.status(429).body("Too many requests. Please try again later.");
         }
@@ -68,8 +65,7 @@ public class TwoFactorSetupController {
     }
 
     @PostMapping("/disable")
-    public ResponseEntity<?> disableTwoFactor(@AuthenticationPrincipal User user,
-                                              @RequestParam String code) {
+    public ResponseEntity<?> disableTwoFactor(@AuthenticationPrincipal User user, @RequestParam String code) {
         String sessionId = getSessionId(user);
         if (twoFactorService.verifyCode(sessionId, code)) {
             user.setTwoFactorEnabled(false);

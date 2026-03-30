@@ -12,15 +12,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
 @Slf4j
 @Controller
 public class ChatController {
 
     @GetMapping(value = {"/chat", "/chat/{chatId}"}, produces = "text/html; charset=UTF-8")
-    public ModelAndView  getChatPage() {
+    public ModelAndView getChatPage() {
         ModelAndView modelAndView = new ModelAndView("chat");
-        modelAndView.addObject("zmienna", "wartosc");
+        modelAndView.addObject("variable", "value");
         List<String> jsFiles = getJsFiles();
         modelAndView.addObject("jsFiles", jsFiles);
         return modelAndView;
@@ -48,5 +47,5 @@ public class ChatController {
         Collections.sort(jsFiles);
         return jsFiles;
     }
-    
+
 }

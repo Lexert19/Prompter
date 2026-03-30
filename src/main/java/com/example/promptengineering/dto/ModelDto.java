@@ -21,7 +21,8 @@ public class ModelDto {
     private double pointsPerInput;
     private double pointsPerOutput;
 
-    public ModelDto() {}
+    public ModelDto() {
+    }
 
     public ModelDto(String name, String text, String provider, String url, String type) {
         this.name = name;
@@ -48,8 +49,6 @@ public class ModelDto {
     }
 
     public static List<ModelDto> toDtoList(List<Model> models) {
-        return models.stream()
-                .map(ModelDto::toDto)
-                .collect(Collectors.toList());
+        return models.stream().map(ModelDto::toDto).collect(Collectors.toList());
     }
 }

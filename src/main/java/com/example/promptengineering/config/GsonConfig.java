@@ -11,11 +11,8 @@ import org.springframework.context.annotation.Configuration;
 public class GsonConfig {
     @Bean
     public Gson gson() {
-        return new GsonBuilder()
-                .setStrictness(Strictness.LENIENT)
-                .serializeNulls()
+        return new GsonBuilder().setStrictness(Strictness.LENIENT).serializeNulls()
                 .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-                .registerTypeAdapter(Content.class, new ContentDeserializer())
-                .create();
+                .registerTypeAdapter(Content.class, new ContentDeserializer()).create();
     }
 }

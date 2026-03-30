@@ -10,8 +10,7 @@ import java.util.HashMap;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
-
-@Converter(autoApply = true) 
+@Converter(autoApply = true)
 public class HashMapConverter implements AttributeConverter<HashMap<String, String>, String> {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -22,19 +21,20 @@ public class HashMapConverter implements AttributeConverter<HashMap<String, Stri
             return "{}";
         }
         try {
-            return objectMapper.writeValueAsString(attribute); 
+            return objectMapper.writeValueAsString(attribute);
         } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("Błąd konwersji HashMap na JSON", e);
+            throw new IllegalArgumentException("Error converting HashMap to JSON", e);
         }
     }
 
     @Override
     public HashMap<String, String> convertToEntityAttribute(String dbData) {
         if (dbData == null || dbData.isEmpty()) {
-            return new HashMap<>(); 
+            return new HashMap<>();
         }
         try {
-            return objectMapper.readValue(dbData, new TypeReference<>() {});
+            return objectMapper.readValue(dbData, new TypeReference<>() {
+            });
         } catch (IOException e) {
             throw new IllegalArgumentException("", e);
         }

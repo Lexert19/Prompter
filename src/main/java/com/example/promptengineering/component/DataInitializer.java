@@ -7,9 +7,7 @@ import com.example.promptengineering.repository.MigrationFlagRepository;
 import com.example.promptengineering.repository.UserRepository;
 import com.example.promptengineering.service.ModelService;
 import com.example.promptengineering.service.SharedKeyService;
-import com.example.promptengineering.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,30 +20,28 @@ import java.util.Optional;
 @Component
 @Slf4j
 public class DataInitializer implements CommandLineRunner {
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final String adminEmail;
+    private final String adminPassword;
+    private final ModelService modelService;
+    private final String geminiApiKey;
+    private final MigrationFlagRepository migrationFlagRepository;
+    private final SharedKeyService sharedKeyService;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Value("${admin.email}")
-    private String adminEmail;
-
-    @Value("${admin.password}")
-    private String adminPassword;
-
-    @Autowired
-    private ModelService modelService;
-
-    @Value("${gemini.api.key:}")
-    private String geminiApiKey;
-
-    @Autowired
-    private MigrationFlagRepository migrationFlagRepository;
-
-    @Autowired
-    private SharedKeyService sharedKeyService;
+    public DataInitializer(UserRepository userRepository, PasswordEncoder passwordEncoder,
+            @Value("${admin.email}") String adminEmail, @Value("${admin.password}") String adminPassword,
+            ModelService modelService, @Value("${gemini.api.key:}") String geminiApiKey,
+            MigrationFlagRepository migrationFlagRepository, SharedKeyService sharedKeyService) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.adminEmail = adminEmail;
+        this.adminPassword = adminPassword;
+        this.modelService = modelService;
+        this.geminiApiKey = geminiApiKey;
+        this.migrationFlagRepository = migrationFlagRepository;
+        this.sharedKeyService = sharedKeyService;
+    }
 
     @Override
     public void run(String... args) throws Exception {
@@ -64,7 +60,6 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         modelService.loadDefaultModelsFromJson();
-
 
         addGeminiSharedKeyIfNeeded(admin);
     }

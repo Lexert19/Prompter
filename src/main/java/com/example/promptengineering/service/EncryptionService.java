@@ -20,7 +20,8 @@ public class EncryptionService {
 
     public EncryptionService(@Value("${api.key.encryption.secret}") String keyBase64) {
         if (keyBase64 == null || keyBase64.isEmpty()) {
-            throw new IllegalStateException("Encryption key not configured. Set api.key.encryption.secret in properties.");
+            throw new IllegalStateException(
+                    "Encryption key not configured. Set api.key.encryption.secret in properties.");
         }
         this.secretKey = Base64.getDecoder().decode(keyBase64);
         if (this.secretKey.length != 32) {

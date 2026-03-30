@@ -30,46 +30,36 @@ public class ProjectController {
     private final FileElementsRepository fileElementRepository;
 
     @Autowired
-    public ProjectController(ProjectRepository projectRepository,
-                             UserRepository userRepository,
-                             EmbeddingService embeddingService,
-                             FileElementsRepository fileElementRepository) {
+    public ProjectController(ProjectRepository projectRepository, UserRepository userRepository,
+            EmbeddingService embeddingService, FileElementsRepository fileElementRepository) {
         this.projectRepository = projectRepository;
         this.embeddingService = embeddingService;
         this.fileElementRepository = fileElementRepository;
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ProjectResponse> createProject(
-            @AuthenticationPrincipal User user,
-            @RequestBody String name) {
+    public ResponseEntity<ProjectResponse> createProject(@AuthenticationPrincipal User user, @RequestBody String name) {
 
         Project project = new Project();
         project.setName(name);
         project.setUser(user);
 
         Project savedProject = projectRepository.save(project);
-        ProjectResponse projectResponse = new ProjectResponse(
-                savedProject.getId(),
-                savedProject.getName(),
-                new ArrayList<>()
-        );
+        ProjectResponse projectResponse = new ProjectResponse(savedProject.getId(), savedProject.getName(),
+                new ArrayList<>());
 
         return ResponseEntity.ok(projectResponse);
     }
 
     @GetMapping("/{projectId}")
-    public ResponseEntity<ProjectResponse> getProject(
-            @AuthenticationPrincipal User user,
+    public ResponseEntity<ProjectResponse> getProject(@AuthenticationPrincipal User user,
             @PathVariable Long projectId) {
 
         Project project = projectRepository.findByIdAndUser(projectId, user)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found"));
 
-        List<FileElementDTO> files = fileElementRepository.findByProject(project)
-                .stream()
-                .map(file -> new FileElementDTO(file.getId(), file.getName()))
-                .collect(Collectors.toList());
+        List<FileElementDTO> files = fileElementRepository.findByProject(project).stream()
+                .map(file -> new FileElementDTO(file.getId(), file.getName())).collect(Collectors.toList());
 
         ProjectResponse projectResponse = new ProjectResponse(project.getId(), project.getName(), files);
         return ResponseEntity.ok(projectResponse);
@@ -80,21 +70,15 @@ public class ProjectController {
         List<Project> projects = projectRepository.findAllByUser(user);
 
         List<ProjectResponse> projectResponses = projects.stream()
-                .map(project -> new ProjectResponse(
-                        project.getId(),
-                        project.getName(),
-                        new ArrayList<>()
-                ))
+                .map(project -> new ProjectResponse(project.getId(), project.getName(), new ArrayList<>()))
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(projectResponses);
     }
 
     @PostMapping("/{projectId}/files")
-    public ResponseEntity<ProjectResponse> addFileToProject(
-            @AuthenticationPrincipal User user,
-            @PathVariable Long projectId,
-            @RequestBody FileElement file) {
+    public ResponseEntity<ProjectResponse> addFileToProject(@AuthenticationPrincipal User user,
+            @PathVariable Long projectId, @RequestBody FileElement file) {
 
         Project project = projectRepository.findByIdAndUser(projectId, user)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found"));
@@ -104,26 +88,22 @@ public class ProjectController {
         Project updatedProject = projectRepository.findByIdAndUser(projectId, user)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
 
-        List<FileElementDTO> files = fileElementRepository.findByProject(updatedProject)
-                .stream()
-                .map(f -> new FileElementDTO(f.getId(), f.getName()))
-                .collect(Collectors.toList());
+        List<FileElementDTO> files = fileElementRepository.findByProject(updatedProject).stream()
+                .map(f -> new FileElementDTO(f.getId(), f.getName())).collect(Collectors.toList());
 
         ProjectResponse projectResponse = new ProjectResponse(updatedProject.getId(), updatedProject.getName(), files);
         return ResponseEntity.ok(projectResponse);
     }
 
     @DeleteMapping("/{projectId}/files/{fileId}")
-    public ResponseEntity<Void> deleteFileFromProject(
-            @AuthenticationPrincipal User user,
-            @PathVariable Long projectId,
+    public ResponseEntity<Void> deleteFileFromProject(@AuthenticationPrincipal User user, @PathVariable Long projectId,
             @PathVariable Long fileId) {
 
-        Project project = projectRepository.findByIdAndUser(projectId, user)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,  "Project not found or you are not the owner"));
+        Project project = projectRepository.findByIdAndUser(projectId, user).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found or you are not the owner"));
 
         FileElement file = fileElementRepository.findByIdAndProject(fileId, project)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,  "File not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found"));
 
         fileElementRepository.delete(file);
 
@@ -131,12 +111,11 @@ public class ProjectController {
     }
 
     @GetMapping("/{projectId}/files")
-    public ResponseEntity<List<FileElement>> getProjectFiles(
-            @AuthenticationPrincipal User user,
+    public ResponseEntity<List<FileElement>> getProjectFiles(@AuthenticationPrincipal User user,
             @PathVariable Long projectId) {
 
-        Project project = projectRepository.findByIdAndUser(projectId, user)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,  "Project not found or you are not the owner"));
+        Project project = projectRepository.findByIdAndUser(projectId, user).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found or you are not the owner"));
 
         List<FileElement> files = fileElementRepository.findByProject(project);
 
@@ -144,13 +123,11 @@ public class ProjectController {
     }
 
     @GetMapping("/{projectId}/files/{fileId}")
-    public ResponseEntity<String> getFile(
-            @AuthenticationPrincipal User user,
-            @PathVariable Long projectId,
+    public ResponseEntity<String> getFile(@AuthenticationPrincipal User user, @PathVariable Long projectId,
             @PathVariable Long fileId) {
 
-        Project project = projectRepository.findByIdAndUser(projectId, user)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,  "Project not found or you are not the owner"));
+        Project project = projectRepository.findByIdAndUser(projectId, user).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found or you are not the owner"));
 
         FileElement file = fileElementRepository.findByIdAndProject(fileId, project)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found"));
@@ -159,10 +136,8 @@ public class ProjectController {
     }
 
     @PostMapping("/{projectId}/similar-fragments")
-    public ResponseEntity<List<ScoredFragment>> getSimilarFragments(
-            @AuthenticationPrincipal User user,
-            @PathVariable Long projectId,
-            @RequestParam String query) {
+    public ResponseEntity<List<ScoredFragment>> getSimilarFragments(@AuthenticationPrincipal User user,
+            @PathVariable Long projectId, @RequestParam String query) {
 
         Project project = projectRepository.findByIdAndUser(projectId, user)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found"));

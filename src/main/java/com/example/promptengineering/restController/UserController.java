@@ -22,7 +22,7 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<UserDto> getOwnData(@AuthenticationPrincipal User user){
+    public ResponseEntity<UserDto> getOwnData(@AuthenticationPrincipal User user) {
         User freshUser = userRepository.findById(user.getId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
         UserDto userDto = userService.mapUserToDto(freshUser);

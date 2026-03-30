@@ -30,24 +30,21 @@ public class HistoryController {
     }
 
     @PostMapping("/chats")
-    public ResponseEntity<ChatDto> createChat(
-                                           @AuthenticationPrincipal User user) {
+    public ResponseEntity<ChatDto> createChat(@AuthenticationPrincipal User user) {
 
         Chat chat = historyService.createChat(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(ChatDto.fromEntity(chat));
     }
 
     @DeleteMapping("/chats/{chatId}")
-    public ResponseEntity<Void> deleteChat(
-            @PathVariable Long chatId,
-            @AuthenticationPrincipal User user) throws ResourceNotFoundException, UserSecurityException {
+    public ResponseEntity<Void> deleteChat(@PathVariable Long chatId, @AuthenticationPrincipal User user)
+            throws ResourceNotFoundException, UserSecurityException {
         historyService.deleteChat(chatId, user);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/messages")
-    public ResponseEntity<MessageDto> saveMessage(
-            @RequestBody MessageBody messageBody,
+    public ResponseEntity<MessageDto> saveMessage(@RequestBody MessageBody messageBody,
             @AuthenticationPrincipal User user) throws UserSecurityException, ResourceNotFoundException {
         Message message = historyService.saveMessage(messageBody, user);
         return ResponseEntity.status(HttpStatus.CREATED).body(MessageDto.fromEntity(message));
@@ -55,8 +52,7 @@ public class HistoryController {
     }
 
     @GetMapping("/chats/{chatId}/messages")
-    public ResponseEntity<List<MessageDto>> getChatHistory(
-            @PathVariable Long chatId,
+    public ResponseEntity<List<MessageDto>> getChatHistory(@PathVariable Long chatId,
             @AuthenticationPrincipal User user) throws UserSecurityException, ResourceNotFoundException {
         List<Message> messages = historyService.getChatHistory(chatId, user);
         return ResponseEntity.ok(MessageDto.fromEntities(messages));
@@ -64,8 +60,7 @@ public class HistoryController {
 
     @GetMapping("/chats")
     public ResponseEntity<Page<ChatDto>> getChats(@AuthenticationPrincipal User user,
-                                                  @RequestParam(defaultValue = "0") int page,
-                                                  @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
 
         Page<Chat> chatPage = historyService.getChatsForUser(user, page, size);
         Page<ChatDto> dtoPage = chatPage.map(ChatDto::fromEntity);

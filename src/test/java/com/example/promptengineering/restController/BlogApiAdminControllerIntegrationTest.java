@@ -107,29 +107,24 @@ public class BlogApiAdminControllerIntegrationTest {
 
     @Test
     void shouldReturnAllPostsAsAdmin() throws Exception {
-        mockMvc.perform(get("/api/admin/blog/posts")
-                        .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
+        mockMvc.perform(get("/api/admin/blog/posts").with(user(userService.loadUserByUsername(adminUser.getEmail()))))
+                .andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[*].title", containsInAnyOrder("First Post", "Second Post")));
     }
 
     @Test
     void shouldReturnPostByIdAsAdmin() throws Exception {
         mockMvc.perform(get("/api/admin/blog/posts/{id}", testPost1.getId())
-                        .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
-                .andExpect(status().isOk())
+                .with(user(userService.loadUserByUsername(adminUser.getEmail())))).andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(testPost1.getId().intValue())))
-                .andExpect(jsonPath("$.title", is("First Post")))
-                .andExpect(jsonPath("$.slug", is("first-post")))
+                .andExpect(jsonPath("$.title", is("First Post"))).andExpect(jsonPath("$.slug", is("first-post")))
                 .andExpect(jsonPath("$.lang", is("pl")));
     }
 
     @Test
     void shouldReturn404WhenPostNotFoundAsAdmin() throws Exception {
         mockMvc.perform(get("/api/admin/blog/posts/{id}", 999L)
-                        .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
-                .andExpect(status().isNotFound());
+                .with(user(userService.loadUserByUsername(adminUser.getEmail())))).andExpect(status().isNotFound());
     }
 
     @Test
@@ -140,14 +135,10 @@ public class BlogApiAdminControllerIntegrationTest {
         newPost.setContent("New content");
         newPost.setLang("en");
 
-        mockMvc.perform(post("/api/admin/blog/posts")
-                        .with(user(userService.loadUserByUsername(adminUser.getEmail())))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newPost)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.title", is("New Post")))
-                .andExpect(jsonPath("$.slug", is("new-post")))
-                .andExpect(jsonPath("$.content", is("New content")))
+        mockMvc.perform(post("/api/admin/blog/posts").with(user(userService.loadUserByUsername(adminUser.getEmail())))
+                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(newPost)))
+                .andExpect(status().isCreated()).andExpect(jsonPath("$.title", is("New Post")))
+                .andExpect(jsonPath("$.slug", is("new-post"))).andExpect(jsonPath("$.content", is("New content")))
                 .andExpect(jsonPath("$.lang", is("en")));
     }
 
@@ -160,16 +151,11 @@ public class BlogApiAdminControllerIntegrationTest {
         newPost.setContent("New content");
         newPost.setLang("en");
 
-        mockMvc.perform(post("/api/admin/blog/posts")
-                        .with(user(userService.loadUserByUsername(adminUser.getEmail())))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newPost)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.title", is("New Post")))
-                .andExpect(jsonPath("$.slug", is("new-post")))
-                .andExpect(jsonPath("$.parentId").doesNotExist())
-                .andExpect(jsonPath("$.content", is("New content")))
-                .andExpect(jsonPath("$.lang", is("en")));
+        mockMvc.perform(post("/api/admin/blog/posts").with(user(userService.loadUserByUsername(adminUser.getEmail())))
+                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(newPost)))
+                .andExpect(status().isCreated()).andExpect(jsonPath("$.title", is("New Post")))
+                .andExpect(jsonPath("$.slug", is("new-post"))).andExpect(jsonPath("$.parentId").doesNotExist())
+                .andExpect(jsonPath("$.content", is("New content"))).andExpect(jsonPath("$.lang", is("en")));
     }
 
     @Test
@@ -181,58 +167,47 @@ public class BlogApiAdminControllerIntegrationTest {
         updatedPost.setLang("pl");
 
         mockMvc.perform(put("/api/admin/blog/posts/{id}", testPost1.getId())
-                        .with(user(userService.loadUserByUsername(adminUser.getEmail())))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updatedPost)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(testPost1.getId().intValue())))
-                .andExpect(jsonPath("$.title", is("Updated Title")))
-                .andExpect(jsonPath("$.slug", is("updated-slug")))
-                .andExpect(jsonPath("$.content", is("Updated content")))
-                .andExpect(jsonPath("$.lang", is("pl")));
+                .with(user(userService.loadUserByUsername(adminUser.getEmail())))
+                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(updatedPost)))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.id", is(testPost1.getId().intValue())))
+                .andExpect(jsonPath("$.title", is("Updated Title"))).andExpect(jsonPath("$.slug", is("updated-slug")))
+                .andExpect(jsonPath("$.content", is("Updated content"))).andExpect(jsonPath("$.lang", is("pl")));
     }
-
 
     @Test
     void shouldReturn404WhenUpdatingNonExistentPostAsAdmin() throws Exception {
         PostDto updatedPost = new PostDto();
         updatedPost.setTitle("Updated Title");
 
-        mockMvc.perform(put("/api/admin/blog/posts/{id}", 999L)
-                        .with(user(userService.loadUserByUsername(adminUser.getEmail())))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updatedPost)))
+        mockMvc.perform(
+                put("/api/admin/blog/posts/{id}", 999L).with(user(userService.loadUserByUsername(adminUser.getEmail())))
+                        .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(updatedPost)))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void shouldDeletePostAsAdmin() throws Exception {
         mockMvc.perform(delete("/api/admin/blog/posts/{id}", testPost1.getId())
-                        .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
-                .andExpect(status().isNoContent());
+                .with(user(userService.loadUserByUsername(adminUser.getEmail())))).andExpect(status().isNoContent());
 
         mockMvc.perform(get("/api/admin/blog/posts/{id}", testPost1.getId())
-                        .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
-                .andExpect(status().isNotFound());
+                .with(user(userService.loadUserByUsername(adminUser.getEmail())))).andExpect(status().isNotFound());
     }
 
     @Test
     void shouldReturn404WhenDeletingNonExistentPostAsAdmin() throws Exception {
         mockMvc.perform(delete("/api/admin/blog/posts/{id}", 999L)
-                        .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
-                .andExpect(status().isNotFound());
+                .with(user(userService.loadUserByUsername(adminUser.getEmail())))).andExpect(status().isNotFound());
     }
 
     @Test
     void shouldReturn401WhenNotAuthenticated() throws Exception {
-        mockMvc.perform(get("/api/admin/blog/posts"))
-                .andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/admin/blog/posts")).andExpect(status().isUnauthorized());
     }
 
     @Test
     void shouldReturn403WhenUserIsNotAdmin() throws Exception {
-        mockMvc.perform(get("/api/admin/blog/posts")
-                        .with(user(userService.loadUserByUsername(normalUser.getEmail()))))
+        mockMvc.perform(get("/api/admin/blog/posts").with(user(userService.loadUserByUsername(normalUser.getEmail()))))
                 .andExpect(status().isForbidden());
     }
 }

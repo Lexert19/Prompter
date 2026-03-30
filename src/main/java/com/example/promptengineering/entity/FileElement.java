@@ -36,5 +36,4 @@ public class FileElement {
     @Transient
     private List<List<Double>> vectors;
 
-
 }

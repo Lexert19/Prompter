@@ -8,7 +8,6 @@ import com.example.promptengineering.service.AuthService;
 import com.example.promptengineering.service.ResetTokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.amqp.RabbitRetryTemplateCustomizer;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +24,8 @@ public class AuthController {
     private final EmailRateLimiter emailRateLimiter;
 
     @Autowired
-    public AuthController(AuthService authService, ResetTokenService resetTokenService, IpRateLimiter rateLimiter, EmailRateLimiter emailRateLimiter) {
+    public AuthController(AuthService authService, ResetTokenService resetTokenService, IpRateLimiter rateLimiter,
+            EmailRateLimiter emailRateLimiter) {
         this.resetTokenService = resetTokenService;
         this.rateLimiter = rateLimiter;
         this.emailRateLimiter = emailRateLimiter;
@@ -47,9 +47,8 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password-request")
-    public String handleForgotPassword(@RequestParam(value = "email", defaultValue = "") String email,
-                                       Model model,
-                                       HttpServletRequest request) {
+    public String handleForgotPassword(@RequestParam(value = "email", defaultValue = "") String email, Model model,
+            HttpServletRequest request) {
         if (!rateLimiter.isAllowed(request)) {
             model.addAttribute("error", "Zbyt wiele prób. Spróbuj ponownie za chwilę.");
             return "reset-password-request";
@@ -76,10 +75,8 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password-confirm")
-    public String handleResetPassword(@RequestParam("token") String token,
-                                      @RequestParam("password") String newPassword,
-                                      @RequestParam("password_confirmation") String passwordConfirmation,
-                                      Model model) {
+    public String handleResetPassword(@RequestParam("token") String token, @RequestParam("password") String newPassword,
+            @RequestParam("password_confirmation") String passwordConfirmation, Model model) {
 
         if (!newPassword.equals(passwordConfirmation)) {
             model.addAttribute("error", "Passwords do not match.");

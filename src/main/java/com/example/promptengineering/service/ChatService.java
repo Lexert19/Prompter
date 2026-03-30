@@ -42,11 +42,13 @@ public class ChatService {
     private final UserRepository userRepository;
     private final TokenTrackingService tokenTrackingService;
 
-    public ChatService(Gson gson, WebClient.Builder webClientBuilder, FileStorageService fileStorageService, SharedKeyService sharedKeyService, EncryptionService encryptionService, SharedKeyRepository sharedKeyRepository, UserRepository userRepository, TokenTrackingService tokenTrackingService) {
+    public ChatService(Gson gson, WebClient.Builder webClientBuilder, FileStorageService fileStorageService,
+            SharedKeyService sharedKeyService, EncryptionService encryptionService,
+            SharedKeyRepository sharedKeyRepository, UserRepository userRepository,
+            TokenTrackingService tokenTrackingService) {
         this.gson = gson;
         this.webClient = webClientBuilder
-                .codecs(configure -> configure.defaultCodecs().maxInMemorySize(16 * 1024 * 1024))
-                .build();
+                .codecs(configure -> configure.defaultCodecs().maxInMemorySize(16 * 1024 * 1024)).build();
         this.fileStorageService = fileStorageService;
         this.sharedKeyService = sharedKeyService;
         this.encryptionService = encryptionService;
@@ -81,36 +83,26 @@ public class ChatService {
     }
 
     private Mono<String> buildRequestBodyJson(RequestBuilder request) {
-        return Mono.fromCallable(() -> gson.toJson(request.build()))
-                .subscribeOn(Schedulers.boundedElastic());
+        return Mono.fromCallable(() -> gson.toJson(request.build())).subscribeOn(Schedulers.boundedElastic());
     }
 
     private Flux<ServerSentEvent<String>> executeRequest(RequestBuilder request, String json) {
         WebClient.RequestBodySpec requestSpec = buildHttpRequest(request, json);
 
-
-        return requestSpec.retrieve()
-                .bodyToFlux(String.class)
-                .timeout(Duration.ofMinutes(5))
-                .filter(line -> !line.isBlank())
-                .doFinally(signalType -> {
+        return requestSpec.retrieve().bodyToFlux(String.class).timeout(Duration.ofMinutes(5))
+                .filter(line -> !line.isBlank()).doFinally(signalType -> {
                     int completion = tokenTrackingService.getCompletionTokens();
                     addPointsForSharedKey(request.getSharedKeyId(), completion);
-                })
-                .map(this::toServerSentEvent)
-                .doOnCancel(() -> log.debug("SSE stream cancelled by client"))
+                }).map(this::toServerSentEvent).doOnCancel(() -> log.debug("SSE stream cancelled by client"))
                 .onErrorResume(this::handleError);
     }
 
     private WebClient.RequestBodySpec buildHttpRequest(RequestBuilder request, String json) {
-        WebClient.RequestBodySpec spec = (WebClient.RequestBodySpec) webClient.post()
-                .uri(request.getUrl())
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(json);
+        WebClient.RequestBodySpec spec = (WebClient.RequestBodySpec) webClient.post().uri(request.getUrl())
+                .contentType(MediaType.APPLICATION_JSON).bodyValue(json);
 
         if (request.getProvider().equals("ANTHROPIC")) {
-            spec.header("x-api-key", request.getKey())
-                    .header("anthropic-version", "2023-06-01")
+            spec.header("x-api-key", request.getKey()).header("anthropic-version", "2023-06-01")
                     .header("anthropic-beta", "prompt-caching-2024-07-31");
         } else {
             spec.header("Authorization", "Bearer " + request.getKey());
@@ -137,10 +129,7 @@ public class ChatService {
         String errorJson = gson.toJson(errorMap);
         log.debug("API request error: {}", errorJson);
 
-        return Flux.just(ServerSentEvent.<String>builder()
-                .event("error")
-                .data(errorJson)
-                .build());
+        return Flux.just(ServerSentEvent.<String>builder().event("error").data(errorJson).build());
     }
 
     private boolean isImageWithFileId(Content content) {
@@ -149,17 +138,13 @@ public class ChatService {
 
     public Flux<ServerSentEvent<String>> makeRequest(RequestBuilder request, User user) {
         Mono<RequestBuilder> preparedRequest = request.isUseSharedKeys()
-                ? Mono.fromCallable(() -> prepareWithSharedKey(request))
-                .subscribeOn(Schedulers.boundedElastic())
+                ? Mono.fromCallable(() -> prepareWithSharedKey(request)).subscribeOn(Schedulers.boundedElastic())
                 : Mono.just(request);
 
         return preparedRequest
-                .flatMapMany(req -> attachBase64Images(req, user)
-                        .then(buildRequestBodyJson(req))
-                        .flatMapMany(json -> executeRequest(req, json))
-                )
-                .doOnError(e -> blockSharedKeyIfUsed(request))
-                .onErrorResume(this::handleError);
+                .flatMapMany(req -> attachBase64Images(req, user).then(buildRequestBodyJson(req))
+                        .flatMapMany(json -> executeRequest(req, json)))
+                .doOnError(e -> blockSharedKeyIfUsed(request)).onErrorResume(this::handleError);
     }
 
     private RequestBuilder prepareWithSharedKey(RequestBuilder request) {
@@ -186,8 +171,8 @@ public class ChatService {
                 double points = (double) completionTokens / 1000000.0;
                 owner.setPoints(owner.getPoints() + points);
                 userRepository.save(owner);
-                log.debug("Added {} points to user {} for using shared key {} ({} completion)",
-                        points, owner.getEmail(), sharedKeyId, completionTokens);
+                log.debug("Added {} points to user {} for using shared key {} ({} completion)", points,
+                        owner.getEmail(), sharedKeyId, completionTokens);
             }
         });
     }

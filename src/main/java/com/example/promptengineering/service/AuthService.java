@@ -16,8 +16,7 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
     }
 
-
-    public void updatePassword(User user, String newPassword){
+    public void updatePassword(User user, String newPassword) {
         String encryptedPassword = passwordEncoder.encode(newPassword);
         user.setPassword(encryptedPassword);
         userRepository.save(user);

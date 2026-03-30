@@ -2,11 +2,8 @@ package com.example.promptengineering.e2e;
 
 import com.example.promptengineering.PromptengineeringApplication;
 import io.github.bonigarcia.wdm.WebDriverManager;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,10 +29,10 @@ public abstract class BaseE2ETest {
         baseUrl = "http://localhost:" + port;
     }
 
-//    @AfterEach
-//    void tearDown() {
-//        if (driver != null) {
-//            driver.quit();
-//        }
-//    }
+    // @AfterEach
+    // void tearDown() {
+    // if (driver != null) {
+    // driver.quit();
+    // }
+    // }
 }

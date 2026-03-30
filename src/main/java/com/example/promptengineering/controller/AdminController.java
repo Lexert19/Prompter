@@ -32,8 +32,7 @@ public class AdminController {
     }
 
     @PostMapping("/users/{id}/role")
-    public String changeRole(@PathVariable Long id,
-                             @RequestParam AppRole role) {
+    public String changeRole(@PathVariable Long id, @RequestParam AppRole role) {
         Optional<User> optionalUser = userRepository.findById(id);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
@@ -46,9 +45,8 @@ public class AdminController {
     }
 
     @PostMapping("/users/{id}/delete")
-    public String deleteUser(@PathVariable Long id,
-                             AuthenticationPrincipal authenticationPrincipal,
-                             RedirectAttributes redirectAttributes) {
+    public String deleteUser(@PathVariable Long id, AuthenticationPrincipal authenticationPrincipal,
+            RedirectAttributes redirectAttributes) {
         User currentUser = (User) authenticationPrincipal;
 
         if (currentUser.getId().equals(id)) {

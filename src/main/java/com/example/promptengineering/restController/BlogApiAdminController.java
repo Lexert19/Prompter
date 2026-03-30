@@ -37,7 +37,8 @@ public class BlogApiAdminController {
     }
 
     @PutMapping("/posts/{id}")
-    public ResponseEntity<PostDto> updatePost(@PathVariable Long id, @RequestBody PostDto postDto) throws ResourceNotFoundException {
+    public ResponseEntity<PostDto> updatePost(@PathVariable Long id, @RequestBody PostDto postDto)
+            throws ResourceNotFoundException {
         PostDto updated = postService.updatePost(id, postDto);
         return ResponseEntity.ok(updated);
     }

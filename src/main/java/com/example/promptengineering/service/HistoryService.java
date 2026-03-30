@@ -43,8 +43,6 @@ public class HistoryService {
     @Value("${app.message.max-documents:100}")
     private int maxDocuments;
 
-
-
     public Chat createChat(User user) {
         Chat chat = new Chat();
         chat.setUser(user);
@@ -65,12 +63,13 @@ public class HistoryService {
         chatRepository.delete(chat.get());
     }
 
-    public Message saveMessage(MessageBody messageBody, User user) throws UserSecurityException, ResourceNotFoundException {
+    public Message saveMessage(MessageBody messageBody, User user)
+            throws UserSecurityException, ResourceNotFoundException {
         Optional<Chat> chat = chatRepository.findById(messageBody.getChatId());
-                if(chat.isEmpty())
-                    throw new ResourceNotFoundException("Chat not found with id: " + messageBody.getChatId());
-                checkUserAuthorization(chat.get(),user);
-                return convertAndSaveMessage(messageBody, chat.get());
+        if (chat.isEmpty())
+            throw new ResourceNotFoundException("Chat not found with id: " + messageBody.getChatId());
+        checkUserAuthorization(chat.get(), user);
+        return convertAndSaveMessage(messageBody, chat.get());
 
     }
 
@@ -108,38 +107,32 @@ public class HistoryService {
         return messageRepository.save(messageEntity);
     }
 
-    public List<Message> getChatHistory(Long chatId, User user) throws ResourceNotFoundException, UserSecurityException {
+    public List<Message> getChatHistory(Long chatId, User user)
+            throws ResourceNotFoundException, UserSecurityException {
         Optional<Chat> chat = chatRepository.findById(chatId);
-        if(chat.isEmpty()){
+        if (chat.isEmpty()) {
             throw new ResourceNotFoundException("");
         }
-        if(!chat.get().getUser().equals(user)){
+        if (!chat.get().getUser().equals(user)) {
             throw new UserSecurityException("");
         }
         List<Message> messages = messageRepository.findByChatId(chatId);
-        long totalSize = messages.stream()
-                .mapToLong(m -> {
-                    long size = m.getText() != null ? m.getText().length() : 0;
-                    if (m.getDocuments() != null) {
-                        size += m.getDocuments().stream()
-                                .mapToLong(d -> d != null ? d.length() : 0)
-                                .sum();
-                    }
-                    if (m.getImages() != null) {
-                        size += m.getImages().stream()
-                                .mapToLong(i -> i != null ? i.length() : 0)
-                                .sum();
-                    }
-                    return size;
-                })
-                .sum();
+        long totalSize = messages.stream().mapToLong(m -> {
+            long size = m.getText() != null ? m.getText().length() : 0;
+            if (m.getDocuments() != null) {
+                size += m.getDocuments().stream().mapToLong(d -> d != null ? d.length() : 0).sum();
+            }
+            if (m.getImages() != null) {
+                size += m.getImages().stream().mapToLong(i -> i != null ? i.length() : 0).sum();
+            }
+            return size;
+        }).sum();
         if (totalSize > maxTotalMessageSize) {
-            throw new UserSecurityException("Total message size (text + documents + images) too large: " + totalSize + " characters, max allowed: " + maxTotalMessageSize);
+            throw new UserSecurityException("Total message size (text + documents + images) too large: " + totalSize
+                    + " characters, max allowed: " + maxTotalMessageSize);
         }
         return messages;
     }
-
-
 
     public Page<Chat> getChatsForUser(User user, int page, int size) {
         if (size > maxChatPageSize) {

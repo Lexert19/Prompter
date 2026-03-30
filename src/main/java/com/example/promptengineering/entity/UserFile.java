@@ -1,6 +1,5 @@
 package com.example.promptengineering.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,6 +38,7 @@ public class UserFile {
     @JoinColumn(name = "user_id")
     private User owner;
 
-    public UserFile() {}
+    public UserFile() {
+    }
 
 }

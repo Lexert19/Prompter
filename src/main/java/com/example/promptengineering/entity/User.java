@@ -14,9 +14,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import com.nimbusds.oauth2.sdk.Role;
-
-
 @Entity
 @Setter
 @Getter
@@ -61,22 +58,17 @@ public class User implements OAuth2User, Principal, UserDetails {
         this.password = password;
     }
 
-
     public User() {
     }
 
-
     @Override
     public Map<String, Object> getAttributes() {
-        return Map.of(
-                "id", id,
-                "email", email);
+        return Map.of("id", id, "email", email);
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_"+role.name()))
+        return roles.stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
                 .collect(Collectors.toList());
     }
 
@@ -112,7 +104,8 @@ public class User implements OAuth2User, Principal, UserDetails {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass())
+            return false;
         User user = (User) o;
         return Objects.equals(id, user.id);
     }

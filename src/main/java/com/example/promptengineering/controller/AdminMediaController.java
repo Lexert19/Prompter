@@ -35,8 +35,7 @@ public class AdminMediaController {
 
     @PostMapping("/delete/{id}")
     public String deleteMedia(@PathVariable Long id) throws IOException {
-        Media media = mediaRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Media not found"));
+        Media media = mediaRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Media not found"));
         Path filePath = Paths.get(media.getFilePath());
         Files.deleteIfExists(filePath);
         mediaRepository.delete(media);

@@ -1,6 +1,5 @@
 package com.example.promptengineering.model;
 
-
 import lombok.Getter;
 import lombok.Setter;
 

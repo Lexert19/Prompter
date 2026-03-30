@@ -50,7 +50,6 @@ public class Message {
 
     private boolean cache;
 
-
     public boolean getCache() {
         return cache;
     }

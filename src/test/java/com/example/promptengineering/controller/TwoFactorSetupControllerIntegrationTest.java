@@ -5,7 +5,6 @@ import com.example.promptengineering.repository.UserRepository;
 import com.example.promptengineering.service.EmailService;
 import com.example.promptengineering.service.TwoFactorEmailService;
 import com.example.promptengineering.service.UserService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -54,16 +53,15 @@ class TwoFactorSetupControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        testUser = userRepository.findByEmail("test@example.com")
-                .orElseGet(() -> {
-                    User u = new User();
-                    u.setEmail("test@example.com");
-                    u.setPassword(passwordEncoder.encode("password"));
-                    u.setTwoFactorEnabled(false);
-                    u.setTwoFactorEmail(null);
-                    u.setEncryptedKeys("some-keys");
-                    return userRepository.save(u);
-                });
+        testUser = userRepository.findByEmail("test@example.com").orElseGet(() -> {
+            User u = new User();
+            u.setEmail("test@example.com");
+            u.setPassword(passwordEncoder.encode("password"));
+            u.setTwoFactorEnabled(false);
+            u.setTwoFactorEmail(null);
+            u.setEncryptedKeys("some-keys");
+            return userRepository.save(u);
+        });
         asTestUser = user(userService.loadUserByUsername(testUser.getEmail()));
     }
 
@@ -71,11 +69,8 @@ class TwoFactorSetupControllerIntegrationTest {
     void sendTestCode_shouldCallEmailService() throws Exception {
         doNothing().when(emailService).sendTwoFactorCode(anyString(), anyString());
 
-        mockMvc.perform(post("/api/2fa/send-test")
-                        .param("email", "test@example.com")
-                        .with(asTestUser))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Kod wysłany na test@example.com"));
+        mockMvc.perform(post("/api/2fa/send-test").param("email", "test@example.com").with(asTestUser))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.message").value("Kod wysłany na test@example.com"));
 
         verify(emailService).sendTwoFactorCode(eq("test@example.com"), anyString());
     }
@@ -87,19 +82,12 @@ class TwoFactorSetupControllerIntegrationTest {
         ArgumentCaptor<String> codeCaptor = ArgumentCaptor.forClass(String.class);
         doNothing().when(emailService).sendTwoFactorCode(eq(email), codeCaptor.capture());
 
-        mockMvc.perform(post("/api/2fa/send-test")
-                        .param("email", email)
-                        .with(asTestUser))
-                .andExpect(status().isOk());
+        mockMvc.perform(post("/api/2fa/send-test").param("email", email).with(asTestUser)).andExpect(status().isOk());
 
         String actualCode = codeCaptor.getValue();
 
-        mockMvc.perform(post("/api/2fa/enable")
-                        .param("email", email)
-                        .param("code", actualCode)
-                        .with(asTestUser))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true));
+        mockMvc.perform(post("/api/2fa/enable").param("email", email).param("code", actualCode).with(asTestUser))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.success").value(true));
 
         User updated = userRepository.findById(testUser.getId()).orElseThrow();
         assert updated.isTwoFactorEnabled();
@@ -111,12 +99,8 @@ class TwoFactorSetupControllerIntegrationTest {
         String email = "test@example.com";
         String wrongCode = "000000";
 
-        mockMvc.perform(post("/api/2fa/enable")
-                        .param("email", email)
-                        .param("code", wrongCode)
-                        .with(asTestUser))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("Nieprawidłowy kod"));
+        mockMvc.perform(post("/api/2fa/enable").param("email", email).param("code", wrongCode).with(asTestUser))
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.error").value("Nieprawidłowy kod"));
 
         User unchanged = userRepository.findById(testUser.getId()).orElseThrow();
         assert !unchanged.isTwoFactorEnabled();
@@ -134,17 +118,11 @@ class TwoFactorSetupControllerIntegrationTest {
         ArgumentCaptor<String> codeCaptor = ArgumentCaptor.forClass(String.class);
         doNothing().when(emailService).sendTwoFactorCode(eq(email), codeCaptor.capture());
 
-        mockMvc.perform(post("/api/2fa/send-test")
-                        .param("email", email)
-                        .with(asTestUser))
-                .andExpect(status().isOk());
+        mockMvc.perform(post("/api/2fa/send-test").param("email", email).with(asTestUser)).andExpect(status().isOk());
 
         String actualCode = codeCaptor.getValue();
 
-        mockMvc.perform(post("/api/2fa/disable")
-                        .param("code", actualCode)
-                        .with(asTestUser))
-                .andExpect(status().isOk())
+        mockMvc.perform(post("/api/2fa/disable").param("code", actualCode).with(asTestUser)).andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
 
         User updated = userRepository.findById(testUser.getId()).orElseThrow();
@@ -160,11 +138,8 @@ class TwoFactorSetupControllerIntegrationTest {
 
         String wrongCode = "000000";
 
-        mockMvc.perform(post("/api/2fa/disable")
-                        .param("code", wrongCode)
-                        .with(asTestUser))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("Nieprawidłowy kod"));
+        mockMvc.perform(post("/api/2fa/disable").param("code", wrongCode).with(asTestUser))
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.error").value("Nieprawidłowy kod"));
 
         User unchanged = userRepository.findById(testUser.getId()).orElseThrow();
         assert unchanged.isTwoFactorEnabled();

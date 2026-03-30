@@ -1,11 +1,10 @@
 package com.example.promptengineering.model;
 
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class OpenAIStrategy implements ProviderStrategy{
+public class OpenAIStrategy implements ProviderStrategy {
     @Override
     public void applySystemPrompt(Map<String, Object> request, List<Message> messages, String system) {
         if (system != null && !system.trim().isEmpty()) {
@@ -28,11 +27,7 @@ public class OpenAIStrategy implements ProviderStrategy{
 
     @Override
     public Map<String, Object> formatImageContent(ImageContent content, boolean cached) {
-        return Map.of(
-                "type", "image_url",
-                "image_url", Map.of(
-                        "url", "data:" + content.getMediaType() + ";base64," + content.getData()
-                )
-        );
+        return Map.of("type", "image_url", "image_url",
+                Map.of("url", "data:" + content.getMediaType() + ";base64," + content.getData()));
     }
 }

@@ -29,9 +29,8 @@ public class FileStorageService {
     private final UserFileRepository userFileRepository;
 
     public FileStorageService(@Value("${file.upload-dir}") String uploadDir,
-                              @Value("${file.max-size}") long maxFileSize,
-                              @Value("${file.max-count}") int maxFilesPerUser,
-                               UserFileRepository userFileRepository) {
+            @Value("${file.max-size}") long maxFileSize, @Value("${file.max-count}") int maxFilesPerUser,
+            UserFileRepository userFileRepository) {
         this.uploadDir = uploadDir;
         this.maxFileSize = maxFileSize;
         this.maxFilesPerUser = maxFilesPerUser;
@@ -39,15 +38,9 @@ public class FileStorageService {
     }
 
     private UserFileDTO toDto(UserFile userFile) {
-        return new UserFileDTO(
-                userFile.getId(),
-                userFile.getFileName(),
-                userFile.getContentType(),
-                userFile.getSize(),
-                userFile.getOwner().getId()
-        );
+        return new UserFileDTO(userFile.getId(), userFile.getFileName(), userFile.getContentType(), userFile.getSize(),
+                userFile.getOwner().getId());
     }
-
 
     public UserFileDTO storeFile(MultipartFile file, User owner) throws IOException {
         if (file.getSize() > maxFileSize) {
@@ -58,7 +51,6 @@ public class FileStorageService {
         if (currentFileCount >= maxFilesPerUser) {
             throw new IllegalArgumentException("User cannot have more than " + maxFilesPerUser + " files.");
         }
-
 
         Path userDir = Paths.get(uploadDir, owner.getId().toString());
         if (!Files.exists(userDir)) {
@@ -98,9 +90,7 @@ public class FileStorageService {
 
     public List<UserFileDTO> getUserFiles(User user) {
         List<UserFile> userFiles = userFileRepository.findByOwner(user);
-        return userFiles.stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
+        return userFiles.stream().map(this::toDto).collect(Collectors.toList());
     }
 
     public UserFile getUserFile(Long fileId, User owner) throws FileStorageException {

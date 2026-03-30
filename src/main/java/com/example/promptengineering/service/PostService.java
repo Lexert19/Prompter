@@ -24,9 +24,7 @@ public class PostService {
     }
 
     public List<PostDto> getAllPosts() {
-        return postRepository.findAllByOrderByCreatedAtDesc().stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+        return postRepository.findAllByOrderByCreatedAtDesc().stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
     public PostDto getPostDtoById(Long id) throws ResourceNotFoundException {
@@ -64,7 +62,7 @@ public class PostService {
         post.setContent(postDto.getContent());
         post.setThumbnailId(postDto.getThumbnailId());
         post.setShortDescription(postDto.getShortDescription());
-        if(postDto.getParentId() != null){
+        if (postDto.getParentId() != null) {
             Post parent = postRepository.findById(postDto.getParentId())
                     .orElseThrow(() -> new ResourceNotFoundException("Parent post not found"));
             post.setParent(parent);
@@ -83,16 +81,11 @@ public class PostService {
     }
 
     public List<PostDto> getTranslations(Long parentId) {
-        return postRepository.findByParentId(parentId).stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+        return postRepository.findByParentId(parentId).stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
     private String generateSlug(String title) {
-        return title.toLowerCase()
-                .replaceAll("[^a-z0-9\\s]", "")
-                .replaceAll("\\s+", "-")
-                .replaceAll("-+", "-")
+        return title.toLowerCase().replaceAll("[^a-z0-9\\s]", "").replaceAll("\\s+", "-").replaceAll("-+", "-")
                 .replaceAll("^-|-$", "");
     }
 
@@ -131,8 +124,7 @@ public class PostService {
     }
 
     public PostDto getPostDtoBySlug(String slug) throws ResourceNotFoundException {
-        Post post = postRepository.findBySlug(slug)
-                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+        Post post = postRepository.findBySlug(slug).orElseThrow(() -> new ResourceNotFoundException("Post not found"));
         return mapToDto(post);
     }
 }

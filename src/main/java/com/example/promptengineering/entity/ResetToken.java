@@ -30,5 +30,4 @@ public class ResetToken {
     @Column(name = "is_used", nullable = false)
     private boolean used;
 
-
 }

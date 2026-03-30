@@ -27,7 +27,6 @@ public class MediaApiController {
     private final String uploadDir;
     private final MediaRepository mediaRepository;
 
-
     public MediaApiController(@Value("${media.upload-dir}") String uploadDir, MediaRepository mediaRepository) {
         this.uploadDir = uploadDir;
         this.mediaRepository = mediaRepository;
@@ -36,26 +35,23 @@ public class MediaApiController {
     @GetMapping
     public ResponseEntity<List<MediaDto>> listMedia() {
         List<Media> mediaList = mediaRepository.findAll(Sort.by(Sort.Direction.DESC, "uploadedAt"));
-        List<MediaDto> dtos = mediaList.stream()
-                .map(media -> {
-                    MediaDto dto = new MediaDto();
-                    dto.setId(media.getId());
-                    dto.setFileName(media.getFileName());
-                    String storedFilename = Paths.get(media.getFilePath()).getFileName().toString();
-                    dto.setUrl("/media/" + storedFilename);
-                    dto.setContentType(media.getContentType());
-                    dto.setSize(media.getSize());
-                    dto.setUploadedAt(media.getUploadedAt());
-                    return dto;
-                })
-                .collect(Collectors.toList());
+        List<MediaDto> dtos = mediaList.stream().map(media -> {
+            MediaDto dto = new MediaDto();
+            dto.setId(media.getId());
+            dto.setFileName(media.getFileName());
+            String storedFilename = Paths.get(media.getFilePath()).getFileName().toString();
+            dto.setUrl("/media/" + storedFilename);
+            dto.setContentType(media.getContentType());
+            dto.setSize(media.getSize());
+            dto.setUploadedAt(media.getUploadedAt());
+            return dto;
+        }).collect(Collectors.toList());
         return ResponseEntity.ok(dtos);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMedia(@PathVariable Long id) throws IOException, ResourceNotFoundException {
-        Media media = mediaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Media not found"));
+        Media media = mediaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Media not found"));
         Path filePath = Paths.get(media.getFilePath());
         Files.deleteIfExists(filePath);
         mediaRepository.delete(media);
@@ -64,8 +60,7 @@ public class MediaApiController {
 
     @GetMapping("/{id}")
     public ResponseEntity<MediaDto> getMedia(@PathVariable Long id) throws ResourceNotFoundException {
-        Media media = mediaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Media not found"));
+        Media media = mediaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Media not found"));
         MediaDto dto = new MediaDto();
         dto.setId(media.getId());
         dto.setFileName(media.getFileName());
@@ -76,7 +71,6 @@ public class MediaApiController {
         dto.setUploadedAt(media.getUploadedAt());
         return ResponseEntity.ok(dto);
     }
-
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadMedia(@RequestParam("file") MultipartFile file) throws IOException {

@@ -7,7 +7,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
@@ -16,18 +15,15 @@ import java.io.IOException;
 public class CustomAuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
     private final TwoFactorEmailService twoFactorService;
-    private final UserRepository userRepository;
 
     public CustomAuthenticationSuccessHandler(TwoFactorEmailService twoFactorService, UserRepository userRepository) {
         this.twoFactorService = twoFactorService;
-        this.userRepository = userRepository;
         setDefaultTargetUrl("/");
     }
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request,
-                                        HttpServletResponse response,
-                                        Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+            Authentication authentication) throws IOException, ServletException {
         User user = (User) authentication.getPrincipal();
         boolean hasApiKeys = user.getEncryptedKeys() != null && !user.getEncryptedKeys().isEmpty();
 

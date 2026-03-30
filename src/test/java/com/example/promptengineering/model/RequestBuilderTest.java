@@ -1,6 +1,5 @@
 package com.example.promptengineering.model;
 
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -10,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 class RequestBuilderTest {
 
@@ -38,11 +36,7 @@ class RequestBuilderTest {
 
     @Test
     void shouldBuildOpenAiRequestWithSystemMessage() {
-        builder.model("gpt-4")
-                .addMessage(userMessage)
-                .maxTokens(200)
-                .temperature(0.7)
-                .stream(true);
+        builder.model("gpt-4").addMessage(userMessage).maxTokens(200).temperature(0.7).stream(true);
         builder.setProvider("OPENAI");
         builder.setSystem("You are a helpful assistant.");
 
@@ -50,38 +44,25 @@ class RequestBuilderTest {
 
         log.info("OpenAI request with system: {}", request);
 
-        assertThat(request)
-                .containsEntry("model", "gpt-4")
-                .containsEntry("max_tokens", 200)
-                .containsEntry("temperature", 0.7)
-                .containsEntry("stream", true)
-                .containsKey("messages");
+        assertThat(request).containsEntry("model", "gpt-4").containsEntry("max_tokens", 200)
+                .containsEntry("temperature", 0.7).containsEntry("stream", true).containsKey("messages");
 
         List<Map<String, Object>> messages = (List<Map<String, Object>>) request.get("messages");
         assertThat(messages).hasSize(2);
 
         Map<String, Object> systemMsg = messages.get(0);
         assertThat(systemMsg).containsEntry("role", "system");
-        assertThat(systemMsg.get("content")).isEqualTo(List.of(
-                Map.of(
-                        "type", "text",
-                        "text", "You are a helpful assistant."
-                )
-        ));
+        assertThat(systemMsg.get("content"))
+                .isEqualTo(List.of(Map.of("type", "text", "text", "You are a helpful assistant.")));
 
         Map<String, Object> userMsg = messages.get(1);
         assertThat(userMsg).containsEntry("role", "user");
-        assertThat(((List<Map<String, Object>>) userMsg.get("content")).get(0))
-                .containsEntry("text", "Hello, world!");
+        assertThat(((List<Map<String, Object>>) userMsg.get("content")).get(0)).containsEntry("text", "Hello, world!");
     }
 
     @Test
     void shouldBuildAnthropicRequestWithSystemField() {
-        builder.model("claude-3-opus-20240229")
-                .addMessage(userMessage)
-                .maxTokens(1000)
-                .temperature(0.0)
-                .stream(false);
+        builder.model("claude-3-opus-20240229").addMessage(userMessage).maxTokens(1000).temperature(0.0).stream(false);
         builder.setProvider("ANTHROPIC");
         builder.setSystem("You are Claude, a helpful AI.");
 
@@ -89,11 +70,8 @@ class RequestBuilderTest {
 
         log.info("Anthropic request with system: {}", request);
 
-        assertThat(request)
-                .containsEntry("model", "claude-3-opus-20240229")
-                .containsEntry("max_tokens", 1000)
-                .containsEntry("temperature", 0.0)
-                .containsEntry("stream", false)
+        assertThat(request).containsEntry("model", "claude-3-opus-20240229").containsEntry("max_tokens", 1000)
+                .containsEntry("temperature", 0.0).containsEntry("stream", false)
                 .containsEntry("system", "You are Claude, a helpful AI.");
 
         List<Map<String, Object>> messages = (List<Map<String, Object>>) request.get("messages");
@@ -110,9 +88,7 @@ class RequestBuilderTest {
 
         Message messageWithImage = new Message("user", List.of(textContent, imageContent));
 
-        builder.model("claude-3-opus-20240229")
-                .addMessage(messageWithImage)
-                .maxTokens(500);
+        builder.model("claude-3-opus-20240229").addMessage(messageWithImage).maxTokens(500);
         builder.setProvider("ANTHROPIC");
 
         Map<String, Object> request = builder.build();
@@ -127,9 +103,7 @@ class RequestBuilderTest {
         assertThat(imagePart).containsEntry("type", "image");
 
         Map<String, Object> source = (Map<String, Object>) imagePart.get("source");
-        assertThat(source)
-                .containsEntry("type", "base64")
-                .containsEntry("media_type", "image/png")
+        assertThat(source).containsEntry("type", "base64").containsEntry("media_type", "image/png")
                 .containsEntry("data", "base64EncodedImageData");
     }
 
@@ -142,9 +116,7 @@ class RequestBuilderTest {
 
         Message messageWithImage = new Message("user", List.of(textContent, imageContent));
 
-        builder.model("gpt-4-vision-preview")
-                .addMessage(messageWithImage)
-                .maxTokens(300);
+        builder.model("gpt-4-vision-preview").addMessage(messageWithImage).maxTokens(300);
         builder.setProvider("OPENAI");
 
         Map<String, Object> request = builder.build();
@@ -172,9 +144,7 @@ class RequestBuilderTest {
         Message cachedMessage = new Message("user", List.of(cachedContent));
         cachedMessage.setCached(true);
 
-        builder.model("claude-3-opus-20240229")
-                .addMessage(cachedMessage)
-                .maxTokens(100);
+        builder.model("claude-3-opus-20240229").addMessage(cachedMessage).maxTokens(100);
         builder.setProvider("ANTHROPIC");
 
         Map<String, Object> request = builder.build();
@@ -191,9 +161,7 @@ class RequestBuilderTest {
 
     @Test
     void shouldIncludeReasoningEffortForOpenAi() {
-        builder.model("o1-preview")
-                .addMessage(userMessage)
-                .maxTokens(500);
+        builder.model("o1-preview").addMessage(userMessage).maxTokens(500);
         builder.setProvider("OPENAI");
         builder.setReasoningEffort("medium");
 
@@ -209,9 +177,7 @@ class RequestBuilderTest {
     @Test
     void shouldFallbackToEmptyContentIfMessageHasNoContent() {
         Message emptyMessage = new Message("user", null);
-        builder.model("gpt-4")
-                .addMessage(emptyMessage)
-                .maxTokens(100);
+        builder.model("gpt-4").addMessage(emptyMessage).maxTokens(100);
         builder.setProvider("OPENAI");
 
         Map<String, Object> request = builder.build();
@@ -221,7 +187,7 @@ class RequestBuilderTest {
         List<Map<String, Object>> messages = (List<Map<String, Object>>) request.get("messages");
         List<Map<String, Object>> contentList = (List<Map<String, Object>>) messages.get(0).get("content");
         assertThat(contentList).hasSize(0);
-        //assertThat(contentList.get(0)).containsEntry("text", "error");
+        // assertThat(contentList.get(0)).containsEntry("text", "error");
     }
 
     @Test
@@ -261,12 +227,9 @@ class RequestBuilderTest {
         Map<String, Object> request = builder.build();
         List<Map<String, Object>> messages = (List<Map<String, Object>>) request.get("messages");
         assertThat(messages).hasSize(3);
-        assertThat(((List<Map<String, Object>>) messages.get(0).get("content")).get(0))
-                .containsEntry("text", "First");
-        assertThat(((List<Map<String, Object>>) messages.get(1).get("content")).get(0))
-                .containsEntry("text", "Second");
-        assertThat(((List<Map<String, Object>>) messages.get(2).get("content")).get(0))
-                .containsEntry("text", "Third");
+        assertThat(((List<Map<String, Object>>) messages.get(0).get("content")).get(0)).containsEntry("text", "First");
+        assertThat(((List<Map<String, Object>>) messages.get(1).get("content")).get(0)).containsEntry("text", "Second");
+        assertThat(((List<Map<String, Object>>) messages.get(2).get("content")).get(0)).containsEntry("text", "Third");
     }
 
     @Test
@@ -299,18 +262,18 @@ class RequestBuilderTest {
         assertThat(messages).hasSize(1);
     }
 
-//    @Test
-//    void shouldThrowExceptionForUnknownContentType() {
-//        TextContent badContent = new TextContent();
-//        badContent.setType("audio");
-//        badContent.setText("whatever");
-//        Message msg = new Message("user", List.of(badContent));
-//
-//        builder.model("gpt-4").addMessage(msg);
-//        builder.setProvider("OPENAI");
-//
-//        assertThatThrownBy(() -> builder.build())
-//                .isInstanceOf(IllegalStateException.class)
-//                .hasMessageContaining("Unknown content type");
-//    }
+    // @Test
+    // void shouldThrowExceptionForUnknownContentType() {
+    // TextContent badContent = new TextContent();
+    // badContent.setType("audio");
+    // badContent.setText("whatever");
+    // Message msg = new Message("user", List.of(badContent));
+    //
+    // builder.model("gpt-4").addMessage(msg);
+    // builder.setProvider("OPENAI");
+    //
+    // assertThatThrownBy(() -> builder.build())
+    // .isInstanceOf(IllegalStateException.class)
+    // .hasMessageContaining("Unknown content type");
+    // }
 }

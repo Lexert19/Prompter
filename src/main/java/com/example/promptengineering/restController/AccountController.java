@@ -28,29 +28,23 @@ public class AccountController {
     }
 
     @PostMapping("/save-key/{keyName}")
-    public String saveKeyToMap(
-            @AuthenticationPrincipal User user,
-            @PathVariable String keyName,
+    public String saveKeyToMap(@AuthenticationPrincipal User user, @PathVariable String keyName,
             @RequestBody String keyValue) {
         userService.appendKeyToMap(user, keyName, keyValue);
         return String.format("Key '%s' saved to map for user with email: %s", keyName, user.getEmail());
     }
 
     @GetMapping("/keys")
-    public Map<String, String> getAllKeys(
-            @AuthenticationPrincipal User user) {
+    public Map<String, String> getAllKeys(@AuthenticationPrincipal User user) {
         return userService.getUserKeys(user);
     }
 
-
     @PostMapping("/change-password")
-    public ResponseEntity<String> changePassword(
-            @AuthenticationPrincipal User user,
+    public ResponseEntity<String> changePassword(@AuthenticationPrincipal User user,
             @RequestBody PasswordChangeRequest request) {
 
         if (!request.getNewPassword().equals(request.getConfirmPassword())) {
-            return ResponseEntity.badRequest()
-                    .body("New password and confirmation do not match");
+            return ResponseEntity.badRequest().body("New password and confirmation do not match");
         }
 
         authService.updatePassword(user, request.getNewPassword());

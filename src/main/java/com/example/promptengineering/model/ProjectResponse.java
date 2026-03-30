@@ -25,5 +25,4 @@ public class ProjectResponse {
         this.files = (files != null) ? files : new ArrayList<>();
     }
 
-
 }

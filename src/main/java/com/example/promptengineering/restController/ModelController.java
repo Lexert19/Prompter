@@ -5,7 +5,6 @@ import com.example.promptengineering.entity.Model;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.exception.ResourceNotFoundException;
 import com.example.promptengineering.service.ModelService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +32,8 @@ public class ModelController {
     }
 
     @PutMapping("/user-models/{id}")
-    public ResponseEntity<String> editUserModel(@AuthenticationPrincipal User user, @PathVariable Long id, @RequestBody ModelDto modelDto) {
+    public ResponseEntity<String> editUserModel(@AuthenticationPrincipal User user, @PathVariable Long id,
+            @RequestBody ModelDto modelDto) {
         Optional<Model> model = modelService.getModel(id);
         if (model.isPresent() && model.get().getUser().equals(user)) {
             modelService.editUserModel(model.orElse(null), modelDto);
@@ -44,11 +44,11 @@ public class ModelController {
     }
 
     @DeleteMapping("/user-models/{id}")
-    public ResponseEntity<String> deleteUserModel(@AuthenticationPrincipal User user, @PathVariable Long id) throws ResourceNotFoundException {
+    public ResponseEntity<String> deleteUserModel(@AuthenticationPrincipal User user, @PathVariable Long id)
+            throws ResourceNotFoundException {
         modelService.deleteUserModel(id, user);
         return ResponseEntity.ok("Model deleted successfully");
     }
-
 
     @GetMapping("/all-models")
     public List<ModelDto> getAllModels(@AuthenticationPrincipal User user) {

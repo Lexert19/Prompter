@@ -33,7 +33,6 @@ public class Model {
     @JoinColumn(name = "user_id", nullable = true)
     private User user;
 
-
     public Model() {
 
     }

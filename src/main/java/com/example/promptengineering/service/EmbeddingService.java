@@ -25,12 +25,12 @@ public class EmbeddingService {
     private final UserService userService;
     private final FileElementsRepository fileElementRepository;
 
-    public EmbeddingService(RestTemplate restTemplate, UserService userService, FileElementsRepository fileElementRepository) {
+    public EmbeddingService(RestTemplate restTemplate, UserService userService,
+            FileElementsRepository fileElementRepository) {
         this.restTemplate = restTemplate;
         this.userService = userService;
         this.fileElementRepository = fileElementRepository;
     }
-
 
     public void addFileToProject(Project project, FileElement file, User user) {
         String apiKey = userService.getUserKeys(user).getOrDefault("OPENAI", "");
@@ -63,8 +63,8 @@ public class EmbeddingService {
         requestBody.put("input", text);
         requestBody.put("model", "text-embedding-3-large");
 
-        Map<String, Object> response = restTemplate.postForObject(EMBEDDINGS_URL,
-                getHttpEntity(requestBody, apiKey), Map.class);
+        Map<String, Object> response = restTemplate.postForObject(EMBEDDINGS_URL, getHttpEntity(requestBody, apiKey),
+                Map.class);
 
         List<Map<String, Object>> data = (List<Map<String, Object>>) response.get("data");
         if (!data.isEmpty()) {
@@ -73,7 +73,8 @@ public class EmbeddingService {
         throw new RuntimeException("Failed to get embedding for text: " + text);
     }
 
-    private org.springframework.http.HttpEntity<Map<String, Object>> getHttpEntity(Map<String, Object> requestBody, String apiKey) {
+    private org.springframework.http.HttpEntity<Map<String, Object>> getHttpEntity(Map<String, Object> requestBody,
+            String apiKey) {
         org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "Bearer " + apiKey);
@@ -91,7 +92,7 @@ public class EmbeddingService {
         List<FileElement> fileElements = fileElementRepository.findByProject(project);
         List<ScoredFragment> scoredFragments = new ArrayList<>();
 
-        for (FileElement fileElement : fileElements){
+        for (FileElement fileElement : fileElements) {
             scoredFragments.addAll(processFile(fileElement, queryVector));
         }
         return formatTopFiveResults(scoredFragments);
@@ -116,7 +117,7 @@ public class EmbeddingService {
     }
 
     private ScoredFragment processPage(List<String> pages, List<List<Double>> vectors, int index,
-                                       List<Double> queryVector) {
+            List<Double> queryVector) {
         String page = pages.get(index);
         List<Double> vector = vectors.get(index);
 
@@ -130,12 +131,8 @@ public class EmbeddingService {
 
     private List<ScoredFragment> formatTopFiveResults(List<ScoredFragment> scoredFragments) {
         scoredFragments.sort(Comparator.comparingDouble(ScoredFragment::getScore).reversed());
-        return scoredFragments.stream()
-                .limit(5)
-                .collect(Collectors.toList());
+        return scoredFragments.stream().limit(5).collect(Collectors.toList());
     }
-
-  
 
     private double cosineSimilarity(List<Double> vectorA, List<Double> vectorB) {
         if (vectorA.size() != vectorB.size()) {
@@ -152,7 +149,7 @@ public class EmbeddingService {
         normA = Math.sqrt(normA);
         normB = Math.sqrt(normB);
         if (normA == 0 || normB == 0) {
-            return 0.0; 
+            return 0.0;
         }
         return dotProduct / (normA * normB);
     }
@@ -175,7 +172,5 @@ public class EmbeddingService {
         }
         return pages;
     }
-
-    
 
 }

@@ -26,9 +26,8 @@ public class ResetTokenService {
     private static final long TOKEN_EXPIRATION_HOURS = 24;
 
     @Autowired
-    public ResetTokenService(AuthService authService,
-                             ResetTokenRepository resetTokenRepository, UserRepository userRepository,
-                             EmailService emailService) {
+    public ResetTokenService(AuthService authService, ResetTokenRepository resetTokenRepository,
+            UserRepository userRepository, EmailService emailService) {
         this.authService = authService;
         this.resetTokenRepository = resetTokenRepository;
         this.userRepository = userRepository;
@@ -37,7 +36,7 @@ public class ResetTokenService {
 
     public String createPasswordResetToken(String email) throws UserNotFoundException {
         Optional<User> userOptional = userRepository.findByEmail(email);
-        if(userOptional.isEmpty()){
+        if (userOptional.isEmpty()) {
             throw new UserNotFoundException("User not found");
         }
 

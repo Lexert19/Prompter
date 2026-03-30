@@ -27,11 +27,8 @@ public class ModelService {
     private final int maxModelsPerUser;
     private final String adminEmail;
 
-    public ModelService(UserRepository userRepository,
-                        ModelRepository modelRepository,
-                        ObjectMapper objectMapper,
-                        @Value("${app.max.models.per.user}") int maxModelsPerUser,
-                        @Value("${admin.email}") String adminEmail) {
+    public ModelService(UserRepository userRepository, ModelRepository modelRepository, ObjectMapper objectMapper,
+            @Value("${app.max.models.per.user}") int maxModelsPerUser, @Value("${admin.email}") String adminEmail) {
         this.userRepository = userRepository;
         this.modelRepository = modelRepository;
         this.objectMapper = objectMapper;
@@ -39,7 +36,7 @@ public class ModelService {
         this.adminEmail = adminEmail;
     }
 
-    public List<Model> getUserModels(User user){
+    public List<Model> getUserModels(User user) {
         List<Model> models = modelRepository.findByUser(user);
         if (models.size() >= maxModelsPerUser) {
             throw new IllegalArgumentException("User cannot have more than " + maxModelsPerUser + " models.");
@@ -47,17 +44,18 @@ public class ModelService {
         return models;
     }
 
-    public List<Model> getGlobalModels(){
+    public List<Model> getGlobalModels() {
         return this.modelRepository.findByGlobal(true);
     }
 
-    public User addUserModel(ModelDto modelDto, User user){
+    public User addUserModel(ModelDto modelDto, User user) {
         long currentCount = modelRepository.countByUser(user);
         if (currentCount >= maxModelsPerUser) {
             throw new IllegalArgumentException("User cannot have more than " + maxModelsPerUser + " models.");
         }
 
-        Model model = new Model(modelDto.getName(), modelDto.getText(), modelDto.getProvider(), modelDto.getUrl(), modelDto.getType(), user);
+        Model model = new Model(modelDto.getName(), modelDto.getText(), modelDto.getProvider(), modelDto.getUrl(),
+                modelDto.getType(), user);
         model.setGlobal(false);
         modelRepository.save(model);
         return userRepository.save(user);
@@ -72,7 +70,7 @@ public class ModelService {
         }
     }
 
-    public void editUserModel(Model model, ModelDto modelDto){
+    public void editUserModel(Model model, ModelDto modelDto) {
         model.setName(modelDto.getName());
         model.setText(modelDto.getText());
         model.setProvider(modelDto.getProvider());

@@ -11,5 +11,4 @@ public class Embedding {
     private List<Double> vector;
     private String name;
 
-
 }

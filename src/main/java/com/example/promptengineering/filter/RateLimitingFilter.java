@@ -26,7 +26,7 @@ public class RateLimitingFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
         String path = httpRequest.getRequestURI();
-        if (path.startsWith("/auth/login")  && httpRequest.getMethod().equalsIgnoreCase("POST")) {
+        if (path.startsWith("/auth/login") && httpRequest.getMethod().equalsIgnoreCase("POST")) {
             if (!rateLimiter.isAllowed(httpRequest)) {
                 httpResponse.setStatus(429);
                 httpResponse.getWriter().write("Too many requests. Please try again later.");

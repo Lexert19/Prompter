@@ -16,21 +16,25 @@ public class UserActionLimiter {
     private final int maxAttemptsPerDay;
     private final int cooldownSeconds;
 
-    public UserActionLimiter(@Value("${app.rate-limit.user.max-attempts:3}") int maxAttemptsPerDay, @Value("${app.rate-limit.user.cooldown-seconds:60}") int cooldownSeconds) {
+    public UserActionLimiter(@Value("${app.rate-limit.user.max-attempts:3}") int maxAttemptsPerDay,
+            @Value("${app.rate-limit.user.cooldown-seconds:60}") int cooldownSeconds) {
         this.maxAttemptsPerDay = maxAttemptsPerDay;
         this.cooldownSeconds = cooldownSeconds;
     }
 
     public boolean canPerform(User user) {
-        if (user == null || user.getId() == null) return false;
+        if (user == null || user.getId() == null)
+            return false;
         Long userId = user.getId();
 
         Instant blocked = blockedUntil.get(userId);
-        if (blocked != null && Instant.now().isBefore(blocked)) return false;
+        if (blocked != null && Instant.now().isBefore(blocked))
+            return false;
 
         if (cooldownSeconds > 0) {
             Instant last = lastAction.get(userId);
-            if (last != null && last.plusSeconds(cooldownSeconds).isAfter(Instant.now())) return false;
+            if (last != null && last.plusSeconds(cooldownSeconds).isAfter(Instant.now()))
+                return false;
         }
 
         AtomicInteger count = attempts.computeIfAbsent(userId, k -> new AtomicInteger(0));

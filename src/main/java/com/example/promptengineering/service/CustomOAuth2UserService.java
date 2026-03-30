@@ -30,14 +30,13 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         String email = oAuth2User.getAttribute("email");
 
-        return userRepository.findByEmail(email)
-                .orElseGet(() -> {
-                    try {
-                        return userService.createUser(email, List.of(AppRole.USER));
-                    } catch (UserAlreadyExistsException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+        return userRepository.findByEmail(email).orElseGet(() -> {
+            try {
+                return userService.createUser(email, List.of(AppRole.USER));
+            } catch (UserAlreadyExistsException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
     }
 

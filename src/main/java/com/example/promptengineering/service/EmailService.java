@@ -26,8 +26,9 @@ public class EmailService {
     public void sendPasswordResetEmail(String toEmail, String token) {
         try {
             String resetLink = "https://dominik-chyziak.pl/auth/reset-password-confirm?token=" + token;
-            String html = "<p>Password reset requested. <a href=\"" + resetLink + "\">Click here to reset your password</a></p>" +
-                    "<p>" + resetLink + "</p><p>If you didn't request this, ignore this email.</p>";
+            String html = "<p>Password reset requested. <a href=\"" + resetLink
+                    + "\">Click here to reset your password</a></p>" + "<p>" + resetLink
+                    + "</p><p>If you didn't request this, ignore this email.</p>";
 
             MimeMessage mime = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mime, true);

@@ -1,4 +1,4 @@
-package com.example.promptengineering.restController;
+package com.example.promptengineering.controller;
 
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.repository.UserRepository;
@@ -23,8 +23,8 @@ public class TwoFactorAuthController {
     private final UserRepository userRepository;
     private final IpRateLimiter rateLimiter;
 
-    public TwoFactorAuthController(TwoFactorEmailService twoFactorService,
-                                   UserRepository userRepository, IpRateLimiter rateLimiter) {
+    public TwoFactorAuthController(TwoFactorEmailService twoFactorService, UserRepository userRepository,
+            IpRateLimiter rateLimiter) {
         this.twoFactorService = twoFactorService;
         this.userRepository = userRepository;
         this.rateLimiter = rateLimiter;
@@ -42,9 +42,7 @@ public class TwoFactorAuthController {
     }
 
     @PostMapping("/auth/2fa")
-    public String verifyTwoFactorCode(@RequestParam String code,
-                                      HttpServletRequest request,
-                                      HttpSession session) {
+    public String verifyTwoFactorCode(@RequestParam String code, HttpServletRequest request, HttpSession session) {
         Long userId = (Long) session.getAttribute("2fa_user_id");
         if (userId == null) {
             return "redirect:/auth/login";

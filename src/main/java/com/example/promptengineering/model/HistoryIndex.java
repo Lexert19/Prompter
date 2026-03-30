@@ -10,5 +10,4 @@ public class HistoryIndex {
     private String title;
     private String name;
 
-
 }

@@ -16,8 +16,6 @@ public class FaviconController {
     public ResponseEntity<byte[]> getFavicon() throws IOException {
         Resource resource = new ClassPathResource("static/favicon.ico");
         byte[] fileContent = FileCopyUtils.copyToByteArray(resource.getInputStream());
-        return ResponseEntity.ok()
-                .contentType(MediaType.valueOf("image/svg+xml"))
-                .body(fileContent);
+        return ResponseEntity.ok().contentType(MediaType.valueOf("image/svg+xml")).body(fileContent);
     }
 }

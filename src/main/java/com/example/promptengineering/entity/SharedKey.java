@@ -1,7 +1,6 @@
 package com.example.promptengineering.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -49,7 +48,8 @@ public class SharedKey {
     }
 
     public boolean isBlocked() {
-        if (blockedUntil == null) return false;
+        if (blockedUntil == null)
+            return false;
         return LocalDateTime.now().isBefore(blockedUntil);
     }
 

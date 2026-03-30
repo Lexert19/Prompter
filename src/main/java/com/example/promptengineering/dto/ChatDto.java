@@ -14,10 +14,12 @@ public class ChatDto {
     private Long userId;
     private String userEmail;
 
-    public ChatDto() {}
+    public ChatDto() {
+    }
 
     public static ChatDto fromEntity(Chat chat) {
-        if (chat == null) return null;
+        if (chat == null)
+            return null;
         ChatDto dto = new ChatDto();
         dto.setId(chat.getId());
         if (chat.getUser() != null) {

@@ -1,15 +1,11 @@
 package com.example.promptengineering.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -22,16 +18,6 @@ import java.util.Locale;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
     private final String mediaUploadDir;
-
-//    @Autowired
-//    @Qualifier("taskExecutor")
-//    private ThreadPoolTaskExecutor taskExecutor;
-//
-//    @Override
-//    public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
-//        configurer.setTaskExecutor(taskExecutor);
-//        configurer.setDefaultTimeout(30000);
-//    }
 
     public WebMvcConfig(@Value("${media.upload-dir}") String mediaUploadDir) {
         this.mediaUploadDir = mediaUploadDir;
@@ -53,7 +39,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
         return clr;
     }
 
-
     @Bean
     public MessageSource messageSource() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
@@ -64,8 +49,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/media/**")
-                .addResourceLocations("file:" + mediaUploadDir + "/");
+        registry.addResourceHandler("/media/**").addResourceLocations("file:" + mediaUploadDir + "/");
     }
 
 }

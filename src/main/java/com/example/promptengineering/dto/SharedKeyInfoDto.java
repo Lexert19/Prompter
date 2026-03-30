@@ -9,7 +9,8 @@ public class SharedKeyInfoDto {
     private boolean working;
     private int usageCount;
 
-    public SharedKeyInfoDto() {}
+    public SharedKeyInfoDto() {
+    }
 
     public SharedKeyInfoDto(Long id, String provider, boolean working, int usageCount) {
         this.id = id;

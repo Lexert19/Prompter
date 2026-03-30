@@ -29,7 +29,6 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -38,7 +37,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 public class AuthControllerTest {
-
 
     @Autowired
     private ResetTokenRepository resetTokenRepository;
@@ -78,17 +76,16 @@ public class AuthControllerTest {
         formData.add("username", "testuser123@wp.pl");
         formData.add("password", "testpassword123");
 
-//        mockMvc.perform(post("/auth/login")
-//                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-//                        .params(formData))
-//                .andExpect(status().is3xxRedirection())
-//                .andExpect(header().string("Location", "/"));
+        // mockMvc.perform(post("/auth/login")
+        // .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+        // .params(formData))
+        // .andExpect(status().is3xxRedirection())
+        // .andExpect(header().string("Location", "/"));
     }
 
     @Test
     public void testShowLoginForm() throws Exception {
-        mockMvc.perform(get("/auth/login"))
-                .andExpect(status().isOk())
+        mockMvc.perform(get("/auth/login")).andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Login")));
     }
 
@@ -98,13 +95,12 @@ public class AuthControllerTest {
         formData.add("username", "testuser123@wp.pl");
         formData.add("password", "wrongpassword");
 
-//        mockMvc.perform(post("/auth/login")
-//                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-//                        .params(formData))
-//                .andExpect(status().is3xxRedirection())
-//                .andExpect(header().string("Location", "/auth/login?error=true"));
+        // mockMvc.perform(post("/auth/login")
+        // .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+        // .params(formData))
+        // .andExpect(status().is3xxRedirection())
+        // .andExpect(header().string("Location", "/auth/login?error=true"));
     }
-
 
     @Test
     @Transactional
@@ -117,17 +113,14 @@ public class AuthControllerTest {
         MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
         MvcResult result = mockMvc.perform(post("/auth/reset-password-request")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .params(formData))
-                .andExpect(status().is3xxRedirection())
-                .andReturn();
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED).params(formData))
+                .andExpect(status().is3xxRedirection()).andReturn();
 
         log.info("Response body: {}", result.getResponse().getContentAsString());
 
         List<ResetToken> resetTokens = resetTokenRepository.findByUserLogin("testuser123@wp.pl");
         assertFalse(resetTokens.isEmpty(), "Lista tokenów resetowania hasła jest pusta");
     }
-
 
     @Test
     public void testPasswordResetConfirmationSuccess() throws Exception {
@@ -146,10 +139,8 @@ public class AuthControllerTest {
 
         MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
-        mockMvc.perform(post("/auth/reset-password-confirm")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .params(formData))
-                .andExpect(status().is2xxSuccessful());
+        mockMvc.perform(post("/auth/reset-password-confirm").contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .params(formData)).andExpect(status().is2xxSuccessful());
 
         Optional<User> user = userRepository.findByEmail(resetToken.getUserLogin());
         assertFalse(user.isEmpty(), "User not found");
@@ -160,7 +151,6 @@ public class AuthControllerTest {
         userRepository.save(user.get());
     }
 
-
     @Test
     public void testPasswordResetConfirmationFailure() throws Exception {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
@@ -170,13 +160,9 @@ public class AuthControllerTest {
 
         MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
-        mockMvc.perform(post("/auth/reset-password-confirm")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .params(formData))
-                .andExpect(status().is2xxSuccessful());
+        mockMvc.perform(post("/auth/reset-password-confirm").contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .params(formData)).andExpect(status().is2xxSuccessful());
     }
-
-
 
     @Test
     public void testExpiredResetToken() throws Exception {
@@ -195,10 +181,8 @@ public class AuthControllerTest {
 
         MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
-        mockMvc.perform(post("/auth/reset-password-confirm")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .params(formData))
-                .andExpect(status().isOk());
+        mockMvc.perform(post("/auth/reset-password-confirm").contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .params(formData)).andExpect(status().isOk());
     }
 
 }

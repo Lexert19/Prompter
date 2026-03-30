@@ -87,29 +87,22 @@ public class MediaApiControllerIntegrationTest {
     @AfterEach
     void tearDown() throws Exception {
         if (Files.exists(tempUploadDir)) {
-            Files.walk(tempUploadDir)
-                    .sorted((a, b) -> -a.compareTo(b))
-                    .forEach(path -> {
-                        try {
-                            Files.deleteIfExists(path);
-                        } catch (Exception ignored) {}
-                    });
+            Files.walk(tempUploadDir).sorted((a, b) -> -a.compareTo(b)).forEach(path -> {
+                try {
+                    Files.deleteIfExists(path);
+                } catch (Exception ignored) {
+                }
+            });
         }
     }
 
     @Test
     void uploadMedia_asAdmin_shouldReturnImageUrlAndSave() throws Exception {
-        MockMultipartFile file = new MockMultipartFile(
-                "file",
-                "test.jpg",
-                MediaType.IMAGE_JPEG_VALUE,
-                "dummy image content".getBytes()
-        );
+        MockMultipartFile file = new MockMultipartFile("file", "test.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "dummy image content".getBytes());
 
-        mockMvc.perform(multipart("/api/admin/media/upload")
-                        .file(file)
-                        .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
-                .andExpect(status().isOk())
+        mockMvc.perform(multipart("/api/admin/media/upload").file(file)
+                .with(user(userService.loadUserByUsername(adminUser.getEmail())))).andExpect(status().isOk())
                 .andExpect(content().string(matchesPattern("/media/[a-f0-9-]+\\.jpg")));
 
         assertThat(Files.list(tempUploadDir)).hasSize(1);
@@ -125,17 +118,11 @@ public class MediaApiControllerIntegrationTest {
 
     @Test
     void uploadNonImageFile_asAdmin_shouldReturnBadRequest() throws Exception {
-        MockMultipartFile file = new MockMultipartFile(
-                "file",
-                "test.txt",
-                MediaType.TEXT_PLAIN_VALUE,
-                "text content".getBytes()
-        );
+        MockMultipartFile file = new MockMultipartFile("file", "test.txt", MediaType.TEXT_PLAIN_VALUE,
+                "text content".getBytes());
 
-        mockMvc.perform(multipart("/api/admin/media/upload")
-                        .file(file)
-                        .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
-                .andExpect(status().isBadRequest())
+        mockMvc.perform(multipart("/api/admin/media/upload").file(file)
+                .with(user(userService.loadUserByUsername(adminUser.getEmail())))).andExpect(status().isBadRequest())
                 .andExpect(content().string("Only image files are allowed"));
 
         assertThat(mediaRepository.findAll()).isEmpty();
@@ -144,17 +131,10 @@ public class MediaApiControllerIntegrationTest {
 
     @Test
     void uploadEmptyFile_asAdmin_shouldReturnBadRequest() throws Exception {
-        MockMultipartFile file = new MockMultipartFile(
-                "file",
-                "empty.jpg",
-                MediaType.IMAGE_JPEG_VALUE,
-                new byte[0]
-        );
+        MockMultipartFile file = new MockMultipartFile("file", "empty.jpg", MediaType.IMAGE_JPEG_VALUE, new byte[0]);
 
-        mockMvc.perform(multipart("/api/admin/media/upload")
-                        .file(file)
-                        .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
-                .andExpect(status().isBadRequest())
+        mockMvc.perform(multipart("/api/admin/media/upload").file(file)
+                .with(user(userService.loadUserByUsername(adminUser.getEmail())))).andExpect(status().isBadRequest())
                 .andExpect(content().string("File is empty"));
 
         assertThat(mediaRepository.findAll()).isEmpty();
@@ -162,76 +142,64 @@ public class MediaApiControllerIntegrationTest {
 
     @Test
     void uploadMedia_withoutAuthentication_shouldReturnUnauthorized() throws Exception {
-        MockMultipartFile file = new MockMultipartFile(
-                "file",
-                "test.jpg",
-                MediaType.IMAGE_JPEG_VALUE,
-                "content".getBytes()
-        );
+        MockMultipartFile file = new MockMultipartFile("file", "test.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "content".getBytes());
 
-        mockMvc.perform(multipart("/api/admin/media/upload").file(file))
-                .andExpect(status().isUnauthorized());
+        mockMvc.perform(multipart("/api/admin/media/upload").file(file)).andExpect(status().isUnauthorized());
 
         assertThat(mediaRepository.findAll()).isEmpty();
     }
 
     @Test
     void uploadMedia_asUserWithoutAdminRole_shouldReturnForbidden() throws Exception {
-        MockMultipartFile file = new MockMultipartFile(
-                "file",
-                "test.jpg",
-                MediaType.IMAGE_JPEG_VALUE,
-                "content".getBytes()
-        );
+        MockMultipartFile file = new MockMultipartFile("file", "test.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "content".getBytes());
 
-        mockMvc.perform(multipart("/api/admin/media/upload")
-                        .file(file)
-                        .with(user(userService.loadUserByUsername(normalUser.getEmail()))))
-                .andExpect(status().isForbidden());
+        mockMvc.perform(multipart("/api/admin/media/upload").file(file)
+                .with(user(userService.loadUserByUsername(normalUser.getEmail())))).andExpect(status().isForbidden());
 
         assertThat(mediaRepository.findAll()).isEmpty();
     }
 
     @Test
     void listMedia_asAdmin_shouldReturnMediaList() throws Exception {
-        MockMultipartFile file1 = new MockMultipartFile("file", "img1.jpg", MediaType.IMAGE_JPEG_VALUE, "data1".getBytes());
-        MockMultipartFile file2 = new MockMultipartFile("file", "img2.png", MediaType.IMAGE_PNG_VALUE, "data2".getBytes());
+        MockMultipartFile file1 = new MockMultipartFile("file", "img1.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "data1".getBytes());
+        MockMultipartFile file2 = new MockMultipartFile("file", "img2.png", MediaType.IMAGE_PNG_VALUE,
+                "data2".getBytes());
 
-        mockMvc.perform(multipart("/api/admin/media/upload").file(file1).with(user(userService.loadUserByUsername(adminUser.getEmail()))))
-                .andExpect(status().isOk());
-        mockMvc.perform(multipart("/api/admin/media/upload").file(file2).with(user(userService.loadUserByUsername(adminUser.getEmail()))))
-                .andExpect(status().isOk());
+        mockMvc.perform(multipart("/api/admin/media/upload").file(file1)
+                .with(user(userService.loadUserByUsername(adminUser.getEmail())))).andExpect(status().isOk());
+        mockMvc.perform(multipart("/api/admin/media/upload").file(file2)
+                .with(user(userService.loadUserByUsername(adminUser.getEmail())))).andExpect(status().isOk());
 
-        mockMvc.perform(get("/api/admin/media")
-                        .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
+        mockMvc.perform(get("/api/admin/media").with(user(userService.loadUserByUsername(adminUser.getEmail()))))
+                .andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].fileName", is("img2.png")))
                 .andExpect(jsonPath("$[1].fileName", is("img1.jpg")));
     }
 
     @Test
     void listMedia_asUserWithoutAdminRole_shouldReturnForbidden() throws Exception {
-        mockMvc.perform(get("/api/admin/media")
-                        .with(user(userService.loadUserByUsername(normalUser.getEmail()))))
+        mockMvc.perform(get("/api/admin/media").with(user(userService.loadUserByUsername(normalUser.getEmail()))))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     void deleteMedia_asAdmin_shouldRemoveFileAndRecord() throws Exception {
-        MockMultipartFile file = new MockMultipartFile("file", "todelete.jpg", MediaType.IMAGE_JPEG_VALUE, "data".getBytes());
-        String response = mockMvc.perform(multipart("/api/admin/media/upload")
-                        .file(file)
+        MockMultipartFile file = new MockMultipartFile("file", "todelete.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "data".getBytes());
+        String response = mockMvc
+                .perform(multipart("/api/admin/media/upload").file(file)
                         .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         List<Media> all = mediaRepository.findAll();
         assertThat(all).hasSize(1);
         Long id = all.get(0).getId();
 
-        mockMvc.perform(delete("/api/admin/media/{id}", id)
-                        .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
+        mockMvc.perform(
+                delete("/api/admin/media/{id}", id).with(user(userService.loadUserByUsername(adminUser.getEmail()))))
                 .andExpect(status().isNoContent());
 
         assertThat(mediaRepository.findAll()).isEmpty();
@@ -240,21 +208,20 @@ public class MediaApiControllerIntegrationTest {
 
     @Test
     void deleteMedia_nonExisting_shouldReturnInternalServerError() throws Exception {
-        mockMvc.perform(delete("/api/admin/media/{id}", 999L)
-                        .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
+        mockMvc.perform(
+                delete("/api/admin/media/{id}", 999L).with(user(userService.loadUserByUsername(adminUser.getEmail()))))
                 .andExpect(status().is4xxClientError());
     }
 
     @Test
     void deleteMedia_asUserWithoutAdminRole_shouldReturnForbidden() throws Exception {
-        mockMvc.perform(delete("/api/admin/media/{id}", 1L)
-                        .with(user(userService.loadUserByUsername(normalUser.getEmail()))))
+        mockMvc.perform(
+                delete("/api/admin/media/{id}", 1L).with(user(userService.loadUserByUsername(normalUser.getEmail()))))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     void deleteMedia_withoutAuthentication_shouldReturnUnauthorized() throws Exception {
-        mockMvc.perform(delete("/api/admin/media/{id}", 1L))
-                .andExpect(status().isUnauthorized());
+        mockMvc.perform(delete("/api/admin/media/{id}", 1L)).andExpect(status().isUnauthorized());
     }
 }
