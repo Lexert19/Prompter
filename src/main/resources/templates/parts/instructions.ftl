@@ -1,5 +1,5 @@
 <div class="chat-settings" id="chatSettings">
-    <div class="instruction-field pe-4">
+    <div class="instruction-field">
         <label class="checkbox-container">
             <input type="checkbox"
                    id="memory"

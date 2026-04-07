@@ -162,6 +162,9 @@ class Settings {
         document.getElementById("chatHistoryInput").checked = this.activeHistory;
         document.getElementById("cache").checked = this.cache;
         document.getElementById("temperature").value = this.temperature * 100;
+        document.getElementById("top_p").value = this.top_p;
+        document.getElementById("frequencyPenalty").value = this.frequencyPenalty;
+        document.getElementById("presencePenalty").value = this.presencePenalty;
         document.getElementById("useSharedKeys").checked = this.useSharedKeys;
     }
 
