@@ -1,5 +1,6 @@
 package com.example.promptengineering.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,5 +33,28 @@ public class AnthropicStrategy implements ProviderStrategy {
             map.put("cache_control", new CacheControl().toMap());
         }
         return map;
+    }
+
+    @Override
+    public Map<String, Object> buildRequest(RequestBuilder builder) {
+        Map<String, Object> request = new HashMap<>();
+        applySystemPrompt(request, builder.getMessages(), builder.getSystem());
+
+        List<Map<String, Object>> messagesList = new ArrayList<>();
+        for (Message message : builder.getMessages()) {
+            List<Map<String, Object>> contentList = new ArrayList<>();
+            for (Content content : message.getContent()) {
+                contentList.add(content.toMap(this, message.isCached()));
+            }
+            messagesList.add(Map.of("role", message.getRole(), "content", contentList));
+        }
+
+        request.put("messages", messagesList);
+        request.put("model", builder.getModel());
+        request.put("stream", builder.getStream());
+        request.put("max_tokens", builder.getMaxTokens());
+        request.put("temperature", builder.getTemperature());
+
+        return request;
     }
 }

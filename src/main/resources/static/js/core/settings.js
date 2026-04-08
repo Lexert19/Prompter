@@ -152,12 +152,6 @@ class Settings {
     }
 
     initUI() {
-//        this.models.forEach((model) => {
-//            modelOptions.innerHTML += `<option value="${model.name}">${model.text}</option>`;
-//        });
-
-        //window.systemPromptSelector.render();
-
         document.getElementById("memory").checked = this.memory;
         document.getElementById("chatHistoryInput").checked = this.activeHistory;
         document.getElementById("cache").checked = this.cache;

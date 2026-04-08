@@ -9,6 +9,7 @@ class ChatClient {
         setInterval(this.renderHtml.bind(this), 100);
         this.rerender = false;
         this.buffer = '';
+        this.jsonAccumulator = '';
     }
 
     getProvider(){
@@ -26,6 +27,7 @@ class ChatClient {
 
     sendStreamingMessage(request) {
         this.parser.clear();
+        this.jsonAccumulator = '';
         this.abortController = new AbortController();
         console.log(request.toRequestJSON());
         this.newMessage();
@@ -46,7 +48,8 @@ class ChatClient {
         })
             .then(this.handleStream.bind(this))
             .catch(error => {
-            this.outputInput.textContent += t.t("errorFetchingData"), error;
+            this.outputInput.textContent += t.t("errorFetchingData") + ": " + error;
+            this.finalizeMessage();
         });
     }
 
@@ -58,19 +61,63 @@ class ChatClient {
         this.read(reader, decoder);
     }
 
+    read(reader, decoder) {
+        reader.read().then(({ done, value }) => {
+            if (done) {
+                this.handleStreamEnd(reader);
+                return;
+            }
+            this.buffer += decoder.decode(value, { stream: true });
+            let events = this.buffer.split('\n\n');
+            this.buffer = events.pop();
+            for (let event of events) {
+                this.processEvent(event);
+            }
 
+            this.read(reader, decoder);
+        }).catch(error => {
+            this.handleStreamEnd(reader);
+        });
+    }
 
-    readChunk(decoder, value) {
-
-        this.buffer += decoder.decode(value, { stream: true });
-
-        let lines = this.buffer.split('\n');
-        this.buffer = lines.pop();
-
+    processEvent(event, reader) {
+        const lines = event.split('\n');
         for (let line of lines) {
-            this.processLine(line);
+            if (line.startsWith('data:')) {
+                const data = line.slice(5).trim();
+
+                if (data === '[DONE]') {
+                    this.handleStreamEnd(reader);
+                    return;
+                }
+
+                this.jsonAccumulator += data;
+                this.tryParseAndProcess();
+            }
         }
     }
+
+    tryParseAndProcess() {
+        try {
+            const rootNode = JSON.parse(this.jsonAccumulator);
+
+            this.readChunkData(rootNode);
+            this.jsonAccumulator = '';
+        } catch (e) {
+        }
+    }
+//
+//    readChunk(decoder, value) {
+//
+//        this.buffer += decoder.decode(value, { stream: true });
+//
+//        let lines = this.buffer.split('\n');
+//        this.buffer = lines.pop();
+//
+//        for (let line of lines) {
+//            this.processLine(line);
+//        }
+//    }
 
     processLine(line) {
         if (!line.trim()) return;
@@ -82,32 +129,39 @@ class ChatClient {
         this.readChunkData(line);
     }
 
-    readChunkData(chunk){
+    readChunkData(rootNode){
         try{
             //event:error
-            if (!chunk.trim() || chunk === "[DONE]" ||
-            chunk.startsWith(': ping') ||
-            chunk.startsWith('event:error') ||
-            chunk.startsWith(': OPENROUTER PROCESSING')) {
-                return;
-            }
-
-            const rootNode = JSON.parse(chunk);
-            let error = rootNode.error;
-            if(error){
+//            if (!chunk.trim() || chunk === "[DONE]" ||
+//            chunk.startsWith(': ping') ||
+//            chunk.startsWith('event:error') ||
+//            chunk.startsWith(': OPENROUTER PROCESSING')) {
+//                return;
+//            }
+//
+//            const rootNode = JSON.parse(chunk);
+            if(rootNode.error){
                 this.outputInput.textContent += error;
                 return;
             }
 
             let content = "";
-            if(this.getProvider() == "ANTHROPIC"){
+//            if(this.getProvider() == "ANTHROPIC"){
+//                content = rootNode.delta.text;
+//            } else if (rootNode.choices && rootNode.choices.length > 0) {
+//                const choice = rootNode.choices[0];
+//                if (choice?.delta?.content) content = choice.delta.content;
+//            }  else if (rootNode.candidates?.[0]?.content?.parts?.[0]?.text) {
+//                content = rootNode.candidates[0].content.parts[0].text;
+//            }
+            if (rootNode.choices?.[0]?.delta?.content) {
+                content = rootNode.choices[0].delta.content;
+            }
+            else if (rootNode.delta?.text) {
                 content = rootNode.delta.text;
-            } else if (rootNode.choices && rootNode.choices.length > 0) {
-                const choice = rootNode.choices[0];
-                if (choice?.delta?.content) content = choice.delta.content;
-            } else if (rootNode.candidates && rootNode.candidates.length > 0) {
-                const candidate = rootNode.candidates[0];
-                if (candidate?.content?.parts?.[0]?.text) content = candidate.content.parts[0].text;
+            }
+            else if (rootNode.candidates?.[0]?.content?.parts?.[0]?.text) {
+                content = rootNode.candidates[0].content.parts[0].text;
             }
 
             content = this.appendReasoningContent(rootNode, content);
@@ -143,7 +197,11 @@ class ChatClient {
 
     appendReasoningContent(rootNode, content){
         const choice = rootNode.choices?.[0];
-        let reasoningContent = choice?.delta?.reasoning_content;
+        const openAiReasoning = rootNode.choices?.[0]?.delta?.reasoning_content;
+        const geminiReasoning = rootNode.delta?.type === 'thought_summary'
+            ? rootNode.delta.content?.text
+            : "";
+        let reasoningContent = openAiReasoning || geminiReasoning || "";
         if(!reasoningContent)
                 reasoningContent="";
         if(content == ""){
@@ -161,32 +219,31 @@ class ChatClient {
         }
     }
 
-    read(reader, decoder) {
-        reader.read().then(({ done, value }) => {
-            if (done) {
-                this.handleStreamEnd(reader);
-                return;
-            }
 
-            this.readChunk(decoder, value);
 
-            this.read(reader, decoder);
-        }).catch(error => {
-            this.handleStreamEnd(reader);
-        });
-    }
+
 
 
     handleStreamEnd(reader) {
         if (this.buffer) {
-            this.processLine(this.buffer);
+            this.processEvent(this.buffer, reader);
+//            this.processLine(this.buffer);
             this.buffer = '';
         }
 
-        reader.releaseLock();
+        if (reader) {
+            reader.releaseLock();
+        }
+
+        this.finalizeMessage();
+    }
+
+    finalizeMessage() {
         window.inputView.setIsBlocked(false);
-        this.currentMessage.end = Date.now();
-        window.chat.saveMessage(this.currentMessage);
+        if (this.currentMessage) {
+            this.currentMessage.end = Date.now();
+            window.chat.saveMessage(this.currentMessage);
+        }
     }
 
 

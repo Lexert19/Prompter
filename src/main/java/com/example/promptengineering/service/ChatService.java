@@ -97,16 +97,35 @@ public class ChatService {
                 .onErrorResume(this::handleError);
     }
 
-    private WebClient.RequestBodySpec buildHttpRequest(RequestBuilder request, String json) {
-        WebClient.RequestBodySpec spec = (WebClient.RequestBodySpec) webClient.post().uri(request.getUrl())
-                .contentType(MediaType.APPLICATION_JSON).bodyValue(json);
+//    private WebClient.RequestBodySpec buildHttpRequest(RequestBuilder request, String json) {
+//        WebClient.RequestBodySpec spec = (WebClient.RequestBodySpec) webClient.post().uri(request.getUrl())
+//                .contentType(MediaType.APPLICATION_JSON).bodyValue(json);
+//
+//        if (request.getProvider().equals("ANTHROPIC")) {
+//            spec.header("x-api-key", request.getKey()).header("anthropic-version", "2023-06-01")
+//                    .header("anthropic-beta", "prompt-caching-2024-07-31");
+//        } else {
+//            spec.header("Authorization", "Bearer " + request.getKey());
+//        }
+//        return spec;
+//    }
 
-        if (request.getProvider().equals("ANTHROPIC")) {
-            spec.header("x-api-key", request.getKey()).header("anthropic-version", "2023-06-01")
-                    .header("anthropic-beta", "prompt-caching-2024-07-31");
+    private WebClient.RequestBodySpec buildHttpRequest(RequestBuilder request, String json) {
+        String finalUrl = request.getUrl();
+
+        WebClient.RequestBodySpec spec = (WebClient.RequestBodySpec) webClient.post().uri(finalUrl)
+            .contentType(MediaType.APPLICATION_JSON).bodyValue(json);
+
+        if ("ANTHROPIC".equalsIgnoreCase(request.getProvider())) {
+            spec.header("x-api-key", request.getKey())
+                .header("anthropic-version", "2023-06-01")
+                .header("anthropic-beta", "prompt-caching-2024-07-31");
+        } else if ("GEMINI".equalsIgnoreCase(request.getProvider())) {
+            spec.header("x-goog-api-key", request.getKey());
         } else {
             spec.header("Authorization", "Bearer " + request.getKey());
         }
+
         return spec;
     }
 

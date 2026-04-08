@@ -34,7 +34,9 @@ public class RequestBuilder {
         this.provider = providerName;
         if ("ANTHROPIC".equals(providerName)) {
             this.providerStrategy = new AnthropicStrategy();
-        } else {
+        } else if ("GEMINI".equalsIgnoreCase(providerName)) {
+        this.providerStrategy = new GeminiStrategy();
+    } else {
             this.providerStrategy = new OpenAIStrategy();
         }
     }
@@ -72,43 +74,48 @@ public class RequestBuilder {
     }
 
     public Map<String, Object> build() {
-        Map<String, Object> request = new HashMap<>();
-
-        getProviderStrategy().applySystemPrompt(request, this.messages, this.system);
-
-        List<Map<String, Object>> messagesListDefault = new ArrayList<>();
-        for (Message message : messages) {
-            List<Map<String, Object>> contentList = new ArrayList<>();
-            for (Content content : message.getContent()) {
-                contentList.add(content.toMap(providerStrategy, message.isCached()));
-            }
-
-            Map<String, Object> msgMap = new HashMap<>();
-            msgMap.put("role", message.getRole());
-            msgMap.put("content", contentList);
-            messagesListDefault.add(msgMap);
-        }
-        request.put("messages", messagesListDefault);
-        request.put("model", model);
-        request.put("stream", stream);
-
-        if (!this.reasoningEffort.isEmpty()) {
-            request.put("response_format", Map.of("type", "text"));
-            request.put("reasoning_effort", this.reasoningEffort);
-            if (!provider.equalsIgnoreCase("gemini")) {
-                request.put("chat_template_kwargs", Map.of("enable_thinking", true));
-            }
-        }
-        request.put("max_tokens", maxTokens);
-        request.put("temperature", temperature);
-        request.put("top_p", top_p);
-        if (!provider.equalsIgnoreCase("gemini")) {
-            request.put("frequency_penalty", frequencyPenalty);
-            request.put("presence_penalty", presencePenalty);
-        }
-
-        return request;
+        return getProviderStrategy().buildRequest(this);
     }
+
+
+//    public Map<String, Object> build() {
+//        Map<String, Object> request = new HashMap<>();
+//
+//        getProviderStrategy().applySystemPrompt(request, this.messages, this.system);
+//
+//        List<Map<String, Object>> messagesListDefault = new ArrayList<>();
+//        for (Message message : messages) {
+//            List<Map<String, Object>> contentList = new ArrayList<>();
+//            for (Content content : message.getContent()) {
+//                contentList.add(content.toMap(providerStrategy, message.isCached()));
+//            }
+//
+//            Map<String, Object> msgMap = new HashMap<>();
+//            msgMap.put("role", message.getRole());
+//            msgMap.put("content", contentList);
+//            messagesListDefault.add(msgMap);
+//        }
+//        request.put("messages", messagesListDefault);
+//        request.put("model", model);
+//        request.put("stream", stream);
+//
+//        if (!this.reasoningEffort.isEmpty()) {
+//            request.put("response_format", Map.of("type", "text"));
+//            request.put("reasoning_effort", this.reasoningEffort);
+//            if (!provider.equalsIgnoreCase("gemini")) {
+//                request.put("chat_template_kwargs", Map.of("enable_thinking", true));
+//            }
+//        }
+//        request.put("max_tokens", maxTokens);
+//        request.put("temperature", temperature);
+//        request.put("top_p", top_p);
+//        if (!provider.equalsIgnoreCase("gemini")) {
+//            request.put("frequency_penalty", frequencyPenalty);
+//            request.put("presence_penalty", presencePenalty);
+//        }
+//
+//        return request;
+//    }
 
     public int estimateTokenCount() {
         int totalTokens = 0;
