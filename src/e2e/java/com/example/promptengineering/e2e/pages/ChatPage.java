@@ -44,7 +44,8 @@ public class ChatPage {
     public void selectModel(String modelName) {
         wait.until(ExpectedConditions.elementToBeClickable(modelSelectorButton)).click();
         By modelOption = By.xpath(
-                "//div[contains(@class,'model-item-selectable') and .//span[contains(text(),'" + modelName + "')]]");
+                "//div[contains(@class,'model-item-selectable') and .//span[contains(text(),'"
+                        + modelName + "')]]");
         wait.until(ExpectedConditions.elementToBeClickable(modelOption)).click();
     }
 
@@ -60,8 +61,10 @@ public class ChatPage {
     }
 
     public String getLastMessageText() {
-        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.cssSelector(".message"), 0));
-        WebElement firstMessage = chatMessages.findElement(By.cssSelector(".message:first-child .code-wrap"));
+        wait.until(ExpectedConditions
+                .numberOfElementsToBeMoreThan(By.cssSelector(".message"), 0));
+        WebElement firstMessage = chatMessages
+                .findElement(By.cssSelector(".message:first-child .code-wrap"));
         return firstMessage.getText();
     }
 }

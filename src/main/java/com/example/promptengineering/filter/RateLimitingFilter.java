@@ -19,17 +19,20 @@ public class RateLimitingFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+    public void doFilter(ServletRequest request, ServletResponse response,
+                         FilterChain chain)
             throws IOException, ServletException {
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
         String path = httpRequest.getRequestURI();
-        if (path.startsWith("/auth/login") && httpRequest.getMethod().equalsIgnoreCase("POST")) {
+        if (path.startsWith("/auth/login")
+                && httpRequest.getMethod().equalsIgnoreCase("POST")) {
             if (!rateLimiter.isAllowed(httpRequest)) {
                 httpResponse.setStatus(429);
-                httpResponse.getWriter().write("Too many requests. Please try again later.");
+                httpResponse.getWriter()
+                        .write("Too many requests. Please try again later.");
                 return;
             }
         }

@@ -23,7 +23,8 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(AsyncRequestNotUsableException.class)
-    public void handleClientAbort(AsyncRequestNotUsableException ex, HttpServletResponse response) {
+    public void handleClientAbort(AsyncRequestNotUsableException ex,
+                                  HttpServletResponse response) {
         if (!response.isCommitted()) {
             response.setStatus(HttpStatus.OK.value());
         }
@@ -57,14 +58,19 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidation(MethodArgumentNotValidException e) {
-        Map<String, String> errors = e.getBindingResult().getFieldErrors().stream().collect(Collectors.toMap(
-                FieldError::getField, fe -> fe.getDefaultMessage() != null ? fe.getDefaultMessage() : "", (a, b) -> a));
+        Map<String, String> errors = e.getBindingResult().getFieldErrors().stream()
+                .collect(Collectors.toMap(FieldError::getField,
+                        fe -> fe.getDefaultMessage() != null
+                                ? fe.getDefaultMessage()
+                                : "",
+                        (a, b) -> a));
         return ResponseEntity.badRequest().body(errors);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGeneric(Exception e) {
         log.error("Unhandled exception", e);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Unexpected error"));
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "Unexpected error"));
     }
 }

@@ -8,7 +8,8 @@ import java.lang.reflect.Type;
 
 public class ContentDeserializer implements JsonDeserializer<Content> {
     @Override
-    public Content deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+    public Content deserialize(JsonElement json, Type typeOfT,
+                               JsonDeserializationContext context)
             throws JsonParseException {
         JsonObject jsonObject = json.getAsJsonObject();
 

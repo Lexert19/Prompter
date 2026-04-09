@@ -30,9 +30,11 @@ public class DataInitializer implements CommandLineRunner {
     private final SharedKeyService sharedKeyService;
 
     public DataInitializer(UserRepository userRepository, PasswordEncoder passwordEncoder,
-            @Value("${admin.email}") String adminEmail, @Value("${admin.password}") String adminPassword,
-            ModelService modelService, @Value("${gemini.api.key:}") String geminiApiKey,
-            MigrationFlagRepository migrationFlagRepository, SharedKeyService sharedKeyService) {
+            @Value("${admin.email}") String adminEmail,
+            @Value("${admin.password}") String adminPassword, ModelService modelService,
+            @Value("${gemini.api.key:}") String geminiApiKey,
+            MigrationFlagRepository migrationFlagRepository,
+            SharedKeyService sharedKeyService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.adminEmail = adminEmail;
@@ -65,7 +67,8 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void addGeminiSharedKeyIfNeeded(User user) {
-        Optional<MigrationFlag> flag = migrationFlagRepository.findByName("gemini_shared_key_added");
+        Optional<MigrationFlag> flag = migrationFlagRepository
+                .findByName("gemini_shared_key_added");
         if (flag.isPresent() && flag.get().isExecuted()) {
             return;
         }
@@ -73,7 +76,8 @@ public class DataInitializer implements CommandLineRunner {
         if (geminiApiKey != null && !geminiApiKey.isBlank()) {
             sharedKeyService.addKey("GEMINI", geminiApiKey, user);
 
-            MigrationFlag newFlag = flag.orElse(new MigrationFlag("gemini_shared_key_added"));
+            MigrationFlag newFlag = flag
+                    .orElse(new MigrationFlag("gemini_shared_key_added"));
             newFlag.setExecuted(true);
             newFlag.setExecutedAt(LocalDateTime.now());
             migrationFlagRepository.save(newFlag);

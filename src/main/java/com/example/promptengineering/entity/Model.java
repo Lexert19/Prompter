@@ -36,7 +36,8 @@ public class Model {
     public Model() {
 
     }
-    public Model(String name, String text, String provider, String url, String type, User user) {
+    public Model(String name, String text, String provider, String url, String type,
+            User user) {
         this.name = name;
         this.text = text;
         this.provider = provider;

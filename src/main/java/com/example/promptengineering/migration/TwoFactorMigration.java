@@ -18,7 +18,8 @@ public class TwoFactorMigration implements CommandLineRunner {
     private final JdbcTemplate jdbcTemplate;
     private static final String FLAG_NAME = "add_two_factor_columns";
 
-    public TwoFactorMigration(MigrationFlagRepository migrationFlagRepository, JdbcTemplate jdbcTemplate) {
+    public TwoFactorMigration(MigrationFlagRepository migrationFlagRepository,
+            JdbcTemplate jdbcTemplate) {
         this.migrationFlagRepository = migrationFlagRepository;
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -31,14 +32,18 @@ public class TwoFactorMigration implements CommandLineRunner {
         }
 
         if (!columnExists("app_user", "two_factor_enabled")) {
-            jdbcTemplate.execute("ALTER TABLE app_user ADD COLUMN two_factor_enabled BOOLEAN DEFAULT FALSE");
-            jdbcTemplate.update("UPDATE app_user SET two_factor_enabled = FALSE WHERE two_factor_enabled IS NULL");
+            jdbcTemplate.execute(
+                    "ALTER TABLE app_user ADD COLUMN two_factor_enabled BOOLEAN DEFAULT FALSE");
+            jdbcTemplate.update(
+                    "UPDATE app_user SET two_factor_enabled = FALSE WHERE two_factor_enabled IS NULL");
         } else {
-            jdbcTemplate.update("UPDATE app_user SET two_factor_enabled = FALSE WHERE two_factor_enabled IS NULL");
+            jdbcTemplate.update(
+                    "UPDATE app_user SET two_factor_enabled = FALSE WHERE two_factor_enabled IS NULL");
         }
 
         if (!columnExists("app_user", "two_factor_email")) {
-            jdbcTemplate.execute("ALTER TABLE app_user ADD COLUMN two_factor_email VARCHAR(255)");
+            jdbcTemplate.execute(
+                    "ALTER TABLE app_user ADD COLUMN two_factor_email VARCHAR(255)");
         }
 
         MigrationFlag flag = new MigrationFlag();
@@ -50,7 +55,8 @@ public class TwoFactorMigration implements CommandLineRunner {
 
     private boolean columnExists(String tableName, String columnName) {
         String sql = "SELECT COUNT(*) FROM information_schema.columns WHERE table_name = ? AND column_name = ?";
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, tableName, columnName);
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, tableName,
+                columnName);
         return count != null && count > 0;
     }
 }

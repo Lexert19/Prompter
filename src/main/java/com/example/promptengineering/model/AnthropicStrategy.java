@@ -7,7 +7,8 @@ import java.util.Map;
 
 public class AnthropicStrategy implements ProviderStrategy {
     @Override
-    public void applySystemPrompt(Map<String, Object> request, List<Message> messages, String system) {
+    public void applySystemPrompt(Map<String, Object> request, List<Message> messages,
+                                  String system) {
         if (system != null && !system.trim().isEmpty()) {
             request.put("system", system);
         }
@@ -28,7 +29,8 @@ public class AnthropicStrategy implements ProviderStrategy {
     public Map<String, Object> formatImageContent(ImageContent content, boolean cached) {
         Map<String, Object> map = new HashMap<>();
         map.put("type", "image");
-        map.put("source", Map.of("type", "base64", "media_type", content.getMediaType(), "data", content.getData()));
+        map.put("source", Map.of("type", "base64", "media_type", content.getMediaType(),
+                "data", content.getData()));
         if (cached) {
             map.put("cache_control", new CacheControl().toMap());
         }

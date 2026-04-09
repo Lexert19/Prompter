@@ -27,8 +27,10 @@ public class ModelService {
     private final int maxModelsPerUser;
     private final String adminEmail;
 
-    public ModelService(UserRepository userRepository, ModelRepository modelRepository, ObjectMapper objectMapper,
-            @Value("${app.max.models.per.user}") int maxModelsPerUser, @Value("${admin.email}") String adminEmail) {
+    public ModelService(UserRepository userRepository, ModelRepository modelRepository,
+            ObjectMapper objectMapper,
+            @Value("${app.max.models.per.user}") int maxModelsPerUser,
+            @Value("${admin.email}") String adminEmail) {
         this.userRepository = userRepository;
         this.modelRepository = modelRepository;
         this.objectMapper = objectMapper;
@@ -39,7 +41,8 @@ public class ModelService {
     public List<Model> getUserModels(User user) {
         List<Model> models = modelRepository.findByUser(user);
         if (models.size() >= maxModelsPerUser) {
-            throw new IllegalArgumentException("User cannot have more than " + maxModelsPerUser + " models.");
+            throw new IllegalArgumentException(
+                    "User cannot have more than " + maxModelsPerUser + " models.");
         }
         return models;
     }
@@ -51,11 +54,12 @@ public class ModelService {
     public User addUserModel(ModelDto modelDto, User user) {
         long currentCount = modelRepository.countByUser(user);
         if (currentCount >= maxModelsPerUser) {
-            throw new IllegalArgumentException("User cannot have more than " + maxModelsPerUser + " models.");
+            throw new IllegalArgumentException(
+                    "User cannot have more than " + maxModelsPerUser + " models.");
         }
 
-        Model model = new Model(modelDto.getName(), modelDto.getText(), modelDto.getProvider(), modelDto.getUrl(),
-                modelDto.getType(), user);
+        Model model = new Model(modelDto.getName(), modelDto.getText(),
+                modelDto.getProvider(), modelDto.getUrl(), modelDto.getType(), user);
         model.setGlobal(false);
         modelRepository.save(model);
         return userRepository.save(user);
@@ -87,11 +91,13 @@ public class ModelService {
         try {
             modelRepository.deleteByGlobalTrue();
             InputStream is = getClass().getResourceAsStream("/default-models.json");
-            List<ModelDto> defaultModels = objectMapper.readValue(is, new TypeReference<>() {
-            });
+            List<ModelDto> defaultModels = objectMapper.readValue(is,
+                    new TypeReference<>() {
+                    });
 
             for (ModelDto dto : defaultModels) {
-                boolean exists = modelRepository.existsByProviderAndName(dto.getProvider(), dto.getName());
+                boolean exists = modelRepository
+                        .existsByProviderAndName(dto.getProvider(), dto.getName());
                 if (!exists) {
                     Optional<User> user = userRepository.findByEmail(adminEmail);
                     Model model = new Model();
@@ -107,7 +113,8 @@ public class ModelService {
                     modelRepository.save(model);
                     log.info("Added model: {} ({})", dto.getName(), dto.getProvider());
                 } else {
-                    log.debug("Model already exists: {} ({}) – skipping", dto.getName(), dto.getProvider());
+                    log.debug("Model already exists: {} ({}) – skipping", dto.getName(),
+                            dto.getProvider());
                 }
             }
         } catch (IOException e) {

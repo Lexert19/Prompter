@@ -23,7 +23,8 @@ public class BlogViewController {
     }
 
     @GetMapping("/blog/{slug}")
-    public String post(@PathVariable String slug, Model model) throws ResourceNotFoundException {
+    public String post(@PathVariable String slug, Model model)
+            throws ResourceNotFoundException {
         PostDto post = postService.getPostDtoBySlug(slug);
         model.addAttribute("post", post);
         return "blog/post";

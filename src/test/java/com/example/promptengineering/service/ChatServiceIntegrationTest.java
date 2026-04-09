@@ -52,11 +52,13 @@ public class ChatServiceIntegrationTest {
         adminUser = userRepository.findByEmail(adminEmail)
                 .orElseThrow(() -> new IllegalStateException("Admin user not found"));
 
-        geminiModel = modelRepository.findByProviderAndGlobalTrue("GEMINI").stream().findFirst()
-                .orElseThrow(() -> new IllegalStateException("No global Gemini model found"));
+        geminiModel = modelRepository.findByProviderAndGlobalTrue("GEMINI").stream()
+                .findFirst().orElseThrow(
+                        () -> new IllegalStateException("No global Gemini model found"));
 
         SharedKey tempKey = sharedKeyRepository.findByProvider("GEMINI").get(0);
-        geminiSharedKey = sharedKeyRepository.findByIdWithOwner(tempKey.getId()).orElseThrow();
+        geminiSharedKey = sharedKeyRepository.findByIdWithOwner(tempKey.getId())
+                .orElseThrow();
         owner = geminiSharedKey.getOwner();
     }
 
@@ -80,7 +82,8 @@ public class ChatServiceIntegrationTest {
         Message message = new Message("user", List.of(content));
         request.setMessages(List.of(message));
 
-        Flux<ServerSentEvent<String>> result = chatService.makeRequest(request, adminUser);
+        Flux<ServerSentEvent<String>> result = chatService.makeRequest(request,
+                adminUser);
 
         CountDownLatch latch = new CountDownLatch(1);
         AtomicReference<String> lastData = new AtomicReference<>();
@@ -133,7 +136,8 @@ public class ChatServiceIntegrationTest {
         Message message = new Message("user", List.of(content));
         request.setMessages(List.of(message));
 
-        Flux<ServerSentEvent<String>> result = chatService.makeRequest(request, adminUser);
+        Flux<ServerSentEvent<String>> result = chatService.makeRequest(request,
+                adminUser);
 
         CountDownLatch latch = new CountDownLatch(1);
         AtomicReference<String> errorEvent = new AtomicReference<>();
@@ -155,7 +159,8 @@ public class ChatServiceIntegrationTest {
         assertThat(errorEvent.get()).isNotNull().contains("error");
 
         User refreshedOwner = userRepository.findById(owner.getId()).orElseThrow();
-        SharedKey refreshedKey = sharedKeyRepository.findById(geminiSharedKey.getId()).orElseThrow();
+        SharedKey refreshedKey = sharedKeyRepository.findById(geminiSharedKey.getId())
+                .orElseThrow();
 
         assertThat(refreshedOwner.getPoints()).isEqualTo(initialPoints);
         assertThat(refreshedKey.getUsageCount()).isEqualTo(initialUsage + 1);

@@ -53,12 +53,14 @@ public class AdminBlogListPage {
     }
 
     private WebElement findEditButton(String title) {
-        WebElement row = tableBody.findElement(By.xpath(".//tr[td[contains(text(),'" + title + "')]]"));
+        WebElement row = tableBody
+                .findElement(By.xpath(".//tr[td[contains(text(),'" + title + "')]]"));
         return row.findElement(By.linkText("Edytuj"));
     }
 
     private WebElement findDeleteButton(String title) {
-        WebElement row = tableBody.findElement(By.xpath(".//tr[td[contains(text(),'" + title + "')]]"));
+        WebElement row = tableBody
+                .findElement(By.xpath(".//tr[td[contains(text(),'" + title + "')]]"));
         return row.findElement(By.cssSelector(".delete-post-btn"));
     }
 }

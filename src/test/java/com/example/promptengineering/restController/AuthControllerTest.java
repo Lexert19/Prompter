@@ -28,6 +28,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -85,8 +86,8 @@ public class AuthControllerTest {
 
     @Test
     public void testShowLoginForm() throws Exception {
-        mockMvc.perform(get("/auth/login")).andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Login")));
+        mockMvc.perform(get("/auth/login")).andExpect(status().isOk()).andExpect(
+                content().string(org.hamcrest.Matchers.containsString("Login")));
     }
 
     @Test
@@ -110,15 +111,19 @@ public class AuthControllerTest {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("email", "testuser123@wp.pl");
 
-        MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .build();
 
-        MvcResult result = mockMvc.perform(post("/auth/reset-password-request")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED).params(formData))
+        MvcResult result = mockMvc
+                .perform(post("/auth/reset-password-request").with(csrf())
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .params(formData))
                 .andExpect(status().is3xxRedirection()).andReturn();
 
         log.info("Response body: {}", result.getResponse().getContentAsString());
 
-        List<ResetToken> resetTokens = resetTokenRepository.findByUserLogin("testuser123@wp.pl");
+        List<ResetToken> resetTokens = resetTokenRepository
+                .findByUserLogin("testuser123@wp.pl");
         assertFalse(resetTokens.isEmpty(), "Lista tokenów resetowania hasła jest pusta");
     }
 
@@ -137,10 +142,12 @@ public class AuthControllerTest {
         formData.add("password", "nowe_haslo");
         formData.add("password_confirmation", "nowe_haslo");
 
-        MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .build();
 
-        mockMvc.perform(post("/auth/reset-password-confirm").contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .params(formData)).andExpect(status().is2xxSuccessful());
+        mockMvc.perform(post("/auth/reset-password-confirm").with(csrf())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED).params(formData))
+                .andExpect(status().is2xxSuccessful());
 
         Optional<User> user = userRepository.findByEmail(resetToken.getUserLogin());
         assertFalse(user.isEmpty(), "User not found");
@@ -158,10 +165,12 @@ public class AuthControllerTest {
         formData.add("password", "nowe_haslo");
         formData.add("password_confirmation", "nowe_haslo");
 
-        MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .build();
 
-        mockMvc.perform(post("/auth/reset-password-confirm").contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .params(formData)).andExpect(status().is2xxSuccessful());
+        mockMvc.perform(post("/auth/reset-password-confirm").with(csrf())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED).params(formData))
+                .andExpect(status().is2xxSuccessful());
     }
 
     @Test
@@ -179,10 +188,12 @@ public class AuthControllerTest {
         formData.add("password", "nowe_haslo");
         formData.add("password_confirmation", "nowe_haslo");
 
-        MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .build();
 
-        mockMvc.perform(post("/auth/reset-password-confirm").contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .params(formData)).andExpect(status().isOk());
+        mockMvc.perform(post("/auth/reset-password-confirm").with(csrf())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED).params(formData))
+                .andExpect(status().isOk());
     }
 
 }

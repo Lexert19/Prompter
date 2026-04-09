@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -58,8 +59,8 @@ public class AccountControllerIntegrationTest {
         userRepository.save(testUser);
 
         UserDetails userDetails = userService.loadUserByUsername(userEmail);
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null,
-                userDetails.getAuthorities());
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.setContext(SecurityContextHolder.createEmptyContext());
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -75,11 +76,13 @@ public class AccountControllerIntegrationTest {
         String keyName = "OPENAI";
         String keyValue = "sk-1234567890abcdef";
 
-        mockMvc.perform(
-                post("/api/account/save-key/{keyName}", keyName).with(user(userService.loadUserByUsername(userEmail)))
-                        .contentType(MediaType.TEXT_PLAIN).content(keyValue))
-                .andExpect(status().isOk()).andExpect(content()
-                        .string(String.format("Key '%s' saved to map for user with email: %s", keyName, userEmail)));
+        mockMvc.perform(post("/api/account/save-key/{keyName}", keyName).with(csrf())
+                .with(user(userService.loadUserByUsername(userEmail)))
+                .contentType(MediaType.TEXT_PLAIN).content(keyValue))
+                .andExpect(status().isOk())
+                .andExpect(content().string(
+                        String.format("Key '%s' saved to map for user with email: %s",
+                                keyName, userEmail)));
 
         User updatedUser = userRepository.findByEmail(userEmail).orElseThrow();
         assert userService.getUserKeys(updatedUser).containsKey(keyName);
@@ -95,8 +98,10 @@ public class AccountControllerIntegrationTest {
         userService.setUserKeys(user, keys);
         userRepository.save(user);
 
-        mockMvc.perform(get("/api/account/keys").with(user(userService.loadUserByUsername(userEmail))))
-                .andExpect(status().isOk()).andExpect(jsonPath("$.OPENAI").value("sk-openai-test"))
+        mockMvc.perform(get("/api/account/keys")
+                .with(user(userService.loadUserByUsername(userEmail))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.OPENAI").value("sk-openai-test"))
                 .andExpect(jsonPath("$.ANTHROPIC").value("sk-anthropic-test"));
     }
 
@@ -106,7 +111,8 @@ public class AccountControllerIntegrationTest {
         userService.setUserKeys(user, new HashMap<>());
         userRepository.save(user);
 
-        mockMvc.perform(get("/api/account/keys").with(user(userService.loadUserByUsername(userEmail))))
+        mockMvc.perform(get("/api/account/keys")
+                .with(user(userService.loadUserByUsername(userEmail))))
                 .andExpect(status().isOk()).andExpect(jsonPath("$").isEmpty());
     }
 
@@ -120,9 +126,9 @@ public class AccountControllerIntegrationTest {
         userService.getUserKeys(user).put(keyName, initialKeyValue);
         userRepository.save(user);
 
-        mockMvc.perform(
-                post("/api/account/save-key/{keyName}", keyName).with(user(userService.loadUserByUsername(userEmail)))
-                        .contentType(MediaType.TEXT_PLAIN).content(newKeyValue))
+        mockMvc.perform(post("/api/account/save-key/{keyName}", keyName).with(csrf())
+                .with(user(userService.loadUserByUsername(userEmail)))
+                .contentType(MediaType.TEXT_PLAIN).content(newKeyValue))
                 .andExpect(status().isOk());
 
         User updatedUser = userRepository.findByEmail(userEmail).orElseThrow();
@@ -135,9 +141,9 @@ public class AccountControllerIntegrationTest {
         String keyName = "CUSTOM_API";
         String keyValue = "api_key_with!@#$%^&*()_+special_chars";
 
-        mockMvc.perform(
-                post("/api/account/save-key/{keyName}", keyName).with(user(userService.loadUserByUsername(userEmail)))
-                        .contentType(MediaType.TEXT_PLAIN).content(keyValue))
+        mockMvc.perform(post("/api/account/save-key/{keyName}", keyName).with(csrf())
+                .with(user(userService.loadUserByUsername(userEmail)))
+                .contentType(MediaType.TEXT_PLAIN).content(keyValue))
                 .andExpect(status().isOk());
 
         User updatedUser = userRepository.findByEmail(userEmail).orElseThrow();
@@ -148,9 +154,9 @@ public class AccountControllerIntegrationTest {
     void shouldHandleEmptyKeyValue() throws Exception {
         String keyName = "EMPTY_KEY";
 
-        mockMvc.perform(
-                post("/api/account/save-key/{keyName}", keyName).with(user(userService.loadUserByUsername(userEmail)))
-                        .contentType(MediaType.TEXT_PLAIN).content("\"\""))
+        mockMvc.perform(post("/api/account/save-key/{keyName}", keyName).with(csrf())
+                .with(user(userService.loadUserByUsername(userEmail)))
+                .contentType(MediaType.TEXT_PLAIN).content("\"\""))
                 .andExpect(status().is2xxSuccessful());
 
         User updatedUser = userRepository.findByEmail(userEmail).orElseThrow();
@@ -165,8 +171,9 @@ public class AccountControllerIntegrationTest {
         String keyName = "OPENAI";
         String keyValue = "sk-test";
 
-        mockMvc.perform(post("/api/account/save-key/{keyName}", keyName).contentType(MediaType.APPLICATION_JSON)
-                .content(keyValue)).andExpect(status().isUnauthorized());
+        mockMvc.perform(post("/api/account/save-key/{keyName}", keyName).with(csrf())
+                .contentType(MediaType.APPLICATION_JSON).content(keyValue))
+                .andExpect(status().isUnauthorized());
 
         mockMvc.perform(get("/api/account/keys")).andExpect(status().isUnauthorized());
 
@@ -181,15 +188,16 @@ public class AccountControllerIntegrationTest {
         userService.setUserKeys(user, initialKeys);
         userRepository.save(user);
 
-        mockMvc.perform(
-                post("/api/account/save-key/{keyName}", "GEMINI").with(user(userService.loadUserByUsername(userEmail)))
-                        .contentType(MediaType.TEXT_PLAIN).content("sk-gemini"))
+        mockMvc.perform(post("/api/account/save-key/{keyName}", "GEMINI").with(csrf())
+                .with(user(userService.loadUserByUsername(userEmail)))
+                .contentType(MediaType.TEXT_PLAIN).content("sk-gemini"))
                 .andExpect(status().isOk());
 
         User updatedUser = userRepository.findByEmail(userEmail).orElseThrow();
         assert userService.getUserKeys(updatedUser).size() == 3;
         assert userService.getUserKeys(updatedUser).get("OPENAI").equals("sk-openai");
-        assert userService.getUserKeys(updatedUser).get("ANTHROPIC").equals("sk-anthropic");
+        assert userService.getUserKeys(updatedUser).get("ANTHROPIC")
+                .equals("sk-anthropic");
         assert userService.getUserKeys(updatedUser).get("GEMINI").equals("sk-gemini");
     }
 }

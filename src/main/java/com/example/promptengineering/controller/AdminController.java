@@ -45,12 +45,14 @@ public class AdminController {
     }
 
     @PostMapping("/users/{id}/delete")
-    public String deleteUser(@PathVariable Long id, AuthenticationPrincipal authenticationPrincipal,
-            RedirectAttributes redirectAttributes) {
+    public String deleteUser(@PathVariable Long id,
+                             AuthenticationPrincipal authenticationPrincipal,
+                             RedirectAttributes redirectAttributes) {
         User currentUser = (User) authenticationPrincipal;
 
         if (currentUser.getId().equals(id)) {
-            redirectAttributes.addFlashAttribute("error", "You cannot delete your own account!");
+            redirectAttributes.addFlashAttribute("error",
+                    "You cannot delete your own account!");
             return "redirect:/admin/users";
         }
 

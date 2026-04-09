@@ -25,8 +25,9 @@ public class CustomAuthenticationManager implements AuthenticationManager {
     private final ProviderManager providerManager;
 
     @Autowired
-    public CustomAuthenticationManager(UserRepository userRepository, PasswordEncoder passwordEncoder,
-            UserDetailsService userDetailsService, CustomOAuth2UserService customOAuth2UserService) {
+    public CustomAuthenticationManager(UserRepository userRepository,
+            PasswordEncoder passwordEncoder, UserDetailsService userDetailsService,
+            CustomOAuth2UserService customOAuth2UserService) {
 
         OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient = new DefaultAuthorizationCodeTokenResponseClient();
 
@@ -37,12 +38,13 @@ public class CustomAuthenticationManager implements AuthenticationManager {
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
         daoAuthenticationProvider.setUserDetailsService(userDetailsService);
 
-        this.providerManager = new ProviderManager(
-                Arrays.asList(daoAuthenticationProvider, oauth2LoginAuthenticationProvider));
+        this.providerManager = new ProviderManager(Arrays
+                .asList(daoAuthenticationProvider, oauth2LoginAuthenticationProvider));
     }
 
     @Override
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+    public Authentication authenticate(Authentication authentication)
+            throws AuthenticationException {
         return providerManager.authenticate(authentication);
     }
 }

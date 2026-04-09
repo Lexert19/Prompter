@@ -40,8 +40,8 @@ public class ChatE2ETest extends BaseE2ETest {
 
     @Test
     void sendMessageWithGeminiModel() {
-        stubFor(post(urlEqualTo("/client/chat")).willReturn(
-                aResponse().withStatus(200).withHeader("Content-Type", MediaType.TEXT_EVENT_STREAM_VALUE).withBody(
+        stubFor(post(urlEqualTo("/client/chat")).willReturn(aResponse().withStatus(200)
+                .withHeader("Content-Type", MediaType.TEXT_EVENT_STREAM_VALUE).withBody(
                         "data: {\"choices\":[{\"delta\":{\"content\":\"Odpowiedź z mocka\"}}]}\n\ndata: [DONE]\n\n")));
 
         driver.get(baseUrl + "/auth/login");

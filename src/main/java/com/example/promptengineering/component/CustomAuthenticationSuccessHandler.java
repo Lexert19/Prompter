@@ -12,25 +12,33 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
-public class CustomAuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
+public class CustomAuthenticationSuccessHandler
+        extends
+            SavedRequestAwareAuthenticationSuccessHandler {
 
     private final TwoFactorEmailService twoFactorService;
 
-    public CustomAuthenticationSuccessHandler(TwoFactorEmailService twoFactorService, UserRepository userRepository) {
+    public CustomAuthenticationSuccessHandler(TwoFactorEmailService twoFactorService,
+            UserRepository userRepository) {
         this.twoFactorService = twoFactorService;
         setDefaultTargetUrl("/");
     }
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-            Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request,
+                                        HttpServletResponse response,
+                                        Authentication authentication)
+            throws IOException, ServletException {
         User user = (User) authentication.getPrincipal();
-        boolean hasApiKeys = user.getEncryptedKeys() != null && !user.getEncryptedKeys().isEmpty();
+        boolean hasApiKeys = user.getEncryptedKeys() != null
+                && !user.getEncryptedKeys().isEmpty();
 
         if (user.isTwoFactorEnabled() && hasApiKeys) {
             request.getSession().setAttribute("2fa_authentication", authentication);
             String sessionId = request.getSession().getId();
-            String emailTo = user.getTwoFactorEmail() != null ? user.getTwoFactorEmail() : user.getEmail();
+            String emailTo = user.getTwoFactorEmail() != null
+                    ? user.getTwoFactorEmail()
+                    : user.getEmail();
             twoFactorService.createAndSendCode(sessionId, emailTo);
             request.getSession().setAttribute("2fa_user_id", user.getId());
             response.sendRedirect("/auth/2fa");

@@ -23,8 +23,8 @@ public class TwoFactorAuthController {
     private final UserRepository userRepository;
     private final IpRateLimiter rateLimiter;
 
-    public TwoFactorAuthController(TwoFactorEmailService twoFactorService, UserRepository userRepository,
-            IpRateLimiter rateLimiter) {
+    public TwoFactorAuthController(TwoFactorEmailService twoFactorService,
+            UserRepository userRepository, IpRateLimiter rateLimiter) {
         this.twoFactorService = twoFactorService;
         this.userRepository = userRepository;
         this.rateLimiter = rateLimiter;
@@ -42,7 +42,8 @@ public class TwoFactorAuthController {
     }
 
     @PostMapping("/auth/2fa")
-    public String verifyTwoFactorCode(@RequestParam String code, HttpServletRequest request, HttpSession session) {
+    public String verifyTwoFactorCode(@RequestParam String code,
+                                      HttpServletRequest request, HttpSession session) {
         Long userId = (Long) session.getAttribute("2fa_user_id");
         if (userId == null) {
             return "redirect:/auth/login";
@@ -52,7 +53,8 @@ public class TwoFactorAuthController {
         boolean valid = twoFactorService.verifyCode(sessionId, code);
         if (valid) {
             User user = userRepository.findById(userId).orElseThrow();
-            Authentication auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+            Authentication auth = new UsernamePasswordAuthenticationToken(user, null,
+                    user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);
             session.removeAttribute("2fa_user_id");
             return "redirect:/";
@@ -65,7 +67,8 @@ public class TwoFactorAuthController {
     @PostMapping("/auth/2fa/resend")
     public ResponseEntity<?> resendCode(HttpServletRequest request) {
         if (!rateLimiter.isAllowed(request)) {
-            return ResponseEntity.status(429).body("Too many requests. Please try again later.");
+            return ResponseEntity.status(429)
+                    .body("Too many requests. Please try again later.");
         }
         HttpSession session = request.getSession();
         Long userId = (Long) session.getAttribute("2fa_user_id");
@@ -73,7 +76,9 @@ public class TwoFactorAuthController {
             return ResponseEntity.badRequest().build();
         }
         User user = userRepository.findById(userId).orElseThrow();
-        String emailTo = user.getTwoFactorEmail() != null ? user.getTwoFactorEmail() : user.getEmail();
+        String emailTo = user.getTwoFactorEmail() != null
+                ? user.getTwoFactorEmail()
+                : user.getEmail();
         String sessionId = request.getSession().getId();
         twoFactorService.createAndSendCode(sessionId, emailTo);
         return ResponseEntity.ok().build();

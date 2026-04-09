@@ -21,7 +21,8 @@ public class IpRateLimiter {
 
     public boolean isAllowed(HttpServletRequest request) {
         String clientIp = getClientIp(request);
-        RequestCounter counter = counters.computeIfAbsent(clientIp, k -> new RequestCounter());
+        RequestCounter counter = counters.computeIfAbsent(clientIp,
+                k -> new RequestCounter());
         return counter.record();
     }
 

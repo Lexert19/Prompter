@@ -25,7 +25,8 @@ public class EmailService {
     @Async("taskExecutor")
     public void sendPasswordResetEmail(String toEmail, String token) {
         try {
-            String resetLink = "https://dominik-chyziak.pl/auth/reset-password-confirm?token=" + token;
+            String resetLink = "https://dominik-chyziak.pl/auth/reset-password-confirm?token="
+                    + token;
             String html = "<p>Password reset requested. <a href=\"" + resetLink
                     + "\">Click here to reset your password</a></p>" + "<p>" + resetLink
                     + "</p><p>If you didn't request this, ignore this email.</p>";
@@ -48,7 +49,8 @@ public class EmailService {
     public void sendTwoFactorCode(String toEmail, String code) {
         try {
             String subject = "Twój kod logowania";
-            String html = "<p>Twój kod do logowania: <strong>" + code + "</strong></p><p>Kod ważny jest 10 minut.</p>";
+            String html = "<p>Twój kod do logowania: <strong>" + code
+                    + "</strong></p><p>Kod ważny jest 10 minut.</p>";
 
             MimeMessage mime = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mime, true);

@@ -32,8 +32,9 @@ public class ModelController {
     }
 
     @PutMapping("/user-models/{id}")
-    public ResponseEntity<String> editUserModel(@AuthenticationPrincipal User user, @PathVariable Long id,
-            @RequestBody ModelDto modelDto) {
+    public ResponseEntity<String> editUserModel(@AuthenticationPrincipal User user,
+                                                @PathVariable Long id,
+                                                @RequestBody ModelDto modelDto) {
         Optional<Model> model = modelService.getModel(id);
         if (model.isPresent() && model.get().getUser().equals(user)) {
             modelService.editUserModel(model.orElse(null), modelDto);
@@ -44,7 +45,8 @@ public class ModelController {
     }
 
     @DeleteMapping("/user-models/{id}")
-    public ResponseEntity<String> deleteUserModel(@AuthenticationPrincipal User user, @PathVariable Long id)
+    public ResponseEntity<String> deleteUserModel(@AuthenticationPrincipal User user,
+                                                  @PathVariable Long id)
             throws ResourceNotFoundException {
         modelService.deleteUserModel(id, user);
         return ResponseEntity.ok("Model deleted successfully");
@@ -60,7 +62,8 @@ public class ModelController {
     }
 
     @PostMapping("/user-models")
-    public ResponseEntity<String> addUserModel(@AuthenticationPrincipal User user, @RequestBody ModelDto modelDto) {
+    public ResponseEntity<String> addUserModel(@AuthenticationPrincipal User user,
+                                               @RequestBody ModelDto modelDto) {
         modelService.addUserModel(modelDto, user);
         return ResponseEntity.ok("Model saved successfully");
     }

@@ -16,7 +16,8 @@ public class UserActionLimiter {
     private final int maxAttemptsPerDay;
     private final int cooldownSeconds;
 
-    public UserActionLimiter(@Value("${app.rate-limit.user.max-attempts:3}") int maxAttemptsPerDay,
+    public UserActionLimiter(
+            @Value("${app.rate-limit.user.max-attempts:3}") int maxAttemptsPerDay,
             @Value("${app.rate-limit.user.cooldown-seconds:60}") int cooldownSeconds) {
         this.maxAttemptsPerDay = maxAttemptsPerDay;
         this.cooldownSeconds = cooldownSeconds;

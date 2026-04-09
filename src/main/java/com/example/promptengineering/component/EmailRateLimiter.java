@@ -16,7 +16,8 @@ public class EmailRateLimiter {
     private final int maxAttemptsPerDay;
     private final int cooldownSeconds;
 
-    public EmailRateLimiter(@Value("${app.rate-limit.email.max-attempts:3}") int maxAttemptsPerDay,
+    public EmailRateLimiter(
+            @Value("${app.rate-limit.email.max-attempts:3}") int maxAttemptsPerDay,
             @Value("${app.rate-limit.email.cooldown-seconds:60}") int cooldownSeconds) {
         this.maxAttemptsPerDay = maxAttemptsPerDay;
         this.cooldownSeconds = cooldownSeconds;

@@ -16,7 +16,8 @@ import java.util.List;
 @Controller
 public class ChatController {
 
-    @GetMapping(value = {"/chat", "/chat/{chatId}"}, produces = "text/html; charset=UTF-8")
+    @GetMapping(value = {"/chat",
+            "/chat/{chatId}"}, produces = "text/html; charset=UTF-8")
     public ModelAndView getChatPage() {
         ModelAndView modelAndView = new ModelAndView("chat");
         modelAndView.addObject("variable", "value");

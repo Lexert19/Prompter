@@ -46,8 +46,9 @@ class EmailServiceIntegrationTest {
 
         Thread.sleep(2000);
 
-        assertThat(listAppender.list).noneMatch(event -> event.getLevel() == Level.ERROR
-                && event.getFormattedMessage().contains("Failed to send password reset email"));
+        assertThat(listAppender.list).noneMatch(
+                event -> event.getLevel() == Level.ERROR && event.getFormattedMessage()
+                        .contains("Failed to send password reset email"));
     }
 
     @Test

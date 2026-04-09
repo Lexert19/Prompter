@@ -24,18 +24,19 @@ public class PostService {
     }
 
     public List<PostDto> getAllPosts() {
-        return postRepository.findAllByOrderByCreatedAtDesc().stream().map(this::mapToDto).collect(Collectors.toList());
+        return postRepository.findAllByOrderByCreatedAtDesc().stream().map(this::mapToDto)
+                .collect(Collectors.toList());
     }
 
     public PostDto getPostDtoById(Long id) throws ResourceNotFoundException {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + id));
+        Post post = postRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Post not found with id: " + id));
         return mapToDto(post);
     }
 
     public Post getPostById(Long id) throws ResourceNotFoundException {
-        return postRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + id));
+        return postRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Post not found with id: " + id));
     }
 
     public PostDto createPost(PostDto postDto) throws ResourceNotFoundException {
@@ -46,8 +47,8 @@ public class PostService {
         post.setThumbnailId(postDto.getThumbnailId());
         post.setShortDescription(postDto.getShortDescription());
         if (postDto.getParentId() != null) {
-            Post parent = postRepository.findById(postDto.getParentId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Parent post not found"));
+            Post parent = postRepository.findById(postDto.getParentId()).orElseThrow(
+                    () -> new ResourceNotFoundException("Parent post not found"));
             post.setParent(parent);
         }
         post.setUpdatedAt(LocalDateTime.now());
@@ -63,8 +64,8 @@ public class PostService {
         post.setThumbnailId(postDto.getThumbnailId());
         post.setShortDescription(postDto.getShortDescription());
         if (postDto.getParentId() != null) {
-            Post parent = postRepository.findById(postDto.getParentId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Parent post not found"));
+            Post parent = postRepository.findById(postDto.getParentId()).orElseThrow(
+                    () -> new ResourceNotFoundException("Parent post not found"));
             post.setParent(parent);
         } else {
             post.setParent(null);
@@ -75,18 +76,19 @@ public class PostService {
     }
 
     public void deletePost(Long id) throws ResourceNotFoundException {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + id));
+        Post post = postRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Post not found with id: " + id));
         postRepository.delete(post);
     }
 
     public List<PostDto> getTranslations(Long parentId) {
-        return postRepository.findByParentId(parentId).stream().map(this::mapToDto).collect(Collectors.toList());
+        return postRepository.findByParentId(parentId).stream().map(this::mapToDto)
+                .collect(Collectors.toList());
     }
 
     private String generateSlug(String title) {
-        return title.toLowerCase().replaceAll("[^a-z0-9\\s]", "").replaceAll("\\s+", "-").replaceAll("-+", "-")
-                .replaceAll("^-|-$", "");
+        return title.toLowerCase().replaceAll("[^a-z0-9\\s]", "").replaceAll("\\s+", "-")
+                .replaceAll("-+", "-").replaceAll("^-|-$", "");
     }
 
     private PostDto mapToDto(Post post) {
@@ -106,7 +108,8 @@ public class PostService {
         if (post.getThumbnailId() != null) {
             Media media = mediaRepository.findById(post.getThumbnailId()).orElse(null);
             if (media != null) {
-                String storedFilename = Paths.get(media.getFilePath()).getFileName().toString();
+                String storedFilename = Paths.get(media.getFilePath()).getFileName()
+                        .toString();
                 dto.setThumbnailUrl("/media/" + storedFilename);
             }
         }
@@ -124,7 +127,8 @@ public class PostService {
     }
 
     public PostDto getPostDtoBySlug(String slug) throws ResourceNotFoundException {
-        Post post = postRepository.findBySlug(slug).orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+        Post post = postRepository.findBySlug(slug)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
         return mapToDto(post);
     }
 }

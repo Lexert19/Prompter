@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<profiles version="13">
+  <profile kind="CodeFormatterProfile" name="CustomSpotlessProfile" version="13">
+    <setting id="org.eclipse.jdt.core.formatter.lineSplit" value="90"/>
+
+    <setting id="org.eclipse.jdt.core.formatter.tabulation.char" value="space"/>
+    <setting id="org.eclipse.jdt.core.formatter.tabulation.size" value="4"/>
+    <setting id="org.eclipse.jdt.core.formatter.alignment_for_parameters_in_method_declaration" value="18"/>
+  </profile>
+</profiles>

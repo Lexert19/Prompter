@@ -36,7 +36,8 @@ class RequestBuilderTest {
 
     @Test
     void shouldBuildOpenAiRequestWithSystemMessage() {
-        builder.model("gpt-4").addMessage(userMessage).maxTokens(200).temperature(0.7).stream(true);
+        builder.model("gpt-4").addMessage(userMessage).maxTokens(200).temperature(0.7)
+                .stream(true);
         builder.setProvider("OPENAI");
         builder.setSystem("You are a helpful assistant.");
 
@@ -44,25 +45,29 @@ class RequestBuilderTest {
 
         log.info("OpenAI request with system: {}", request);
 
-        assertThat(request).containsEntry("model", "gpt-4").containsEntry("max_tokens", 200)
-                .containsEntry("temperature", 0.7).containsEntry("stream", true).containsKey("messages");
+        assertThat(request).containsEntry("model", "gpt-4")
+                .containsEntry("max_tokens", 200).containsEntry("temperature", 0.7)
+                .containsEntry("stream", true).containsKey("messages");
 
-        List<Map<String, Object>> messages = (List<Map<String, Object>>) request.get("messages");
+        List<Map<String, Object>> messages = (List<Map<String, Object>>) request
+                .get("messages");
         assertThat(messages).hasSize(2);
 
         Map<String, Object> systemMsg = messages.get(0);
         assertThat(systemMsg).containsEntry("role", "system");
-        assertThat(systemMsg.get("content"))
-                .isEqualTo(List.of(Map.of("type", "text", "text", "You are a helpful assistant.")));
+        assertThat(systemMsg.get("content")).isEqualTo(
+                List.of(Map.of("type", "text", "text", "You are a helpful assistant.")));
 
         Map<String, Object> userMsg = messages.get(1);
         assertThat(userMsg).containsEntry("role", "user");
-        assertThat(((List<Map<String, Object>>) userMsg.get("content")).get(0)).containsEntry("text", "Hello, world!");
+        assertThat(((List<Map<String, Object>>) userMsg.get("content")).get(0))
+                .containsEntry("text", "Hello, world!");
     }
 
     @Test
     void shouldBuildAnthropicRequestWithSystemField() {
-        builder.model("claude-3-opus-20240229").addMessage(userMessage).maxTokens(1000).temperature(0.0).stream(false);
+        builder.model("claude-3-opus-20240229").addMessage(userMessage).maxTokens(1000)
+                .temperature(0.0).stream(false);
         builder.setProvider("ANTHROPIC");
         builder.setSystem("You are Claude, a helpful AI.");
 
@@ -70,11 +75,13 @@ class RequestBuilderTest {
 
         log.info("Anthropic request with system: {}", request);
 
-        assertThat(request).containsEntry("model", "claude-3-opus-20240229").containsEntry("max_tokens", 1000)
-                .containsEntry("temperature", 0.0).containsEntry("stream", false)
+        assertThat(request).containsEntry("model", "claude-3-opus-20240229")
+                .containsEntry("max_tokens", 1000).containsEntry("temperature", 0.0)
+                .containsEntry("stream", false)
                 .containsEntry("system", "You are Claude, a helpful AI.");
 
-        List<Map<String, Object>> messages = (List<Map<String, Object>>) request.get("messages");
+        List<Map<String, Object>> messages = (List<Map<String, Object>>) request
+                .get("messages");
         assertThat(messages).hasSize(1);
         assertThat(messages.get(0)).containsEntry("role", "user");
     }
@@ -86,24 +93,29 @@ class RequestBuilderTest {
         imageContent.setMediaType("image/png");
         imageContent.setData("base64EncodedImageData");
 
-        Message messageWithImage = new Message("user", List.of(textContent, imageContent));
+        Message messageWithImage = new Message("user",
+                List.of(textContent, imageContent));
 
-        builder.model("claude-3-opus-20240229").addMessage(messageWithImage).maxTokens(500);
+        builder.model("claude-3-opus-20240229").addMessage(messageWithImage)
+                .maxTokens(500);
         builder.setProvider("ANTHROPIC");
 
         Map<String, Object> request = builder.build();
         log.info("Anthropic request with image: {}", request);
 
-        List<Map<String, Object>> messages = (List<Map<String, Object>>) request.get("messages");
+        List<Map<String, Object>> messages = (List<Map<String, Object>>) request
+                .get("messages");
         Map<String, Object> userMsg = messages.get(0);
-        List<Map<String, Object>> contentList = (List<Map<String, Object>>) userMsg.get("content");
+        List<Map<String, Object>> contentList = (List<Map<String, Object>>) userMsg
+                .get("content");
         assertThat(contentList).hasSize(2);
 
         Map<String, Object> imagePart = contentList.get(1);
         assertThat(imagePart).containsEntry("type", "image");
 
         Map<String, Object> source = (Map<String, Object>) imagePart.get("source");
-        assertThat(source).containsEntry("type", "base64").containsEntry("media_type", "image/png")
+        assertThat(source).containsEntry("type", "base64")
+                .containsEntry("media_type", "image/png")
                 .containsEntry("data", "base64EncodedImageData");
     }
 
@@ -114,7 +126,8 @@ class RequestBuilderTest {
         imageContent.setMediaType("image/jpeg");
         imageContent.setData("base64ImageData");
 
-        Message messageWithImage = new Message("user", List.of(textContent, imageContent));
+        Message messageWithImage = new Message("user",
+                List.of(textContent, imageContent));
 
         builder.model("gpt-4-vision-preview").addMessage(messageWithImage).maxTokens(300);
         builder.setProvider("OPENAI");
@@ -122,9 +135,11 @@ class RequestBuilderTest {
         Map<String, Object> request = builder.build();
         log.info("OpenAI request with image: {}", request);
 
-        List<Map<String, Object>> messages = (List<Map<String, Object>>) request.get("messages");
+        List<Map<String, Object>> messages = (List<Map<String, Object>>) request
+                .get("messages");
         Map<String, Object> userMsg = messages.get(0);
-        List<Map<String, Object>> contentList = (List<Map<String, Object>>) userMsg.get("content");
+        List<Map<String, Object>> contentList = (List<Map<String, Object>>) userMsg
+                .get("content");
         assertThat(contentList).hasSize(2);
 
         Map<String, Object> imagePart = contentList.get(1);
@@ -132,7 +147,8 @@ class RequestBuilderTest {
 
         Map<String, String> imageUrl = (Map<String, String>) imagePart.get("image_url");
         assertThat(imageUrl).containsKey("url");
-        assertThat(imageUrl.get("url")).startsWith("data:image/jpeg;base64,base64ImageData");
+        assertThat(imageUrl.get("url"))
+                .startsWith("data:image/jpeg;base64,base64ImageData");
     }
 
     @Test
@@ -150,12 +166,15 @@ class RequestBuilderTest {
         Map<String, Object> request = builder.build();
         log.info("Anthropic request with cache: {}", request);
 
-        List<Map<String, Object>> messages = (List<Map<String, Object>>) request.get("messages");
-        List<Map<String, Object>> contentList = (List<Map<String, Object>>) messages.get(0).get("content");
+        List<Map<String, Object>> messages = (List<Map<String, Object>>) request
+                .get("messages");
+        List<Map<String, Object>> contentList = (List<Map<String, Object>>) messages
+                .get(0).get("content");
         Map<String, Object> firstContent = contentList.get(0);
         assertThat(firstContent).containsKey("cache_control");
 
-        Map<String, String> cacheControl = (Map<String, String>) firstContent.get("cache_control");
+        Map<String, String> cacheControl = (Map<String, String>) firstContent
+                .get("cache_control");
         assertThat(cacheControl).containsEntry("type", "ephemeral");
     }
 
@@ -184,8 +203,10 @@ class RequestBuilderTest {
 
         log.info("Request with empty content: {}", request);
 
-        List<Map<String, Object>> messages = (List<Map<String, Object>>) request.get("messages");
-        List<Map<String, Object>> contentList = (List<Map<String, Object>>) messages.get(0).get("content");
+        List<Map<String, Object>> messages = (List<Map<String, Object>>) request
+                .get("messages");
+        List<Map<String, Object>> contentList = (List<Map<String, Object>>) messages
+                .get(0).get("content");
         assertThat(contentList).hasSize(0);
         // assertThat(contentList.get(0)).containsEntry("text", "error");
     }
@@ -201,7 +222,8 @@ class RequestBuilderTest {
         builder.setProvider("OPENAI");
 
         Map<String, Object> request = builder.build();
-        List<Map<String, Object>> messages = (List<Map<String, Object>>) request.get("messages");
+        List<Map<String, Object>> messages = (List<Map<String, Object>>) request
+                .get("messages");
         assertThat(messages.get(0)).containsEntry("role", "assistant");
     }
 
@@ -211,7 +233,8 @@ class RequestBuilderTest {
         builder.setProvider("OPENAI");
 
         Map<String, Object> request = builder.build();
-        List<Map<String, Object>> messages = (List<Map<String, Object>>) request.get("messages");
+        List<Map<String, Object>> messages = (List<Map<String, Object>>) request
+                .get("messages");
         assertThat(messages).isEmpty();
     }
 
@@ -225,11 +248,15 @@ class RequestBuilderTest {
         builder.setProvider("OPENAI");
 
         Map<String, Object> request = builder.build();
-        List<Map<String, Object>> messages = (List<Map<String, Object>>) request.get("messages");
+        List<Map<String, Object>> messages = (List<Map<String, Object>>) request
+                .get("messages");
         assertThat(messages).hasSize(3);
-        assertThat(((List<Map<String, Object>>) messages.get(0).get("content")).get(0)).containsEntry("text", "First");
-        assertThat(((List<Map<String, Object>>) messages.get(1).get("content")).get(0)).containsEntry("text", "Second");
-        assertThat(((List<Map<String, Object>>) messages.get(2).get("content")).get(0)).containsEntry("text", "Third");
+        assertThat(((List<Map<String, Object>>) messages.get(0).get("content")).get(0))
+                .containsEntry("text", "First");
+        assertThat(((List<Map<String, Object>>) messages.get(1).get("content")).get(0))
+                .containsEntry("text", "Second");
+        assertThat(((List<Map<String, Object>>) messages.get(2).get("content")).get(0))
+                .containsEntry("text", "Third");
     }
 
     @Test
@@ -258,7 +285,8 @@ class RequestBuilderTest {
         builder.setSystem(null);
 
         Map<String, Object> request = builder.build();
-        List<Map<String, Object>> messages = (List<Map<String, Object>>) request.get("messages");
+        List<Map<String, Object>> messages = (List<Map<String, Object>>) request
+                .get("messages");
         assertThat(messages).hasSize(1);
     }
 

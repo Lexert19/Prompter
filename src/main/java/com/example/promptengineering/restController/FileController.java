@@ -30,14 +30,16 @@ public class FileController {
 
     @PostMapping("/upload")
     public ResponseEntity<UserFileDTO> uploadFile(@RequestParam("file") MultipartFile file,
-            @AuthenticationPrincipal User user) throws IOException {
+                                                  @AuthenticationPrincipal User user)
+            throws IOException {
 
         UserFileDTO savedFile = fileStorageService.storeFile(file, user);
         return ResponseEntity.ok(savedFile);
     }
 
     @GetMapping("/{fileId}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable Long fileId, @AuthenticationPrincipal User user)
+    public ResponseEntity<Resource> downloadFile(@PathVariable Long fileId,
+                                                 @AuthenticationPrincipal User user)
             throws IOException, FileStorageException {
 
         UserFile userFile = fileStorageService.getUserFile(fileId, user);
@@ -54,7 +56,8 @@ public class FileController {
         }
 
         return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + userFile.getFileName() + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + userFile.getFileName() + "\"")
                 .body(resource);
     }
 

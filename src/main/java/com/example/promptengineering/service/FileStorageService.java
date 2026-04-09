@@ -29,7 +29,8 @@ public class FileStorageService {
     private final UserFileRepository userFileRepository;
 
     public FileStorageService(@Value("${file.upload-dir}") String uploadDir,
-            @Value("${file.max-size}") long maxFileSize, @Value("${file.max-count}") int maxFilesPerUser,
+            @Value("${file.max-size}") long maxFileSize,
+            @Value("${file.max-count}") int maxFilesPerUser,
             UserFileRepository userFileRepository) {
         this.uploadDir = uploadDir;
         this.maxFileSize = maxFileSize;
@@ -38,18 +39,21 @@ public class FileStorageService {
     }
 
     private UserFileDTO toDto(UserFile userFile) {
-        return new UserFileDTO(userFile.getId(), userFile.getFileName(), userFile.getContentType(), userFile.getSize(),
+        return new UserFileDTO(userFile.getId(), userFile.getFileName(),
+                userFile.getContentType(), userFile.getSize(),
                 userFile.getOwner().getId());
     }
 
     public UserFileDTO storeFile(MultipartFile file, User owner) throws IOException {
         if (file.getSize() > maxFileSize) {
-            throw new IllegalArgumentException("File too large. Max allowed size: " + maxFileSize + " bytes");
+            throw new IllegalArgumentException(
+                    "File too large. Max allowed size: " + maxFileSize + " bytes");
         }
 
         long currentFileCount = userFileRepository.countByOwner(owner);
         if (currentFileCount >= maxFilesPerUser) {
-            throw new IllegalArgumentException("User cannot have more than " + maxFilesPerUser + " files.");
+            throw new IllegalArgumentException(
+                    "User cannot have more than " + maxFilesPerUser + " files.");
         }
 
         Path userDir = Paths.get(uploadDir, owner.getId().toString());
@@ -94,8 +98,8 @@ public class FileStorageService {
     }
 
     public UserFile getUserFile(Long fileId, User owner) throws FileStorageException {
-        return userFileRepository.findByIdAndOwner(fileId, owner)
-                .orElseThrow(() -> new FileStorageException("File not found or access denied"));
+        return userFileRepository.findByIdAndOwner(fileId, owner).orElseThrow(
+                () -> new FileStorageException("File not found or access denied"));
     }
 
     public Path getFilePath(UserFile userFile) {

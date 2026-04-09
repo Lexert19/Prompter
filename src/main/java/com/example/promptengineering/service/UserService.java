@@ -39,8 +39,8 @@ public class UserService implements UserDetailsService {
             String json = objectMapper.writeValueAsString(keys);
             String encrypted = encryptionService.encrypt(json);
             if (encrypted.length() > maxEncryptedKeysLength) {
-                throw new IllegalArgumentException(
-                        "Encrypted keys too long (max " + maxEncryptedKeysLength + " characters)");
+                throw new IllegalArgumentException("Encrypted keys too long (max "
+                        + maxEncryptedKeysLength + " characters)");
             }
             user.setEncryptedKeys(encrypted);
         } catch (Exception e) {
@@ -60,12 +60,13 @@ public class UserService implements UserDetailsService {
         }
         try {
             if (user.getEncryptedKeys().length() > maxEncryptedKeysLength) {
-                throw new IllegalArgumentException(
-                        "Encrypted keys too long (max " + maxEncryptedKeysLength + " characters)");
+                throw new IllegalArgumentException("Encrypted keys too long (max "
+                        + maxEncryptedKeysLength + " characters)");
             }
             String decrypted = encryptionService.decrypt(user.getEncryptedKeys());
-            return objectMapper.readValue(decrypted, new TypeReference<Map<String, String>>() {
-            });
+            return objectMapper.readValue(decrypted,
+                    new TypeReference<Map<String, String>>() {
+                    });
         } catch (Exception e) {
             throw new RuntimeException("Error reading keys", e);
         }
@@ -81,11 +82,13 @@ public class UserService implements UserDetailsService {
 
     private void checkUserNotExists(String email) throws UserAlreadyExistsException {
         if (userRepository.findByEmail(email).isPresent()) {
-            throw new UserAlreadyExistsException("User already exists with email: " + email);
+            throw new UserAlreadyExistsException(
+                    "User already exists with email: " + email);
         }
     }
 
-    private User createAndSaveUser(String email, String encodedPassword, List<AppRole> roles) {
+    private User createAndSaveUser(String email, String encodedPassword,
+                                   List<AppRole> roles) {
         User user = new User();
         user.setEmail(email);
         user.setPassword(encodedPassword);
@@ -94,13 +97,15 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
-    public User createUser(String email, String rawPassword, List<AppRole> roles) throws UserAlreadyExistsException {
+    public User createUser(String email, String rawPassword, List<AppRole> roles)
+            throws UserAlreadyExistsException {
         checkUserNotExists(email);
         String encodedPassword = passwordEncoder.encode(rawPassword);
         return createAndSaveUser(email, encodedPassword, roles);
     }
 
-    public User createUser(String email, List<AppRole> roles) throws UserAlreadyExistsException {
+    public User createUser(String email, List<AppRole> roles)
+            throws UserAlreadyExistsException {
         checkUserNotExists(email);
         String randomPassword = UUID.randomUUID().toString();
         String encodedPassword = passwordEncoder.encode(randomPassword);
@@ -108,7 +113,8 @@ public class UserService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username)
+            throws UsernameNotFoundException {
         Optional<User> user = userRepository.findByEmail(username);
         if (user.isEmpty()) {
             throw new UsernameNotFoundException("User not found with email: " + username);

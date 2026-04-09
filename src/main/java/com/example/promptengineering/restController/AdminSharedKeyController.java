@@ -22,7 +22,7 @@ public class AdminSharedKeyController {
 
     @PostMapping
     public ResponseEntity<Map<String, String>> addSharedKey(@RequestBody SharedKeyDto dto,
-            @AuthenticationPrincipal User user) {
+                                                            @AuthenticationPrincipal User user) {
         sharedKeyService.addKey(dto.getProvider(), dto.getKeyValue(), user);
         return ResponseEntity.ok(Map.of("message", "Added"));
     }

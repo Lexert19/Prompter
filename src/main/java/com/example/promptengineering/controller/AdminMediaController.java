@@ -28,14 +28,16 @@ public class AdminMediaController {
 
     @GetMapping
     public String listMedia(Model model) {
-        List<Media> mediaList = mediaRepository.findAll(Sort.by(Sort.Direction.DESC, "uploadedAt"));
+        List<Media> mediaList = mediaRepository
+                .findAll(Sort.by(Sort.Direction.DESC, "uploadedAt"));
         model.addAttribute("mediaList", mediaList);
         return "admin/media/list";
     }
 
     @PostMapping("/delete/{id}")
     public String deleteMedia(@PathVariable Long id) throws IOException {
-        Media media = mediaRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Media not found"));
+        Media media = mediaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Media not found"));
         Path filePath = Paths.get(media.getFilePath());
         Files.deleteIfExists(filePath);
         mediaRepository.delete(media);

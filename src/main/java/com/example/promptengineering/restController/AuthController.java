@@ -24,8 +24,8 @@ public class AuthController {
     private final EmailRateLimiter emailRateLimiter;
 
     @Autowired
-    public AuthController(AuthService authService, ResetTokenService resetTokenService, IpRateLimiter rateLimiter,
-            EmailRateLimiter emailRateLimiter) {
+    public AuthController(AuthService authService, ResetTokenService resetTokenService,
+            IpRateLimiter rateLimiter, EmailRateLimiter emailRateLimiter) {
         this.resetTokenService = resetTokenService;
         this.rateLimiter = rateLimiter;
         this.emailRateLimiter = emailRateLimiter;
@@ -47,14 +47,15 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password-request")
-    public String handleForgotPassword(@RequestParam(value = "email", defaultValue = "") String email, Model model,
-            HttpServletRequest request) {
+    public String handleForgotPassword(@RequestParam(value = "email", defaultValue = "") String email,
+                                       Model model, HttpServletRequest request) {
         if (!rateLimiter.isAllowed(request)) {
             model.addAttribute("error", "Zbyt wiele prób. Spróbuj ponownie za chwilę.");
             return "reset-password-request";
         }
         if (!emailRateLimiter.canSend(email)) {
-            model.addAttribute("error", "Daily limit reached for this email address. Please try again later.");
+            model.addAttribute("error",
+                    "Daily limit reached for this email address. Please try again later.");
             return "reset-password-request";
         }
         try {
@@ -69,14 +70,17 @@ public class AuthController {
     }
 
     @GetMapping("/reset-password-confirm")
-    public String showResetPasswordForm(@RequestParam("token") String token, Model model) {
+    public String showResetPasswordForm(@RequestParam("token") String token,
+                                        Model model) {
         model.addAttribute("token", token);
         return "reset-password-confirm";
     }
 
     @PostMapping("/reset-password-confirm")
-    public String handleResetPassword(@RequestParam("token") String token, @RequestParam("password") String newPassword,
-            @RequestParam("password_confirmation") String passwordConfirmation, Model model) {
+    public String handleResetPassword(@RequestParam("token") String token,
+                                      @RequestParam("password") String newPassword,
+                                      @RequestParam("password_confirmation") String passwordConfirmation,
+                                      Model model) {
 
         if (!newPassword.equals(passwordConfirmation)) {
             model.addAttribute("error", "Passwords do not match.");

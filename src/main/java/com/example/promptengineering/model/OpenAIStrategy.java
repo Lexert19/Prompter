@@ -7,7 +7,8 @@ import java.util.Map;
 
 public class OpenAIStrategy implements ProviderStrategy {
     @Override
-    public void applySystemPrompt(Map<String, Object> request, List<Message> messages, String system) {
+    public void applySystemPrompt(Map<String, Object> request, List<Message> messages,
+                                  String system) {
         if (system != null && !system.trim().isEmpty()) {
             TextContent systemContent = new TextContent();
             systemContent.setType("text");
@@ -28,8 +29,8 @@ public class OpenAIStrategy implements ProviderStrategy {
 
     @Override
     public Map<String, Object> formatImageContent(ImageContent content, boolean cached) {
-        return Map.of("type", "image_url", "image_url",
-                Map.of("url", "data:" + content.getMediaType() + ";base64," + content.getData()));
+        return Map.of("type", "image_url", "image_url", Map.of("url",
+                "data:" + content.getMediaType() + ";base64," + content.getData()));
     }
 
     @Override

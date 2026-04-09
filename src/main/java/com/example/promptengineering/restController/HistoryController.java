@@ -37,7 +37,8 @@ public class HistoryController {
     }
 
     @DeleteMapping("/chats/{chatId}")
-    public ResponseEntity<Void> deleteChat(@PathVariable Long chatId, @AuthenticationPrincipal User user)
+    public ResponseEntity<Void> deleteChat(@PathVariable Long chatId,
+                                           @AuthenticationPrincipal User user)
             throws ResourceNotFoundException, UserSecurityException {
         historyService.deleteChat(chatId, user);
         return ResponseEntity.noContent().build();
@@ -45,22 +46,26 @@ public class HistoryController {
 
     @PostMapping("/messages")
     public ResponseEntity<MessageDto> saveMessage(@RequestBody MessageBody messageBody,
-            @AuthenticationPrincipal User user) throws UserSecurityException, ResourceNotFoundException {
+                                                  @AuthenticationPrincipal User user)
+            throws UserSecurityException, ResourceNotFoundException {
         Message message = historyService.saveMessage(messageBody, user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(MessageDto.fromEntity(message));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(MessageDto.fromEntity(message));
 
     }
 
     @GetMapping("/chats/{chatId}/messages")
     public ResponseEntity<List<MessageDto>> getChatHistory(@PathVariable Long chatId,
-            @AuthenticationPrincipal User user) throws UserSecurityException, ResourceNotFoundException {
+                                                           @AuthenticationPrincipal User user)
+            throws UserSecurityException, ResourceNotFoundException {
         List<Message> messages = historyService.getChatHistory(chatId, user);
         return ResponseEntity.ok(MessageDto.fromEntities(messages));
     }
 
     @GetMapping("/chats")
     public ResponseEntity<Page<ChatDto>> getChats(@AuthenticationPrincipal User user,
-            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
+                                                  @RequestParam(defaultValue = "0") int page,
+                                                  @RequestParam(defaultValue = "20") int size) {
 
         Page<Chat> chatPage = historyService.getChatsForUser(user, page, size);
         Page<ChatDto> dtoPage = chatPage.map(ChatDto::fromEntity);

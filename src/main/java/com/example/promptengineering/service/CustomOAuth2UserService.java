@@ -14,17 +14,21 @@ import com.example.promptengineering.repository.UserRepository;
 import java.util.List;
 
 @Service
-public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
+public class CustomOAuth2UserService
+        implements
+            OAuth2UserService<OAuth2UserRequest, OAuth2User> {
     private final UserRepository userRepository;
     private final UserService userService;
 
-    public CustomOAuth2UserService(UserRepository userRepository, UserService userService) {
+    public CustomOAuth2UserService(UserRepository userRepository,
+            UserService userService) {
         this.userRepository = userRepository;
         this.userService = userService;
     }
 
     @Override
-    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+    public OAuth2User loadUser(OAuth2UserRequest userRequest)
+            throws OAuth2AuthenticationException {
         OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
         OAuth2User oAuth2User = delegate.loadUser(userRequest);
 

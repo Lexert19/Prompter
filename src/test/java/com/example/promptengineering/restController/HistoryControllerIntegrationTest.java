@@ -29,6 +29,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasItems;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -70,7 +71,8 @@ public class HistoryControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity())
+                .build();
 
         user1 = new User();
         user1.setEmail(user1Email);
@@ -93,8 +95,8 @@ public class HistoryControllerIntegrationTest {
 
     @Test
     void createChat_shouldReturnCreatedChat() throws Exception {
-        mockMvc.perform(post("/api/history/chats").with(asUser1())).andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").exists());
+        mockMvc.perform(post("/api/history/chats").with(csrf()).with(asUser1()))
+                .andExpect(status().isCreated()).andExpect(jsonPath("$.id").exists());
 
         List<Chat> chats = chatRepository.findByUser(user1);
         assertThat(chats).hasSize(1);
@@ -118,9 +120,11 @@ public class HistoryControllerIntegrationTest {
         chat3.setCreatedAt(Instant.now());
         chatRepository.save(chat3);
 
-        mockMvc.perform(get("/api/history/chats").with(asUser1())).andExpect(status().isOk())
+        mockMvc.perform(get("/api/history/chats").with(asUser1()))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(greaterThanOrEqualTo(2)))
-                .andExpect(jsonPath("$.content[*].id", hasItems(chat1.getId().intValue(), chat2.getId().intValue())));
+                .andExpect(jsonPath("$.content[*].id",
+                        hasItems(chat1.getId().intValue(), chat2.getId().intValue())));
     }
 
     @Test
@@ -138,9 +142,11 @@ public class HistoryControllerIntegrationTest {
         messageBody.setEnd(System.currentTimeMillis());
         messageBody.setCache(false);
 
-        mockMvc.perform(post("/api/history/messages").with(asUser1()).contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(messageBody))).andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").exists()).andExpect(jsonPath("$.text").value("Hello, world!"))
+        mockMvc.perform(post("/api/history/messages").with(csrf()).with(asUser1())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(messageBody)))
+                .andExpect(status().isCreated()).andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.text").value("Hello, world!"))
                 .andExpect(jsonPath("$.role").value("user"));
 
         List<Message> messages = messageRepository.findByChatId(chat.getId());
@@ -169,9 +175,11 @@ public class HistoryControllerIntegrationTest {
         msg2.setCreatedAt(Instant.now());
         messageRepository.save(msg2);
 
-        mockMvc.perform(get("/api/history/chats/{chatId}/messages", chat.getId()).with(asUser1()))
+        mockMvc.perform(
+                get("/api/history/chats/{chatId}/messages", chat.getId()).with(asUser1()))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].text").value("First")).andExpect(jsonPath("$[1].text").value("Second"));
+                .andExpect(jsonPath("$[0].text").value("First"))
+                .andExpect(jsonPath("$[1].text").value("Second"));
     }
 
     @Test
@@ -188,8 +196,8 @@ public class HistoryControllerIntegrationTest {
         msg.setCreatedAt(Instant.now());
         messageRepository.save(msg);
 
-        mockMvc.perform(delete("/api/history/chats/{chatId}", chat.getId()).with(asUser1()))
-                .andExpect(status().isNoContent());
+        mockMvc.perform(delete("/api/history/chats/{chatId}", chat.getId()).with(csrf())
+                .with(asUser1())).andExpect(status().isNoContent());
 
         Optional<Chat> deletedChat = chatRepository.findById(chat.getId());
         assertThat(deletedChat).isEmpty();
@@ -210,8 +218,10 @@ public class HistoryControllerIntegrationTest {
         messageBody.setText("Test");
         messageBody.setRole("user");
 
-        mockMvc.perform(post("/api/history/messages").with(asUser1()).contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(messageBody))).andExpect(status().is4xxClientError());
+        mockMvc.perform(post("/api/history/messages").with(csrf()).with(asUser1())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(messageBody)))
+                .andExpect(status().is4xxClientError());
     }
 
     @Test
@@ -221,11 +231,12 @@ public class HistoryControllerIntegrationTest {
         chat.setCreatedAt(Instant.now());
         chat = chatRepository.save(chat);
 
-        mockMvc.perform(get("/api/history/chats/{chatId}/messages", chat.getId()).with(asUser1()))
+        mockMvc.perform(
+                get("/api/history/chats/{chatId}/messages", chat.getId()).with(asUser1()))
                 .andExpect(status().isForbidden());
 
-        mockMvc.perform(delete("/api/history/chats/{chatId}", chat.getId()).with(asUser1()))
-                .andExpect(status().is4xxClientError());
+        mockMvc.perform(delete("/api/history/chats/{chatId}", chat.getId()).with(csrf())
+                .with(asUser1())).andExpect(status().is4xxClientError());
     }
 
     @Test
@@ -240,25 +251,32 @@ public class HistoryControllerIntegrationTest {
         messageBody.setText("Hack attempt");
         messageBody.setRole("user");
 
-        mockMvc.perform(post("/api/history/messages").with(asUser1()).contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(messageBody))).andExpect(status().is4xxClientError());
+        mockMvc.perform(post("/api/history/messages").with(csrf()).with(asUser1())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(messageBody)))
+                .andExpect(status().is4xxClientError());
     }
 
     @Test
     void unauthenticatedRequests_shouldReturn401() throws Exception {
-        mockMvc.perform(post("/api/history/chats")).andExpect(status().isUnauthorized());
+        mockMvc.perform(post("/api/history/chats").with(csrf()))
+                .andExpect(status().isUnauthorized());
 
         mockMvc.perform(get("/api/history/chats")).andExpect(status().isUnauthorized());
 
-        mockMvc.perform(get("/api/history/chats/1/messages")).andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/history/chats/1/messages"))
+                .andExpect(status().isUnauthorized());
 
-        mockMvc.perform(delete("/api/history/chats/1")).andExpect(status().isUnauthorized());
+        mockMvc.perform(delete("/api/history/chats/1").with(csrf()))
+                .andExpect(status().isUnauthorized());
 
         MessageBody body = new MessageBody();
         body.setChatId(1L);
         body.setText("test");
-        mockMvc.perform(post("/api/history/messages").contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(body))).andExpect(status().isUnauthorized());
+        mockMvc.perform(post("/api/history/messages").with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(body)))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -278,12 +296,15 @@ public class HistoryControllerIntegrationTest {
         messageBody.setStart(1000L);
         messageBody.setEnd(2000L);
 
-        mockMvc.perform(post("/api/history/messages").with(asUser1()).contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(messageBody))).andExpect(status().isCreated())
+        mockMvc.perform(post("/api/history/messages").with(asUser1()).with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(messageBody)))
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.documents[0]").value("doc1.pdf"))
                 .andExpect(jsonPath("$.documents[1]").value("doc2.docx"))
                 .andExpect(jsonPath("$.images[0]").value("img1.png"))
-                .andExpect(jsonPath("$.images[1]").value("img2.jpg")).andExpect(jsonPath("$.cache").value(true));
+                .andExpect(jsonPath("$.images[1]").value("img2.jpg"))
+                .andExpect(jsonPath("$.cache").value(true));
 
         Message saved = messageRepository.findByChatId(chat.getId()).get(0);
         assertThat(saved.getDocuments()).containsExactly("doc1.pdf", "doc2.docx");

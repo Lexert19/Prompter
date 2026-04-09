@@ -63,8 +63,8 @@ public class EmbeddingService {
         requestBody.put("input", text);
         requestBody.put("model", "text-embedding-3-large");
 
-        Map<String, Object> response = restTemplate.postForObject(EMBEDDINGS_URL, getHttpEntity(requestBody, apiKey),
-                Map.class);
+        Map<String, Object> response = restTemplate.postForObject(EMBEDDINGS_URL,
+                getHttpEntity(requestBody, apiKey), Map.class);
 
         List<Map<String, Object>> data = (List<Map<String, Object>>) response.get("data");
         if (!data.isEmpty()) {
@@ -74,21 +74,23 @@ public class EmbeddingService {
     }
 
     private org.springframework.http.HttpEntity<Map<String, Object>> getHttpEntity(Map<String, Object> requestBody,
-            String apiKey) {
+                                                                                   String apiKey) {
         org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "Bearer " + apiKey);
         return new org.springframework.http.HttpEntity<>(requestBody, headers);
     }
 
-    public List<ScoredFragment> retrieveSimilarFragments(String query, Project project, User user) {
+    public List<ScoredFragment> retrieveSimilarFragments(String query, Project project,
+                                                         User user) {
         String apiKey = userService.getUserKeys(user).getOrDefault("OPENAI", "");
 
         List<Double> queryVector = getEmbedding(query, apiKey);
         return processQueryVectorWithProjectFiles(queryVector, project);
     }
 
-    private List<ScoredFragment> processQueryVectorWithProjectFiles(List<Double> queryVector, Project project) {
+    private List<ScoredFragment> processQueryVectorWithProjectFiles(List<Double> queryVector,
+                                                                    Project project) {
         List<FileElement> fileElements = fileElementRepository.findByProject(project);
         List<ScoredFragment> scoredFragments = new ArrayList<>();
 
@@ -116,8 +118,8 @@ public class EmbeddingService {
         return scoredFragments;
     }
 
-    private ScoredFragment processPage(List<String> pages, List<List<Double>> vectors, int index,
-            List<Double> queryVector) {
+    private ScoredFragment processPage(List<String> pages, List<List<Double>> vectors,
+                                       int index, List<Double> queryVector) {
         String page = pages.get(index);
         List<Double> vector = vectors.get(index);
 
@@ -130,7 +132,8 @@ public class EmbeddingService {
     }
 
     private List<ScoredFragment> formatTopFiveResults(List<ScoredFragment> scoredFragments) {
-        scoredFragments.sort(Comparator.comparingDouble(ScoredFragment::getScore).reversed());
+        scoredFragments
+                .sort(Comparator.comparingDouble(ScoredFragment::getScore).reversed());
         return scoredFragments.stream().limit(5).collect(Collectors.toList());
     }
 

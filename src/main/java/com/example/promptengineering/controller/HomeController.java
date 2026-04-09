@@ -19,8 +19,8 @@ public class HomeController {
     }
 
     @GetMapping({"/{lang:(?:pl|en)}/", "/"})
-    public String getHomePage(@PathVariable(required = false) String lang, HttpServletRequest request,
-            HttpServletResponse response) {
+    public String getHomePage(@PathVariable(required = false) String lang,
+                              HttpServletRequest request, HttpServletResponse response) {
 
         Locale newLocale;
         newLocale = Locale.forLanguageTag(Objects.requireNonNullElse(lang, "pl"));

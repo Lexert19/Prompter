@@ -26,8 +26,9 @@ public class ResetTokenService {
     private static final long TOKEN_EXPIRATION_HOURS = 24;
 
     @Autowired
-    public ResetTokenService(AuthService authService, ResetTokenRepository resetTokenRepository,
-            UserRepository userRepository, EmailService emailService) {
+    public ResetTokenService(AuthService authService,
+            ResetTokenRepository resetTokenRepository, UserRepository userRepository,
+            EmailService emailService) {
         this.authService = authService;
         this.resetTokenRepository = resetTokenRepository;
         this.userRepository = userRepository;
@@ -63,7 +64,8 @@ public class ResetTokenService {
         ResetToken resetToken = resetTokenRepository.findByToken(token)
                 .orElseThrow(() -> new TokenValidationException("Token does not exist"));
 
-        if (resetToken.getCreationTime().plusHours(TOKEN_EXPIRATION_HOURS).isBefore(LocalDateTime.now())) {
+        if (resetToken.getCreationTime().plusHours(TOKEN_EXPIRATION_HOURS)
+                .isBefore(LocalDateTime.now())) {
             throw new TokenValidationException("Token has expired");
         }
 
@@ -77,7 +79,8 @@ public class ResetTokenService {
         return UUID.randomUUID().toString();
     }
 
-    public void resetPassword(String token, String newPassword) throws TokenValidationException {
+    public void resetPassword(String token, String newPassword)
+            throws TokenValidationException {
         ResetToken resetToken = validateResetToken(token);
         authService.updatePassword(resetToken.getUser(), newPassword);
         resetTokenRepository.delete(resetToken);

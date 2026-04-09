@@ -20,7 +20,8 @@ public class UserRolesMigration implements CommandLineRunner {
 
     private static final String FLAG_NAME = "drop_user_roles_check_constraint";
 
-    public UserRolesMigration(MigrationFlagRepository migrationFlagRepository, JdbcTemplate jdbcTemplate) {
+    public UserRolesMigration(MigrationFlagRepository migrationFlagRepository,
+            JdbcTemplate jdbcTemplate) {
         this.migrationFlagRepository = migrationFlagRepository;
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -32,9 +33,11 @@ public class UserRolesMigration implements CommandLineRunner {
             return;
         }
 
-        jdbcTemplate.execute("ALTER TABLE user_roles DROP CONSTRAINT IF EXISTS user_roles_role_check");
+        jdbcTemplate.execute(
+                "ALTER TABLE user_roles DROP CONSTRAINT IF EXISTS user_roles_role_check");
 
-        jdbcTemplate.update("UPDATE user_roles SET role = 'USER' WHERE role NOT IN ('USER', 'ADMIN')");
+        jdbcTemplate.update(
+                "UPDATE user_roles SET role = 'USER' WHERE role NOT IN ('USER', 'ADMIN')");
 
         MigrationFlag flag = new MigrationFlag();
         flag.setName(FLAG_NAME);

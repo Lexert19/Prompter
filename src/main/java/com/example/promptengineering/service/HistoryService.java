@@ -53,7 +53,8 @@ public class HistoryService {
     }
 
     @Transactional
-    public void deleteChat(Long chatId, User user) throws ResourceNotFoundException, UserSecurityException {
+    public void deleteChat(Long chatId, User user)
+            throws ResourceNotFoundException, UserSecurityException {
         Optional<Chat> chat = chatRepository.findById(chatId);
         if (chat.isEmpty()) {
             throw new ResourceNotFoundException("Chat not found with id: " + chatId);
@@ -67,15 +68,18 @@ public class HistoryService {
             throws UserSecurityException, ResourceNotFoundException {
         Optional<Chat> chat = chatRepository.findById(messageBody.getChatId());
         if (chat.isEmpty())
-            throw new ResourceNotFoundException("Chat not found with id: " + messageBody.getChatId());
+            throw new ResourceNotFoundException(
+                    "Chat not found with id: " + messageBody.getChatId());
         checkUserAuthorization(chat.get(), user);
         return convertAndSaveMessage(messageBody, chat.get());
 
     }
 
-    private Chat checkUserAuthorization(Chat chat, User user) throws UserSecurityException {
+    private Chat checkUserAuthorization(Chat chat, User user)
+            throws UserSecurityException {
         if (!isUserAuthorizedForChat(chat, user)) {
-            throw new UserSecurityException("User is not authorized to send messages to this chat.");
+            throw new UserSecurityException(
+                    "User is not authorized to send messages to this chat.");
         }
         return chat;
     }
@@ -85,12 +89,16 @@ public class HistoryService {
     }
 
     public Message convertAndSaveMessage(MessageBody messageBody, Chat chat) {
-        if (messageBody.getImages() != null && messageBody.getImages().size() > maxImages) {
-            throw new IllegalArgumentException("Too many images. Max allowed: " + maxImages);
+        if (messageBody.getImages() != null
+                && messageBody.getImages().size() > maxImages) {
+            throw new IllegalArgumentException(
+                    "Too many images. Max allowed: " + maxImages);
         }
 
-        if (messageBody.getDocuments() != null && messageBody.getDocuments().size() > maxDocuments) {
-            throw new IllegalArgumentException("Too many documents. Max allowed: " + maxDocuments);
+        if (messageBody.getDocuments() != null
+                && messageBody.getDocuments().size() > maxDocuments) {
+            throw new IllegalArgumentException(
+                    "Too many documents. Max allowed: " + maxDocuments);
         }
 
         Message messageEntity = new Message();
@@ -120,16 +128,20 @@ public class HistoryService {
         long totalSize = messages.stream().mapToLong(m -> {
             long size = m.getText() != null ? m.getText().length() : 0;
             if (m.getDocuments() != null) {
-                size += m.getDocuments().stream().mapToLong(d -> d != null ? d.length() : 0).sum();
+                size += m.getDocuments().stream()
+                        .mapToLong(d -> d != null ? d.length() : 0).sum();
             }
             if (m.getImages() != null) {
-                size += m.getImages().stream().mapToLong(i -> i != null ? i.length() : 0).sum();
+                size += m.getImages().stream().mapToLong(i -> i != null ? i.length() : 0)
+                        .sum();
             }
             return size;
         }).sum();
         if (totalSize > maxTotalMessageSize) {
-            throw new UserSecurityException("Total message size (text + documents + images) too large: " + totalSize
-                    + " characters, max allowed: " + maxTotalMessageSize);
+            throw new UserSecurityException(
+                    "Total message size (text + documents + images) too large: "
+                            + totalSize + " characters, max allowed: "
+                            + maxTotalMessageSize);
         }
         return messages;
     }
