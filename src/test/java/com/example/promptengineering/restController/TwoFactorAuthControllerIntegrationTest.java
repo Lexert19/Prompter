@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -73,7 +74,8 @@ class TwoFactorAuthControllerIntegrationTest {
         when(twoFactorEmailService.verifyCode(anyString(), eq("123456")))
                 .thenReturn(true);
 
-        mockMvc.perform(post("/auth/2fa").session(session).param("code", "123456"))
+        mockMvc.perform(
+                post("/auth/2fa").session(session).param("code", "123456").with(csrf()))
                 .andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/"));
     }
 
@@ -83,7 +85,8 @@ class TwoFactorAuthControllerIntegrationTest {
         when(twoFactorEmailService.verifyCode(anyString(), eq("000000")))
                 .thenReturn(false);
 
-        mockMvc.perform(post("/auth/2fa").session(session).param("code", "000000"))
+        mockMvc.perform(
+                post("/auth/2fa").session(session).param("code", "000000").with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/auth/2fa"));
     }
@@ -94,7 +97,7 @@ class TwoFactorAuthControllerIntegrationTest {
         doNothing().when(twoFactorEmailService).createAndSendCode(anyString(),
                 anyString());
 
-        mockMvc.perform(post("/auth/2fa/resend").session(session))
+        mockMvc.perform(post("/auth/2fa/resend").session(session).with(csrf()))
                 .andExpect(status().isOk());
 
         verify(twoFactorEmailService).createAndSendCode(session.getId(),
@@ -103,7 +106,7 @@ class TwoFactorAuthControllerIntegrationTest {
 
     @Test
     void resendCode_withoutUserId_shouldReturnBadRequest() throws Exception {
-        mockMvc.perform(post("/auth/2fa/resend").session(session))
+        mockMvc.perform(post("/auth/2fa/resend").session(session).with(csrf()))
                 .andExpect(status().isBadRequest());
 
         verifyNoInteractions(twoFactorEmailService);

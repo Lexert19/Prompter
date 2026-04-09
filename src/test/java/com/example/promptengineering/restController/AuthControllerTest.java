@@ -86,8 +86,9 @@ public class AuthControllerTest {
 
     @Test
     public void testShowLoginForm() throws Exception {
-        mockMvc.perform(get("/auth/login")).andExpect(status().isOk()).andExpect(
-                content().string(org.hamcrest.Matchers.containsString("Login")));
+        mockMvc.perform(get("/auth/login").with(csrf())).andExpect(status().isOk())
+                .andExpect(
+                        content().string(org.hamcrest.Matchers.containsString("Login")));
     }
 
     @Test

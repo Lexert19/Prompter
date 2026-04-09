@@ -25,6 +25,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -83,7 +84,7 @@ public class FileControllerIntegrationTest {
         MockMultipartFile file = new MockMultipartFile("file", "test.txt",
                 MediaType.TEXT_PLAIN_VALUE, "Hello, World!".getBytes());
 
-        mockMvc.perform(multipart("/api/files/upload").file(file)
+        mockMvc.perform(multipart("/api/files/upload").file(file).with(csrf())
                 .with(user(userService.loadUserByUsername(user1Email))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.fileName").value("test.txt"))
@@ -98,7 +99,7 @@ public class FileControllerIntegrationTest {
                 MediaType.APPLICATION_OCTET_STREAM_VALUE, new byte[]{1, 2, 3, 4, 5});
 
         String uploadResponse = mockMvc
-                .perform(multipart("/api/files/upload").file(file)
+                .perform(multipart("/api/files/upload").file(file).with(csrf())
                         .with(user(userService.loadUserByUsername(user1Email))))
                 .andExpect(status().isOk()).andReturn().getResponse()
                 .getContentAsString();
@@ -119,7 +120,8 @@ public class FileControllerIntegrationTest {
                 MediaType.TEXT_PLAIN_VALUE, "for user1 only".getBytes());
 
         String uploadResponse = mockMvc
-                .perform(multipart("/api/files/upload").file(file)
+                .perform(multipart("/api/files/upload").file(file).with(csrf())
+
                         .with(user(userService.loadUserByUsername(user1Email))))
                 .andExpect(status().isOk()).andReturn().getResponse()
                 .getContentAsString();
@@ -137,7 +139,7 @@ public class FileControllerIntegrationTest {
                 MediaType.TEXT_PLAIN_VALUE, "content".getBytes());
 
         String uploadResponse = mockMvc
-                .perform(multipart("/api/files/upload").file(file)
+                .perform(multipart("/api/files/upload").file(file).with(csrf())
                         .with(user(userService.loadUserByUsername(user1Email))))
                 .andExpect(status().isOk()).andReturn().getResponse()
                 .getContentAsString();
@@ -153,7 +155,8 @@ public class FileControllerIntegrationTest {
         MockMultipartFile file = new MockMultipartFile("file", "test.txt",
                 MediaType.TEXT_PLAIN_VALUE, "content".getBytes());
 
-        mockMvc.perform(multipart("/api/files/upload").file(file))
+        mockMvc.perform(multipart("/api/files/upload").file(file).with(csrf()))
+
                 .andExpect(status().isUnauthorized());
     }
 
@@ -166,13 +169,13 @@ public class FileControllerIntegrationTest {
         MockMultipartFile file3 = new MockMultipartFile("file", "file3.txt",
                 MediaType.TEXT_PLAIN_VALUE, "user2 file".getBytes());
 
-        mockMvc.perform(multipart("/api/files/upload").file(file1)
+        mockMvc.perform(multipart("/api/files/upload").file(file1).with(csrf())
                 .with(user(userService.loadUserByUsername(user1Email))))
                 .andExpect(status().isOk());
-        mockMvc.perform(multipart("/api/files/upload").file(file2)
+        mockMvc.perform(multipart("/api/files/upload").file(file2).with(csrf())
                 .with(user(userService.loadUserByUsername(user1Email))))
                 .andExpect(status().isOk());
-        mockMvc.perform(multipart("/api/files/upload").file(file3)
+        mockMvc.perform(multipart("/api/files/upload").file(file3).with(csrf())
                 .with(user(userService.loadUserByUsername(user2Email))))
                 .andExpect(status().isOk());
 

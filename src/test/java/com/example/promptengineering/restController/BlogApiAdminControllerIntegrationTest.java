@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -140,7 +141,7 @@ public class BlogApiAdminControllerIntegrationTest {
         newPost.setContent("New content");
         newPost.setLang("en");
 
-        mockMvc.perform(post("/api/admin/blog/posts")
+        mockMvc.perform(post("/api/admin/blog/posts").with(csrf())
                 .with(user(userService.loadUserByUsername(adminUser.getEmail())))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(newPost)))
@@ -160,7 +161,7 @@ public class BlogApiAdminControllerIntegrationTest {
         newPost.setContent("New content");
         newPost.setLang("en");
 
-        mockMvc.perform(post("/api/admin/blog/posts")
+        mockMvc.perform(post("/api/admin/blog/posts").with(csrf())
                 .with(user(userService.loadUserByUsername(adminUser.getEmail())))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(newPost)))
@@ -180,7 +181,7 @@ public class BlogApiAdminControllerIntegrationTest {
         updatedPost.setContent("Updated content");
         updatedPost.setLang("pl");
 
-        mockMvc.perform(put("/api/admin/blog/posts/{id}", testPost1.getId())
+        mockMvc.perform(put("/api/admin/blog/posts/{id}", testPost1.getId()).with(csrf())
                 .with(user(userService.loadUserByUsername(adminUser.getEmail())))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updatedPost)))
@@ -197,7 +198,7 @@ public class BlogApiAdminControllerIntegrationTest {
         PostDto updatedPost = new PostDto();
         updatedPost.setTitle("Updated Title");
 
-        mockMvc.perform(put("/api/admin/blog/posts/{id}", 999L)
+        mockMvc.perform(put("/api/admin/blog/posts/{id}", 999L).with(csrf())
                 .with(user(userService.loadUserByUsername(adminUser.getEmail())))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updatedPost)))
@@ -206,8 +207,10 @@ public class BlogApiAdminControllerIntegrationTest {
 
     @Test
     void shouldDeletePostAsAdmin() throws Exception {
-        mockMvc.perform(delete("/api/admin/blog/posts/{id}", testPost1.getId())
-                .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
+        mockMvc.perform(
+                delete("/api/admin/blog/posts/{id}", testPost1.getId()).with(csrf())
+
+                        .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
                 .andExpect(status().isNoContent());
 
         mockMvc.perform(get("/api/admin/blog/posts/{id}", testPost1.getId())
@@ -217,7 +220,7 @@ public class BlogApiAdminControllerIntegrationTest {
 
     @Test
     void shouldReturn404WhenDeletingNonExistentPostAsAdmin() throws Exception {
-        mockMvc.perform(delete("/api/admin/blog/posts/{id}", 999L)
+        mockMvc.perform(delete("/api/admin/blog/posts/{id}", 999L).with(csrf())
                 .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
                 .andExpect(status().isNotFound());
     }

@@ -7,7 +7,9 @@ import java.time.Instant;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.springframework.stereotype.Component;
 
+@Component
 public class UserActionLimiter {
     private final ConcurrentMap<Long, AtomicInteger> attempts = new ConcurrentHashMap<>();
     private final ConcurrentMap<Long, Instant> lastAction = new ConcurrentHashMap<>();

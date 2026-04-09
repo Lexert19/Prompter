@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -70,7 +71,7 @@ class TwoFactorSetupControllerIntegrationTest {
         doNothing().when(emailService).sendTwoFactorCode(anyString(), anyString());
 
         mockMvc.perform(post("/api/2fa/send-test").param("email", "test@example.com")
-                .with(asTestUser)).andExpect(status().isOk()).andExpect(
+                .with(asTestUser).with(csrf())).andExpect(status().isOk()).andExpect(
                         jsonPath("$.message").value("Kod wysłany na test@example.com"));
 
         verify(emailService).sendTwoFactorCode(eq("test@example.com"), anyString());
@@ -83,12 +84,12 @@ class TwoFactorSetupControllerIntegrationTest {
         ArgumentCaptor<String> codeCaptor = ArgumentCaptor.forClass(String.class);
         doNothing().when(emailService).sendTwoFactorCode(eq(email), codeCaptor.capture());
 
-        mockMvc.perform(post("/api/2fa/send-test").param("email", email).with(asTestUser))
-                .andExpect(status().isOk());
+        mockMvc.perform(post("/api/2fa/send-test").param("email", email).with(asTestUser)
+                .with(csrf())).andExpect(status().isOk());
 
         String actualCode = codeCaptor.getValue();
 
-        mockMvc.perform(post("/api/2fa/enable").param("email", email)
+        mockMvc.perform(post("/api/2fa/enable").param("email", email).with(csrf())
                 .param("code", actualCode).with(asTestUser)).andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
 
@@ -102,7 +103,7 @@ class TwoFactorSetupControllerIntegrationTest {
         String email = "test@example.com";
         String wrongCode = "000000";
 
-        mockMvc.perform(post("/api/2fa/enable").param("email", email)
+        mockMvc.perform(post("/api/2fa/enable").param("email", email).with(csrf())
                 .param("code", wrongCode).with(asTestUser))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("Nieprawidłowy kod"));
@@ -123,14 +124,14 @@ class TwoFactorSetupControllerIntegrationTest {
         ArgumentCaptor<String> codeCaptor = ArgumentCaptor.forClass(String.class);
         doNothing().when(emailService).sendTwoFactorCode(eq(email), codeCaptor.capture());
 
-        mockMvc.perform(post("/api/2fa/send-test").param("email", email).with(asTestUser))
-                .andExpect(status().isOk());
+        mockMvc.perform(post("/api/2fa/send-test").param("email", email).with(asTestUser)
+                .with(csrf())).andExpect(status().isOk());
 
         String actualCode = codeCaptor.getValue();
 
-        mockMvc.perform(
-                post("/api/2fa/disable").param("code", actualCode).with(asTestUser))
-                .andExpect(status().isOk()).andExpect(jsonPath("$.success").value(true));
+        mockMvc.perform(post("/api/2fa/disable").param("code", actualCode)
+                .with(asTestUser).with(csrf())).andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
 
         User updated = userRepository.findById(testUser.getId()).orElseThrow();
         assert !updated.isTwoFactorEnabled();
@@ -145,9 +146,8 @@ class TwoFactorSetupControllerIntegrationTest {
 
         String wrongCode = "000000";
 
-        mockMvc.perform(
-                post("/api/2fa/disable").param("code", wrongCode).with(asTestUser))
-                .andExpect(status().isBadRequest())
+        mockMvc.perform(post("/api/2fa/disable").param("code", wrongCode).with(asTestUser)
+                .with(csrf())).andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("Nieprawidłowy kod"));
 
         User unchanged = userRepository.findById(testUser.getId()).orElseThrow();

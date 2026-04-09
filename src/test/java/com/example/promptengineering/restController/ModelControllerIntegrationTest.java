@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -98,7 +99,7 @@ public class ModelControllerIntegrationTest {
         newModel.setProvider("OPENAI");
         newModel.setType("text");
 
-        mockMvc.perform(post("/api/models/user-models").with(user(testUser))
+        mockMvc.perform(post("/api/models/user-models").with(user(testUser)).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(newModel)))
                 .andExpect(status().isOk())
@@ -114,7 +115,7 @@ public class ModelControllerIntegrationTest {
         editDto.setProvider("ANTHROPIC");
 
         mockMvc.perform(put("/api/models/user-models/{id}", userModel.getId())
-                .with(user(testUser)).contentType(MediaType.APPLICATION_JSON)
+                .with(csrf()).with(user(testUser)).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(editDto)))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Model updated successfully"));
@@ -140,7 +141,7 @@ public class ModelControllerIntegrationTest {
         editDto.setName("Hacked");
 
         mockMvc.perform(put("/api/models/user-models/{id}", otherModel.getId())
-                .with(user(testUser)).contentType(MediaType.APPLICATION_JSON)
+                .with(csrf()).with(user(testUser)).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(editDto)))
                 .andExpect(status().isNotFound());
 
@@ -151,7 +152,7 @@ public class ModelControllerIntegrationTest {
     @Test
     void shouldDeleteUserModel() throws Exception {
         mockMvc.perform(delete("/api/models/user-models/{id}", userModel.getId())
-                .with(user(testUser))).andExpect(status().isOk())
+                .with(csrf()).with(user(testUser))).andExpect(status().isOk())
                 .andExpect(content().string("Model deleted successfully"));
 
         assertThat(modelRepository.findById(userModel.getId())).isEmpty();
@@ -171,7 +172,7 @@ public class ModelControllerIntegrationTest {
         otherModel = modelRepository.save(otherModel);
 
         mockMvc.perform(delete("/api/models/user-models/{id}", otherModel.getId())
-                .with(user(testUser))).andExpect(status().isNotFound());
+                .with(csrf()).with(user(testUser))).andExpect(status().isNotFound());
 
         assertThat(modelRepository.findById(otherModel.getId())).isPresent();
     }
@@ -181,9 +182,9 @@ public class ModelControllerIntegrationTest {
         mockMvc.perform(get("/api/models/user-models"))
                 .andExpect(status().isUnauthorized());
 
-        mockMvc.perform(
-                post("/api/models/user-models").contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new ModelDto())))
+        mockMvc.perform(post("/api/models/user-models")
+                .contentType(MediaType.APPLICATION_JSON).with(csrf())
+                .content(objectMapper.writeValueAsString(new ModelDto())))
                 .andExpect(status().isUnauthorized());
     }
 }
