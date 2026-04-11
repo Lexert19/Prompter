@@ -22,7 +22,7 @@ public class UserFile {
     @Column(nullable = false)
     private String storedPath;
 
-    @Column(nullable = false)
+    @Column
     private String base64Path;
 
     @Column(nullable = false)
