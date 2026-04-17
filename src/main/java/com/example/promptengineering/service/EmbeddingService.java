@@ -1,5 +1,7 @@
 package com.example.promptengineering.service;
 
+import com.example.promptengineering.entity.UserFile;
+import com.example.promptengineering.repository.UserFileRepository;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -24,23 +26,23 @@ public class EmbeddingService {
     private final RestTemplate restTemplate;
     private final UserService userService;
     private final FileElementsRepository fileElementRepository;
+    private final UserFileRepository userFileRepository;
 
     public EmbeddingService(RestTemplate restTemplate, UserService userService,
-            FileElementsRepository fileElementRepository) {
+            FileElementsRepository fileElementRepository,
+            UserFileRepository userFileRepository) {
         this.restTemplate = restTemplate;
         this.userService = userService;
         this.fileElementRepository = fileElementRepository;
+        this.userFileRepository = userFileRepository;
     }
 
-    public void addFileToProject(Project project, FileElement file, User user) {
-        String apiKey = userService.getUserKeys(user).getOrDefault("OPENAI", "");
-        List<String> pages = splitContentIntoPages(file.getContent());
-        file.setPages(pages);
-        file.setProject(project);
-        file.setUser(user);
+    public void addFileToProject(Project project, Long fileId, User user) {
+        UserFile userFile = userFileRepository.findByIdAndOwner(fileId, user).orElseThrow(
+                () -> new RuntimeException("File not found or access denied"));
 
-        FileElement fileElement = createEmbeddingForFile(file, apiKey);
-        fileElementRepository.save(fileElement);
+        userFile.setProject(project);
+        userFileRepository.save(userFile);
     }
 
     private FileElement createEmbeddingForFile(FileElement file, String apiKey) {

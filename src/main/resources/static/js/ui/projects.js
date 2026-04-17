@@ -90,7 +90,8 @@ class Projects {
     displayProjectDetails(project) {
         this.projectNameDisplay.textContent = project.name;
         this.currentProjectId = project.id; 
-        this.loadProjectFiles(project.id);
+//        this.loadProjectFiles(project.id);
+        this.displayFiles(project.files);
     }
 
     async loadProjects() {
@@ -121,44 +122,79 @@ class Projects {
 
     }
 
-    handleFileUpload() {
+    async handleFileUpload() {
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
-        fileInput.onchange = (e) => {
+        fileInput.onchange = async (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const fileContent = e.target.result;
-                this.addFileToProject(file.name, fileContent);
-            };
-            reader.readAsText(file);
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetchWithCsrf('/api/files/upload', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                });
+
+                if (!response.ok) throw new Error('Upload failed');
+
+                const uploadedFileData = await response.json();
+                await this.addFileToProject(uploadedFileData.id);
+
+            } catch (error) {
+                this.showError(t.t("addFileFailed"));
+                console.error('Error:', error);
+            }
         };
         fileInput.click();
     }
 
-    async addFileToProject(fileName, fileContent) {
+//    async addFileToProject(fileName, fileContent) {
+//        const projectId = this.projectSelect.value;
+//        if (!projectId) return;
+//
+//        try {
+//            const response = await fetchWithCsrf(`${this.controllerUrl}/${projectId}/files`, {
+//                method: 'POST',
+//                headers: {
+//                    'Content-Type': 'application/json',
+//                },
+//                credentials: 'include',
+//                body: JSON.stringify({
+//                    name: fileName,
+//                    content: fileContent
+//                })
+//            });
+//
+//            if (!response.ok) throw new Error('Failed to add file');
+//
+//            await response.json();
+//            this.loadProjectFiles(projectId);
+//        } catch (error) {
+//            this.showError(t.t("addFileFailed"));
+//            console.error('Error:', error);
+//        }
+//    }
+
+    async addFileToProject(fileId) {
         const projectId = this.projectSelect.value;
         if (!projectId) return;
 
         try {
             const response = await fetchWithCsrf(`${this.controllerUrl}/${projectId}/files`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
-                body: JSON.stringify({
-                    name: fileName,
-                    content: fileContent
-                })
+                body: JSON.stringify({ fileId: fileId })
             });
 
             if (!response.ok) throw new Error('Failed to add file');
-            
-            await response.json();
-            this.loadProjectFiles(projectId);
+
+            const updatedProject = await response.json();
+            this.displayFiles(updatedProject.files);
         } catch (error) {
             this.showError(t.t("addFileFailed"));
             console.error('Error:', error);

@@ -11,7 +11,7 @@ class FileItem{
                 fileElement.className = 'file-item';
                 fileElement.innerHTML = `
                     <span class="icon-file">📄</span>
-                    <span class="file-name">${file.name}</span>
+                    <span class="file-name">${file.fileName}</span>
                 `;
 
                 fileElement.dataset.fileId = file.id;
@@ -23,7 +23,8 @@ class FileItem{
 
                  fileElement.addEventListener('contextmenu', (event) => {
                             event.preventDefault();
-                            this.selectFile(fileElement.dataset.projectId, fileElement.dataset.fileId, fileElement.id);
+                            this.selectFile(this.projectId, file.id, fileElement.id);
+                   //this.selectFile(fileElement.dataset.projectId, fileElement.dataset.fileId, fileElement.id);
                             this.editMenu.show(event);
                         });
 
@@ -38,23 +39,17 @@ class FileItem{
 
     async showFileContent(projectId, fileId) {
             try {
-                const response = await fetchWithCsrf(`/api/projects/${projectId}/files/${fileId}`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    credentials: 'include'
-                });
+              const response = await fetchWithCsrf(`/api/projects/${projectId}/files/${fileId}`, {
+                credentials: 'include'
+              });
 
-                if (!response.ok) {
-                    throw new Error('Nie udało się pobrać pliku');
-                }
+              if (!response.ok) throw new Error('Nie udało się pobrać pliku');
 
-                const content = await response.text();
-                const blob = new Blob([content], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
-                window.open(url, '_blank');
+              const blob = await response.blob();
+              const url = URL.createObjectURL(blob);
+              window.open(url, '_blank');
             } catch (error) {
-                this.showError(t.t("openFileFailed"));
+                //this.showError(t.t("openFileFailed"));
                 console.error('Błąd:', error);
             }
         }

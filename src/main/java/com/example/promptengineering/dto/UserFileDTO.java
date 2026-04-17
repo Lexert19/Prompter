@@ -1,5 +1,6 @@
 package com.example.promptengineering.dto;
 
+import com.example.promptengineering.entity.UserFile;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,4 +25,12 @@ public class UserFileDTO {
         this.ownerId = ownerId;
     }
 
+    public static UserFileDTO fromEntity(UserFile userFile) {
+        if (userFile == null)
+            return null;
+
+        return new UserFileDTO(userFile.getId(), userFile.getFileName(),
+                userFile.getContentType(), userFile.getSize(),
+                userFile.getOwner() != null ? userFile.getOwner().getId() : null);
+    }
 }

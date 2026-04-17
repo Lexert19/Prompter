@@ -1,17 +1,24 @@
 package com.example.promptengineering.restController;
 
-import com.example.promptengineering.dto.FileElementDTO;
-import com.example.promptengineering.entity.FileElement;
+import com.example.promptengineering.dto.UserFileDTO;
 import com.example.promptengineering.entity.Project;
 import com.example.promptengineering.entity.User;
+import com.example.promptengineering.entity.UserFile;
 import com.example.promptengineering.model.ProjectResponse;
 import com.example.promptengineering.model.ScoredFragment;
-import com.example.promptengineering.repository.FileElementsRepository;
 import com.example.promptengineering.repository.ProjectRepository;
+import com.example.promptengineering.repository.UserFileRepository;
 import com.example.promptengineering.repository.UserRepository;
 import com.example.promptengineering.service.EmbeddingService;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -27,15 +34,15 @@ public class ProjectController {
 
     private final ProjectRepository projectRepository;
     private final EmbeddingService embeddingService;
-    private final FileElementsRepository fileElementRepository;
+    private final UserFileRepository userFileRepository;
 
     @Autowired
     public ProjectController(ProjectRepository projectRepository,
             UserRepository userRepository, EmbeddingService embeddingService,
-            FileElementsRepository fileElementRepository) {
+            UserFileRepository userFileRepository) {
         this.projectRepository = projectRepository;
         this.embeddingService = embeddingService;
-        this.fileElementRepository = fileElementRepository;
+        this.userFileRepository = userFileRepository;
     }
 
     @PostMapping("/create")
@@ -61,9 +68,8 @@ public class ProjectController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Project not found"));
 
-        List<FileElementDTO> files = fileElementRepository.findByProject(project).stream()
-                .map(file -> new FileElementDTO(file.getId(), file.getName()))
-                .collect(Collectors.toList());
+        List<UserFileDTO> files = userFileRepository.findByProject(project).stream()
+                .map(UserFileDTO::fromEntity).collect(Collectors.toList());
 
         ProjectResponse projectResponse = new ProjectResponse(project.getId(),
                 project.getName(), files);
@@ -85,71 +91,86 @@ public class ProjectController {
     @PostMapping("/{projectId}/files")
     public ResponseEntity<ProjectResponse> addFileToProject(@AuthenticationPrincipal User user,
                                                             @PathVariable Long projectId,
-                                                            @RequestBody FileElement file) {
+                                                            @RequestBody java.util.Map<String, Long> payload) {
 
         Project project = projectRepository.findByIdAndUser(projectId, user)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Project not found"));
 
-        embeddingService.addFileToProject(project, file, user);
+        Long fileId = payload.get("fileId");
+        if (fileId == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        embeddingService.addFileToProject(project, fileId, user);
 
         Project updatedProject = projectRepository.findByIdAndUser(projectId, user)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
 
-        List<FileElementDTO> files = fileElementRepository.findByProject(updatedProject)
-                .stream().map(f -> new FileElementDTO(f.getId(), f.getName()))
-                .collect(Collectors.toList());
+        List<UserFileDTO> files = userFileRepository.findByProject(updatedProject)
+                .stream().map(UserFileDTO::fromEntity).collect(Collectors.toList());
 
-        ProjectResponse projectResponse = new ProjectResponse(updatedProject.getId(),
-                updatedProject.getName(), files);
-        return ResponseEntity.ok(projectResponse);
+        return ResponseEntity.ok(new ProjectResponse(updatedProject.getId(),
+                updatedProject.getName(), files));
     }
 
     @DeleteMapping("/{projectId}/files/{fileId}")
     public ResponseEntity<Void> deleteFileFromProject(@AuthenticationPrincipal User user,
                                                       @PathVariable Long projectId,
-                                                      @PathVariable Long fileId) {
+                                                      @PathVariable Long fileId)
+            throws IOException {
 
         Project project = projectRepository.findByIdAndUser(projectId, user)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Project not found or you are not the owner"));
 
-        FileElement file = fileElementRepository.findByIdAndProject(fileId, project)
+        UserFile userFile = userFileRepository.findByIdAndProject(fileId, project)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "File not found"));
+                        "File not found in this project"));
 
-        fileElementRepository.delete(file);
+        Path path = Paths.get(userFile.getStoredPath());
+        Files.deleteIfExists(path);
+        Path base64Path = Paths.get(userFile.getBase64Path());
+        Files.deleteIfExists(base64Path);
+        userFileRepository.delete(userFile);
 
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{projectId}/files")
-    public ResponseEntity<List<FileElement>> getProjectFiles(@AuthenticationPrincipal User user,
+    public ResponseEntity<List<UserFileDTO>> getProjectFiles(@AuthenticationPrincipal User user,
                                                              @PathVariable Long projectId) {
-
         Project project = projectRepository.findByIdAndUser(projectId, user)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Project not found or you are not the owner"));
 
-        List<FileElement> files = fileElementRepository.findByProject(project);
+        List<UserFile> files = userFileRepository.findByProject(project);
+        List<UserFileDTO> fileDtos = files.stream().map(UserFileDTO::fromEntity)
+                .collect(Collectors.toList());
 
-        return ResponseEntity.ok(files);
+        return ResponseEntity.ok(fileDtos);
     }
 
     @GetMapping("/{projectId}/files/{fileId}")
-    public ResponseEntity<String> getFile(@AuthenticationPrincipal User user,
-                                          @PathVariable Long projectId,
-                                          @PathVariable Long fileId) {
+    public ResponseEntity<Resource> getFile(@AuthenticationPrincipal User user,
+                                            @PathVariable Long projectId,
+                                            @PathVariable Long fileId)
+            throws MalformedURLException {
 
         Project project = projectRepository.findByIdAndUser(projectId, user)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Project not found or you are not the owner"));
 
-        FileElement file = fileElementRepository.findByIdAndProject(fileId, project)
+        UserFile userFile = userFileRepository.findByIdAndProject(fileId, project)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "File not found"));
 
-        return ResponseEntity.ok(file.getContent());
+        Path path = Paths.get(userFile.getStoredPath());
+        Resource resource = new org.springframework.core.io.UrlResource(path.toUri());
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(userFile.getContentType()))
+                .body(resource);
     }
 
     @PostMapping("/{projectId}/similar-fragments")

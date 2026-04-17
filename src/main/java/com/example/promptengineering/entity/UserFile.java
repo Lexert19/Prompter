@@ -38,6 +38,10 @@ public class UserFile {
     @JoinColumn(name = "user_id")
     private User owner;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id")
+    private Project project;
+
     public UserFile() {
     }
 
