@@ -141,7 +141,7 @@ class ChatClient {
 //
 //            const rootNode = JSON.parse(chunk);
             if(rootNode.error){
-                this.outputInput.textContent += error;
+                this.outputInput.textContent += rootNode.error;
                 return;
             }
 
