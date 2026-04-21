@@ -177,8 +177,11 @@ class Settings {
             return response.json();
         })
             .then((keys) => {
-            this.keys = keys;
-            this.key = this.keys[this.provider];
+            this.keys = Object.fromEntries(
+                Object.entries(keys).map(([providerName, apiToken]) => [providerName.toUpperCase(), apiToken])
+            );
+
+            this.key = this.provider ? (this.keys[this.provider.toUpperCase()] || "") : "";
         })
             .catch((error) => {
             console.error("Error loading keys:", error);

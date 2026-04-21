@@ -99,7 +99,7 @@ class ModelSelector {
                 window.settings.provider = provider;
                 window.settings.url = url;
                 window.settings.type = type;
-                window.settings.key = window.settings.keys ? window.settings.keys[provider] : '';
+                window.settings.key = (window.settings.keys && provider) ? (window.settings.keys[provider.toUpperCase()] || '') : '';
                 window.settings.save();
                 const modalElement = document.querySelector('.modal-menu');
                 if (modalElement) modalElement.classList.remove('modal-wide');
