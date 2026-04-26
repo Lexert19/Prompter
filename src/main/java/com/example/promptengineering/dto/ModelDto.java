@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ModelDto {
     private Long id;
+    private String uuid;
     private String name;
     private String text;
     private String provider;
@@ -45,6 +46,7 @@ public class ModelDto {
         dto.setType(model.getType());
         dto.setPointsPerInput(model.getPointsPerInput());
         dto.setPointsPerOutput(model.getPointsPerOutput());
+        dto.setUuid(model.getUuid());
         return dto;
     }
 

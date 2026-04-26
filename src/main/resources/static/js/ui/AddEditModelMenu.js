@@ -73,6 +73,7 @@ class AddEditModelMenu {
             .then(res => res.text())
             .then(() => {
             window.modelsView.renderUserModels();
+            window.modelSelector.syncModels();
             window.modal.close();
         })
             .catch(console.error);
@@ -94,6 +95,7 @@ class AddEditModelMenu {
             .then(res => res.text())
             .then(() => {
             window.modelsView.renderUserModels();
+            window.modelSelector.syncModels();
             window.modal.close();
         })
             .catch(console.error);

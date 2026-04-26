@@ -30,6 +30,31 @@ class ModelSelector {
         }
     }
 
+    async syncModels() {
+        try {
+            const response = await fetchWithCsrf('/api/models/all-models', { credentials: 'include' });
+            const models = await response.json();
+
+            const newModels = models.map(model => ({
+                name: model.name,
+                text: model.text || model.name,
+                provider: model.provider,
+                url: model.url,
+                type: model.type
+            }));
+
+            const uniqueModels = [...new Map(newModels.map(m => [m.name, m])).values()];
+            uniqueModels.sort((a, b) => a.text.localeCompare(b.text));
+
+            window.settings.models = uniqueModels;
+
+            this.render();
+            this.attachEvents();
+        } catch (error) {
+            console.error('syncModels error:', error);
+        }
+    }
+
     openModal() {
         const models = window.settings.models || [];
 

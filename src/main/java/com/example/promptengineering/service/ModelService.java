@@ -110,6 +110,7 @@ public class ModelService {
                     model.setPointsPerOutput(dto.getPointsPerOutput());
                     model.setGlobal(true);
                     model.setUser(user.get());
+                    model.setUuid(dto.getUuid());
                     modelRepository.save(model);
                     log.info("Added model: {} ({})", dto.getName(), dto.getProvider());
                 } else {

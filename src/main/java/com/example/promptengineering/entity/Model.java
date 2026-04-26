@@ -1,6 +1,7 @@
 package com.example.promptengineering.entity;
 
 import jakarta.persistence.*;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,6 +14,9 @@ public class Model {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(unique = true, nullable = true, updatable = false)
+    private String uuid;
 
     private String name;
 
@@ -44,6 +48,13 @@ public class Model {
         this.url = url;
         this.type = type;
         this.user = user;
+    }
+
+    @PrePersist
+    private void ensureUuid() {
+        if (this.uuid == null || this.uuid.isEmpty()) {
+            this.uuid = UUID.randomUUID().toString();
+        }
     }
 
 }
