@@ -249,7 +249,6 @@ class ChatClient {
         if (this.currentMessage) {
             this.currentMessage.end = Date.now();
             window.chat.saveMessage(this.currentMessage);
-            this.currentMessage.finish();
         }
     }
 

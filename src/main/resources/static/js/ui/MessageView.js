@@ -56,6 +56,7 @@ class MessageView{
         this.updateTpsCounter();
 
         const intervalId = setInterval(() => {
+            this.updateTpsCounter();
             if (this.message.end !== null) {
                 clearInterval(intervalId);
                 const loadingEl = document.getElementById(`loading-${this.message.id}`);
@@ -63,7 +64,6 @@ class MessageView{
                 return;
             }
             this.updateDurationCounter();
-            this.updateTpsCounter();
         }, 100);
     }
 
@@ -81,7 +81,4 @@ class MessageView{
         tpsElement.textContent = ` | ${tps} tps`;
     }
 
-    finish(){
-        this.updateTpsCounter();
-    }
 }
