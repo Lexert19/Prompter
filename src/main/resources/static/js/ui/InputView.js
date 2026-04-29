@@ -82,6 +82,14 @@ class InputView{
             document.getElementById('send-icon').classList.remove("d-none");
             document.getElementById('stop-icon').classList.add("d-none");
         }
+
+        const contextSize = window.chat.requestBuilder.calculateContextSize();
+        const contextDisplay = document.getElementById('context-counter');
+        if (contextDisplay) {
+            //todo
+            //contextDisplay.textContent = `Kontekst: ${contextSize.toLocaleString()} znaków`;
+        }
+
         this.updateDocumentsView();
     }
 

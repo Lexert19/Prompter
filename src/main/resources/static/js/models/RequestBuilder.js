@@ -118,4 +118,24 @@ class RequestBuilder {
         this.messages.push(message);
         return this;
     }
+
+    calculateContextSize() {
+        let total = 0;
+        let messagesToInclude;
+        if (window.settings.memory) {
+            messagesToInclude = [...this.messages];
+        } else {
+            messagesToInclude = [
+                ...this.messages.filter((message) => message.cache === true),
+                this.messages[this.messages.length - 1],
+            ];
+        }
+
+        messagesToInclude.forEach(msg => {
+            total += msg.text.length;
+            total += (msg.images.length * 1000);
+        });
+
+        return total;
+    }
 }

@@ -13,6 +13,18 @@ class Message {
         this.images = images;
     }
 
+    getTps(){
+        const now = Date.now();
+        const endTime = this.end !== null ? this.end : now;
+
+        const durationSec = (endTime - this.start) / 1000;
+        if (durationSec <= 0) return 0;
+
+        const estimatedTokens = this.text.length / 4;
+
+        return parseFloat((estimatedTokens / durationSec).toFixed(2));
+    }
+
     appendText(text) {
         this.text += text;
     }

@@ -10,6 +10,8 @@ class ChatClient {
         this.rerender = false;
         this.buffer = '';
         this.jsonAccumulator = '';
+        this.streamStartTime = 0;
+        this.streamCharCount = 0;
     }
 
     getProvider(){
@@ -18,6 +20,8 @@ class ChatClient {
 
     newMessage(){
         this.currentMessage = new Message("assistant");
+        this.streamStartTime = Date.now();
+        this.streamCharCount = 0;
         const messageView = new MessageView(this.currentMessage);
         this.outputInput = messageView.createHtmlElement(window.chat.chatMessages);
         this.parser.setRootElement(this.outputInput);
@@ -87,7 +91,7 @@ class ChatClient {
                 const data = line.slice(5).trim();
 
                 if (data === '[DONE]') {
-                    this.handleStreamEnd(reader);
+                    //this.handleStreamEnd(reader);
                     return;
                 }
 
@@ -169,6 +173,8 @@ class ChatClient {
             if(!content)
             return;
 
+            this.streamCharCount += content.length;
+
             this.parser.parse(content)
             this.currentMessage.appendText(content);
 
@@ -190,7 +196,7 @@ class ChatClient {
             this.abortController = null;
             window.inputView.setIsBlocked(false);
             this.currentMessage.end = Date.now();
-            window.chat.saveMessage(this.currentMessage);
+            //window.chat.saveMessage(this.currentMessage);
         }
     }
 
@@ -243,6 +249,7 @@ class ChatClient {
         if (this.currentMessage) {
             this.currentMessage.end = Date.now();
             window.chat.saveMessage(this.currentMessage);
+            this.currentMessage.finish();
         }
     }
 

@@ -6,10 +6,14 @@ class MessageView{
 
     createHtmlElement(destination, finished = false){
         let duration = "";
+        let tpsDisplay = "";
         if (this.message.end !== null) {
             const durationMs = this.message.end - this.message.start;
             const seconds = (durationMs / 1000).toFixed(1);
             duration = `${seconds} s`;
+        }
+        if (this.message.role === "assistant") {
+            tpsDisplay = ` | ${this.message.getTps()} tps`;
         }
 
         let htmlContent = "";
@@ -23,6 +27,7 @@ class MessageView{
                 <div class="assitant-data d-flex align-items-center">
                     <div class="date"></div>
                     <div class="duration" id="duration-${this.message.id}">${duration}</div>
+                    <div class="duration ms-1" id="tps-${this.message.id}">${tpsDisplay}</div>
                     <div class="loading-dots" id="loading-${this.message.id}" style="display: ${finished ? 'none' : 'inline-flex'};">
                         <span></span><span></span><span></span>
                     </div>
@@ -48,6 +53,7 @@ class MessageView{
 
     startDurationCounter(){
         this.updateDurationCounter();
+        this.updateTpsCounter();
 
         const intervalId = setInterval(() => {
             if (this.message.end !== null) {
@@ -57,18 +63,25 @@ class MessageView{
                 return;
             }
             this.updateDurationCounter();
+            this.updateTpsCounter();
         }, 100);
     }
 
     updateDurationCounter(){
         const durationElement = document.getElementById(`duration-${this.message.id}`);
-        if(durationElement){
-            const currentTime = Date.now();
-            const elapsedTimeMs = currentTime - this.message.start;
+        const currentTime = Date.now();
+        const elapsedTimeMs = currentTime - this.message.start;
+        const elapsedTimeSec = (elapsedTimeMs / 1000).toFixed(1);
+        durationElement.textContent = `${elapsedTimeSec}s`;
+    }
 
-            const elapsedTimeSec = (elapsedTimeMs / 1000).toFixed(1);
+    updateTpsCounter() {
+        const tpsElement = document.getElementById(`tps-${this.message.id}`);
+        const tps = this.message.getTps();
+        tpsElement.textContent = ` | ${tps} tps`;
+    }
 
-            durationElement.textContent = `${elapsedTimeSec}s`;
-        }
+    finish(){
+        this.updateTpsCounter();
     }
 }
