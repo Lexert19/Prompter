@@ -19,6 +19,9 @@
         <option value="high">
             <@spring.message "settings.thinking.effort.high" />
         </option>
+        <option value="xhigh">
+            <@spring.message "settings.thinking.effort.xhigh" />
+        </option>
         <option value="max">
             <@spring.message "settings.thinking.effort.max" />
         </option>
