@@ -1,0 +1,7 @@
+ALTER TABLE chat ADD COLUMN IF NOT EXISTS uuid UUID;
+
+UPDATE chat SET uuid = gen_random_uuid() WHERE uuid IS NULL;
+
+ALTER TABLE chat ALTER COLUMN uuid SET NOT NULL;
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_chat_uuid ON chat(uuid);
