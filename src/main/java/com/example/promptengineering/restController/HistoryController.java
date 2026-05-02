@@ -5,6 +5,7 @@ import com.example.promptengineering.dto.MessageDto;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.exception.ResourceNotFoundException;
 import com.example.promptengineering.exception.UserSecurityException;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -36,11 +37,11 @@ public class HistoryController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ChatDto.fromEntity(chat));
     }
 
-    @DeleteMapping("/chats/{chatId}")
-    public ResponseEntity<Void> deleteChat(@PathVariable Long chatId,
-                                           @AuthenticationPrincipal User user)
-            throws ResourceNotFoundException, UserSecurityException {
-        historyService.deleteChat(chatId, user);
+    @DeleteMapping("/chats/{chatUuid}")
+    public ResponseEntity<Void> deleteChat(@PathVariable UUID chatUuid,
+        @AuthenticationPrincipal User user)
+        throws ResourceNotFoundException, UserSecurityException {
+        historyService.deleteChat(chatUuid, user);
         return ResponseEntity.noContent().build();
     }
 
@@ -54,11 +55,11 @@ public class HistoryController {
 
     }
 
-    @GetMapping("/chats/{chatId}/messages")
-    public ResponseEntity<List<MessageDto>> getChatHistory(@PathVariable Long chatId,
-                                                           @AuthenticationPrincipal User user)
-            throws UserSecurityException, ResourceNotFoundException {
-        List<Message> messages = historyService.getChatHistory(chatId, user);
+    @GetMapping("/chats/{chatUuid}/messages")
+    public ResponseEntity<List<MessageDto>> getChatHistory(@PathVariable UUID chatUuid,
+        @AuthenticationPrincipal User user)
+        throws UserSecurityException, ResourceNotFoundException {
+        List<Message> messages = historyService.getChatHistory(chatUuid, user);
         return ResponseEntity.ok(MessageDto.fromEntities(messages));
     }
 

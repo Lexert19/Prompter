@@ -20,17 +20,8 @@ class History {
     async createChatSession(content) {
         if (window.settings.activeHistory) {
             const chat = await this.createChat();
-            this.updateUrlForChat(chat.id);
-            //this.saveMessage(chat.id, content);
-
-//            const newPath = `/chat/${chat.id}`;
-//
-//            if (window.history && typeof window.history.pushState === "function") {
-//                window.history.pushState({ chatId: chat.id }, document.title, newPath);
-//            } else {
-//                console.warn("History API not supported");
-//            }
-            return chat.id;
+            this.updateUrlForChat(chat.uuid);
+            return chat.uuid;
         }
         return "";
     }
@@ -69,7 +60,7 @@ class History {
             }
 
             const messageBody = {
-                chatId: chatId,
+                chatUuid: chatId,
                 text: message.text,
                 documents: message.documents,
                 images: images,
@@ -193,10 +184,11 @@ class History {
         const date = new Date(historyIndex.createdAt || Date.now());
         const options = { hour: '2-digit', minute: '2-digit' };
         const formatted = `${date.toLocaleDateString()} ${date.toLocaleTimeString([], options)}`;
+        const uuid = historyIndex.uuid;
         let index = `
       <div style="display: flex; align-items: center;">
-        <button class="rounded-1" onclick="window.chat.loadChat('${historyIndex.id}')">${formatted}</button>
-        <button class="d-flex rounded-1 justify-content-end" onclick="window.chatHistory.deleteChat('${historyIndex.id}')" style="margin-left: 10px; background-color: transparent; border: none; cursor: pointer;">
+        <button class="rounded-1" onclick="window.chat.loadChat('${uuid}')">${formatted}</button>
+        <button class="d-flex rounded-1 justify-content-end" onclick="window.chatHistory.deleteChat('${uuid}')" style="margin-left: 10px; background-color: transparent; border: none; cursor: pointer;">
           <i class="fa fa-trash" aria-hidden="true"></i>
         </button>
       </div>

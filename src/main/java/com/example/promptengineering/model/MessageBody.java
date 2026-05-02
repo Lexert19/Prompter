@@ -1,5 +1,6 @@
 package com.example.promptengineering.model;
 
+import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,7 +9,7 @@ import java.util.List;
 @Setter
 @Getter
 public class MessageBody {
-    private Long chatId;
+    private UUID chatUuid;
     private String text;
     private List<String> documents;
     private List<String> images;
