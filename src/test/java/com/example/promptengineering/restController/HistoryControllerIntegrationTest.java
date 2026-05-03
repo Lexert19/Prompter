@@ -9,6 +9,7 @@ import com.example.promptengineering.repository.MessageRepository;
 import com.example.promptengineering.repository.UserRepository;
 import com.example.promptengineering.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,7 +97,7 @@ public class HistoryControllerIntegrationTest {
     @Test
     void createChat_shouldReturnCreatedChat() throws Exception {
         mockMvc.perform(post("/api/history/chats").with(csrf()).with(asUser1()))
-                .andExpect(status().isCreated()).andExpect(jsonPath("$.id").exists());
+                .andExpect(status().isCreated()).andExpect(jsonPath("$.uuid").exists());
 
         List<Chat> chats = chatRepository.findByUser(user1);
         assertThat(chats).hasSize(1);
@@ -123,8 +124,8 @@ public class HistoryControllerIntegrationTest {
         mockMvc.perform(get("/api/history/chats").with(asUser1()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(greaterThanOrEqualTo(2)))
-                .andExpect(jsonPath("$.content[*].id",
-                        hasItems(chat1.getId().intValue(), chat2.getId().intValue())));
+                .andExpect(jsonPath("$.content[*].uuid",
+                        hasItems(chat1.getUuid().toString(), chat2.getUuid().toString())));
     }
 
     @Test
@@ -135,7 +136,7 @@ public class HistoryControllerIntegrationTest {
         chat = chatRepository.save(chat);
 
         MessageBody messageBody = new MessageBody();
-        messageBody.setChatId(chat.getId());
+        messageBody.setChatUuid(chat.getUuid());
         messageBody.setText("Hello, world!");
         messageBody.setRole("user");
         messageBody.setStart(System.currentTimeMillis() - 1000);
@@ -145,7 +146,7 @@ public class HistoryControllerIntegrationTest {
         mockMvc.perform(post("/api/history/messages").with(csrf()).with(asUser1())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(messageBody)))
-                .andExpect(status().isCreated()).andExpect(jsonPath("$.id").exists())
+                .andExpect(status().isCreated()).andExpect(jsonPath("$.uuid").exists())
                 .andExpect(jsonPath("$.text").value("Hello, world!"))
                 .andExpect(jsonPath("$.role").value("user"));
 
@@ -176,7 +177,7 @@ public class HistoryControllerIntegrationTest {
         messageRepository.save(msg2);
 
         mockMvc.perform(
-                get("/api/history/chats/{chatId}/messages", chat.getId()).with(asUser1()))
+                get("/api/history/chats/{chatId}/messages", chat.getUuid()).with(asUser1()))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].text").value("First"))
                 .andExpect(jsonPath("$[1].text").value("Second"));
@@ -196,7 +197,7 @@ public class HistoryControllerIntegrationTest {
         msg.setCreatedAt(Instant.now());
         messageRepository.save(msg);
 
-        mockMvc.perform(delete("/api/history/chats/{chatId}", chat.getId()).with(csrf())
+        mockMvc.perform(delete("/api/history/chats/{chatId}", chat.getUuid()).with(csrf())
                 .with(asUser1())).andExpect(status().isNoContent());
 
         Optional<Chat> deletedChat = chatRepository.findById(chat.getId());
@@ -207,14 +208,14 @@ public class HistoryControllerIntegrationTest {
 
     @Test
     void deleteChat_whenChatNotFound_shouldReturn404() throws Exception {
-        mockMvc.perform(delete("/api/history/chats/{chatId}", 999L).with(asUser1()))
+        mockMvc.perform(delete("/api/history/chats/{chatId}", UUID.randomUUID()).with(asUser1()))
                 .andExpect(status().is4xxClientError());
     }
 
     @Test
     void saveMessage_whenChatNotFound_shouldReturn404() throws Exception {
         MessageBody messageBody = new MessageBody();
-        messageBody.setChatId(999L);
+        messageBody.setChatUuid(UUID.randomUUID());
         messageBody.setText("Test");
         messageBody.setRole("user");
 
@@ -232,10 +233,10 @@ public class HistoryControllerIntegrationTest {
         chat = chatRepository.save(chat);
 
         mockMvc.perform(
-                get("/api/history/chats/{chatId}/messages", chat.getId()).with(asUser1()))
+                get("/api/history/chats/{chatId}/messages", chat.getUuid()).with(asUser1()))
                 .andExpect(status().isForbidden());
 
-        mockMvc.perform(delete("/api/history/chats/{chatId}", chat.getId()).with(csrf())
+        mockMvc.perform(delete("/api/history/chats/{chatId}", chat.getUuid()).with(csrf())
                 .with(asUser1())).andExpect(status().is4xxClientError());
     }
 
@@ -247,7 +248,7 @@ public class HistoryControllerIntegrationTest {
         chat = chatRepository.save(chat);
 
         MessageBody messageBody = new MessageBody();
-        messageBody.setChatId(chat.getId());
+        messageBody.setChatUuid(chat.getUuid());
         messageBody.setText("Hack attempt");
         messageBody.setRole("user");
 
@@ -271,7 +272,7 @@ public class HistoryControllerIntegrationTest {
                 .andExpect(status().isUnauthorized());
 
         MessageBody body = new MessageBody();
-        body.setChatId(1L);
+        body.setChatUuid(UUID.randomUUID());
         body.setText("test");
         mockMvc.perform(post("/api/history/messages").with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -287,7 +288,7 @@ public class HistoryControllerIntegrationTest {
         chat = chatRepository.save(chat);
 
         MessageBody messageBody = new MessageBody();
-        messageBody.setChatId(chat.getId());
+        messageBody.setChatUuid(chat.getUuid());
         messageBody.setText("Message with attachments");
         messageBody.setRole("user");
         messageBody.setDocuments(List.of("doc1.pdf", "doc2.docx"));

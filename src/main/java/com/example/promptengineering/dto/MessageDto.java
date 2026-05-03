@@ -1,6 +1,7 @@
 package com.example.promptengineering.dto;
 
 import com.example.promptengineering.entity.Message;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +12,7 @@ import java.util.stream.Collectors;
 @Setter
 @Getter
 public class MessageDto {
-    private Long id;
+    private UUID uuid;
     private String text;
     private List<String> documents;
     private List<String> images;
@@ -30,7 +31,7 @@ public class MessageDto {
         if (message == null)
             return null;
         MessageDto dto = new MessageDto();
-        dto.setId(message.getId());
+        dto.setUuid(message.getUuid());
         dto.setText(message.getText());
         dto.setDocuments(message.getDocuments());
         dto.setImages(message.getImages());
