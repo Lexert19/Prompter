@@ -6,6 +6,3 @@ A modern web application for interacting with Large Language Models (LLMs) from 
 
 Technologies: SpringBoot, PostgreSQL, Java, JUnit, Jenkins (CI/CD), pure JavaScript
 
-General architecture scheme:
-
-![architecture_scheme](docs/architecture.png)
