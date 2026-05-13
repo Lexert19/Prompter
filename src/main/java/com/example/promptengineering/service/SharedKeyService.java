@@ -37,6 +37,7 @@ public class SharedKeyService {
         if (workingKeys.isEmpty()) {
             throw new RuntimeException("No working keys for provider: " + provider);
         }
+
         SharedKey key = workingKeys.get(random.nextInt(workingKeys.size()));
         key.setUsageCount(key.getUsageCount() + 1);
         sharedKeyRepository.save(key);

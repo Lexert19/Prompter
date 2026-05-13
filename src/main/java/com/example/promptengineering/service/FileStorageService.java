@@ -5,12 +5,12 @@ import com.example.promptengineering.entity.User;
 import com.example.promptengineering.entity.UserFile;
 import com.example.promptengineering.exception.FileStorageException;
 import com.example.promptengineering.repository.UserFileRepository;
+import java.nio.file.StandardCopyOption;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -45,51 +45,57 @@ public class FileStorageService {
     }
 
     public UserFileDTO storeFile(MultipartFile file, User owner) throws IOException {
-        if (file.getSize() > maxFileSize) {
-            throw new IllegalArgumentException(
-                    "File too large. Max allowed size: " + maxFileSize + " bytes");
+        if (file.getSize() > maxFileSize)
+            throw new IllegalArgumentException("Too big");
+        if (userFileRepository.countByOwner(owner) >= maxFilesPerUser)
+            throw new IllegalArgumentException("Limit");
+
+        Path userDir = Paths.get(uploadDir).toAbsolutePath().normalize()
+                .resolve(owner.getId().toString());
+        Files.createDirectories(userDir);
+
+        String original = file.getOriginalFilename();
+        String displayName = original == null
+                ? "file"
+                : Paths.get(original).getFileName().toString().replaceAll("[\\p{Cntrl}]",
+                        "_");
+
+        String ext = "";
+        int dot = displayName.lastIndexOf('.');
+        if (dot > 0) {
+            ext = displayName.substring(dot).replaceAll("[^a-zA-Z0-9._-]", "");
+            if (ext.length() > 20)
+                ext = ext.substring(0, 20);
         }
 
-        long currentFileCount = userFileRepository.countByOwner(owner);
-        if (currentFileCount >= maxFilesPerUser) {
-            throw new IllegalArgumentException(
-                    "User cannot have more than " + maxFilesPerUser + " files.");
+        String baseName = UUID.randomUUID().toString();
+        Path binPath = userDir.resolve(baseName + ext).normalize();
+        Path b64Path = userDir.resolve(baseName + ".b64").normalize();
+
+        if (!binPath.startsWith(userDir) || !b64Path.startsWith(userDir)) {
+            throw new SecurityException("Path traversal");
         }
 
-        Path userDir = Paths.get(uploadDir, owner.getId().toString());
-        if (!Files.exists(userDir)) {
-            Files.createDirectories(userDir);
+        try (var in = file.getInputStream()) {
+            Files.copy(in, binPath, StandardCopyOption.REPLACE_EXISTING);
         }
 
-        byte[] fileBytes = file.getBytes();
-
-        String originalFilename = file.getOriginalFilename();
-        String extension = "";
-        if (originalFilename != null && originalFilename.contains(".")) {
-            extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        try (var in = Files.newInputStream(binPath);
+                var fileOut = Files.newOutputStream(b64Path);
+                var base64Out = Base64.getEncoder().wrap(fileOut)) {
+            in.transferTo(base64Out);
         }
 
-        String binaryFilename = UUID.randomUUID() + extension;
-        Path binaryPath = userDir.resolve(binaryFilename);
-        file.transferTo(binaryPath.toFile());
+        UserFile uf = new UserFile();
+        uf.setFileName(displayName);
+        uf.setStoredPath(binPath.toString());
+        uf.setBase64Path(b64Path.toString());
+        uf.setContentType(file.getContentType());
+        uf.setSize(Files.size(binPath));
+        uf.setUploadedAt(Instant.now());
+        uf.setOwner(owner);
 
-        String base64Content = Base64.getEncoder().encodeToString(fileBytes);
-
-        String base64Filename = UUID.randomUUID() + ".b64";
-        Path base64Path = userDir.resolve(base64Filename);
-        Files.writeString(base64Path, base64Content, StandardCharsets.UTF_8);
-
-        UserFile userFile = new UserFile();
-        userFile.setFileName(originalFilename);
-        userFile.setStoredPath(binaryPath.toString());
-        userFile.setBase64Path(base64Path.toString());
-        userFile.setContentType(file.getContentType());
-        userFile.setSize(file.getSize());
-        userFile.setUploadedAt(Instant.now());
-        userFile.setOwner(owner);
-
-        UserFile savedFile = userFileRepository.save(userFile);
-        return toDto(savedFile);
+        return toDto(userFileRepository.save(uf));
     }
 
     public List<UserFileDTO> getUserFiles(User user) {
