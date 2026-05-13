@@ -20,8 +20,7 @@ public class Chat {
     private Long id;
 
     @UuidGenerator
-    @Column(unique = true, updatable = false,
-        columnDefinition = "uuid default gen_random_uuid()")
+    @Column(unique = true, updatable = false)
     private UUID uuid;
 
     @ManyToOne(fetch = FetchType.LAZY)

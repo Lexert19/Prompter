@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
+import org.hibernate.annotations.UuidGenerator;
 
 @Setter
 @Getter
@@ -25,8 +26,8 @@ public class Message {
     @JoinColumn(name = "chat_id", nullable = false)
     private Chat chat;
 
-    @Column(unique = true, updatable = false,
-        columnDefinition = "uuid default gen_random_uuid()")
+    @UuidGenerator
+    @Column(unique = true, updatable = false)
     private UUID uuid;
 
     @Column(columnDefinition = "TEXT")
