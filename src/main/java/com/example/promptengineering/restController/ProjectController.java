@@ -1,5 +1,6 @@
 package com.example.promptengineering.restController;
 
+import com.example.promptengineering.dto.CreateProjectDTO;
 import com.example.promptengineering.dto.UserFileDTO;
 import com.example.promptengineering.entity.Project;
 import com.example.promptengineering.entity.User;
@@ -10,6 +11,7 @@ import com.example.promptengineering.repository.ProjectRepository;
 import com.example.promptengineering.repository.UserFileRepository;
 import com.example.promptengineering.repository.UserRepository;
 import com.example.promptengineering.service.EmbeddingService;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
@@ -47,10 +49,10 @@ public class ProjectController {
 
     @PostMapping("/create")
     public ResponseEntity<ProjectResponse> createProject(@AuthenticationPrincipal User user,
-                                                         @RequestBody String name) {
+                                                         @Valid @RequestBody CreateProjectDTO dto) {
 
         Project project = new Project();
-        project.setName(name);
+        project.setName(dto.name());
         project.setUser(user);
 
         Project savedProject = projectRepository.save(project);

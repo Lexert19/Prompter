@@ -2,7 +2,6 @@ package com.example.promptengineering.service;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 
 import com.example.promptengineering.exception.ResourceNotFoundException;
 import com.example.promptengineering.exception.UserSecurityException;
@@ -55,19 +54,19 @@ public class HistoryService {
 
     @Transactional
     public void deleteChat(UUID chatUuid, User user)
-        throws ResourceNotFoundException, UserSecurityException {
-        Chat chat = chatRepository.findByUuid(chatUuid)
-            .orElseThrow(() -> new ResourceNotFoundException("Chat not found: " + chatUuid));
+            throws ResourceNotFoundException, UserSecurityException {
+        Chat chat = chatRepository.findByUuid(chatUuid).orElseThrow(
+                () -> new ResourceNotFoundException("Chat not found: " + chatUuid));
         checkUserAuthorization(chat, user);
         messageRepository.deleteByChatId(chat.getId());
         chatRepository.delete(chat);
     }
 
     public Message saveMessage(MessageBody messageBody, User user)
-        throws UserSecurityException, ResourceNotFoundException {
+            throws UserSecurityException, ResourceNotFoundException {
         UUID chatUuid = messageBody.getChatUuid();
-        Chat chat = chatRepository.findByUuid(chatUuid)
-            .orElseThrow(() -> new ResourceNotFoundException("Chat not found: " + chatUuid));
+        Chat chat = chatRepository.findByUuid(chatUuid).orElseThrow(
+                () -> new ResourceNotFoundException("Chat not found: " + chatUuid));
         checkUserAuthorization(chat, user);
         return convertAndSaveMessage(messageBody, chat);
     }
@@ -113,11 +112,10 @@ public class HistoryService {
     }
 
     public List<Message> getChatHistory(UUID chatUuid, User user)
-        throws ResourceNotFoundException, UserSecurityException {
-        Chat chat = chatRepository.findByUuid(chatUuid)
-            .orElseThrow(() -> new ResourceNotFoundException("Chat not found: " + chatUuid));
+            throws ResourceNotFoundException, UserSecurityException {
+        Chat chat = chatRepository.findByUuid(chatUuid).orElseThrow(
+                () -> new ResourceNotFoundException("Chat not found: " + chatUuid));
         checkUserAuthorization(chat, user);
-
 
         List<Message> messages = messageRepository.findByChatId(chat.getId());
         long totalSize = messages.stream().mapToLong(m -> {

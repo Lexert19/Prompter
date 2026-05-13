@@ -124,8 +124,8 @@ public class HistoryControllerIntegrationTest {
         mockMvc.perform(get("/api/history/chats").with(asUser1()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(greaterThanOrEqualTo(2)))
-                .andExpect(jsonPath("$.content[*].uuid",
-                        hasItems(chat1.getUuid().toString(), chat2.getUuid().toString())));
+                .andExpect(jsonPath("$.content[*].uuid", hasItems(
+                        chat1.getUuid().toString(), chat2.getUuid().toString())));
     }
 
     @Test
@@ -176,9 +176,9 @@ public class HistoryControllerIntegrationTest {
         msg2.setCreatedAt(Instant.now());
         messageRepository.save(msg2);
 
-        mockMvc.perform(
-                get("/api/history/chats/{chatId}/messages", chat.getUuid()).with(asUser1()))
-                .andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(2))
+        mockMvc.perform(get("/api/history/chats/{chatId}/messages", chat.getUuid())
+                .with(asUser1())).andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].text").value("First"))
                 .andExpect(jsonPath("$[1].text").value("Second"));
     }
@@ -208,7 +208,8 @@ public class HistoryControllerIntegrationTest {
 
     @Test
     void deleteChat_whenChatNotFound_shouldReturn404() throws Exception {
-        mockMvc.perform(delete("/api/history/chats/{chatId}", UUID.randomUUID()).with(asUser1()))
+        mockMvc.perform(
+                delete("/api/history/chats/{chatId}", UUID.randomUUID()).with(asUser1()))
                 .andExpect(status().is4xxClientError());
     }
 
@@ -232,9 +233,8 @@ public class HistoryControllerIntegrationTest {
         chat.setCreatedAt(Instant.now());
         chat = chatRepository.save(chat);
 
-        mockMvc.perform(
-                get("/api/history/chats/{chatId}/messages", chat.getUuid()).with(asUser1()))
-                .andExpect(status().isForbidden());
+        mockMvc.perform(get("/api/history/chats/{chatId}/messages", chat.getUuid())
+                .with(asUser1())).andExpect(status().isForbidden());
 
         mockMvc.perform(delete("/api/history/chats/{chatId}", chat.getUuid()).with(csrf())
                 .with(asUser1())).andExpect(status().is4xxClientError());

@@ -39,8 +39,8 @@ public class HistoryController {
 
     @DeleteMapping("/chats/{chatUuid}")
     public ResponseEntity<Void> deleteChat(@PathVariable UUID chatUuid,
-        @AuthenticationPrincipal User user)
-        throws ResourceNotFoundException, UserSecurityException {
+                                           @AuthenticationPrincipal User user)
+            throws ResourceNotFoundException, UserSecurityException {
         historyService.deleteChat(chatUuid, user);
         return ResponseEntity.noContent().build();
     }
@@ -57,8 +57,8 @@ public class HistoryController {
 
     @GetMapping("/chats/{chatUuid}/messages")
     public ResponseEntity<List<MessageDto>> getChatHistory(@PathVariable UUID chatUuid,
-        @AuthenticationPrincipal User user)
-        throws UserSecurityException, ResourceNotFoundException {
+                                                           @AuthenticationPrincipal User user)
+            throws UserSecurityException, ResourceNotFoundException {
         List<Message> messages = historyService.getChatHistory(chatUuid, user);
         return ResponseEntity.ok(MessageDto.fromEntities(messages));
     }

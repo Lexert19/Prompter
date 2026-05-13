@@ -12,12 +12,8 @@ import org.hibernate.annotations.UuidGenerator;
 @Setter
 @Getter
 @Entity
-@Table(
-    name = "chat",
-    indexes = {
-        @Index(name = "idx_chat_uuid", columnList = "uuid", unique = true),
-    }
-)
+@Table(name = "chat", indexes = {
+        @Index(name = "idx_chat_uuid", columnList = "uuid", unique = true),})
 public class Chat {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
