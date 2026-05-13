@@ -20,8 +20,9 @@ public class Chat {
     private Long id;
 
     @UuidGenerator
-    @Column(name = "uuid", unique = true, updatable = false)
-    private UUID uuid = UUID.randomUUID();
+    @Column(unique = true, updatable = false,
+        columnDefinition = "uuid default gen_random_uuid()")
+    private UUID uuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

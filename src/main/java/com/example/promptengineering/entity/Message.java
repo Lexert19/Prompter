@@ -25,8 +25,9 @@ public class Message {
     @JoinColumn(name = "chat_id", nullable = false)
     private Chat chat;
 
-    @Column(nullable = false, unique = true, updatable = false)
-    private UUID uuid = UUID.randomUUID();
+    @Column(unique = true, updatable = false,
+        columnDefinition = "uuid default gen_random_uuid()")
+    private UUID uuid;
 
     @Column(columnDefinition = "TEXT")
     private String text;
