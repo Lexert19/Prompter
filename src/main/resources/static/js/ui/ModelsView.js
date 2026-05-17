@@ -1,5 +1,19 @@
 class ModelsView{
+    static _instance = null;
+
+    static instance() {
+        if (!ModelsView._instance) {
+            ModelsView._instance = new ModelsView();
+        }
+        return ModelsView._instance;
+    }
+
     constructor(){
+        if (ModelsView._instance) {
+            return ModelsView._instance;
+        }
+        ModelsView._instance = this;
+
         this.models = [];
         this.renderUserModels();
     }
@@ -23,33 +37,32 @@ class ModelsView{
     <div class="model-item">
         <span class="model-name">${model.text || model.name}</span>
         <div class="model-actions">
-            <button class="btn-edit" data-id="${model.id}" onclick="window.modelsView.editModel(this)" title="${t.t("edit")}">
+            <button class="btn-edit" data-id="${model.id}" onclick="ModelsView.instance().editModel(this)" title="${t.t("edit")}">
                 <i class="fas fa-pencil-alt"></i>
             </button>
-            <button class="btn-delete" data-id="${model.id}" onclick="window.modelsView.deleteModel(this)" title="${t.t("delete")}">
+            <button class="btn-delete" data-id="${model.id}" onclick="ModelsView.instance().deleteModel(this)" title="${t.t("delete")}">
                 <i class="fas fa-trash-alt"></i>
             </button>
         </div>
     </div>
 `;
         });
-        //html += '<button class="rounded-1" onclick="window.addEditModelMenu.showAddMenu()">'+t.t("addModel")+'</button>';
         modelsDiv.innerHTML = html;
     }
 
     editModel(btn) {
         const id = btn.getAttribute('data-id');
         const model = this.models.find(m => m.id == id);
-        if (model) window.addEditModelMenu.showEditMenu(model);
+        if (model) AddEditModelMenu.instance().showEditMenu(model);
     }
 
     deleteModel(btn) {
         const id = btn.getAttribute('data-id');
         const model = this.models.find(m => m.id == id);
-        if (model) window.deleteModelMenu.showDeleteMenu(model);
+        if (model) DeleteModelMenu.instance().showDeleteMenu(model);
     }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    window.modelsView = new ModelsView();
+    ModelsView.instance();
 });

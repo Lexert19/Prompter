@@ -46,5 +46,8 @@
   "disabled": "disabled",
   "editSystemPrompt": "Edit system prompt",
   "systemPrompt": "System prompt content",
-  "enableSystemPrompt": "Enable system prompt"
+  "enableSystemPrompt": "Enable system prompt",
+  "account.twofactor.enabled":"2FA enabled",
+  "account.twofactor.disabled":"2FA disabled",
+  "account.twofactor.email":"2FA email"
 }

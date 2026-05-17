@@ -1,5 +1,19 @@
 class InputView{
+    static _instance = null;
+
+    static instance() {
+        if (!InputView._instance) {
+            InputView._instance = new InputView();
+        }
+        return InputView._instance;
+    }
+
     constructor(){
+        if (InputView._instance) {
+            return InputView._instance;
+        }
+        InputView._instance = this;
+
         this.chatInput = document.getElementById("input");
         this.documentsHtml = document.getElementById("documents");
         this.images = [];
@@ -27,10 +41,10 @@ class InputView{
     updateDocumentsView() {
         const texts = [];
         this.longTexts.forEach((text, index) => {
-            texts.push(`<span id="doc-${index}"><i class="fas fa-file-alt" style="margin-right:5px;"></i> ${text.length} <i class="fas fa-times" style="cursor: pointer;" onclick="window.inputView.removeLongText(${index})"></i></span>`);
+            texts.push(`<span id="doc-${index}"><i class="fas fa-file-alt" style="margin-right:5px;"></i> ${text.length} <i class="fas fa-times" style="cursor: pointer;" onclick="InputView.instance().removeLongText(${index})"></i></span>`);
         });
         this.images.forEach((img, index) => {
-            texts.push(`<span id="img-${index}"><i class="fas fa-image" style="margin-right:5px;"></i> ${img.length} <i class="fas fa-times" style="cursor: pointer;" onclick="window.inputView.removeImage(${index})"></i></span>`);
+            texts.push(`<span id="img-${index}"><i class="fas fa-image" style="margin-right:5px;"></i> ${img.length} <i class="fas fa-times" style="cursor: pointer;" onclick="InputView.instance().removeImage(${index})"></i></span>`);
         });
         this.documentsHtml.innerHTML = texts.join(' ');
     }
@@ -48,7 +62,7 @@ class InputView{
         const message = this.chatInput.value;
 
         if (this.isBlocked) {
-            window.chat.stopStreaming();
+            Chat.instance().stopStreaming();
             this.isBlocked = false;
             this.updateView();
             return;
@@ -58,8 +72,8 @@ class InputView{
             return;
         }
 
-        if (!window.settings.key && !window.settings.useSharedKeys) {
-            window.modal.open(
+        if (!Settings.instance().key && !Settings.instance().useSharedKeys) {
+            Modal.instance().open(
                 t.t("error"),
                 '<p>'+t.t("noApiKey")+'</p>'
             );
@@ -68,7 +82,7 @@ class InputView{
 
         this.chatInput.value = "";
         this.isBlocked = true;
-        window.chat.sendMessage(message, "user", this.images, this.longTexts);
+        Chat.instance().sendMessage(message, "user", this.images, this.longTexts);
         this.images = [];
         this.longTexts = [];
         this.updateView();
@@ -83,7 +97,7 @@ class InputView{
             document.getElementById('stop-icon').classList.add("d-none");
         }
 
-        const contextSize = window.chat.requestBuilder.calculateContextSize();
+        const contextSize = Chat.instance().requestBuilder.calculateContextSize();
         const contextDisplay = document.getElementById('context-counter');
         if (contextDisplay) {
             //todo
@@ -111,12 +125,12 @@ class InputView{
                     reader.onload = async function (e) {
                         const base64 = e.target.result;
                         try {
-                            const fileId = await window.chatHistory.uploadImageBase64(base64);
-                            window.inputView.images.push(fileId);
+                            const fileId = await History.instance().uploadImageBase64(base64);
+                            InputView.instance().images.push(fileId);
                         } catch (error) {
                             console.error("Error sending image:", error);
                         }
-                        window.inputView.updateView();
+                        InputView.instance().updateView();
                     };
                     reader.readAsDataURL(file);
                     break;
@@ -126,8 +140,8 @@ class InputView{
             if (!hasImage) {
                 if (pastedText.length > 2000) {
                     event.preventDefault();
-                    window.inputView.longTexts.push(pastedText);
-                    window.inputView.updateView();
+                    InputView.instance().longTexts.push(pastedText);
+                    InputView.instance().updateView();
                 } else {
                 }
             }
@@ -137,4 +151,4 @@ class InputView{
 
 }
 
-window.inputView = new InputView();
+InputView.instance();

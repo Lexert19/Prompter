@@ -1,5 +1,19 @@
 class Settings {
+    static _instance = null;
+
+    static instance() {
+        if (!Settings._instance) {
+            Settings._instance = new Settings();
+        }
+        return Settings._instance;
+    }
+
     constructor() {
+        if (Settings._instance) {
+            return Settings._instance;
+        }
+        Settings._instance = this;
+
         this.memory = false;
         this.cache = false;
         this.maxTokens = 8000;
@@ -67,34 +81,34 @@ class Settings {
     change(event) {
         switch (event.target.name) {
             case "memory":
-                window.settings.memory = event.target.checked;
+                Settings.instance().memory = event.target.checked;
                 break;
             case "cache":
-                window.settings.cache = event.target.checked;
+                Settings.instance().cache = event.target.checked;
                 break;
             case "systemSwitch":
-                window.settings.systemSwitch = event.target.checked;
+                Settings.instance().systemSwitch = event.target.checked;
                 break;
             case "chatHistoryInput":
-                window.settings.activeHistory = event.target.checked;
+                Settings.instance().activeHistory = event.target.checked;
                 break;
             case "projectSwitch":
-                window.settings.projectSwitch = event.target.checked;
+                Settings.instance().projectSwitch = event.target.checked;
                 break;
             case "system":
-                window.settings.system = event.target.value;
+                Settings.instance().system = event.target.value;
                 break;
             case "project":
-                window.settings.project = event.target.value;
+                Settings.instance().project = event.target.value;
                 break;
             case "temperature":
-                window.settings.temperature = event.target.value / 100;
+                Settings.instance().temperature = event.target.value / 100;
                 break;
             case "top_p":
                 this.top_p = parseFloat(event.target.value);
                 break;
             case "useSharedKeys":
-                window.settings.useSharedKeys = event.target.checked;
+                Settings.instance().useSharedKeys = event.target.checked;
                 break;
             case "frequencyPenalty":
                 this.frequencyPenalty = parseFloat(event.target.value);
@@ -108,16 +122,16 @@ class Settings {
     }
 
     changeModel(event) {
-        const selectedModel = window.settings.models.find(
+        const selectedModel = Settings.instance().models.find(
             (model) => model.name === event.target.value
         );
         if (selectedModel) {
-            window.settings.model = selectedModel.name;
-            window.settings.provider = selectedModel.provider;
-            window.settings.url = selectedModel.url;
-            window.settings.type = selectedModel.type;
+            Settings.instance().model = selectedModel.name;
+            Settings.instance().provider = selectedModel.provider;
+            Settings.instance().url = selectedModel.url;
+            Settings.instance().type = selectedModel.type;
 
-            window.settings.key = window.settings.keys[selectedModel.provider];
+            Settings.instance().key = Settings.instance().keys[selectedModel.provider];
         }
         this.save();
     }
@@ -190,5 +204,5 @@ class Settings {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    window.settings = new Settings();
+    Settings.instance();
 });

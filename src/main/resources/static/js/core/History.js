@@ -1,5 +1,19 @@
 class History {
+    static _instance = null;
+
+    static instance() {
+        if (!History._instance) {
+            History._instance = new History();
+        }
+        return History._instance;
+    }
+
     constructor() {
+        if (History._instance) {
+            return History._instance;
+        }
+        History._instance = this;
+
         this.baseUrl = "/api/history";
         this.history = document.getElementById("history");
     }
@@ -18,7 +32,7 @@ class History {
 
 
     async createChatSession(content) {
-        if (window.settings.activeHistory) {
+        if (Settings.instance().activeHistory) {
             const chat = await this.createChat();
             this.updateUrlForChat(chat.uuid);
             return chat.uuid;
@@ -187,8 +201,8 @@ class History {
         const uuid = historyIndex.uuid;
         let index = `
       <div style="display: flex; align-items: center;">
-        <button class="rounded-1" onclick="window.chat.loadChat('${uuid}')">${formatted}</button>
-        <button class="d-flex rounded-1 justify-content-end" onclick="window.chatHistory.deleteChat('${uuid}')" style="margin-left: 10px; background-color: transparent; border: none; cursor: pointer;">
+        <button class="rounded-1" onclick="Chat.instance().loadChat('${uuid}')">${formatted}</button>
+        <button class="d-flex rounded-1 justify-content-end" onclick="History.instance().deleteChat('${uuid}')" style="margin-left: 10px; background-color: transparent; border: none; cursor: pointer;">
           <i class="fa fa-trash" aria-hidden="true"></i>
         </button>
       </div>
@@ -237,13 +251,12 @@ class History {
 
     updateUrlForChat(chatId) {
         const newPath = `/chat/${chatId}`;
-        if (window.history && typeof window.history.pushState === "function") {
-            window.history.pushState({ chatId: chatId }, document.title, newPath);
+        if (History.instance() && typeof History.instance().pushState === "function") {
+            History.instance().pushState({ chatId: chatId }, document.title, newPath);
         } else {
             console.warn("History API not supported");
         }
     }
 
 }
-
-window.chatHistory = new History();
+History.instance();

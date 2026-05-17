@@ -1,5 +1,19 @@
 class Chat {
+    static _instance = null;
+
+    static instance() {
+        if (!Chat._instance) {
+            Chat._instance = new Chat();
+        }
+        return Chat._instance;
+    }
+
     constructor() {
+        if (Chat._instance) {
+            return Chat._instance;
+        }
+        Chat._instance = this;
+
         this.documents = [];
         this.images = [];
         this.chatView = new ChatView();
@@ -18,51 +32,34 @@ class Chat {
             this.loadChat(this.session);
         }
 
-        window.chatHistory.loadHistory();
+        History.instance().loadHistory();
     }
 
     async saveMessage(content){
-        if(!window.settings.activeHistory)
+        if(!Settings.instance().activeHistory)
         return;
         if(this.session == ""){
-            const id =  await window.chatHistory.createChatSession(content);
+            const id =  await History.instance().createChatSession(content);
             this.session = id;
         }
-        await window.chatHistory.saveMessage(this.session, content);
+        await History.instance().saveMessage(this.session, content);
     }
 
     async loadChat(id) {
         this.session = id;
-        window.chatHistory.updateUrlForChat(id);
-        this.requestBuilder = await window.chatHistory.getRequestBuilderForChat(this.session);
-        window.chatClient.requestBuilder = this.requestBuilder;
+        History.instance().updateUrlForChat(id);
+        this.requestBuilder = await History.instance().getRequestBuilderForChat(this.session);
+        ChatClient.instance().requestBuilder = this.requestBuilder;
         this.chatView.renderMessages(this.requestBuilder);
     }
 
     stopStreaming(){
-        this.chatClient.stopStreaming();
+        ChatClient.instance().stopStreaming();
     }
 
-//    async sendMessage(content, role, images, longTexts) {
-//        const fragments = await window.projects.getContext(this.message.value);
-//        this.currentMessage = new Message(
-//            role,
-//            content,
-//            images,
-//            longTexts,
-//            []
-//        );
-//
-//        this.chatView.appendMessage(this.currentMessage)
-//        this.saveMessage(this.currentMessage);
-//
-//        this.requestBuilder.addMessage(this.currentMessage);
-//        this.chatClient.sendStreamingMessage(this.requestBuilder);
-//        this.message.value = "";
-//    }
 
     async sendMessage(content, role, images, longTexts) {
-        const fragments = await window.projects.getContext(content);
+        const fragments = await Projects.instance().getContext(content);
         const userMessage = new Message(role, content, images, longTexts, []);
 
         this.chatView.appendMessage(userMessage);
@@ -74,7 +71,7 @@ class Chat {
     }
 
     async _sendRequest() {
-        this.chatClient.sendStreamingMessage(this.requestBuilder);
+        ChatClient.instance().sendStreamingMessage(this.requestBuilder);
     }
 
     async resendUserMessage(userMessage) {
@@ -101,12 +98,12 @@ class Chat {
             this.chatView.clearMessages();
             this.chatView.renderMessages(this.requestBuilder);
             await this._sendRequest();
-            window.inputView.setIsBlocked(true);
+            InputView.instance().setIsBlocked(true);
         }
     }
 
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    window.chat = new Chat();
+    Chat.instance()
 });

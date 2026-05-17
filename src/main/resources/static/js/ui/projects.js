@@ -1,5 +1,19 @@
 class Projects {
+    static _instance = null;
+
+    static instance() {
+        if (!Projects._instance) {
+            Projects._instance = new Projects();
+        }
+        return Projects._instance;
+    }
+
     constructor() {
+        if (Projects._instance) {
+            return Projects._instance;
+        }
+        Projects._instance = this;
+
         this.controllerUrl = '/api/projects';
         this.projectSelect = document.getElementById('project-select');
         this.createButton = document.getElementById('btn-create');
@@ -35,8 +49,8 @@ class Projects {
     }
 
     async getContext(query){
-        if (window.settings.projectSwitch && window.settings.project) {
-            const fragments = await this.searchSimilarFragments(window.settings.project, encodeURIComponent(query));
+        if (Settings.instance().projectSwitch && Settings.instance().project) {
+            const fragments = await this.searchSimilarFragments(Settings.instance().project, encodeURIComponent(query));
             return fragments;
         }
         return [];
@@ -273,4 +287,4 @@ class Projects {
     }
 }
 
-window.projects = new Projects();   
+Projects.instance();

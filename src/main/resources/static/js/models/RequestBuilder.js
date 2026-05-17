@@ -6,55 +6,55 @@ class RequestBuilder {
     }
 
     getSystem() {
-        if (window.settings.systemSwitch) {
-            return window.settings.system;
+        if (Settings.instance().systemSwitch) {
+            return Settings.instance().system;
         }
         return "";
     }
 
     getFrequencyPenalty() {
-        return window.settings.frequencyPenalty;
+        return Settings.instance().frequencyPenalty;
     }
 
     getPresencePenalty() {
-        return window.settings.presencePenalty;
+        return Settings.instance().presencePenalty;
     }
 
     getType() {
-        return window.settings.type;
+        return Settings.instance().type;
     }
 
     getTopP(){
-        return window.settings.top_p;
+        return Settings.instance().top_p;
     }
 
     getProvider() {
-        return window.settings.provider;
+        return Settings.instance().provider;
     }
 
     getModel() {
-        return window.settings.model;
+        return Settings.instance().model;
     }
 
     getUrl() {
-        return window.settings.url;
+        return Settings.instance().url;
     }
 
     getMaxTokens() {
-        return window.settings.maxTokens;
+        return Settings.instance().maxTokens;
     }
 
     getTemperature() {
-        return window.settings.temperature;
+        return Settings.instance().temperature;
     }
 
     getKey() {
-        return window.settings.key;
+        return Settings.instance().key;
     }
 
     toRequestJSON() {
         let messagesToInclude;
-        if (window.settings.memory) {
+        if (Settings.instance().memory) {
             messagesToInclude = [...this.messages];
         } else {
             messagesToInclude = [
@@ -79,11 +79,11 @@ class RequestBuilder {
             stream: this.stream,
             type: this.getType(),
             key: this.getKey(),
-            ...(window.settings.thinkingEffort !== "lack" && {
-                reasoningEffort: window.settings.thinkingEffort
+            ...(Settings.instance().thinkingEffort !== "lack" && {
+                reasoningEffort: Settings.instance().thinkingEffort
             }),
             system: this.getSystem(),
-            useSharedKeys: window.settings.useSharedKeys
+            useSharedKeys: Settings.instance().useSharedKeys
         });
     }
 
@@ -122,7 +122,7 @@ class RequestBuilder {
     calculateContextSize() {
         let total = 0;
         let messagesToInclude;
-        if (window.settings.memory) {
+        if (Settings.instance().memory) {
             messagesToInclude = [...this.messages];
         } else {
             messagesToInclude = [

@@ -11,6 +11,8 @@ class HtmlParser {
         this.blockElements = new Map();
         this.randomId = Math.floor(Math.random() * 1000000);
         this.nextBlockId = 0;
+        this.processedLength = 0;
+        this.incompleteLine = '';
     }
 
     setRootElement(rootElement){
@@ -25,11 +27,32 @@ class HtmlParser {
         this.previousBlocks = [];
         this.randomId = Math.floor(Math.random() * 1000000);
         this.nextBlockId = 0;
+        this.processedLength = 0;
+        this.incompleteLine = '';
+        this.lastProcessedLine = 0;
+        this.isCodeBlock = false;
+        this.isThinkingBlock = false;
     }
 
     parse(textFragment) {
         this.bufferedText += textFragment;
-        this.readLines();
+
+        const newData = this.bufferedText.slice(this.processedLength);
+        this.processedLength = this.bufferedText.length;
+
+        this.incompleteLine += newData;
+        const lines = this.incompleteLine.split('\n');
+
+        this.incompleteLine = lines.pop() || '';
+
+        for (const line of lines) {
+            const previousLine = this.lines[this.lines.length - 1] || {text: "", mode: ""};
+            this.lines.push({
+                text: line,
+                mode: this.getLineMode(previousLine, line)
+            });
+        }
+
         this.updateBlocks();
         this.renderChanges();
     }
@@ -52,76 +75,102 @@ class HtmlParser {
         }
     }
 
-
     getLineMode(previousLine, line){
-        const codeBlockDelimiterRegex = /^ *```/;
-        if(line.startsWith('<think>')){
-            return "START_THINKING";
-        }else if (line.startsWith('</think>')) {
-            return "STOP_THINKING";
-        }else if(codeBlockDelimiterRegex.test(line) && previousLine.mode != "CODE"){
-            return "START_CODE";
-        }else if(codeBlockDelimiterRegex.test(line) && previousLine.mode == "CODE"){
-            return "STOP_CODE";
-        }else if(previousLine.mode == "START_THINKING" || previousLine.mode == "THINKING"){
-            return "THINKING";
-        }else if(previousLine.mode == "START_CODE" || previousLine.mode == "CODE"){
-            return "CODE";
-        }else if(line.startsWith("###") || line.startsWith("##")){
-            return "HEADER3"
-        }else if(line.startsWith("**")){
-            //return "HEADER3"
-        }else if(line.startsWith("* ") || line.startsWith("- ")){
-            return "LISTITEM"
-        }else if(line.startsWith("    *") ){
-            return "LISTITEM2";
-        }else if(line.startsWith("        *")){
-            return "LISTITEM3";
-        }else if(line.startsWith("---")){
-            return "LINE";
-        }else if(line.startsWith("   -")){
-            return "LISTITEM2DEEPSEEK";
-        }else if(line.startsWith("     -")){
-            return "LISTITEM3DEEPSEEK";
-        }else if(line.startsWith("|")){
-            return "ROW";
+        const codeDelim = /^ *```/;
+
+        if(line.startsWith('<think>')){ this.isThinkingBlock = true; return "START_THINKING"; }
+        if(line.startsWith('</think>')){ this.isThinkingBlock = false; return "STOP_THINKING"; }
+
+        if(codeDelim.test(line)){
+            if(this.isCodeBlock){ this.isCodeBlock = false; return "STOP_CODE"; }
+            this.isCodeBlock = true; return "START_CODE";
         }
+
+        if(this.isThinkingBlock) return "THINKING";
+        if(this.isCodeBlock) return "CODE";
+
+        if(line.startsWith("###") || line.startsWith("##")) return "HEADER3";
+        if(line.startsWith("---")) return "LINE";
+        if(line.startsWith("|")) return "ROW";
+
+        if(line.startsWith("        *") || line.startsWith("        -")) return "LISTITEM3";
+        if(line.startsWith("    *") || line.startsWith("    -")) return "LISTITEM2";
+        if(line.startsWith("     -")) return "LISTITEM3DEEPSEEK";
+        if(line.startsWith("   -")) return "LISTITEM2DEEPSEEK";
+        if(line.startsWith("* ") || line.startsWith("- ")) return "LISTITEM"
 
         return "NORMAL";
     }
 
-    updateBlocks(){
-        this.blocks = [];
-        let currentBlock = { type: 'NORMAL', content: '' };
-        let blockIdCounter = 0;
+//    getLineMode(previousLine, line){
+//        const codeBlockDelimiterRegex = /^ *```/;
+//        if(line.startsWith('<think>')){
+//            return "START_THINKING";
+//        }else if (line.startsWith('</think>')) {
+//            return "STOP_THINKING";
+//        }else if(codeBlockDelimiterRegex.test(line) && previousLine.mode != "CODE"){
+//            return "START_CODE";
+//        }else if(codeBlockDelimiterRegex.test(line) && previousLine.mode == "CODE"){
+//            return "STOP_CODE";
+//        }else if(previousLine.mode == "START_THINKING" || previousLine.mode == "THINKING"){
+//            return "THINKING";
+//        }else if(previousLine.mode == "START_CODE" || previousLine.mode == "CODE"){
+//            return "CODE";
+//        }else if(line.startsWith("###") || line.startsWith("##")){
+//            return "HEADER3"
+//        }else if(line.startsWith("**")){
+//            //return "HEADER3"
+//        }else if(line.startsWith("* ") || line.startsWith("- ")){
+//            return "LISTITEM"
+//        }else if(line.startsWith("    *") ){
+//            return "LISTITEM2";
+//        }else if(line.startsWith("        *")){
+//            return "LISTITEM3";
+//        }else if(line.startsWith("---")){
+//            return "LINE";
+//        }else if(line.startsWith("   -")){
+//            return "LISTITEM2DEEPSEEK";
+//        }else if(line.startsWith("     -")){
+//            return "LISTITEM3DEEPSEEK";
+//        }else if(line.startsWith("|")){
+//            return "ROW";
+//        }
+//
+//        return "NORMAL";
+//    }
 
-        for(const line of this.lines){
+    updateBlocks(){
+        const startIdx = this.lastProcessedLine || 0;
+        for(let i = startIdx; i < this.lines.length; i++){
+            const line = this.lines[i];
+            let currentBlock = this.blocks[this.blocks.length - 1];
             switch(line.mode){
                 case 'START_THINKING':
-                    currentBlock = { id: blockIdCounter++, type: 'THINKING', content: '' };
+                    currentBlock = { id: this.nextBlockId++, type: 'THINKING', content: '', closed: false };
                     this.blocks.push(currentBlock);
                     break;
                 case 'STOP_THINKING':
+                    if(currentBlock && currentBlock.type === 'THINKING') currentBlock.closed = true;
                     break;
                 case 'START_CODE':
-                    currentBlock = {
-                        id: blockIdCounter++,
+                    this.blocks.push({
+                        id: this.nextBlockId++,
                         type: 'CODE',
                         content: '',
-                        language: line.text.replace(/```/, '').trim() || null
-                    };
-                    this.blocks.push(currentBlock);
+                        language: line.text.replace(/```/, '').trim() || null,
+                        closed: false
+                    });
                     break;
                 case 'STOP_CODE':
+                    if(currentBlock && currentBlock.type === 'CODE') currentBlock.closed = true;
                     break;
                 case 'CODE':
                 case 'THINKING':
-                    this.blocks[this.blocks.length-1].content += line.text + "\n";
+                    if(currentBlock) currentBlock.content += line.text + "\n";
                     break;
                 case 'NORMAL':
                     if(line.text){
-                        currentBlock = { id: blockIdCounter++, type: line.mode, content: line.text };
-                        this.blocks.push(currentBlock);
+                        this.blocks.push({ id: this.nextBlockId++, type: 'NORMAL', content: line.text, closed: true });
                     }
                     break;
                 case 'ROW':
@@ -133,12 +182,12 @@ class HtmlParser {
                 case 'LINE':
                 case 'HEADER2':
                 case 'HEADER3':
-                    currentBlock = { id: blockIdCounter++, type: line.mode, content: line.text };
-                    this.blocks.push(currentBlock);
+                    this.blocks.push({ id: this.nextBlockId++, type: line.mode, content: line.text, closed: true });
                     break;
 
             }
         }
+        this.lastProcessedLine = this.lines.length;
     }
 
     renderStrongs(content){
@@ -225,7 +274,7 @@ class HtmlParser {
     }
 
     _updateExistingBlock(existingElement, newBlock, oldBlock) {
-        if (!oldBlock || JSON.stringify(oldBlock) !== JSON.stringify(newBlock)) {
+        if (!oldBlock || oldBlock.content !== newBlock.content || oldBlock.type !== newBlock.type) {
             existingElement.innerHTML = this.renderBlockToHtmlString(newBlock);
             if (newBlock.type === 'CODE') {
                 this._highlightCodeBlock(existingElement);
@@ -260,30 +309,41 @@ class HtmlParser {
     }
 
     renderChanges() {
-        if (!this.rootElement) {
-            console.error("Root element not found for rendering.");
-            return;
-        }
+        if (!this.rootElement) return;
+        const newMap = new Map(this.blocks.map(b => [b.id, b]));
+        this._removeStaleBlocks(newMap);
 
-        const newBlockMap = new Map();
-        this.blocks.forEach(block => newBlockMap.set(block.id, block));
-
-        this._removeStaleBlocks(newBlockMap);
-
-        let currentDomNode = this.rootElement.firstChild;
+        let node = this.rootElement.firstChild;
         for (let i = 0; i < this.blocks.length; i++) {
-            const newBlock = this.blocks[i];
-            const oldBlock = this.previousBlocks.find(b => b.id === newBlock.id);
-            let existingElement = this.blockElements.get(newBlock.id);
+            const block = this.blocks[i];
+            const old = this.previousBlocks.find(b => b.id === block.id);
+            let el = this.blockElements.get(block.id);
 
-            if (existingElement) {
-                currentDomNode = this._handleExistingBlock(existingElement, newBlock, oldBlock, currentDomNode);
+            if (el && block.closed && old && old.content === block.content) {
+                node = el.nextSibling;
+                continue;
+            }
+
+            if (el) {
+                this._updateExistingBlock(el, block, old);
+                if (node!== el) this.rootElement.insertBefore(el, node);
+                node = el.nextSibling;
             } else {
-                currentDomNode = this._handleNewBlock(newBlock, currentDomNode);
+                el = this._createNewBlockElement(block);
+                this.rootElement.insertBefore(el, node);
+                this.blockElements.set(block.id, el);
+                if (block.type === 'CODE' && block.closed) this._highlightCodeBlock(el);
             }
         }
+        this.previousBlocks = this.blocks.map(b => ({...b}));
+    }
 
-        this.previousBlocks = JSON.parse(JSON.stringify(this.blocks));
+    restoreHighlights(){
+        if (!this.rootElement) return;
+        this.rootElement.querySelectorAll('pre code').forEach(code => {
+            delete code.dataset.highlighted;
+            hljs.highlightElement(code);
+        });
     }
 
     escapeHtml(text) {

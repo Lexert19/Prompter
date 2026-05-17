@@ -56,12 +56,12 @@
                     <div class="cache-container"></div>
                     <textarea type="text"
                               class="transparent-textarea"
-                              onkeydown="window.inputView.appendText(event)"
+                              onkeydown="InputView.instance().appendText(event)"
                               id="input"
                               placeholder="<@spring.message 'input.placeholder'/>"></textarea>
                     <button id="send-button"
                             class="send-button"
-                            onclick="window.inputView.makeChat()">
+                            onclick="InputView.instance().makeChat()">
                         <div id="send-icon"
                              class="d-flex align-items-center justify-content-center">
                             <svg xmlns="http://www.w3.org/2000/svg"

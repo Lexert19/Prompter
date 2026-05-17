@@ -19,6 +19,13 @@ class ChatView {
             const messageView = new MessageView(message);
             messageView.createHtmlElement(this.chatView, true);
         });
+
+        if (window.hljs) {
+            document.querySelectorAll('#chatMessages pre code').forEach(block => {
+                delete block.dataset.highlighted;
+                hljs.highlightElement(block);
+            });
+        }
     }
 
     clearMessages() {

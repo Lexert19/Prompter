@@ -5,7 +5,7 @@
                    id="memory"
                    name="memory"
                    value="memory"
-                   onchange="window.settings.change(event)">
+                   onchange="Settings.instance().change(event)">
             <label for="memory" class="custom-checkbox"></label>
             <span><@spring.message "settings.memory" /></span>
         </label>
@@ -16,7 +16,7 @@
                    id="cache"
                    name="cache"
                    value="cache"
-                   onchange="window.settings.change(event)">
+                   onchange="Settings.instance().change(event)">
             <label for="cache" class="custom-checkbox"></label>
             <span><@spring.message "settings.cache" /></span>
         </label>
@@ -33,7 +33,7 @@
                max="100"
                step="1"
                value="0"
-               onchange="window.settings.change(event)">
+               onchange="Settings.instance().change(event)">
     </div>
     <div class="instruction-field ">
         <label for="top_p">
@@ -46,7 +46,7 @@
                max="1"
                step="0.01"
                value="0.95"
-               onchange="window.settings.change(event)">
+               onchange="Settings.instance().change(event)">
     </div>
     <div class="instruction-field">
         <label for="frequencyPenalty">
@@ -59,7 +59,7 @@
                max="2.0"
                step="0.01"
                value="0"
-               onchange="window.settings.change(event)">
+               onchange="Settings.instance().change(event)">
     </div>
     <div class="instruction-field">
         <label for="presencePenalty">
@@ -72,7 +72,7 @@
                max="2.0"
                step="0.01"
                value="0"
-               onchange="window.settings.change(event)">
+               onchange="Settings.instance().change(event)">
     </div>
     <div id="systemPromptContainer"></div>
     <div id="projectSelectorContainer"></div>
@@ -83,7 +83,7 @@
             <input type="checkbox"
                    id="useSharedKeys"
                    name="useSharedKeys"
-                   onchange="window.settings.change(event)">
+                   onchange="Settings.instance().change(event)">
             <span class="custom-checkbox"></span>
             <span><@spring.message "settings.use.shared.keys" /></span>
         </label>

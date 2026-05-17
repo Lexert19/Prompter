@@ -3,7 +3,7 @@
         <@spring.message "settings.thinking.effort" />
     </label>
     <select id="thinkingEffort"
-            onchange="window.thinkingEffortView.change(event)">
+            onchange="ThinkingEffortView.instance().change(event)">
         <option selected value="lack">
             <@spring.message "settings.thinking.effort.lack" />
         </option>

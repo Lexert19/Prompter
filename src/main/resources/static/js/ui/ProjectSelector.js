@@ -1,7 +1,22 @@
 class ProjectSelector {
+    static _instance = null;
+
+    static instance(containerId = 'projectSelectorContainer') {
+        if (!ProjectSelector._instance) {
+            ProjectSelector._instance = new ProjectSelector(containerId);
+        }
+        return ProjectSelector._instance;
+    }
+
     constructor(containerId) {
+        if (ProjectSelector._instance) {
+            return ProjectSelector._instance;
+        }
+        ProjectSelector._instance = this;
+
         this.container = document.getElementById(containerId);
         if (!this.container) return;
+
         this.projects = [];
         this.render();
         this.attachEvents();
@@ -9,8 +24,8 @@ class ProjectSelector {
     }
 
     render() {
-        const currentProjectId = window.settings.project || '';
-        const enabled = window.settings.projectSwitch || false;
+        const currentProjectId = Settings.instance().project || '';
+        const enabled = Settings.instance().projectSwitch || false;
         const currentProject = this.projects.find(p => p.id == currentProjectId);
         const projectName = currentProject ? currentProject.name : t.t('noProjectSelected');
         const status = enabled ? t.t('enabled') : t.t('disabled');
@@ -48,8 +63,8 @@ class ProjectSelector {
     }
 
     openModal() {
-        const currentProjectId = window.settings.project || '';
-        const enabled = window.settings.projectSwitch || false;
+        const currentProjectId = Settings.instance().project || '';
+        const enabled = Settings.instance().projectSwitch || false;
 
         let listHtml = '<div class="project-list">';
         this.projects.forEach(project => {
@@ -73,7 +88,7 @@ class ProjectSelector {
             </div>
         `;
 
-        window.modal.open(
+        Modal.instance().open(
             t.t('selectProject'),
             modalContent,
             null
@@ -84,10 +99,10 @@ class ProjectSelector {
                 const projectId = el.dataset.id;
                 const project = this.projects.find(p => p.id == projectId);
                 if (project) {
-                    window.settings.project = project.id;
-                    window.settings.save();
+                    Settings.instance().project = project.id;
+                    Settings.instance().save();
                 }
-                window.modal.close();
+                Modal.instance().close();
                 this.render();
                 this.attachEvents();
             });
@@ -96,8 +111,8 @@ class ProjectSelector {
         const enableCheckbox = document.getElementById('projectEnable');
         if (enableCheckbox) {
             enableCheckbox.addEventListener('change', (e) => {
-                window.settings.projectSwitch = e.target.checked;
-                window.settings.save();
+                Settings.instance().projectSwitch = e.target.checked;
+                Settings.instance().save();
             });
         }
     }
@@ -105,6 +120,6 @@ class ProjectSelector {
 
 document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('projectSelectorContainer')) {
-        window.projectSelector = new ProjectSelector('projectSelectorContainer');
+        ProjectSelector.instance('projectSelectorContainer');
     }
 });

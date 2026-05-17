@@ -1,5 +1,20 @@
 class AccountView{
+    static _instance = null;
+
+    static instance() {
+        if (!AccountView._instance) {
+            AccountView._instance = new AccountView();
+        }
+        return AccountView._instance;
+    }
+
+
     constructor(){
+        if (AccountView._instance) {
+            return AccountView._instance;
+        }
+        AccountView._instance = this;
+
         document.addEventListener('DOMContentLoaded', () => {
             const select = document.getElementById('languageSelect');
             if (select) {
@@ -40,7 +55,7 @@ class AccountView{
                 <button class="rounded-1 mt-2 ms-auto" type="submit">${t.t("save")}</button>
             </form>
         `;
-        window.modal.open(t.t("addApiKey"), content, (formData) => {
+        Modal.instance().open(t.t("addApiKey"), content, (formData) => {
             this.saveKey(formData.get('keyName'), formData.get('keyValue'));
         });
     }
@@ -55,7 +70,7 @@ class AccountView{
                 <button class="rounded-1 mt-2 ms-auto" type="submit">${t.t("changePassword")}</button>
             </form>
         `;
-        window.modal.open(t.t("changePassword"), content, (formData) => {
+        Modal.instance().open(t.t("changePassword"), content, (formData) => {
             this.setNewPassword(formData.get('newPassword'), formData.get('confirmPassword'));
         });
     }
@@ -72,7 +87,7 @@ class AccountView{
             <button class="rounded-1 mt-2 ms-auto" type="submit">${t.t("add")}</button>
         </form>
     `;
-        window.modal.open(t.t("addSharedApiKey"), content, (formData) => {
+        Modal.instance().open(t.t("addSharedApiKey"), content, (formData) => {
             this.saveSharedKey(formData.get('provider'), formData.get('keyValue'));
         });
     }
@@ -87,7 +102,7 @@ class AccountView{
             if (!response.ok) throw new Error('Błąd zapisu');
             const data = await response.json();
             alert(t.t("keySaved"));
-            window.modal.close();
+            Modal.instance().close();
             if (window.adminSharedKeys) window.adminSharedKeys.loadKeys();
         } catch (error) {
             alert(t.t("errorSavingKey") + error.message);
@@ -116,8 +131,8 @@ class AccountView{
         })
             .then(data => {
             console.log(data);
-            window.settings.loadKeys();
-            window.modal.close();
+            Settings.instance().loadKeys();
+            Modal.instance().close();
         })
             .catch(error => {
             console.error('There was a problem with the fetch operation:', error);
@@ -160,7 +175,7 @@ class AccountView{
         })
             .then(data => {
             alert(t.t("passwordChanged"));
-            window.modal.close();
+            Modal.instance().close();
             document.getElementById('newPassword').value = '';
             document.getElementById('confirmPassword').value = '';
         })
@@ -171,4 +186,4 @@ class AccountView{
     }
 }
 
-window.accountView = new AccountView();
+AccountView.instance();

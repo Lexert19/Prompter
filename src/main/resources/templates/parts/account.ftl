@@ -8,7 +8,7 @@
         </label>
         <select id="languageSelect"
                 class="rounded-1 w-100"
-                onchange="window.accountView.changeLanguage(this.value)">
+                onchange="AccountView.instance().changeLanguage(this.value)">
             <option value="pl">Polski</option>
             <option value="en">English</option>
         </select>
@@ -17,19 +17,19 @@
         <label><@spring.message "account.points" />: <span id="userPoints">0</span></label>
     </div>
     <div class="mb-2">
-        <button class="rounded-1" onclick="window.accountView.openAddKeyModal()">
+        <button class="rounded-1" onclick="AccountView.instance().openAddKeyModal()">
             <@spring.message "account.add.api.key" />
         </button>
     </div>
     <div class="mb-2">
         <button class="rounded-1"
-                onclick="window.accountView.openChangePasswordModal()">
+                onclick="AccountView.instance().openChangePasswordModal()">
             <@spring.message "account.change.password" />
         </button>
     </div>
     <div class="mb-2">
         <button class="rounded-1"
-                onclick="window.accountView.openAddSharedKeyModal()">
+                onclick="AccountView.instance().openAddSharedKeyModal()">
             <@spring.message "addSharedApiKey" />
         </button>
     </div>
@@ -39,7 +39,7 @@
                    id="chatHistoryInput"
                    name="chatHistoryInput"
                    value="chatHistoryInput"
-                   onchange="window.settings.change(event)">
+                   onchange="Settings.instance().change(event)">
             <span class="custom-checkbox"></span>
             <span><@spring.message "account.save.history" /></span>
         </label>

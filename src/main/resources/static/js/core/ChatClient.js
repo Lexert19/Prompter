@@ -1,5 +1,19 @@
 class ChatClient {
+    static _instance = null;
+
+    static instance() {
+        if (!ChatClient._instance) {
+            ChatClient._instance = new ChatClient();
+        }
+        return ChatClient._instance;
+    }
+
     constructor() {
+        if (ChatClient._instance) {
+            return ChatClient._instance;
+        }
+        ChatClient._instance = this;
+
         this.url = "/client/chat";
         this.parser = new HtmlParser();
         this.firstReason = false;
@@ -15,7 +29,7 @@ class ChatClient {
     }
 
     getProvider(){
-        return window.settings.provider;
+        return Settings.instance().provider;
     }
 
     newMessage(){
@@ -23,10 +37,8 @@ class ChatClient {
         this.streamStartTime = Date.now();
         this.streamCharCount = 0;
         const messageView = new MessageView(this.currentMessage);
-        this.outputInput = messageView.createHtmlElement(window.chat.chatMessages);
+        this.outputInput = messageView.createHtmlElement(Chat.instance().chatMessages);
         this.parser.setRootElement(this.outputInput);
-        //this.outputInput = window.chat.createMessage(this.currentMessage);
-        //window.chat.startDurationCounter(this.currentMessage);
     }
 
     sendStreamingMessage(request) {
@@ -61,7 +73,7 @@ class ChatClient {
         const reader = stream.getReader();
         const decoder = new TextDecoder();
 
-        window.chat.requestBuilder.addMessage(this.currentMessage);
+        Chat.instance().requestBuilder.addMessage(this.currentMessage);
         this.read(reader, decoder);
     }
 
@@ -194,9 +206,8 @@ class ChatClient {
         if (this.abortController) {
             this.abortController.abort();
             this.abortController = null;
-            window.inputView.setIsBlocked(false);
+            InputView.instance().setIsBlocked(false);
             this.currentMessage.end = Date.now();
-            //window.chat.saveMessage(this.currentMessage);
         }
     }
 
@@ -245,17 +256,13 @@ class ChatClient {
     }
 
     finalizeMessage() {
-        window.inputView.setIsBlocked(false);
+        InputView.instance().setIsBlocked(false);
         if (this.currentMessage) {
             this.currentMessage.end = Date.now();
-            window.chat.saveMessage(this.currentMessage);
+            Chat.instance().saveMessage(this.currentMessage);
         }
     }
 
 
 
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    window.chatClient = new ChatClient();
-});

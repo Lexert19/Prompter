@@ -1,6 +1,5 @@
 class FileItem{
     constructor(fileId, projectId){
-        this.editMenu = window.editFileView;
         this.fileId = fileId;
         this.projectId = projectId;
     }
@@ -25,16 +24,16 @@ class FileItem{
                             event.preventDefault();
                             this.selectFile(this.projectId, file.id, fileElement.id);
                    //this.selectFile(fileElement.dataset.projectId, fileElement.dataset.fileId, fileElement.id);
-                            this.editMenu.show(event);
+                            EditFileView.instance().show(event);
                         });
 
                 destination.appendChild(fileElement);
     }
 
     selectFile(projectId, fileId, fileItemId){
-        this.editMenu.selectedFile = fileId;
-        this.editMenu.selectedProject = projectId;
-        this.editMenu.selectedFileItemId = fileItemId;
+        EditFileView.instance().selectedFile = fileId;
+        EditFileView.instance().selectedProject = projectId;
+        EditFileView.instance().selectedFileItemId = fileItemId;
     }
 
     async showFileContent(projectId, fileId) {

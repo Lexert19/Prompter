@@ -1,5 +1,19 @@
 class Modal {
+    static _instance = null;
+
+    static instance() {
+        if (!Modal._instance) {
+            Modal._instance = new Modal();
+        }
+        return Modal._instance;
+    }
+
     constructor() {
+        if (Modal._instance) {
+            return Modal._instance;
+        }
+        Modal._instance = this;
+
         this.overlay = document.getElementById('modalOverlay');
         this.modal = document.getElementById('modal');
         this.titleEl = document.getElementById('modalTitle');
@@ -41,4 +55,4 @@ class Modal {
     }
 }
 
-window.modal = new Modal();
+Modal.instance();

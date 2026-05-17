@@ -1,5 +1,19 @@
 class EditFileView {
+    static _instance = null;
+
+    static instance() {
+        if (!EditFileView._instance) {
+            EditFileView._instance = new EditFileView();
+        }
+        return EditFileView._instance;
+    }
+
     constructor() {
+        if (EditFileView._instance) {
+            return EditFileView._instance;
+        }
+        EditFileView._instance = this;
+
         this.editFileHtml = document.getElementById("edit-file-menu");
         this.deleteButton = document.getElementById("delete-file-button");
 
@@ -47,4 +61,4 @@ class EditFileView {
         });
     }
 }
-window.editFileView = new EditFileView();
+EditFileView.instance();

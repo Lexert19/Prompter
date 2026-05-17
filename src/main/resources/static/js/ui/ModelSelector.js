@@ -1,14 +1,29 @@
 class ModelSelector {
+    static _instance = null;
+
+    static instance(containerId = 'modelSelectorContainer') {
+        if (!ModelSelector._instance) {
+            ModelSelector._instance = new ModelSelector(containerId);
+        }
+        return ModelSelector._instance;
+    }
+
     constructor(containerId) {
+        if (ModelSelector._instance) {
+            return ModelSelector._instance;
+        }
+        ModelSelector._instance = this;
+
         this.container = document.getElementById(containerId);
         if (!this.container) return;
+
         this.render();
         this.attachEvents();
     }
 
     render() {
-        const currentModel = window.settings.model;
-        const models = window.settings.models || [];
+        const currentModel = Settings.instance().model;
+        const models = Settings.instance().models || [];
         const currentModelObj = models.find(m => m.name === currentModel) || { text: currentModel || '...' };
         const displayText = currentModelObj.text || currentModel || 'Wybierz model';
 
@@ -46,7 +61,7 @@ class ModelSelector {
             const uniqueModels = [...new Map(newModels.map(m => [m.name, m])).values()];
             uniqueModels.sort((a, b) => a.text.localeCompare(b.text));
 
-            window.settings.models = uniqueModels;
+            Settings.instance().models = uniqueModels;
 
             this.render();
             this.attachEvents();
@@ -56,7 +71,7 @@ class ModelSelector {
     }
 
     openModal() {
-        const models = window.settings.models || [];
+        const models = Settings.instance().models || [];
 
         let modalHtml = `
             <div class="model-selector-modal-wrapper">
@@ -69,7 +84,7 @@ class ModelSelector {
         `;
 
         models.forEach(model => {
-            const selectedClass = (model.name === window.settings.model) ? 'selected' : '';
+            const selectedClass = (model.name === Settings.instance().model) ? 'selected' : '';
             modalHtml += `
                 <div class="model-item-selectable ${selectedClass}"
                      data-name="${model.name}"
@@ -84,7 +99,7 @@ class ModelSelector {
 
         modalHtml += '</div></div></div>';
 
-        window.modal.open(
+        Modal.instance().open(
             t.t('selectModel'),
             modalHtml,
             null
@@ -120,15 +135,15 @@ class ModelSelector {
         document.querySelectorAll('.model-item-selectable').forEach(el => {
             el.addEventListener('click', (e) => {
                 const { name, provider, url, type } = el.dataset;
-                window.settings.model = name;
-                window.settings.provider = provider;
-                window.settings.url = url;
-                window.settings.type = type;
-                window.settings.key = (window.settings.keys && provider) ? (window.settings.keys[provider.toUpperCase()] || '') : '';
-                window.settings.save();
+                Settings.instance().model = name;
+                Settings.instance().provider = provider;
+                Settings.instance().url = url;
+                Settings.instance().type = type;
+                Settings.instance().key = (Settings.instance().keys && provider) ? (Settings.instance().keys[provider.toUpperCase()] || '') : '';
+                Settings.instance().save();
                 const modalElement = document.querySelector('.modal-menu');
                 if (modalElement) modalElement.classList.remove('modal-wide');
-                window.modal.close();
+                Modal.instance().close();
                 this.render();
                 this.attachEvents();
             });
@@ -137,7 +152,5 @@ class ModelSelector {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (document.getElementById('modelSelectorContainer')) {
-        window.modelSelector = new ModelSelector('modelSelectorContainer');
-    }
+    ModelSelector.instance('modelSelectorContainer');
 });

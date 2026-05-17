@@ -1,5 +1,19 @@
 class EditMessageView {
+    static _instance = null;
+
+    static instance() {
+        if (!EditMessageView._instance) {
+            EditMessageView._instance = new EditMessageView();
+        }
+        return EditMessageView._instance;
+    }
+
     constructor() {
+        if (EditMessageView._instance) {
+            return EditMessageView._instance;
+        }
+        EditMessageView._instance = this;
+
         this.editMessageHtml = document.getElementById("edit-menu");
         this.cachedButton = document.getElementById("edit-menu-cached");
         this.rerunButton = document.getElementById("edit-menu-rerun");
@@ -17,7 +31,7 @@ class EditMessageView {
     addRerunButtonListener() {
         this.rerunButton.addEventListener("click", () => {
             if (this.messageId) {
-                window.chat.rerunMessage(this.messageId);
+                Chat.instance().rerunMessage(this.messageId);
             }
             this.hideEditMenu();
         });
@@ -37,7 +51,7 @@ class EditMessageView {
 
     addCachedButtonListener() {
         this.cachedButton.addEventListener("click", () => {
-            const message = window.chat.requestBuilder.messages.find(
+            const message = Chat.instance().requestBuilder.messages.find(
                 (msg) => msg.id === this.messageId
             );
             if (message) {
@@ -51,4 +65,4 @@ class EditMessageView {
     }
 }
 
-window.editMessageView = new EditMessageView();
+EditMessageView.instance();

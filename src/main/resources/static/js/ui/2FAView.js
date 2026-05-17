@@ -1,5 +1,19 @@
 class TwoFactorManager {
+    static _instance = null;
+
+    static instance() {
+        if (!TwoFactorManager._instance) {
+            TwoFactorManager._instance = new TwoFactorManager();
+        }
+        return TwoFactorManager._instance;
+    }
+
     constructor() {
+        if (TwoFactorManager._instance) {
+            return TwoFactorManager._instance;
+        }
+        TwoFactorManager._instance = this;
+
         this.status = false;
         this.email = '';
         this.lastSentEmail = '';
@@ -56,7 +70,7 @@ class TwoFactorManager {
 
         if (this.status) {
             statusDiv.innerHTML = `<span class="text-success"></span><br>
-                                   <small><@spring.message "account.twofactor.email" />: ${this.email}</small>`;
+                                   <small>${t.t('account.twofactor.email')}: ${this.email}</small>`;
             emailInput.disabled = true;
             sendBtn.style.display = 'none';
             enableBtn.style.display = 'none';
@@ -168,7 +182,5 @@ class TwoFactorManager {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (document.getElementById('twofaStatus')) {
-        window.twoFactorManager = new TwoFactorManager();
-    }
+    TwoFactorManager.instance();
 });

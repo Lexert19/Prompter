@@ -1,4 +1,20 @@
 class DeleteModelMenu {
+    static _instance = null;
+
+    static instance() {
+        if (!DeleteModelMenu._instance) {
+            DeleteModelMenu._instance = new DeleteModelMenu();
+        }
+        return DeleteModelMenu._instance;
+    }
+
+    constructor() {
+        if (DeleteModelMenu._instance) {
+            return DeleteModelMenu._instance;
+        }
+        DeleteModelMenu._instance = this;
+    }
+
     showDeleteMenu(model) {
 
         const confirmDeleteModel = t.t("confirmDeleteModel",  { name: model.name });
@@ -9,9 +25,9 @@ class DeleteModelMenu {
                 <button id="confirmDeleteBtn" class="btn-danger">${t.t("delete")}</button>
             </div>
         `;
-        window.modal.open(t.t("confirmDelete"), html, null);
+        Modal.instance().open(t.t("confirmDelete"), html, null);
         document.getElementById('confirmDeleteBtn').addEventListener('click', () => this.deleteModel(model.id));
-        document.getElementById('cancelDeleteBtn').addEventListener('click', () => window.modal.close());
+        document.getElementById('cancelDeleteBtn').addEventListener('click', () => Modal.instance().close());
     }
 
     deleteModel(id) {
@@ -21,11 +37,11 @@ class DeleteModelMenu {
         })
             .then(res => res.text())
             .then(() => {
-            window.modelsView.renderUserModels();
-            window.modelSelector.syncModels();
-            window.modal.close();
+            ModelsView.instance().renderUserModels();
+            ModelSelector.instance().syncModels();
+            Modal.instance().close();
         })
             .catch(console.error);
     }
 }
-window.deleteModelMenu = new DeleteModelMenu();
+DeleteModelMenu.instance()

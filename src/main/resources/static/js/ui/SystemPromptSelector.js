@@ -1,14 +1,29 @@
 class SystemPromptSelector {
+    static _instance = null;
+
+    static instance(containerId = 'systemPromptContainer') {
+        if (!SystemPromptSelector._instance) {
+            SystemPromptSelector._instance = new SystemPromptSelector(containerId);
+        }
+        return SystemPromptSelector._instance;
+    }
+
     constructor(containerId) {
+        if (SystemPromptSelector._instance) {
+            return SystemPromptSelector._instance;
+        }
+        SystemPromptSelector._instance = this;
+
         this.container = document.getElementById(containerId);
         if (!this.container) return;
+
         this.render();
         this.attachEvents();
     }
 
     render() {
-        const system = window.settings.system || '';
-        const enabled = window.settings.systemSwitch || false;
+        const system = Settings.instance().system || '';
+        const enabled = Settings.instance().systemSwitch || false;
         const preview = system.length > 30 ? system.substring(0, 30) + '…' : (system || t.t('systemPromptEmpty'));
         const status = enabled ? t.t('enabled') : t.t('disabled');
 
@@ -31,8 +46,8 @@ class SystemPromptSelector {
     }
 
     openModal() {
-        const system = window.settings.system || '';
-        const enabled = window.settings.systemSwitch || false;
+        const system = Settings.instance().system || '';
+        const enabled = Settings.instance().systemSwitch || false;
 
         const modalContent = `
             <form id="systemPromptForm" class="d-flex flex-column">
@@ -47,20 +62,20 @@ class SystemPromptSelector {
             </form>
         `;
 
-        window.modal.open(
+        Modal.instance().open(
             t.t('editSystemPrompt'),
             modalContent,
             (formData) => {
                 const newText = document.getElementById('systemPromptText').value;
                 const newEnabled = document.getElementById('systemPromptEnable').checked;
 
-                window.settings.system = newText;
-                window.settings.systemSwitch = newEnabled;
-                window.settings.save();
+                Settings.instance().system = newText;
+                Settings.instance().systemSwitch = newEnabled;
+                Settings.instance().save();
 
                 this.render();
                 this.attachEvents();
-                window.modal.close();
+                Modal.instance().close();
             }
         );
 
@@ -71,20 +86,18 @@ class SystemPromptSelector {
                 const newText = document.getElementById('systemPromptText').value;
                 const newEnabled = document.getElementById('systemPromptEnable').checked;
 
-                window.settings.system = newText;
-                window.settings.systemSwitch = newEnabled;
-                window.settings.save();
+                Settings.instance().system = newText;
+                Settings.instance().systemSwitch = newEnabled;
+                Settings.instance().save();
 
                 this.render();
                 this.attachEvents();
-                window.modal.close();
+                Modal.instance().close();
             });
         }
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (document.getElementById('systemPromptContainer')) {
-        window.systemPromptSelector = new SystemPromptSelector('systemPromptContainer');
-    }
+    SystemPromptSelector.instance('systemPromptContainer');
 });

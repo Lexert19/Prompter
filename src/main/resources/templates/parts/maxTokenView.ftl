@@ -2,5 +2,5 @@
     <input type="number"
            name="maxTokens"
            value="8000"
-           onchange="window.maxTokenView.change(event)">
+           onchange=" MaxTokenView.instance().change(event)">
 </div>

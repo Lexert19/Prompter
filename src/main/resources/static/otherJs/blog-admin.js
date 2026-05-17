@@ -138,7 +138,7 @@ async function openMediaPicker() {
         });
         contentHtml += '</div>';
 
-        window.modal.open('Wybierz miniaturkę', contentHtml, null);
+        Modal.instance().open('Wybierz miniaturkę', contentHtml, null);
 
         document.querySelectorAll('.media-item-selectable').forEach(el => {
             el.addEventListener('click', () => {
@@ -150,7 +150,7 @@ async function openMediaPicker() {
                 const previewDiv = document.getElementById('thumbnailPreview');
                 previewDiv.innerHTML = `<img src="${imgUrl}" style="max-width: 200px; max-height: 200px; border-radius: 4px;">`;
 
-                window.modal.close();
+                Modal.instance().close();
             });
         });
     } catch (error) {
@@ -163,5 +163,5 @@ function selectThumbnail(id, fileName) {
     document.getElementById('thumbnailId').value = id;
     const preview = document.getElementById('thumbnailPreview');
     preview.innerHTML = `<img src="/media/${fileName}" style="max-width: 200px; max-height: 200px;">`;
-    window.modal.close();
+    Modal.instance().close();
 }

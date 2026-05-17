@@ -1,4 +1,20 @@
 class AddEditModelMenu {
+    static _instance = null;
+
+    static instance() {
+        if (!AddEditModelMenu._instance) {
+            AddEditModelMenu._instance = new AddEditModelMenu();
+        }
+        return AddEditModelMenu._instance;
+    }
+
+    constructor() {
+        if (AddEditModelMenu._instance) {
+            return AddEditModelMenu._instance;
+        }
+        AddEditModelMenu._instance = this;
+    }
+
     showAddMenu() {
         const html = `
             <form class="d-flex flex-column" id="modelForm">
@@ -20,7 +36,7 @@ class AddEditModelMenu {
                 <button class="ms-auto rounded-1" type="submit">${t.t("addModel")}</button>
             </form>
         `;
-        window.modal.open(t.t("addModel"), html, (formData) => this.addModel(formData));
+        Modal.instance().open(t.t("addModel"), html, (formData) => this.addModel(formData));
     }
 
     showEditMenu(model) {
@@ -45,11 +61,11 @@ class AddEditModelMenu {
                 <button class="ms-auto rounded-1" type="submit">${t.t("save")}</button>
             </form>
         `;
-        window.modal.open(t.t("editModel"), html, (formData) => this.editModel(model.id, formData));
+        Modal.instance().open(t.t("editModel"), html, (formData) => this.editModel(model.id, formData));
     }
 
     providerOptions(selected = '') {
-        const keys = Object.keys(window.settings.keys || {});
+        const keys = Object.keys(Settings.instance().keys || {});
         let options = '<option value="" disabled>'+t.t("selectProvider")+'</option>';
         keys.forEach(key => {
             options += `<option value="${key}" ${key === selected ? 'selected' : ''}>${key}</option>`;
@@ -72,9 +88,9 @@ class AddEditModelMenu {
         })
             .then(res => res.text())
             .then(() => {
-            window.modelsView.renderUserModels();
-            window.modelSelector.syncModels();
-            window.modal.close();
+            ModelsView.instance().renderUserModels();
+            ModelSelector.instance().syncModels();
+            Modal.instance().close();
         })
             .catch(console.error);
     }
@@ -94,11 +110,12 @@ class AddEditModelMenu {
         })
             .then(res => res.text())
             .then(() => {
-            window.modelsView.renderUserModels();
-            window.modelSelector.syncModels();
-            window.modal.close();
+            ModelsView.instance().renderUserModels();
+            ModelSelector.instance().syncModels();
+            Modal.instance().close();
         })
             .catch(console.error);
     }
 }
-window.addEditModelMenu = new AddEditModelMenu();
+
+AddEditModelMenu.instance();

@@ -64,11 +64,11 @@ class Message {
     }
 
     getSystemPrompt(role){
-        if(window.settings.systemSwitch == false || role == "assistant"){
+        if(Settings.instance().systemSwitch == false || role == "assistant"){
             return "";
         }
 
-        return `{${window.settings.system}}`
+        return `{${Settings.instance().system}}`
 
     }
 

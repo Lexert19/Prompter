@@ -1,6 +1,5 @@
 class MessageView{
     constructor(message){
-        this.editMenu = window.editMessageView;
         this.message = message;
     }
 
@@ -18,7 +17,7 @@ class MessageView{
 
         let htmlContent = "";
         if(this.message.role == "assistant"){
-            htmlContent = window.chatClient.parser.parseToHtml(this.message.getText());
+            htmlContent = ChatClient.instance().parser.parseToHtml(this.message.getText());
         }else{
             htmlContent = escapeHtml(this.message.getText());
         }
@@ -41,9 +40,16 @@ class MessageView{
 
         destination.insertAdjacentHTML('afterbegin', htmlMessage);
         const messageElement = document.getElementById(this.message.id);
+
+        if (finished && this.message.role === 'assistant' && window.hljs) {
+            messageElement.querySelectorAll('pre code').forEach(block => {
+                hljs.highlightElement(block);
+            });
+        }
+
         messageElement.addEventListener('contextmenu', (event) => {
             event.preventDefault();
-            this.editMenu.showEditMenu(event, this.message.id);
+            EditMessageView.instance().showEditMenu(event, this.message.id);
         });
 
         if(this.message.role == "assistant" && finished == false)
