@@ -102,13 +102,9 @@ class ModelSelector {
         Modal.instance().open(
             t.t('selectModel'),
             modalHtml,
-            null
+            null,
+            ['modal-wide']
         );
-
-        const modalElement = document.querySelector('.modal-menu');
-        if (modalElement) {
-            modalElement.classList.add('modal-wide');
-        }
 
 
         const searchInput = document.getElementById('modelSearchInput');
@@ -141,8 +137,6 @@ class ModelSelector {
                 Settings.instance().type = type;
                 Settings.instance().key = (Settings.instance().keys && provider) ? (Settings.instance().keys[provider.toUpperCase()] || '') : '';
                 Settings.instance().save();
-                const modalElement = document.querySelector('.modal-menu');
-                if (modalElement) modalElement.classList.remove('modal-wide');
                 Modal.instance().close();
                 this.render();
                 this.attachEvents();
@@ -151,6 +145,6 @@ class ModelSelector {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('i18n:ready', () => {
     ModelSelector.instance('modelSelectorContainer');
 });

@@ -24,7 +24,7 @@ class SystemPromptSelector {
     render() {
         const system = Settings.instance().system || '';
         const enabled = Settings.instance().systemSwitch || false;
-        const preview = system.length > 30 ? system.substring(0, 30) + '…' : (system || t.t('systemPromptEmpty'));
+        const preview = system.length > 24 ? system.substring(0, 24) + '…' : (system || t.t('systemPromptEmpty'));
         const status = enabled ? t.t('enabled') : t.t('disabled');
 
         this.container.innerHTML = `
@@ -76,28 +76,12 @@ class SystemPromptSelector {
                 this.render();
                 this.attachEvents();
                 Modal.instance().close();
-            }
+            },
+            ["modal-wide"]
         );
-
-        const form = document.getElementById('systemPromptForm');
-        if (form) {
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const newText = document.getElementById('systemPromptText').value;
-                const newEnabled = document.getElementById('systemPromptEnable').checked;
-
-                Settings.instance().system = newText;
-                Settings.instance().systemSwitch = newEnabled;
-                Settings.instance().save();
-
-                this.render();
-                this.attachEvents();
-                Modal.instance().close();
-            });
-        }
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('i18n:ready', () => {
     SystemPromptSelector.instance('systemPromptContainer');
 });

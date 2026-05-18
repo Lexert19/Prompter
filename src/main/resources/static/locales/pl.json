@@ -43,6 +43,8 @@
   "settings.system": "System prompt",
   "systemPromptEmpty": "(pusty)",
   "enabled": "włączony",
+  "settings.project": "Projekt",
+  "noProjectSelected": "Nie wybrano projektu",
   "disabled": "wyłączony",
   "editSystemPrompt": "Edytuj system prompt",
   "systemPrompt": "Treść prompta systemowego",

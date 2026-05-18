@@ -118,8 +118,6 @@ class ProjectSelector {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    if (document.getElementById('projectSelectorContainer')) {
-        ProjectSelector.instance('projectSelectorContainer');
-    }
+document.addEventListener('i18n:ready', () => {
+    ProjectSelector.instance('projectSelectorContainer');
 });

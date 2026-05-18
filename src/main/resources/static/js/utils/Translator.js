@@ -2,6 +2,7 @@ class Translator {
     constructor() {
         this.translations = {};
         this.currentLang = 'pl';
+        this._loading = null;
     }
 
     async load(lang) {
@@ -38,4 +39,7 @@ function getCookie(name) {
 
 const t = new Translator();
 const lang = getCookie('lang') || 'pl';
-t.load(lang);
+
+t.load(lang).then(() => {
+    document.dispatchEvent(new Event('i18n:ready'));
+});

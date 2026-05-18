@@ -44,6 +44,8 @@
   "systemPromptEmpty": "(empty)",
   "enabled": "enabled",
   "disabled": "disabled",
+  "settings.project": "Project",
+  "noProjectSelected": "No project selected",
   "editSystemPrompt": "Edit system prompt",
   "systemPrompt": "System prompt content",
   "enableSystemPrompt": "Enable system prompt",
