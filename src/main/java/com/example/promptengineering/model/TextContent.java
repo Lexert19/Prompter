@@ -1,12 +1,16 @@
 package com.example.promptengineering.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Map;
 
 @Setter
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class TextContent extends Content {
     private String text;
 

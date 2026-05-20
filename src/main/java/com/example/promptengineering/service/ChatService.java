@@ -1,5 +1,6 @@
 package com.example.promptengineering.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,7 +17,6 @@ import com.example.promptengineering.model.ImageContent;
 import com.example.promptengineering.model.Message;
 import com.example.promptengineering.repository.SharedKeyRepository;
 import com.example.promptengineering.repository.UserRepository;
-import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
@@ -33,7 +33,7 @@ import reactor.core.scheduler.Schedulers;
 @Slf4j
 @Service
 public class ChatService {
-    private final Gson gson;
+    private final ObjectMapper objectMapper;
     private final WebClient webClient;
     private final FileStorageService fileStorageService;
     private final SharedKeyService sharedKeyService;
@@ -42,12 +42,12 @@ public class ChatService {
     private final UserRepository userRepository;
     private final TokenTrackingService tokenTrackingService;
 
-    public ChatService(Gson gson, WebClient.Builder webClientBuilder,
+    public ChatService(ObjectMapper objectMapper, WebClient.Builder webClientBuilder,
             FileStorageService fileStorageService, SharedKeyService sharedKeyService,
             EncryptionService encryptionService, SharedKeyRepository sharedKeyRepository,
             UserRepository userRepository, TokenTrackingService tokenTrackingService) {
-        this.gson = gson;
-        this.webClient = webClientBuilder.codecs(
+      this.objectMapper = objectMapper;
+      this.webClient = webClientBuilder.codecs(
                 configure -> configure.defaultCodecs().maxInMemorySize(16 * 1024 * 1024))
                 .build();
         this.fileStorageService = fileStorageService;
@@ -84,8 +84,8 @@ public class ChatService {
     }
 
     private Mono<String> buildRequestBodyJson(RequestBuilder request) {
-        return Mono.fromCallable(() -> gson.toJson(request.build()))
-                .subscribeOn(Schedulers.boundedElastic());
+        return Mono.fromCallable(() -> objectMapper.writeValueAsString(request.build()))
+            .subscribeOn(Schedulers.boundedElastic());
     }
 
     private Flux<ServerSentEvent<String>> executeRequest(RequestBuilder request,
@@ -101,22 +101,6 @@ public class ChatService {
                 .doOnCancel(() -> log.debug("SSE stream cancelled by client"))
                 .onErrorResume(this::handleError);
     }
-
-    // private WebClient.RequestBodySpec buildHttpRequest(RequestBuilder request,
-    // String json) {
-    // WebClient.RequestBodySpec spec = (WebClient.RequestBodySpec)
-    // webClient.post().uri(request.getUrl())
-    // .contentType(MediaType.APPLICATION_JSON).bodyValue(json);
-    //
-    // if (request.getProvider().equals("ANTHROPIC")) {
-    // spec.header("x-api-key", request.getKey()).header("anthropic-version",
-    // "2023-06-01")
-    // .header("anthropic-beta", "prompt-caching-2024-07-31");
-    // } else {
-    // spec.header("Authorization", "Bearer " + request.getKey());
-    // }
-    // return spec;
-    // }
 
     private WebClient.RequestBodySpec buildHttpRequest(RequestBuilder request,
                                                        String json) {
@@ -154,7 +138,12 @@ public class ChatService {
 
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put("error", errorDetails);
-        String errorJson = gson.toJson(errorMap);
+        String errorJson;
+        try {
+            errorJson = objectMapper.writeValueAsString(errorMap);
+        } catch (Exception ex) {
+            errorJson = "{\"error\":\"serialization failed\"}";
+        }
         log.debug("API request error: {}", errorJson);
 
         return Flux.just(

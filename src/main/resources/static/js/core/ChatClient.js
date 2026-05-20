@@ -122,18 +122,6 @@ class ChatClient {
         } catch (e) {
         }
     }
-//
-//    readChunk(decoder, value) {
-//
-//        this.buffer += decoder.decode(value, { stream: true });
-//
-//        let lines = this.buffer.split('\n');
-//        this.buffer = lines.pop();
-//
-//        for (let line of lines) {
-//            this.processLine(line);
-//        }
-//    }
 
     processLine(line) {
         if (!line.trim()) return;
@@ -147,29 +135,12 @@ class ChatClient {
 
     readChunkData(rootNode){
         try{
-            //event:error
-//            if (!chunk.trim() || chunk === "[DONE]" ||
-//            chunk.startsWith(': ping') ||
-//            chunk.startsWith('event:error') ||
-//            chunk.startsWith(': OPENROUTER PROCESSING')) {
-//                return;
-//            }
-//
-//            const rootNode = JSON.parse(chunk);
             if(rootNode.error){
                 this.outputInput.textContent += rootNode.error;
                 return;
             }
 
             let content = "";
-//            if(this.getProvider() == "ANTHROPIC"){
-//                content = rootNode.delta.text;
-//            } else if (rootNode.choices && rootNode.choices.length > 0) {
-//                const choice = rootNode.choices[0];
-//                if (choice?.delta?.content) content = choice.delta.content;
-//            }  else if (rootNode.candidates?.[0]?.content?.parts?.[0]?.text) {
-//                content = rootNode.candidates[0].content.parts[0].text;
-//            }
             if (rootNode.choices?.[0]?.delta?.content) {
                 content = rootNode.choices[0].delta.content;
             }
@@ -236,15 +207,9 @@ class ChatClient {
         }
     }
 
-
-
-
-
-
     handleStreamEnd(reader) {
         if (this.buffer) {
             this.processEvent(this.buffer, reader);
-//            this.processLine(this.buffer);
             this.buffer = '';
         }
 
@@ -262,7 +227,4 @@ class ChatClient {
             Chat.instance().saveMessage(this.currentMessage);
         }
     }
-
-
-
 }

@@ -27,7 +27,6 @@ class Chat {
         const path = window.location.pathname;
         const parts = path.split('/').filter(Boolean);
         this.session = parts[0] === "chat" && parts[1] ? parts[1] : "";
-        //this.addPasteListener();
         if(this.session != ""){
             this.loadChat(this.session);
         }
@@ -39,7 +38,7 @@ class Chat {
         if(!Settings.instance().activeHistory)
         return;
         if(this.session == ""){
-            const id =  await History.instance().createChatSession(content);
+            const id = await History.instance().createChatSession(content);
             this.session = id;
         }
         await History.instance().saveMessage(this.session, content);

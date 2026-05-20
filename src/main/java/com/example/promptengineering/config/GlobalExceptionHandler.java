@@ -4,11 +4,12 @@ import com.example.promptengineering.exception.FileStorageException;
 import com.example.promptengineering.exception.ResourceNotFoundException;
 import com.example.promptengineering.exception.TokenValidationException;
 import com.example.promptengineering.exception.UserSecurityException;
-import com.google.gson.JsonSyntaxException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -58,8 +59,18 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(JsonSyntaxException.class)
-    public ResponseEntity<Map<String, String>> handleJsonError(JsonSyntaxException e) {
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, String>> handleJsonError(HttpMessageNotReadableException e) {
+        Throwable cause = e.getCause();
+        String detail = cause instanceof JsonProcessingException
+            ? "Invalid JSON format"
+            : "Malformed request body";
+        return ResponseEntity.badRequest().body(Map.of("error", detail));
+    }
+
+    @ExceptionHandler(JsonProcessingException.class)
+    public ResponseEntity<Map<String, String>> handleJacksonError(JsonProcessingException e) {
+        log.warn("Jackson parsing error: {}", e.getOriginalMessage());
         return ResponseEntity.badRequest().body(Map.of("error", "Invalid JSON format"));
     }
 

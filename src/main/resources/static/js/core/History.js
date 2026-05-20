@@ -251,11 +251,7 @@ class History {
 
     updateUrlForChat(chatId) {
         const newPath = `/chat/${chatId}`;
-        if (History.instance() && typeof History.instance().pushState === "function") {
-            History.instance().pushState({ chatId: chatId }, document.title, newPath);
-        } else {
-            console.warn("History API not supported");
-        }
+        window.history.pushState({ chatId: chatId }, document.title, newPath);
     }
 
 }

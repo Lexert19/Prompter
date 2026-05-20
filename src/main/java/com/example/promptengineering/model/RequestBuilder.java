@@ -1,6 +1,8 @@
 package com.example.promptengineering.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
@@ -9,6 +11,8 @@ import java.util.Map;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class RequestBuilder {
     private String model;
     private List<Message> messages = new ArrayList<>();

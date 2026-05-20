@@ -26,10 +26,10 @@ public class FreeMarkerConfig implements WebMvcConfigurer {
 
     @Bean
     public FreeMarkerConfigurer freeMarkerConfigurer() {
-        FreeMarkerConfigurer configurer = new FreeMarkerConfigurer();
-        configurer.setTemplateLoaderPath("classpath:/templates");
-        configurer.setDefaultEncoding("UTF-8");
-        return configurer;
+        FreeMarkerConfigurer configure = new FreeMarkerConfigurer();
+        configure.setTemplateLoaderPath("classpath:/templates");
+        configure.setDefaultEncoding("UTF-8");
+        return configure;
     }
 
     @Autowired

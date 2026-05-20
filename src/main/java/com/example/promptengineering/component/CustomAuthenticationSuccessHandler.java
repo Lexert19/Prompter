@@ -8,6 +8,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
 
@@ -17,6 +20,7 @@ public class CustomAuthenticationSuccessHandler
             SavedRequestAwareAuthenticationSuccessHandler {
 
     private final TwoFactorEmailService twoFactorService;
+    private final CsrfTokenRepository csrfRepo = CookieCsrfTokenRepository.withHttpOnlyFalse();
 
     public CustomAuthenticationSuccessHandler(TwoFactorEmailService twoFactorService,
             UserRepository userRepository) {
@@ -32,6 +36,9 @@ public class CustomAuthenticationSuccessHandler
         User user = (User) authentication.getPrincipal();
         boolean hasApiKeys = user.getEncryptedKeys() != null
                 && !user.getEncryptedKeys().isEmpty();
+
+        CsrfToken token = csrfRepo.generateToken(request);
+        csrfRepo.saveToken(token, request, response);
 
         if (user.isTwoFactorEnabled() && hasApiKeys) {
             request.getSession().setAttribute("2fa_authentication", authentication);

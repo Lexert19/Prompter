@@ -1,6 +1,9 @@
 package com.example.promptengineering.model;
 
+import java.util.Objects;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
@@ -8,6 +11,8 @@ import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Message {
     private Long id;
     private String role;
@@ -24,35 +29,7 @@ public class Message {
     }
 
     public void setContent(List<Content> content) {
-        if (content == null) {
-            this.content = new ArrayList<>();
-        } else {
-            this.content = content;
-        }
+      this.content = Objects.requireNonNullElseGet(content, ArrayList::new);
     }
-
-    // public Map<String, Object> toMap(String provider, String type) {
-    // switch (type.toLowerCase()) {
-    // case "text" -> {
-    // StringBuilder contentText = new StringBuilder();
-    // for (Content item : content) {
-    // contentText.append(item.getText());
-    // }
-    // return Map.of(
-    // "role", role,
-    // "content", contentText.toString().trim());
-    // }
-    // default -> {
-    // List<Map<String, Object>> contentList = new ArrayList<>();
-    // for (Content item : content) {
-    // contentList.add(item.toMap(provider, cached));
-    // }
-    // return Map.of(
-    // "role", role,
-    // "content", contentList);
-    // }
-    // }
-    //
-    // }
 
 }
