@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -31,6 +32,17 @@ public class GlobalExceptionHandler {
             response.setStatus(HttpStatus.OK.value());
         }
         log.debug("Client aborted connection: {}", ex.getMessage());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, String>> handleAccessDenied(AccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Map.of("error", "Access denied"));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, String>> handleBadRequest(IllegalArgumentException ex) {
+        return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
     }
 
     @ExceptionHandler(TokenValidationException.class)
@@ -63,8 +75,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleJsonError(HttpMessageNotReadableException e) {
         Throwable cause = e.getCause();
         String detail = cause instanceof JsonProcessingException
-            ? "Invalid JSON format"
-            : "Malformed request body";
+                ? "Invalid JSON format"
+                : "Malformed request body";
         return ResponseEntity.badRequest().body(Map.of("error", detail));
     }
 

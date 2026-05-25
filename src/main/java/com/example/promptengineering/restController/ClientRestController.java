@@ -24,13 +24,13 @@ public class ClientRestController {
 
     public ClientRestController(ChatService chatService, ObjectMapper objectMapper) {
         this.chatService = chatService;
-      this.objectMapper = objectMapper;
+        this.objectMapper = objectMapper;
     }
 
     @PostMapping(value = "/chat", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent<String>> chat(@AuthenticationPrincipal User user,
                                               @RequestBody String body)
-        throws JsonProcessingException {
+            throws JsonProcessingException {
         RequestBuilder request = objectMapper.readValue(body, RequestBuilder.class);
         return chatService.makeRequest(request, user);
     }

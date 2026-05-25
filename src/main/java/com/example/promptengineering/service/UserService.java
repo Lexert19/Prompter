@@ -1,5 +1,8 @@
 package com.example.promptengineering.service;
 
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+import java.security.SecureRandom;
 import java.util.*;
 
 import com.example.promptengineering.dto.UserDto;
@@ -24,6 +27,7 @@ public class UserService implements UserDetailsService {
     private final EncryptionService encryptionService;
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private final int maxEncryptedKeysLength;
+    private final SecureRandom random = new SecureRandom();
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
             EncryptionService encryptionService,
@@ -32,6 +36,27 @@ public class UserService implements UserDetailsService {
         this.passwordEncoder = passwordEncoder;
         this.encryptionService = encryptionService;
         this.maxEncryptedKeysLength = maxEncryptedKeysLength;
+    }
+
+    @Transactional
+    public String generateApiToken(User user) {
+        String token;
+        do {
+            byte[] bytes = new byte[32];
+            random.nextBytes(bytes);
+            token = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+        } while (userRepository.existsByApiToken(token));
+
+        user.setApiToken(token);
+        userRepository.save(user);
+        return token;
+    }
+
+    @Transactional
+    public String rotateApiToken(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        return generateApiToken(user);
     }
 
     public void setUserKeys(User user, Map<String, String> keys) {
@@ -92,7 +117,7 @@ public class UserService implements UserDetailsService {
         User user = new User();
         user.setEmail(email);
         user.setPassword(encodedPassword);
-        user.setRoles(roles);
+        user.setRoles(new ArrayList<>(roles));
         user.setEncryptedKeys(null);
         return userRepository.save(user);
     }

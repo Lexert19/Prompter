@@ -29,7 +29,7 @@ public class Message {
     }
 
     public void setContent(List<Content> content) {
-      this.content = Objects.requireNonNullElseGet(content, ArrayList::new);
+        this.content = Objects.requireNonNullElseGet(content, ArrayList::new);
     }
 
 }

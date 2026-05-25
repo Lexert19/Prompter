@@ -53,6 +53,9 @@ public class User implements OAuth2User, Principal, UserDetails {
     @Column(name = "two_factor_email")
     private String twoFactorEmail;
 
+    @Column(unique = true, length = 64)
+    private String apiToken;
+
     public User(String email, String password) {
         this.email = email;
         this.password = password;

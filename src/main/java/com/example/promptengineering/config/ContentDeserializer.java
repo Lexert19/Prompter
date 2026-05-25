@@ -8,11 +8,11 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
-import java.lang.reflect.Type;
 
 public class ContentDeserializer extends JsonDeserializer<Content> {
     @Override
-    public Content deserialize(JsonParser p, DeserializationContext ct) throws IOException {
+    public Content deserialize(JsonParser p, DeserializationContext ct)
+            throws IOException {
         JsonNode node = p.getCodec().readTree(p);
         JsonNode typeNode = node.get("type");
 

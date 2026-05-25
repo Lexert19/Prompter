@@ -1,5 +1,7 @@
 package com.example.promptengineering.model;
 
+import java.util.UUID;
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,16 +34,23 @@ public class RequestBuilder {
     private boolean useSharedKeys = false;
     private Long sharedKeyId;
     private ProviderStrategy providerStrategy;
+    private UUID communityNodeId;
+
+    private static final Map<String, Supplier<ProviderStrategy>> STRATEGIES = Map
+            .ofEntries(Map.entry("ANTHROPIC", AnthropicStrategy::new),
+                    Map.entry("GEMINI", GeminiStrategy::new),
+                    Map.entry("OPENAI", OpenAIStrategy::new),
+                    Map.entry("NVIDIA", OpenAIStrategy::new));
 
     public void setProvider(String providerName) {
-        this.provider = providerName;
-        if ("ANTHROPIC".equals(providerName)) {
-            this.providerStrategy = new AnthropicStrategy();
-        } else if ("GEMINI".equalsIgnoreCase(providerName)) {
-            this.providerStrategy = new GeminiStrategy();
-        } else {
-            this.providerStrategy = new OpenAIStrategy();
-        }
+        this.provider = providerName.toUpperCase();
+        this.providerStrategy = STRATEGIES
+                .getOrDefault(this.provider, OpenAIStrategy::new).get();
+    }
+
+    public RequestBuilder communityNode(UUID nodeId) {
+        this.communityNodeId = nodeId;
+        return this;
     }
 
     public ProviderStrategy getProviderStrategy() {

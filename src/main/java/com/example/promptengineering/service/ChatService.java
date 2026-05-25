@@ -1,5 +1,8 @@
 package com.example.promptengineering.service;
 
+import com.example.promptengineering.component.NodeTunnelRegistry;
+import com.example.promptengineering.entity.HostedNode;
+import com.example.promptengineering.repository.HostedNodeRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -17,6 +20,7 @@ import com.example.promptengineering.model.ImageContent;
 import com.example.promptengineering.model.Message;
 import com.example.promptengineering.repository.SharedKeyRepository;
 import com.example.promptengineering.repository.UserRepository;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
@@ -41,13 +45,17 @@ public class ChatService {
     private final SharedKeyRepository sharedKeyRepository;
     private final UserRepository userRepository;
     private final TokenTrackingService tokenTrackingService;
+    private final HostedNodeRepository hostedNodeRepository;
+    private final NodeTunnelRegistry nodeTunnelRegistry;
 
     public ChatService(ObjectMapper objectMapper, WebClient.Builder webClientBuilder,
             FileStorageService fileStorageService, SharedKeyService sharedKeyService,
             EncryptionService encryptionService, SharedKeyRepository sharedKeyRepository,
-            UserRepository userRepository, TokenTrackingService tokenTrackingService) {
-      this.objectMapper = objectMapper;
-      this.webClient = webClientBuilder.codecs(
+            UserRepository userRepository, TokenTrackingService tokenTrackingService,
+            HostedNodeRepository hostedNodeRepository,
+            NodeTunnelRegistry nodeTunnelRegistry) {
+        this.objectMapper = objectMapper;
+        this.webClient = webClientBuilder.codecs(
                 configure -> configure.defaultCodecs().maxInMemorySize(16 * 1024 * 1024))
                 .build();
         this.fileStorageService = fileStorageService;
@@ -56,6 +64,8 @@ public class ChatService {
         this.sharedKeyRepository = sharedKeyRepository;
         this.userRepository = userRepository;
         this.tokenTrackingService = tokenTrackingService;
+        this.hostedNodeRepository = hostedNodeRepository;
+        this.nodeTunnelRegistry = nodeTunnelRegistry;
     }
 
     private Mono<Void> attachBase64Images(RequestBuilder request, User user) {
@@ -85,7 +95,7 @@ public class ChatService {
 
     private Mono<String> buildRequestBodyJson(RequestBuilder request) {
         return Mono.fromCallable(() -> objectMapper.writeValueAsString(request.build()))
-            .subscribeOn(Schedulers.boundedElastic());
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
     private Flux<ServerSentEvent<String>> executeRequest(RequestBuilder request,
@@ -100,6 +110,34 @@ public class ChatService {
                 }).map(this::toServerSentEvent)
                 .doOnCancel(() -> log.debug("SSE stream cancelled by client"))
                 .onErrorResume(this::handleError);
+    }
+
+    private Flux<ServerSentEvent<String>> executeCommunityRequest(RequestBuilder request,
+                                                                  String json) {
+        UUID nodeId = request.getCommunityNodeId();
+
+        HostedNode node = hostedNodeRepository
+                .findByIdAndStatus(nodeId, HostedNode.Status.ONLINE)
+                .orElseThrow(() -> new IllegalStateException("Node offline"));
+
+        if (!nodeTunnelRegistry.isOnline(nodeId)) {
+            throw new IllegalStateException("Node isn't active");
+        }
+
+        try {
+            Map<String, Object> payload = objectMapper.readValue(json, Map.class);
+            payload.put("model", node.getModelName());
+
+            return Mono.fromFuture(nodeTunnelRegistry.sendRequest(nodeId, payload))
+                    .timeout(Duration.ofMinutes(2)).flatMapMany(result -> {
+                        return Flux.just(toServerSentEvent(result));
+                    }).doFinally(s -> {
+                        int completion = tokenTrackingService.getCompletionTokens();
+                    });
+
+        } catch (Exception e) {
+            return handleError(e);
+        }
     }
 
     private WebClient.RequestBodySpec buildHttpRequest(RequestBuilder request,
@@ -155,17 +193,42 @@ public class ChatService {
     }
 
     public Flux<ServerSentEvent<String>> makeRequest(RequestBuilder request, User user) {
-        Mono<RequestBuilder> preparedRequest = request.isUseSharedKeys()
-                ? Mono.fromCallable(() -> prepareWithSharedKey(request))
-                        .subscribeOn(Schedulers.boundedElastic())
-                : Mono.just(request);
+        Mono<RequestBuilder> preparedRequest = Mono.fromCallable(() -> {
+            if (request.getCommunityNodeId() != null) {
+                return applyCommunityNode(request, user);
+            }
+            if (request.isUseSharedKeys()) {
+                return prepareWithSharedKey(request);
+            }
+            return request;
+        }).subscribeOn(Schedulers.boundedElastic());
 
-        return preparedRequest
-                .flatMapMany(req -> attachBase64Images(req, user)
-                        .then(buildRequestBodyJson(req))
-                        .flatMapMany(json -> executeRequest(req, json)))
-                .doOnError(e -> blockSharedKeyIfUsed(request))
+        return preparedRequest.flatMapMany(req -> attachBase64Images(req, user)
+                .then(buildRequestBodyJson(req)).flatMapMany(json -> {
+                    if (req.getCommunityNodeId() != null) {
+                        return executeCommunityRequest(req, json);
+                    } else {
+                        return executeRequest(req, json);
+                    }
+                })).doOnError(e -> blockSharedKeyIfUsed(request))
                 .onErrorResume(this::handleError);
+    }
+
+    private RequestBuilder applyCommunityNode(RequestBuilder request, User user) {
+        UUID nodeId = request.getCommunityNodeId();
+        HostedNode node = hostedNodeRepository.findById(nodeId)
+                .orElseThrow(() -> new IllegalArgumentException("Node nie istnieje"));
+
+        if (!node.isAllowPublicUse() && !node.getOwner().getId().equals(user.getId())) {
+            throw new org.springframework.security.access.AccessDeniedException(
+                    "Brak dostępu");
+        }
+
+        request.setProvider("COMMUNITY");
+        request.setModel(node.getModelName());
+        request.setUrl("tunnel://" + nodeId);
+        request.setKey(node.getAuthToken());
+        return request;
     }
 
     private RequestBuilder prepareWithSharedKey(RequestBuilder request) {

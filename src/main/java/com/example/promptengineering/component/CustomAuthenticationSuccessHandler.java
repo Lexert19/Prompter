@@ -20,7 +20,8 @@ public class CustomAuthenticationSuccessHandler
             SavedRequestAwareAuthenticationSuccessHandler {
 
     private final TwoFactorEmailService twoFactorService;
-    private final CsrfTokenRepository csrfRepo = CookieCsrfTokenRepository.withHttpOnlyFalse();
+    private final CsrfTokenRepository csrfRepo = CookieCsrfTokenRepository
+            .withHttpOnlyFalse();
 
     public CustomAuthenticationSuccessHandler(TwoFactorEmailService twoFactorService,
             UserRepository userRepository) {
