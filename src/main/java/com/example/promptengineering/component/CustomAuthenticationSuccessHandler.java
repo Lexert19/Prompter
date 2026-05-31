@@ -6,7 +6,9 @@ import com.example.promptengineering.service.TwoFactorEmailService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfToken;
@@ -20,13 +22,18 @@ public class CustomAuthenticationSuccessHandler
             SavedRequestAwareAuthenticationSuccessHandler {
 
     private final TwoFactorEmailService twoFactorService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final String frontendRedirectUrl;
     private final CsrfTokenRepository csrfRepo = CookieCsrfTokenRepository
             .withHttpOnlyFalse();
 
     public CustomAuthenticationSuccessHandler(TwoFactorEmailService twoFactorService,
-            UserRepository userRepository) {
+            UserRepository userRepository, JwtTokenProvider jwtTokenProvider,
+        @Value("${app.frontend.url}") String frontendRedirectUrl) {
         this.twoFactorService = twoFactorService;
-        setDefaultTargetUrl("/");
+      this.jwtTokenProvider = jwtTokenProvider;
+      this.frontendRedirectUrl = frontendRedirectUrl;
+      setDefaultTargetUrl("/");
     }
 
     @Override
@@ -34,6 +41,11 @@ public class CustomAuthenticationSuccessHandler
                                         HttpServletResponse response,
                                         Authentication authentication)
             throws IOException, ServletException {
+        if (authentication instanceof OAuth2AuthenticationToken) {
+            handleOAuth2Success(authentication, response);
+            return;
+        }
+
         User user = (User) authentication.getPrincipal();
         boolean hasApiKeys = user.getEncryptedKeys() != null
                 && !user.getEncryptedKeys().isEmpty();
@@ -53,5 +65,12 @@ public class CustomAuthenticationSuccessHandler
         } else {
             super.onAuthenticationSuccess(request, response, authentication);
         }
+    }
+
+    private void handleOAuth2Success(Authentication authentication, HttpServletResponse response) throws IOException {
+        String token = jwtTokenProvider.generateToken(authentication);
+
+        String redirectUrl = frontendRedirectUrl + "/oauth2/redirect?token=" + token;
+        response.sendRedirect(redirectUrl);
     }
 }

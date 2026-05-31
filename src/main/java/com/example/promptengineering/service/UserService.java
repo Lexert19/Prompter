@@ -1,5 +1,6 @@
 package com.example.promptengineering.service;
 
+import com.example.promptengineering.dto.RegisterRequest;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.security.SecureRandom;
@@ -36,6 +37,11 @@ public class UserService implements UserDetailsService {
         this.passwordEncoder = passwordEncoder;
         this.encryptionService = encryptionService;
         this.maxEncryptedKeysLength = maxEncryptedKeysLength;
+    }
+
+    @Transactional
+    public User registerUser(RegisterRequest request) throws UserAlreadyExistsException {
+        return createUser(request.email(), request.password(), List.of(AppRole.USER));
     }
 
     @Transactional

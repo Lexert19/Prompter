@@ -1,5 +1,8 @@
 package com.example.promptengineering.restController;
 
+import com.example.promptengineering.dto.LoginRequest;
+import com.example.promptengineering.dto.RegisterRequest;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -47,6 +51,8 @@ public class AuthControllerTest {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private WebApplicationContext webApplicationContext;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private MockMvc mockMvc;
     private User user;
@@ -72,17 +78,43 @@ public class AuthControllerTest {
     }
 
     @Test
-    public void testLoginSuccess() throws Exception {
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("username", "testuser123@wp.pl");
-        formData.add("password", "testpassword123");
+    @Transactional
+    public void testRegisterSuccess() throws Exception {
+        String newEmail = "newuser@wp.pl";
+        userRepository.findByEmail(newEmail).ifPresent(userRepository::delete);
 
-        // mockMvc.perform(post("/auth/login")
-        // .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-        // .params(formData))
-        // .andExpect(status().is3xxRedirection())
-        // .andExpect(header().string("Location", "/"));
+        RegisterRequest registerRequest = new RegisterRequest(newEmail, "securepassword123");
+
+        mockMvc.perform(post("/auth/register").with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(registerRequest)))
+            .andExpect(status().isOk());
+
+        Optional<User> registeredUser = userRepository.findByEmail(newEmail);
+        assertTrue(registeredUser.isPresent());
     }
+
+    @Test
+    public void testRegisterFailureEmailExists() throws Exception {
+        RegisterRequest registerRequest = new RegisterRequest("testuser123@wp.pl", "anotherpassword");
+
+        mockMvc.perform(post("/auth/register").with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(registerRequest)))
+            .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    public void testLoginSuccess() throws Exception {
+        LoginRequest loginRequest = new LoginRequest("testuser123@wp.pl", "testpassword123");
+
+        mockMvc.perform(post("/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginRequest)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.token").exists());
+    }
+
 
     @Test
     public void testShowLoginForm() throws Exception {
@@ -93,15 +125,12 @@ public class AuthControllerTest {
 
     @Test
     public void testLoginFailure() throws Exception {
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("username", "testuser123@wp.pl");
-        formData.add("password", "wrongpassword");
+        LoginRequest loginRequest = new LoginRequest("testuser123@wp.pl", "wrongpassword");
 
-        // mockMvc.perform(post("/auth/login")
-        // .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-        // .params(formData))
-        // .andExpect(status().is3xxRedirection())
-        // .andExpect(header().string("Location", "/auth/login?error=true"));
+        mockMvc.perform(post("/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginRequest)))
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
