@@ -1031,3 +1031,60 @@ input[type="number"]::-ms-spin-button {
     right: -44px;
     border-radius: 0 0 12px 0;
 }
+
+
+/*
+
+*/
+
+.node-selector-button {
+    background-color: var(--second-bg);
+    border: 1px solid #555866;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.node-selector-button:hover {
+    background-color: var(--accent-darker);
+}
+
+.node-selector-preview {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.node-selector-status {
+    font-size: 0.8rem;
+    background: rgba(255,255,255,0.1);
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-left: 10px;
+}
+
+.node-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.node-item-selectable {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.node-item-selectable:hover {
+    background-color: var(--accent-darker);
+}
+
+.node-item-selectable.selected {
+    background-color: var(--accent);
+}
+
+.node-item-name {
+    font-weight: 600;
+}

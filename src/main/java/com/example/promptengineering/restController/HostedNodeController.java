@@ -1,9 +1,12 @@
 package com.example.promptengineering.restController;
 
+import com.example.promptengineering.dto.HostedNodeDto;
+import com.example.promptengineering.dto.PublicHostedNodeDto;
 import com.example.promptengineering.dto.RegisterNodeRequest;
 import com.example.promptengineering.entity.HostedNode;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.service.HostedNodeService;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,24 +22,28 @@ public class HostedNodeController {
     private final HostedNodeService service;
 
     @PostMapping
-    public HostedNode create(@AuthenticationPrincipal User user,
-                             @RequestBody RegisterNodeRequest req) {
-        return service.registerNode(user, req);
+    public HostedNodeDto create(@AuthenticationPrincipal User user,
+        @RequestBody RegisterNodeRequest req) {
+        return HostedNodeDto.fromEntity(service.registerNode(user, req));
     }
 
     @GetMapping
-    public List<HostedNode> myNodes(@AuthenticationPrincipal User user) {
-        return service.findByOwner(user);
+    public List<HostedNodeDto> myNodes(@AuthenticationPrincipal User user) {
+        return service.findByOwner(user).stream()
+            .map(HostedNodeDto::fromEntity)
+            .collect(Collectors.toList());
     }
 
     @GetMapping("/public")
-    public List<HostedNode> publicNodes() {
-        return service.findPublicOnlineNodes();
+    public List<PublicHostedNodeDto> publicNodes() {
+        return service.findPublicOnlineNodes().stream()
+            .map(PublicHostedNodeDto::fromEntity)
+            .collect(Collectors.toList());
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id,
-                                       @AuthenticationPrincipal User user) {
+        @AuthenticationPrincipal User user) {
         service.deleteNode(id, user);
         return ResponseEntity.noContent().build();
     }

@@ -1,5 +1,3 @@
-writing shit in frameworks is dead
-
 Prompt Engineering Platform
 
 A modern web application for interacting with Large Language Models (LLMs) from multiple providers, managing prompt history.

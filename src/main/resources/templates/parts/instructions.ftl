@@ -88,4 +88,7 @@
             <span><@spring.message "settings.use.shared.keys" /></span>
         </label>
     </div>
+    <button class="node-selector-button rounded-1 d-flex align-items-center justify-content-between w-100" onclick="HostedNodesView.instance().openRegisterNodeModal()">
+        <i class="fas fa-plus"></i> Dodaj własny Community Node
+    </button>
 </div>
