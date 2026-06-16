@@ -47,7 +47,7 @@ class ModelSelector {
 
     async syncModels() {
         try {
-            const response = await fetchWithCsrf('/api/models/all-models', { credentials: 'include' });
+            const response = await fetchWithAuth('/api/models/all-models', { credentials: 'include' });
             const models = await response.json();
 
             const newModels = models.map(model => ({

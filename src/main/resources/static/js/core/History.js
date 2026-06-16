@@ -42,7 +42,7 @@ class History {
 
     async createChat() {
         try {
-            const response = await fetchWithCsrf(`${this.baseUrl}/chats`, {
+            const response = await fetchWithAuth(`${this.baseUrl}/chats`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -84,7 +84,7 @@ class History {
                 role: message.role
             };
 
-            const response = await fetchWithCsrf(`${this.baseUrl}/messages`, {
+            const response = await fetchWithAuth(`${this.baseUrl}/messages`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(messageBody),
@@ -116,7 +116,7 @@ class History {
         const formData = new FormData();
         formData.append('file', file);
 
-        const response = await fetchWithCsrf('/api/files/upload', {
+        const response = await fetchWithAuth('/api/files/upload', {
             method: 'POST',
             body: formData,
             credentials: 'include'
@@ -128,7 +128,7 @@ class History {
     }
 
     async fetchImageAsBase64(fileId) {
-        const response = await fetchWithCsrf(`/api/files/${fileId}`, {
+        const response = await fetchWithAuth(`/api/files/${fileId}`, {
             credentials: 'include'
         });
         if (!response.ok) throw new Error('Nie udało się pobrać obrazu');
@@ -144,7 +144,7 @@ class History {
 
     async getChatHistory(chatId) {
         try {
-            const response = await fetchWithCsrf(`${this.baseUrl}/chats/${chatId}/messages`, {
+            const response = await fetchWithAuth(`${this.baseUrl}/chats/${chatId}/messages`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -212,7 +212,7 @@ class History {
 
     async deleteChat(chatId) {
         try {
-            const response = await fetchWithCsrf(`${this.baseUrl}/chats/${chatId}`, {
+            const response = await fetchWithAuth(`${this.baseUrl}/chats/${chatId}`, {
                 method: "DELETE",
                 credentials: "include",
             });
@@ -229,7 +229,7 @@ class History {
 
     async loadChats(page = 0, size = 100) {
         try {
-            const response = await fetchWithCsrf(`${this.baseUrl}/chats?page=${page}&size=${size}`, {
+            const response = await fetchWithAuth(`${this.baseUrl}/chats?page=${page}&size=${size}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",

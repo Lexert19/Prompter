@@ -4,6 +4,7 @@ import com.example.promptengineering.component.JwtTokenProvider;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -31,10 +32,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       FilterChain chain) throws IOException, ServletException {
 
     String token = extractToken(request);
-    if (token != null && tokenProvider.validateToken(token)) {
+    if (token != null && tokenProvider.validateToken(token, "full")) {
       Claims claims = tokenProvider.getClaims(token);
-      String userId = claims.getSubject();
-      UserDetails userDetails = userDetailsService.loadUserByUsername(userId); // lub po email
+      String email = claims.get("email", String.class);
+      UserDetails userDetails = userDetailsService.loadUserByUsername(email);
       Authentication auth = new UsernamePasswordAuthenticationToken(
           userDetails, null, userDetails.getAuthorities());
       SecurityContextHolder.getContext().setAuthentication(auth);
@@ -46,6 +47,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     String bearer = request.getHeader("Authorization");
     if (bearer != null && bearer.startsWith("Bearer ")) {
       return bearer.substring(7);
+    }
+    Cookie[] cookies = request.getCookies();
+    if (cookies != null) {
+      for (Cookie cookie : cookies) {
+        if ("access_token".equals(cookie.getName())) {
+          return cookie.getValue();
+        }
+      }
     }
     return null;
   }

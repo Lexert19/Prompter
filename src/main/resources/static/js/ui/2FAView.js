@@ -51,7 +51,7 @@ class TwoFactorManager {
 
     async loadStatus() {
         try {
-            const response = await fetchWithCsrf('/api/user');
+            const response = await fetchWithAuth('/api/user');
             if (!response.ok) throw new Error('Nie udało się pobrać statusu');
             const data = await response.json();
             this.status = data.twoFactorEnabled;
@@ -108,7 +108,7 @@ class TwoFactorManager {
             return;
         }
         try {
-            const response = await fetchWithCsrf('/api/2fa/send-test', {
+            const response = await fetchWithAuth('/api/2fa/send-test', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({ email: email })
@@ -133,7 +133,7 @@ class TwoFactorManager {
             return;
         }
         try {
-            const response = await fetchWithCsrf('/api/2fa/enable', {
+            const response = await fetchWithAuth('/api/2fa/enable', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({ email: email, code: code })
@@ -160,7 +160,7 @@ class TwoFactorManager {
             return;
         }
         try {
-            const response = await fetchWithCsrf('/api/2fa/disable', {
+            const response = await fetchWithAuth('/api/2fa/disable', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({ code: code })

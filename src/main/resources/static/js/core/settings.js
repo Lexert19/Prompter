@@ -142,7 +142,7 @@ class Settings {
         hidePages();
         this.chatSettings = document.getElementById("chatSettings");
         this.chatSettings.classList.add("active");
-        fetchWithCsrf('/api/models/all-models', {
+        fetchWithAuth('/api/models/all-models', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -177,7 +177,7 @@ class Settings {
     }
 
     loadKeys() {
-        fetchWithCsrf("/api/account/keys", {
+        fetchWithAuth("/api/account/keys", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",

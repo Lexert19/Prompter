@@ -89,6 +89,9 @@
         </label>
     </div>
     <button class="node-selector-button rounded-1 d-flex align-items-center justify-content-between w-100" onclick="HostedNodesView.instance().openRegisterNodeModal()">
-        <i class="fas fa-plus"></i> Dodaj własny Community Node
+        <i class="fas fa-plus"></i><@spring.message "settings.add_model_button" />
+    </button>
+    <button class="node-selector-button my-3 rounded-1 d-flex align-items-center justify-content-between w-100" onclick="HostedNodesView.instance().openNodesListModal()">
+        <@spring.message "settings.show_nodes_button" />
     </button>
 </div>

@@ -2,6 +2,8 @@ package com.example.promptengineering.config;
 
 import com.example.promptengineering.component.CustomAuthenticationEntryPoint;
 import com.example.promptengineering.component.CustomAuthenticationSuccessHandler;
+import com.example.promptengineering.component.OAuth2JwtSuccessHandler;
+import com.example.promptengineering.filter.JwtAuthenticationFilter;
 import com.example.promptengineering.filter.RateLimitingFilter;
 import com.example.promptengineering.service.CustomOAuth2UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +16,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.web.*;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -33,13 +36,19 @@ public class SecurityConfig implements WebMvcConfigurer {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final RateLimitingFilter rateLimitingFilter;
     private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+    private final OAuth2JwtSuccessHandler oAuth2JwtSuccessHandler;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     public SecurityConfig(CustomOAuth2UserService customOAuth2UserService,
             RateLimitingFilter rateLimitingFilter,
-            CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler) {
+            CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler,
+        OAuth2JwtSuccessHandler oAuth2JwtSuccessHandler,
+        JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.customOAuth2UserService = customOAuth2UserService;
         this.rateLimitingFilter = rateLimitingFilter;
         this.customAuthenticationSuccessHandler = customAuthenticationSuccessHandler;
+      this.oAuth2JwtSuccessHandler = oAuth2JwtSuccessHandler;
+      this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
     @Bean
@@ -48,6 +57,11 @@ public class SecurityConfig implements WebMvcConfigurer {
             throws Exception {
         http.addFilterBefore(rateLimitingFilter,
                 UsernamePasswordAuthenticationFilter.class);
+
+        http.addFilterBefore(jwtAuthenticationFilter,
+            UsernamePasswordAuthenticationFilter.class)
+            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .formLogin(AbstractHttpConfigurer::disable);
 
         http.csrf(AbstractHttpConfigurer::disable);
 
@@ -61,19 +75,12 @@ public class SecurityConfig implements WebMvcConfigurer {
         http.oauth2Login(oauth2 -> oauth2.loginPage("/auth/login")
                 .userInfoEndpoint(userInfo -> userInfo.oidcUserService(oidcUserService())
                         .userService(customOAuth2UserService))
-                .successHandler(customAuthenticationSuccessHandler)
+                .successHandler(oAuth2JwtSuccessHandler)
                 .failureHandler((request, response, exception) -> {
                     log.error("OAuth2 login failed for request: {}",
                             request.getRequestURI(), exception);
                     response.sendRedirect("/auth/login?error=true");
                 }));
-
-        http.formLogin(customizer -> customizer.loginPage("/auth/login")
-                .loginProcessingUrl("/auth/login")
-                .successHandler(customAuthenticationSuccessHandler)
-                .failureHandler(authenticationFailureHandler()));
-
-        http.logout(customizer -> customizer.logoutUrl("/auth/logout"));
 
         http.exceptionHandling(exception -> exception
                 .defaultAuthenticationEntryPointFor(

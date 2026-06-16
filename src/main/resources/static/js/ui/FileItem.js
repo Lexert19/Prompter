@@ -38,7 +38,7 @@ class FileItem{
 
     async showFileContent(projectId, fileId) {
             try {
-              const response = await fetchWithCsrf(`/api/projects/${projectId}/files/${fileId}`, {
+              const response = await fetchWithAuth(`/api/projects/${projectId}/files/${fileId}`, {
                 credentials: 'include'
               });
 

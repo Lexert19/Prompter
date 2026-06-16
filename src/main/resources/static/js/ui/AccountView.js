@@ -32,7 +32,7 @@ class AccountView{
 
     async loadUserStats() {
         try {
-            const response = await fetchWithCsrf('/api/user', { credentials: 'include' });
+            const response = await fetchWithAuth('/api/user', { credentials: 'include' });
             if (response.ok) {
                 const data = await response.json();
                 const pointsSpan = document.getElementById('userPoints');
@@ -94,7 +94,7 @@ class AccountView{
 
     async saveSharedKey(provider, keyValue) {
         try {
-            const response = await fetchWithCsrf('/api/admin/shared-keys', {
+            const response = await fetchWithAuth('/api/admin/shared-keys', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ provider, keyValue })
@@ -116,7 +116,7 @@ class AccountView{
 
         const url = "/api/account/save-key/"+keyName.value;
 
-        fetchWithCsrf(url, {
+        fetchWithAuth(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -155,7 +155,7 @@ class AccountView{
             return;
         }
 
-        fetchWithCsrf('/api/account/change-password', {
+        fetchWithAuth('/api/account/change-password', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

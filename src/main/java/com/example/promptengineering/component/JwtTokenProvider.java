@@ -38,28 +38,45 @@ public class JwtTokenProvider {
         .compact();
   }
 
-  public String generateTokenFromUserId(Long userId, String email, List<String> roles) {
+  public String generateToken(User user, String scope, long jwtExpirationMs) {
     Date now = new Date();
     Date expiry = new Date(now.getTime() + jwtExpirationMs);
     return Jwts.builder()
-        .subject(userId.toString())
-        .claim("email", email)
-        .claim("roles", roles)
+        .subject(user.getId().toString())
+        .claim("email", user.getEmail())
+        .claim("roles", user.getRoles())
+        .claim("scope", scope)
         .issuedAt(now)
         .expiration(expiry)
         .signWith(getSignKey())
         .compact();
   }
 
+  public String generateAccessToken(User user) {
+    return generateToken(user, "full", jwtExpirationMs);
+  }
+
+  public String generateRefreshToken(User user) {
+    return generateToken(user, "refresh", jwtExpirationMs);
+  }
+
+
+  public String generatePreAuthToken(User user) {
+    return generateToken(user, "2fa_pending", 10 * 60 * 1000);
+  }
+
   public Claims getClaims(String token) {
     return Jwts.parser().verifyWith(getSignKey()).build().parseSignedClaims(token).getPayload();
   }
 
-  public boolean validateToken(String token) {
+  public boolean validateToken(String token, String requiredScope) {
     try {
-      getClaims(token);
+      Claims claims = getClaims(token);
+      if (requiredScope != null && !requiredScope.equals(claims.get("scope", String.class))) {
+        return false;
+      }
       return true;
-    } catch (JwtException | IllegalArgumentException e) {
+    } catch (Exception e) {
       return false;
     }
   }

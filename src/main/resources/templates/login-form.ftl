@@ -16,19 +16,19 @@
             <div class="content-wrapper  px-2">
                 <div class="login-container p-4 panel">
                     <h2>Login</h2>
-                    <#if error??>
-                    <div class="alert-error">${error}</div>
-                    </#if>
-                    <form action="/auth/login" method="POST">
+                    <div id="login-error" class="alert-error" style="display:none"></div>
+                    <form  id="login-form">
                         <input type="text"
+                               id="username"
                                name="username"
                                placeholder="<@spring.message 'login.username.placeholder'/>"
                                required>
                         <input type="password"
+                               id="password"
                                name="password"
                                placeholder="<@spring.message 'login.password.placeholder'/>"
                                required>
-                        <button type="submit">
+                        <button type="submit" id="login-btn">
                             <@spring.message "login.button" />
                         </button>
                     </form>
@@ -69,6 +69,18 @@
                         </div>
                     </div>
                 </div>
-                <script src="/static/js/auth.js"></script>
+            <div id="twofaModal" class="modal" style="display:none">
+                <div class="modal-content">
+                    <h3>Kod 2FA</h3>
+                    <p>Sprawdź email</p>
+                    <input type="text" id="twofa-code" maxlength="6" autocomplete="one-time-code">
+                    <div id="twofa-error" class="alert-error" style="display:none"></div>
+                    <div>
+                        <button id="twofa-submit" type="button">Zweryfikuj</button>
+                        <button id="twofa-cancel" type="button">Anuluj</button>
+                    </div>
+                </div>
+            </div>
+                <script src="/static/otherJs/auth.js"></script>
             </body>
         </html>

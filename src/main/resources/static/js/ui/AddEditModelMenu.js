@@ -81,7 +81,7 @@ class AddEditModelMenu {
             url: formData.get('url'),
             type: formData.get('type')
         };
-        fetchWithCsrf('/api/models/user-models', {
+        fetchWithAuth('/api/models/user-models', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dto)
@@ -103,7 +103,7 @@ class AddEditModelMenu {
             url: formData.get('url'),
             type: formData.get('type')
         };
-        fetchWithCsrf(`/api/models/user-models/${id}`, {
+        fetchWithAuth(`/api/models/user-models/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dto)

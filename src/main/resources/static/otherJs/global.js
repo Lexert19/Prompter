@@ -1,14 +1,13 @@
+function getCookie(name) {
+    const m = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return m? decodeURIComponent(m[2]) : null;
+}
 
-function fetchWithCsrf(url, options = {}) {
-    if (!options.headers) options.headers = {};
-    if (options.method && ['POST', 'PUT', 'DELETE'].includes(options.method.toUpperCase())) {
-        options.headers['X-XSRF-TOKEN'] = getCsrfToken();
+function fetchWithAuth(url, options = {}) {
+    options.headers = options.headers || {};
+    const token = getCookie('access_token');
+    if (token) {
+        options.headers['Authorization'] = 'Bearer ' + token;
     }
     return fetch(url, options);
 }
-
-    function getCsrfToken() {
-        const name = 'XSRF-TOKEN';
-        const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-        return match ? match[2] : null;
-    }

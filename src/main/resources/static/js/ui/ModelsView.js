@@ -20,7 +20,7 @@ class ModelsView{
 
 
     renderUserModels() {
-        fetchWithCsrf('/api/models/user-models', { credentials: 'include' })
+        fetchWithAuth('/api/models/user-models', { credentials: 'include' })
             .then(res => res.json())
             .then(models => {
             this.models = models;
