@@ -40,7 +40,6 @@ window.onclick = function(event) {
     const loginForm = document.getElementById('login-form');
     const loginBtn = document.getElementById('login-btn');
     const errorBox = document.getElementById('login-error');
-    const googleBtn = document.getElementById('google-login-btn');
 
     const twofaModal = document.getElementById('twofaModal');
     const twofaInput = document.getElementById('twofa-code');
@@ -77,8 +76,12 @@ window.onclick = function(event) {
                 const data = await res.json().catch(() => ({}));
 
                 if (!res.ok) {
-                    showError(errorBox, data.error || 'Nieprawidłowy email lub hasło');
+                    showError(errorBox, data.error ||  'Invalid email or password');
                     return;
+                }
+
+                if (data.token) {
+                    localStorage.setItem('jwt_token', data.token);
                 }
 
                 if (data.requires2fa) {
@@ -89,7 +92,7 @@ window.onclick = function(event) {
                 }
                 window.location.href = '/chat';
             } catch (err) {
-                showError(errorBox, 'Błąd połączenia');
+                showError(errorBox, 'Connection error');
             } finally {
                 loginBtn.disabled = false;
             }
@@ -109,12 +112,12 @@ window.onclick = function(event) {
             });
             const data = await res.json().catch(() => ({}));
             if (!res.ok) {
-                showError(twofaError, data.error || 'Nieprawidłowy kod');
+                showError(twofaError, data.error || 'Invalid code');
                 return;
             }
             window.location.href = '/chat';
         } catch {
-            showError(twofaError, 'Błąd połączenia');
+            showError(twofaError, 'Connection error');
         } finally {
             twofaSubmit.disabled = false;
         }
@@ -127,11 +130,6 @@ window.onclick = function(event) {
         preAuthToken = null;
     });
 
-    if (googleBtn) {
-        googleBtn.addEventListener('click', () => {
-            window.location.href = '/oauth2/authorization/google';
-        });
-    }
 
     const params = new URLSearchParams(window.location.search);
     const oauthToken = params.get('token');

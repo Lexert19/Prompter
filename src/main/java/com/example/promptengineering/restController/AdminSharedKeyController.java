@@ -4,6 +4,7 @@ import com.example.promptengineering.dto.SharedKeyDto;
 import com.example.promptengineering.dto.SharedKeyInfoDto;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.service.SharedKeyService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -32,8 +33,10 @@ public class AdminSharedKeyController {
         return ResponseEntity.ok(sharedKeyService.getAllKeys());
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSharedKey(@PathVariable Long id) {
+    @DeleteMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> deleteSharedKey(@PathVariable Long id,
+                                                @RequestBody(required = false) Map<String, Object> dummy,
+                                                @AuthenticationPrincipal User user) {
         if (sharedKeyService.deleteKey(id)) {
             return ResponseEntity.noContent().build();
         } else {

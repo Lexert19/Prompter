@@ -23,7 +23,7 @@ public class ResetTokenService {
     private final UserRepository userRepository;
     private final EmailService emailService;
     private static final Logger logger = LoggerFactory.getLogger(ResetTokenService.class);
-    private static final long TOKEN_EXPIRATION_HOURS = 24;
+    private static final long TOKEN_EXPIRATION_HOURS = 1;
 
     @Autowired
     public ResetTokenService(AuthService authService,

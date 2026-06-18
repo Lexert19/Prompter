@@ -29,11 +29,11 @@ public class CustomAuthenticationSuccessHandler
 
     public CustomAuthenticationSuccessHandler(TwoFactorEmailService twoFactorService,
             UserRepository userRepository, JwtTokenProvider jwtTokenProvider,
-        @Value("${app.frontend.url}") String frontendRedirectUrl) {
+            @Value("${app.frontend.url}") String frontendRedirectUrl) {
         this.twoFactorService = twoFactorService;
-      this.jwtTokenProvider = jwtTokenProvider;
-      this.frontendRedirectUrl = frontendRedirectUrl;
-      setDefaultTargetUrl("/");
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.frontendRedirectUrl = frontendRedirectUrl;
+        setDefaultTargetUrl("/");
     }
 
     @Override
@@ -67,7 +67,9 @@ public class CustomAuthenticationSuccessHandler
         }
     }
 
-    private void handleOAuth2Success(Authentication authentication, HttpServletResponse response) throws IOException {
+    private void handleOAuth2Success(Authentication authentication,
+                                     HttpServletResponse response)
+            throws IOException {
         String token = jwtTokenProvider.generateToken(authentication);
 
         String redirectUrl = frontendRedirectUrl + "/oauth2/redirect?token=" + token;

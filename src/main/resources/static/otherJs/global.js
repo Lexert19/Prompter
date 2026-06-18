@@ -5,9 +5,13 @@ function getCookie(name) {
 
 function fetchWithAuth(url, options = {}) {
     options.headers = options.headers || {};
-    const token = getCookie('access_token');
+    const token = getToken();
     if (token) {
         options.headers['Authorization'] = 'Bearer ' + token;
     }
     return fetch(url, options);
+}
+
+function getToken() {
+    return localStorage.getItem('jwt_token');
 }

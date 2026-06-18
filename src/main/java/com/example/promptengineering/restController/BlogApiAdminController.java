@@ -1,10 +1,14 @@
 package com.example.promptengineering.restController;
 
 import com.example.promptengineering.dto.PostDto;
+import com.example.promptengineering.entity.User;
 import com.example.promptengineering.exception.ResourceNotFoundException;
 import com.example.promptengineering.service.PostService;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,8 +50,10 @@ public class BlogApiAdminController {
         return ResponseEntity.ok(updated);
     }
 
-    @DeleteMapping("/posts/{id}")
-    public ResponseEntity<Void> deletePost(@PathVariable Long id)
+    @DeleteMapping(value = "/posts/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> deletePost(@PathVariable Long id,
+                                           @RequestBody(required = false) Map<String, Object> dummy,
+                                           @AuthenticationPrincipal User user)
             throws ResourceNotFoundException {
         postService.deletePost(id);
         return ResponseEntity.noContent().build();

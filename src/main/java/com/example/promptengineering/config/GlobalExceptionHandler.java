@@ -39,7 +39,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Map<String, String>> handleBadCredentials(BadCredentialsException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-            .body(Map.of("error", "Invalid email or password"));
+                .body(Map.of("error", "Invalid email or password"));
     }
 
     @ExceptionHandler(UserAlreadyExistsException.class)

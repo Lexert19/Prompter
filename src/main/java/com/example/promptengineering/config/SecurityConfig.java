@@ -22,8 +22,6 @@ import org.springframework.security.web.*;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.CharacterEncodingFilter;
@@ -42,13 +40,13 @@ public class SecurityConfig implements WebMvcConfigurer {
     public SecurityConfig(CustomOAuth2UserService customOAuth2UserService,
             RateLimitingFilter rateLimitingFilter,
             CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler,
-        OAuth2JwtSuccessHandler oAuth2JwtSuccessHandler,
-        JwtAuthenticationFilter jwtAuthenticationFilter) {
+            OAuth2JwtSuccessHandler oAuth2JwtSuccessHandler,
+            JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.customOAuth2UserService = customOAuth2UserService;
         this.rateLimitingFilter = rateLimitingFilter;
         this.customAuthenticationSuccessHandler = customAuthenticationSuccessHandler;
-      this.oAuth2JwtSuccessHandler = oAuth2JwtSuccessHandler;
-      this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.oAuth2JwtSuccessHandler = oAuth2JwtSuccessHandler;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
     @Bean
@@ -59,15 +57,16 @@ public class SecurityConfig implements WebMvcConfigurer {
                 UsernamePasswordAuthenticationFilter.class);
 
         http.addFilterBefore(jwtAuthenticationFilter,
-            UsernamePasswordAuthenticationFilter.class)
-            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .formLogin(AbstractHttpConfigurer::disable);
+                UsernamePasswordAuthenticationFilter.class)
+                .sessionManagement(
+                        sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .formLogin(AbstractHttpConfigurer::disable);
 
         http.csrf(AbstractHttpConfigurer::disable);
 
         http.authorizeHttpRequests(exchanges -> exchanges
-                .requestMatchers("/", "/{lang:(?:pl|en)}/**", "/public/**", "/login",
-                        "/debug", "/error", "/terms", "/privacy", "/static/**",
+                .requestMatchers("/", "/{lang:(?:pl|en)}/**", "/public/**", "/chat",
+                        "/login", "/debug", "/error", "/terms", "/privacy", "/static/**",
                         "/auth/**", "/favicon.ico", "/favicon")
                 .permitAll().requestMatchers("/admin/**", "/api/admin/**")
                 .hasAuthority("ROLE_ADMIN").anyRequest().authenticated());

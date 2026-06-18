@@ -5,6 +5,8 @@ import com.example.promptengineering.component.JwtTokenProvider;
 import com.example.promptengineering.dto.JwtResponse;
 import com.example.promptengineering.dto.LoginRequest;
 import com.example.promptengineering.dto.RegisterRequest;
+import com.example.promptengineering.dto.ResetPasswordConfirmRequest;
+import com.example.promptengineering.dto.ResetPasswordRequest;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.exception.TokenValidationException;
 import com.example.promptengineering.exception.UserAlreadyExistsException;
@@ -29,7 +31,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -56,58 +57,65 @@ public class AuthController {
     @Autowired
     public AuthController(AuthService authService, ResetTokenService resetTokenService,
             IpRateLimiter rateLimiter, EmailRateLimiter emailRateLimiter,
-        AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider,
-        UserService userService, UserRepository userRepository, TwoFactorEmailService twoFactorService) {
+            AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider,
+            UserService userService, UserRepository userRepository,
+            TwoFactorEmailService twoFactorService) {
         this.resetTokenService = resetTokenService;
         this.rateLimiter = rateLimiter;
         this.emailRateLimiter = emailRateLimiter;
-      this.authenticationManager = authenticationManager;
-      this.tokenProvider = tokenProvider;
-      this.userService = userService;
-      this.userRepository = userRepository;
-      this.twoFactorService = twoFactorService;
+        this.authenticationManager = authenticationManager;
+        this.tokenProvider = tokenProvider;
+        this.userService = userService;
+        this.userRepository = userRepository;
+        this.twoFactorService = twoFactorService;
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request)
-        throws UserAlreadyExistsException {
+            throws UserAlreadyExistsException {
         userService.registerUser(request);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletResponse response) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest request,
+                                   HttpServletResponse response) {
         try {
             Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-            );
+                    new UsernamePasswordAuthenticationToken(request.getEmail(),
+                            request.getPassword()));
             User user = (User) authentication.getPrincipal();
-            boolean hasApiKeys = user.getEncryptedKeys() != null && !user.getEncryptedKeys().isEmpty();
+            boolean hasApiKeys = user.getEncryptedKeys() != null
+                    && !user.getEncryptedKeys().isEmpty();
 
             if (user.isTwoFactorEnabled() && hasApiKeys) {
                 String preAuth = tokenProvider.generatePreAuthToken(user);
-                String emailTo = user.getTwoFactorEmail() != null ? user.getTwoFactorEmail() : user.getEmail();
+                String emailTo = user.getTwoFactorEmail() != null
+                        ? user.getTwoFactorEmail()
+                        : user.getEmail();
                 twoFactorService.createAndSendCode(user.getId().toString(), emailTo);
-                return ResponseEntity.ok(Map.of("requires2fa", true, "preAuthToken", preAuth));
+                return ResponseEntity
+                        .ok(Map.of("requires2fa", true, "preAuthToken", preAuth));
             }
             return issueTokens(user, response);
         } catch (BadCredentialsException e) {
-            return ResponseEntity.status(401).body(Map.of("error", "Nieprawidłowy email lub hasło"));
+            return ResponseEntity.status(401)
+                    .body(Map.of("error", "Invalid email or password"));
         }
     }
 
     @PostMapping("/2fa/verify")
     public ResponseEntity<?> verify2fa(@RequestHeader("X-Pre-Auth-Token") String preAuth,
-        @RequestParam String code,
-        HttpServletResponse response) {
+                                       @RequestParam String code,
+                                       HttpServletResponse response) {
         if (!tokenProvider.validateToken(preAuth, "2fa_pending")) {
-            return ResponseEntity.status(401).body(Map.of("error", "Token 2FA wygasł"));
+            return ResponseEntity.status(401).body(Map.of("error", "2FA token expired"));
         }
         Claims claims = tokenProvider.getClaims(preAuth);
         Long userId = Long.parseLong(claims.getSubject());
 
         if (!twoFactorService.verifyCode(userId.toString(), code)) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Nieprawidłowy kod"));
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid code"));
         }
         User user = userRepository.findById(userId).orElseThrow();
         return issueTokens(user, response);
@@ -115,8 +123,9 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(@CookieValue(value = "refresh_token", required = false) String refreshToken,
-        HttpServletResponse response) {
-        if (refreshToken == null || !tokenProvider.validateToken(refreshToken, "refresh")) {
+                                     HttpServletResponse response) {
+        if (refreshToken == null
+                || !tokenProvider.validateToken(refreshToken, "refresh")) {
             return ResponseEntity.status(401).build();
         }
         Claims claims = tokenProvider.getClaims(refreshToken);
@@ -127,10 +136,10 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {
-        ResponseCookie delAccess = ResponseCookie.from("access_token", "")
-            .httpOnly(true).path("/").maxAge(0).sameSite("Lax").build();
+        ResponseCookie delAccess = ResponseCookie.from("access_token", "").httpOnly(true)
+                .path("/").maxAge(0).sameSite("Lax").build();
         ResponseCookie delRefresh = ResponseCookie.from("refresh_token", "")
-            .httpOnly(true).path("/auth/refresh").maxAge(0).sameSite("Lax").build();
+                .httpOnly(true).path("/auth/refresh").maxAge(0).sameSite("Lax").build();
         response.addHeader(HttpHeaders.SET_COOKIE, delAccess.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, delRefresh.toString());
         return ResponseEntity.ok().build();
@@ -141,19 +150,11 @@ public class AuthController {
         String refresh = tokenProvider.generateRefreshToken(user);
 
         ResponseCookie accessCookie = ResponseCookie.from("access_token", access)
-            .httpOnly(true)
-            .secure(false) // w prod: true
-            .path("/")
-            .maxAge(Duration.ofMinutes(15))
-            .sameSite("Lax")
-            .build();
+                .httpOnly(true).secure(false) // w prod: true
+                .path("/").maxAge(Duration.ofMinutes(15)).sameSite("Lax").build();
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refresh)
-            .httpOnly(true)
-            .secure(false)
-            .path("/")
-            .maxAge(Duration.ofDays(7))
-            .sameSite("Lax")
-            .build();
+                .httpOnly(true).secure(false).path("/").maxAge(Duration.ofDays(7))
+                .sameSite("Lax").build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
@@ -177,26 +178,25 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password-request")
-    public String handleForgotPassword(@RequestParam(value = "email", defaultValue = "") String email,
-                                       Model model, HttpServletRequest request) {
+    public ResponseEntity<?> requestPasswordReset(@RequestBody ResetPasswordRequest resetRequest,
+                                                  HttpServletRequest request) {
+        String email = resetRequest.email();
         if (!rateLimiter.isAllowed(request)) {
-            model.addAttribute("error", "Zbyt wiele prób. Spróbuj ponownie za chwilę.");
-            return "reset-password-request";
+            return ResponseEntity.status(429)
+                    .body(Map.of("error", "Too many attempts. Please try again later."));
         }
         if (!emailRateLimiter.canSend(email)) {
-            model.addAttribute("error",
-                    "Daily limit reached for this email address. Please try again later.");
-            return "reset-password-request";
+            return ResponseEntity.status(429)
+                    .body(Map.of("error", "Daily limit reached for this email address."));
         }
         try {
             resetTokenService.createPasswordResetToken(email);
         } catch (UserNotFoundException e) {
-            return "redirect:/auth/reset-password-info";
         } catch (Exception e) {
-            model.addAttribute("error", e.getMessage());
-            return "reset-password-request";
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
-        return "redirect:/auth/reset-password-info";
+        return ResponseEntity.ok(
+                Map.of("message", "If the email exists, a reset link has been sent."));
     }
 
     @GetMapping("/reset-password-confirm")
@@ -207,24 +207,18 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password-confirm")
-    public String handleResetPassword(@RequestParam("token") String token,
-                                      @RequestParam("password") String newPassword,
-                                      @RequestParam("password_confirmation") String passwordConfirmation,
-                                      Model model) {
-
-        if (!newPassword.equals(passwordConfirmation)) {
-            model.addAttribute("error", "Passwords do not match.");
-            model.addAttribute("token", token);
-            return "reset-password-confirm";
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordConfirmRequest confirmRequest) {
+        if (!confirmRequest.password().equals(confirmRequest.passwordConfirmation())) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Passwords do not match."));
         }
-
         try {
-            resetTokenService.resetPassword(token, newPassword);
-            return "reset-password-success";
+            resetTokenService.resetPassword(confirmRequest.token(),
+                    confirmRequest.password());
+            return ResponseEntity
+                    .ok(Map.of("message", "Password has been reset successfully."));
         } catch (TokenValidationException e) {
-            model.addAttribute("token", token);
-            model.addAttribute("error", e.getMessage());
-            return "reset-password-confirm";
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 }

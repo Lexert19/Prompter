@@ -104,7 +104,7 @@ public class ChatService {
 
         return requestSpec.retrieve().bodyToFlux(String.class)
                 .timeout(Duration.ofMinutes(5)).filter(line -> !line.isBlank())
-                .doFinally(signalType -> {
+                .doOnComplete(() -> {
                     int completion = tokenTrackingService.getCompletionTokens();
                     addPointsForSharedKey(request.getSharedKeyId(), completion);
                 }).map(this::toServerSentEvent)

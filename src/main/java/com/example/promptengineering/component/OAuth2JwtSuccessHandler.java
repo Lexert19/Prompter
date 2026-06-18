@@ -17,33 +17,34 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class OAuth2JwtSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-  private final JwtTokenProvider jwtTokenProvider;
-  private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
 
-  @Value("${app.frontend.url:http://localhost:8080}")
-  private String frontendUrl;
+    @Value("${app.frontend.url:http://localhost:8080}")
+    private String frontendUrl;
 
-  @Override
-  public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-      Authentication authentication) throws IOException {
-    OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-    String email = oAuth2User.getAttribute("email");
-    User user = userRepository.findByEmail(email).orElseThrow();
+    @Override
+    public void onAuthenticationSuccess(HttpServletRequest request,
+                                        HttpServletResponse response,
+                                        Authentication authentication)
+            throws IOException {
+        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+        String email = oAuth2User.getAttribute("email");
+        User user = userRepository.findByEmail(email).orElseThrow();
 
-    String access = jwtTokenProvider.generateAccessToken(user);
-    String refresh = jwtTokenProvider.generateRefreshToken(user);
+        String access = jwtTokenProvider.generateAccessToken(user);
+        String refresh = jwtTokenProvider.generateRefreshToken(user);
 
-    ResponseCookie accessCookie = ResponseCookie.from("full", access)
-        .httpOnly(true).secure(false)
-        .path("/").maxAge(900).sameSite("Lax").build();
-    ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refresh)
-        .httpOnly(true).secure(false)
-        .path("/auth/refresh").maxAge(604800).sameSite("Lax").build();
+        ResponseCookie accessCookie = ResponseCookie.from("full", access).httpOnly(true)
+                .secure(false).path("/").maxAge(900).sameSite("Lax").build();
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refresh)
+                .httpOnly(true).secure(false).path("/auth/refresh").maxAge(604800)
+                .sameSite("Lax").build();
 
-    response.addHeader("Set-Cookie", accessCookie.toString());
-    response.addHeader("Set-Cookie", refreshCookie.toString());
+        response.addHeader("Set-Cookie", accessCookie.toString());
+        response.addHeader("Set-Cookie", refreshCookie.toString());
 
-    getRedirectStrategy().sendRedirect(request, response, frontendUrl + "/chat");
+        getRedirectStrategy().sendRedirect(request, response, frontendUrl + "/chat");
 
-  }
+    }
 }

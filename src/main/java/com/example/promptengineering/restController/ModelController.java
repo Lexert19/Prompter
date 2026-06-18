@@ -5,6 +5,7 @@ import com.example.promptengineering.entity.Model;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.exception.ResourceNotFoundException;
 import com.example.promptengineering.service.ModelService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -44,8 +45,9 @@ public class ModelController {
         }
     }
 
-    @DeleteMapping("/user-models/{id}")
+    @DeleteMapping(value = "/user-models/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> deleteUserModel(@AuthenticationPrincipal User user,
+                                                  @RequestBody(required = false) Map<String, Object> dummy,
                                                   @PathVariable Long id)
             throws ResourceNotFoundException {
         modelService.deleteUserModel(id, user);

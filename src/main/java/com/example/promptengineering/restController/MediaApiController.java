@@ -2,11 +2,15 @@ package com.example.promptengineering.restController;
 
 import com.example.promptengineering.dto.MediaDto;
 import com.example.promptengineering.entity.Media;
+import com.example.promptengineering.entity.User;
 import com.example.promptengineering.exception.ResourceNotFoundException;
 import com.example.promptengineering.repository.MediaRepository;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -52,8 +56,10 @@ public class MediaApiController {
         return ResponseEntity.ok(dtos);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMedia(@PathVariable Long id)
+    @DeleteMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> deleteMedia(@PathVariable Long id,
+                                            @RequestBody(required = false) Map<String, Object> dummy,
+                                            @AuthenticationPrincipal User user)
             throws IOException, ResourceNotFoundException {
         Media media = mediaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Media not found"));

@@ -20,42 +20,42 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-  @Autowired
-  private JwtTokenProvider tokenProvider;
+    @Autowired
+    private JwtTokenProvider tokenProvider;
 
-  @Autowired
-  private UserDetailsService userDetailsService;
+    @Autowired
+    private UserDetailsService userDetailsService;
 
-  @Override
-  protected void doFilterInternal(HttpServletRequest request,
-      HttpServletResponse response,
-      FilterChain chain) throws IOException, ServletException {
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
 
-    String token = extractToken(request);
-    if (token != null && tokenProvider.validateToken(token, "full")) {
-      Claims claims = tokenProvider.getClaims(token);
-      String email = claims.get("email", String.class);
-      UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-      Authentication auth = new UsernamePasswordAuthenticationToken(
-          userDetails, null, userDetails.getAuthorities());
-      SecurityContextHolder.getContext().setAuthentication(auth);
-    }
-    chain.doFilter(request, response);
-  }
-
-  private String extractToken(HttpServletRequest request) {
-    String bearer = request.getHeader("Authorization");
-    if (bearer != null && bearer.startsWith("Bearer ")) {
-      return bearer.substring(7);
-    }
-    Cookie[] cookies = request.getCookies();
-    if (cookies != null) {
-      for (Cookie cookie : cookies) {
-        if ("access_token".equals(cookie.getName())) {
-          return cookie.getValue();
+        String token = extractToken(request);
+        if (token != null && tokenProvider.validateToken(token, "full")) {
+            Claims claims = tokenProvider.getClaims(token);
+            String email = claims.get("email", String.class);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+            Authentication auth = new UsernamePasswordAuthenticationToken(userDetails,
+                    null, userDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(auth);
         }
-      }
+        chain.doFilter(request, response);
     }
-    return null;
-  }
+
+    private String extractToken(HttpServletRequest request) {
+        String bearer = request.getHeader("Authorization");
+        if (bearer != null && bearer.startsWith("Bearer ")) {
+            return bearer.substring(7);
+        }
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("full".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
 }

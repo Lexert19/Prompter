@@ -17,6 +17,7 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -116,8 +117,9 @@ public class ProjectController {
                 updatedProject.getName(), files));
     }
 
-    @DeleteMapping("/{projectId}/files/{fileId}")
+    @DeleteMapping(value = "/{projectId}/files/{fileId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> deleteFileFromProject(@AuthenticationPrincipal User user,
+                                                      @RequestBody(required = false) Map<String, Object> dummy,
                                                       @PathVariable Long projectId,
                                                       @PathVariable Long fileId)
             throws IOException {

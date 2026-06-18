@@ -5,10 +5,12 @@ import com.example.promptengineering.dto.MessageDto;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.exception.ResourceNotFoundException;
 import com.example.promptengineering.exception.UserSecurityException;
+import java.util.Map;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -37,8 +39,9 @@ public class HistoryController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ChatDto.fromEntity(chat));
     }
 
-    @DeleteMapping("/chats/{chatUuid}")
+    @DeleteMapping(value = "/chats/{chatUuid}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> deleteChat(@PathVariable UUID chatUuid,
+                                           @RequestBody(required = false) Map<String, Object> dummy,
                                            @AuthenticationPrincipal User user)
             throws ResourceNotFoundException, UserSecurityException {
         historyService.deleteChat(chatUuid, user);
