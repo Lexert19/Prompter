@@ -10,12 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const payload = {
       token: form.dataset.token,
       password: document.getElementById('password').value,
-      password_confirmation: document.getElementById('password_confirmation').value
+      passwordConfirmation: document.getElementById('password_confirmation').value
     };
 
     const alertBox = document.getElementById('alert');
 
-    if (payload.password !== payload.password_confirmation) {
+    if (payload.password !== payload.passwordConfirmation) {
       showError('Passwords do not match');
       btn.disabled = false;
       return;
