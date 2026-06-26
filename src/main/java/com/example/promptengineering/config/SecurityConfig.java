@@ -65,7 +65,7 @@ public class SecurityConfig implements WebMvcConfigurer {
         http.csrf(AbstractHttpConfigurer::disable);
 
         http.authorizeHttpRequests(exchanges -> exchanges
-                .requestMatchers("/", "/{lang:(?:pl|en)}/**", "/public/**", "/chat",
+                .requestMatchers("/", "/{lang:(?:pl|en)}/**", "/public/**",
                         "/login", "/debug", "/error", "/terms", "/privacy", "/static/**",
                         "/auth/**", "/favicon.ico", "/favicon")
                 .permitAll().requestMatchers("/admin/**", "/api/admin/**")
