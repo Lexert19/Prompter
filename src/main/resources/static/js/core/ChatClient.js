@@ -186,10 +186,11 @@ class ChatClient {
     appendReasoningContent(rootNode, content){
         const choice = rootNode.choices?.[0];
         const openAiReasoning = rootNode.choices?.[0]?.delta?.reasoning_content;
+        const otherReasoning = rootNode.choices?.[0]?.delta?.reasoning;
         const geminiReasoning = rootNode.delta?.type === 'thought_summary'
             ? rootNode.delta.content?.text
             : "";
-        let reasoningContent = openAiReasoning || geminiReasoning || "";
+        let reasoningContent = openAiReasoning || geminiReasoning || otherReasoning || "";
         if(!reasoningContent)
                 reasoningContent="";
         if(content == ""){
