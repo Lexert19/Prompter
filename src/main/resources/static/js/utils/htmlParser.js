@@ -32,6 +32,7 @@ class HtmlParser {
         this.lastProcessedLine = 0;
         this.isCodeBlock = false;
         this.isThinkingBlock = false;
+        this._tempBlockId = undefined;
     }
 
     parse(textFragment) {
@@ -53,7 +54,21 @@ class HtmlParser {
             });
         }
 
+        if (this.incompleteLine) {
+            if (this._tempLineIndex !== undefined) {
+                this.lines.splice(this._tempLineIndex, 1);
+                this._tempLineIndex = undefined;
+            }
+            const previousLine = this.lines[this.lines.length - 1] || {text: "", mode: ""};
+            this.lines.push({
+                text: this.incompleteLine,
+                mode: this.getLineMode(previousLine, this.incompleteLine)
+            });
+            this._tempLineIndex = this.lines.length - 1;
+        }
+
         this.updateBlocks();
+
         this.renderChanges();
     }
 
@@ -148,8 +163,9 @@ class HtmlParser {
 //    }
 
     updateBlocks(){
-        const startIdx = this.lastProcessedLine || 0;
-        for(let i = startIdx; i < this.lines.length; i++){
+        this.blocks = [];
+        this.nextBlockId = 0;
+        for(let i = 0; i < this.lines.length; i++){
             const line = this.lines[i];
             let currentBlock = this.blocks[this.blocks.length - 1];
             switch(line.mode){
