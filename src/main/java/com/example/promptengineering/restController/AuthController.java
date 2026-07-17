@@ -24,6 +24,7 @@ import jakarta.validation.Valid;
 import java.time.Duration;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -53,6 +54,9 @@ public class AuthController {
     private final UserService userService;
     private final UserRepository userRepository;
     private final TwoFactorEmailService twoFactorService;
+
+    @Value("${jwt.expiration-ms}")
+    private long jwtExpirationMs;
 
     @Autowired
     public AuthController(AuthService authService, ResetTokenService resetTokenService,
@@ -150,10 +154,10 @@ public class AuthController {
         String refresh = tokenProvider.generateRefreshToken(user);
 
         ResponseCookie accessCookie = ResponseCookie.from("access_token", access)
-                .httpOnly(true).secure(false) // w prod: true
-                .path("/").maxAge(Duration.ofMinutes(15)).sameSite("Lax").build();
+                .httpOnly(true).secure(true)
+                .path("/").maxAge(Duration.ofMillis(jwtExpirationMs)).sameSite("Lax").build();
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refresh)
-                .httpOnly(true).secure(false).path("/").maxAge(Duration.ofDays(7))
+                .httpOnly(true).secure(true).path("/").maxAge(Duration.ofMillis(jwtExpirationMs))
                 .sameSite("Lax").build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
