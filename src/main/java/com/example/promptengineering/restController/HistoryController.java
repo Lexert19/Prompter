@@ -70,7 +70,6 @@ public class HistoryController {
     public ResponseEntity<Page<ChatDto>> getChats(@AuthenticationPrincipal User user,
                                                   @RequestParam(defaultValue = "0") int page,
                                                   @RequestParam(defaultValue = "20") int size) {
-
         Page<Chat> chatPage = historyService.getChatsForUser(user, page, size);
         Page<ChatDto> dtoPage = chatPage.map(ChatDto::fromEntity);
         return ResponseEntity.ok(dtoPage);

@@ -111,38 +111,46 @@ class InputView{
     addPasteListener() {
         this.chatInput.addEventListener("paste", function (event) {
             const pastedText = event.clipboardData.getData("text");
-
             const items = event.clipboardData.items;
-            let hasImage = false;
+            let handledAsFile = false;
 
             for (let i = 0; i < items.length; i++) {
                 const item = items[i];
-
-                if (item.kind === "file" && item.type.startsWith("image/")) {
+                if (item.kind === "file") {
+                    handledAsFile = true;
                     event.preventDefault();
                     const file = item.getAsFile();
-                    const reader = new FileReader();
-                    reader.onload = async function (e) {
-                        const base64 = e.target.result;
-                        try {
-                            const fileId = await History.instance().uploadImageBase64(base64);
-                            InputView.instance().images.push(fileId);
-                        } catch (error) {
-                            console.error("Error sending image:", error);
-                        }
-                        InputView.instance().updateView();
-                    };
-                    reader.readAsDataURL(file);
+                    if (!file) continue;
+
+                    if (file.type.startsWith("image/")) {
+                        const reader = new FileReader();
+                        reader.onload = async (e) => {
+                            try {
+                                const fileId = await History.instance().uploadImageBase64(e.target.result);
+                                InputView.instance().images.push(fileId);
+                            } catch (err) {
+                                console.error("Error sending image:", err);
+                            }
+                            InputView.instance().updateView();
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            InputView.instance().longTexts.push(e.target.result);
+                            InputView.instance().updateView();
+                        };
+                        reader.readAsText(file);
+                    }
                     break;
                 }
             }
 
-            if (!hasImage) {
+            if (!handledAsFile) {
                 if (pastedText.length > 2000) {
                     event.preventDefault();
                     InputView.instance().longTexts.push(pastedText);
                     InputView.instance().updateView();
-                } else {
                 }
             }
 
