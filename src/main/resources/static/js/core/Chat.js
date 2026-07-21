@@ -16,7 +16,7 @@ class Chat {
 
         this.documents = [];
         this.images = [];
-        this.chatView = new ChatView();
+        this.chatView = ChatView.instance();
 
         this.message = document.getElementById("input");
         this.chatMessages = document.getElementById("chatMessages");

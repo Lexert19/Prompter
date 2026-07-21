@@ -128,8 +128,9 @@ h3{
     overflow-y: auto;
     flex-grow: 1;
     display: flex;
-    flex-direction: column-reverse;
+    flex-direction: column;
     scrollbar-width: none;
+    overflow-anchor: none;
     -ms-overflow-style: none;
 }
 
@@ -734,6 +735,7 @@ input[type="number"]::-ms-spin-button {
     max-height: 70px;
     overflow: hidden;
     font-size: 14px;
+    transition: max-height 0.7s ease;
 }
 
 .border-blue{
@@ -741,7 +743,7 @@ input[type="number"]::-ms-spin-button {
 }
 
 .thinking-content.show{
-    max-height: 9999px;
+    max-height: none;
 }
 
 .thinking-content::after {
@@ -1087,4 +1089,21 @@ input[type="number"]::-ms-spin-button {
 
 .node-item-name {
     font-weight: 600;
+}
+
+
+/**/
+
+.chat-messages{
+    overflow-anchor: none;
+}
+.message{
+    overflow-anchor: none;
+}
+.thinking-content{
+    overflow-anchor: none;
+    contain: layout;
+}
+.thinking-content.no-anim{
+    transition: none!important;
 }

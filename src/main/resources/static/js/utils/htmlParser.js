@@ -13,10 +13,18 @@ class HtmlParser {
         this.nextBlockId = 0;
         this.processedLength = 0;
         this.incompleteLine = '';
+        this.collapsedBlocks = new Set();
     }
 
     setRootElement(rootElement){
         this.rootElement = rootElement;
+        this.rootElement.addEventListener("click", (e) => {
+            const btn = e.target.closest("[data-thinking-toggle]");
+            if(!btn) return;
+            const id = Number(btn.dataset.thinkingToggle);
+            const contentEl = btn.closest(".thinking")?.querySelector(".thinking-content");
+            this.toggleThinkingBlock(id, contentEl);
+        });
     }
 
     clear(){
@@ -25,7 +33,7 @@ class HtmlParser {
         this.blocks = [];
         this.blockElements.clear();
         this.previousBlocks = [];
-        this.randomId = Math.floor(Math.random() * 1000000);
+        //this.randomId = Math.floor(Math.random() * 1000000);
         this.nextBlockId = 0;
         this.processedLength = 0;
         this.incompleteLine = '';
@@ -33,6 +41,7 @@ class HtmlParser {
         this.isCodeBlock = false;
         this.isThinkingBlock = false;
         this._tempBlockId = undefined;
+        this.collapsedBlocks.clear();
     }
 
     parse(textFragment) {
@@ -125,42 +134,6 @@ class HtmlParser {
         return "NORMAL";
     }
 
-//    getLineMode(previousLine, line){
-//        const codeBlockDelimiterRegex = /^ *```/;
-//        if(line.startsWith('<think>')){
-//            return "START_THINKING";
-//        }else if (line.startsWith('</think>')) {
-//            return "STOP_THINKING";
-//        }else if(codeBlockDelimiterRegex.test(line) && previousLine.mode != "CODE"){
-//            return "START_CODE";
-//        }else if(codeBlockDelimiterRegex.test(line) && previousLine.mode == "CODE"){
-//            return "STOP_CODE";
-//        }else if(previousLine.mode == "START_THINKING" || previousLine.mode == "THINKING"){
-//            return "THINKING";
-//        }else if(previousLine.mode == "START_CODE" || previousLine.mode == "CODE"){
-//            return "CODE";
-//        }else if(line.startsWith("###") || line.startsWith("##")){
-//            return "HEADER3"
-//        }else if(line.startsWith("**")){
-//            //return "HEADER3"
-//        }else if(line.startsWith("* ") || line.startsWith("- ")){
-//            return "LISTITEM"
-//        }else if(line.startsWith("    *") ){
-//            return "LISTITEM2";
-//        }else if(line.startsWith("        *")){
-//            return "LISTITEM3";
-//        }else if(line.startsWith("---")){
-//            return "LINE";
-//        }else if(line.startsWith("   -")){
-//            return "LISTITEM2DEEPSEEK";
-//        }else if(line.startsWith("     -")){
-//            return "LISTITEM3DEEPSEEK";
-//        }else if(line.startsWith("|")){
-//            return "ROW";
-//        }
-//
-//        return "NORMAL";
-//    }
 
     updateBlocks(){
         this.blocks = [];
@@ -237,7 +210,11 @@ class HtmlParser {
                 withoutHtmlContent = this.escapeHtml(block.content);
                 return `${withoutHtmlContent}`;
             case 'THINKING':
-                return `<div class="thinking"><button class="clear-button p-0 bg-transparent" onclick="collapseThinkingContent(${this.randomId})"><h4>Thinking:</h4></button><p class="thinking-content show" id="thinkingContent-${this.randomId}">${this.escapeHtml(block.content)}</p></div>\n`;
+                const domId = `${this.randomId}-${block.id}`;
+                const isCollapsed = this.collapsedBlocks.has(block.id);
+                const cls = isCollapsed ? "thinking-content" : "thinking-content show";
+                const style = isCollapsed ? ` style="max-height:70px"` : ` style="max-height:none"`;
+                return `<div class="thinking"><button class="clear-button p-0 bg-transparent" data-thinking-toggle="${block.id}"><h4>Thinking:</h4></button><p class="${cls}" id="thinkingContent-${domId}"${style}>${this.escapeHtml(block.content)}</p></div>\n`;
             case 'CODE':
                 const langClass = block.language ? ` class="language-${block.language}"` : '';
                 return `<div class="code-block"><pre><code${langClass}>${this.escapeHtml(block.content)}</code></pre></div>\n`;
@@ -280,6 +257,33 @@ class HtmlParser {
         }
     }
 
+
+    toggleThinkingBlock(blockId, contentElOverride){
+        const domId = `${this.randomId}-${blockId}`;
+        const el = contentElOverride || this.rootElement.querySelector(`#thinkingContent-${domId}`) || document.getElementById(`thinkingContent-${domId}`);
+        if(!el) return;
+        const isCollapsed = this.collapsedBlocks.has(blockId);
+
+        if(isCollapsed){
+            this.collapsedBlocks.delete(blockId);
+            el.classList.add("show");
+            el.style.maxHeight = el.scrollHeight + "px";
+            el.addEventListener("transitionend", (e) => {
+                if(e.propertyName !== "max-height") return;
+                if(this.collapsedBlocks.has(blockId)) return;
+                el.style.maxHeight = "none";
+            }, { once: true });
+        } else {
+            this.collapsedBlocks.add(blockId);
+            if(el.style.maxHeight === "none" || el.style.maxHeight === ""){
+                el.style.maxHeight = el.scrollHeight + "px";
+            }
+            void el.offsetHeight;
+            el.classList.remove("show");
+            el.style.maxHeight = "70px";
+        }
+    }
+
     _removeStaleBlocks(newBlockMap) {
         for (const [id, element] of this.blockElements.entries()) {
             if (!newBlockMap.has(id)) {
@@ -299,6 +303,23 @@ class HtmlParser {
 
     _updateExistingBlock(existingElement, newBlock, oldBlock) {
         if (!oldBlock || oldBlock.content !== newBlock.content || oldBlock.type !== newBlock.type) {
+            if (newBlock.type === 'THINKING') {
+                const contentEl = existingElement.querySelector('.thinking-content');
+                if (contentEl) {
+                    const isCollapsed = this.collapsedBlocks.has(newBlock.id);
+                    contentEl.innerHTML = this.escapeHtml(newBlock.content);
+
+                    if (isCollapsed) {
+                        contentEl.classList.remove("show");
+                        contentEl.style.maxHeight = "70px";
+                    } else {
+                        if (contentEl.style.maxHeight !== "none" && contentEl.style.maxHeight !== "") {
+                            contentEl.style.maxHeight = contentEl.scrollHeight + "px";
+                        }
+                    }
+                    return;
+                }
+            }
             existingElement.innerHTML = this.renderBlockToHtmlString(newBlock);
             if (newBlock.type === 'CODE') {
                 this._highlightCodeBlock(existingElement);
@@ -332,8 +353,42 @@ class HtmlParser {
         return existingElement.nextSibling;
     }
 
+//    renderChanges() {
+//        if (!this.rootElement) return;
+//        const newMap = new Map(this.blocks.map(b => [b.id, b]));
+//        this._removeStaleBlocks(newMap);
+//
+//        let node = this.rootElement.firstChild;
+//        for (let i = 0; i < this.blocks.length; i++) {
+//            const block = this.blocks[i];
+//            const old = this.previousBlocks.find(b => b.id === block.id);
+//            let el = this.blockElements.get(block.id);
+//
+//            if (el && block.closed && old && old.content === block.content) {
+//                node = el.nextSibling;
+//                continue;
+//            }
+//
+//            if (el) {
+//                this._updateExistingBlock(el, block, old);
+//                if (node!== el) this.rootElement.insertBefore(el, node);
+//                node = el.nextSibling;
+//            } else {
+//                el = this._createNewBlockElement(block);
+//                this.rootElement.insertBefore(el, node);
+//                this.blockElements.set(block.id, el);
+//                if (block.type === 'CODE' && block.closed) this._highlightCodeBlock(el);
+//            }
+//        }
+//        this.previousBlocks = this.blocks.map(b => ({...b}));
+//    }
     renderChanges() {
         if (!this.rootElement) return;
+        const chatContainer = document.getElementById('chatMessages') || this.rootElement.closest('.chat-messages');
+        const prevScrollHeight = chatContainer?.scrollHeight || 0;
+        const prevScrollTop = chatContainer?.scrollTop || 0;
+
+
         const newMap = new Map(this.blocks.map(b => [b.id, b]));
         this._removeStaleBlocks(newMap);
 
@@ -347,7 +402,6 @@ class HtmlParser {
                 node = el.nextSibling;
                 continue;
             }
-
             if (el) {
                 this._updateExistingBlock(el, block, old);
                 if (node!== el) this.rootElement.insertBefore(el, node);
@@ -360,6 +414,13 @@ class HtmlParser {
             }
         }
         this.previousBlocks = this.blocks.map(b => ({...b}));
+
+        const shouldScroll = ChatView.instance().shouldAutoScroll;
+        requestAnimationFrame(() => {
+            if (!shouldScroll) {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        });
     }
 
     restoreHighlights(){

@@ -108,9 +108,10 @@ function handleResize() {
 }
 
 
-function collapseThinkingContent(id){
-  document.getElementById("thinkingContent-"+id).classList.toggle("show");
-}
+const chatMessages = document.getElementById('chatMessages');
+let shouldAutoScroll = true;
+
+
 
 
 function base64ToFile(base64String, filename) {

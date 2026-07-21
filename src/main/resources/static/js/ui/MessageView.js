@@ -38,7 +38,7 @@ class MessageView{
             </div>
             `;
 
-        destination.insertAdjacentHTML('afterbegin', htmlMessage);
+        destination.insertAdjacentHTML('beforeend', htmlMessage);
         const messageElement = document.getElementById(this.message.id);
 
         if (finished && this.message.role === 'assistant' && window.hljs) {

@@ -86,6 +86,7 @@ class InputView{
         this.images = [];
         this.longTexts = [];
         this.updateView();
+
     }
 
     updateView(){
