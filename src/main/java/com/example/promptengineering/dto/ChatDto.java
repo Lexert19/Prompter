@@ -1,6 +1,9 @@
 package com.example.promptengineering.dto;
 
 import com.example.promptengineering.entity.Chat;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
+import java.time.Instant;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +17,9 @@ public class ChatDto {
     private UUID uuid;
     private Long userId;
     private String userEmail;
+    @JsonFormat(shape = Shape.NUMBER_INT)
+    private Instant createdAt;
+
 
     public ChatDto() {
     }
@@ -27,6 +33,7 @@ public class ChatDto {
             dto.setUserId(chat.getUser().getId());
             dto.setUserEmail(chat.getUser().getEmail());
         }
+        dto.setCreatedAt(chat.getCreatedAt());
         return dto;
     }
 
