@@ -1107,3 +1107,76 @@ input[type="number"]::-ms-spin-button {
 .thinking-content.no-anim{
     transition: none!important;
 }
+
+
+
+/**/
+
+.slide1-logo {
+    vertical-align: middle;
+    margin-left: 10px;
+    filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.3));
+}
+.slide1-title {
+    margin: 0;
+    font-weight: bold;
+}
+.slide1-title .accent {
+    color: var(--accent);
+}
+.slide1-subtitle {
+    font-size: 0.9rem;
+}
+.slide1-btn {
+    padding: 15px 30px;
+}
+.slide1-btn i {
+    margin-right: 8px;
+}
+.slide2-title {
+    color: var(--accent);
+}
+.slide2-icon {
+    margin-right: 12px;
+    flex-shrink: 0;
+    color: var(--accent);
+}
+.slide2-item h5 {
+    margin-bottom: 2px;
+}
+.slide2-item p {
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 0;
+}
+.github-icon {
+    font-size: 70px;
+    color: var(--accent);
+    filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.3));
+}
+.github-title {
+    margin: 0;
+    font-weight: bold;
+}
+.github-title .accent {
+    color: var(--accent);
+}
+.github-desc {
+    font-size: 0.9rem;
+}
+.github-btn {
+    padding: 12px 30px;
+}
+.github-btn i {
+    margin-right: 8px;
+}
+.content-box .w-100 {
+    width: 100%;
+}
+.p-0 {
+    padding: 0;
+}
+.pt-5 {
+    padding-top: 3rem;
+}
+
+.accent-icon { color: var(--accent); }
