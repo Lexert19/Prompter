@@ -263,6 +263,7 @@ input {
 .button-panel button{
     margin-right: 5px;
     width: 20%;
+    border-radius: 5px;
 }
 
 .pages .active{
