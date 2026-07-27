@@ -7,6 +7,7 @@ import com.example.promptengineering.exception.UserAlreadyExistsException;
 import com.example.promptengineering.exception.UserSecurityException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -115,5 +116,14 @@ public class GlobalExceptionHandler {
         log.error("Unhandled exception", e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("error", "Unexpected error"));
+    }
+
+    @ExceptionHandler(IOException.class)
+    public void handleIOException(IOException ex, HttpServletResponse response) {
+        String msg = ex.getMessage();
+        log.debug("IO error: {}", msg);
+        if (!response.isCommitted()) {
+            response.setStatus(HttpStatus.OK.value());
+        }
     }
 }

@@ -2,6 +2,7 @@ package com.example.promptengineering.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,7 @@ public class HomeController {
         this.localeResolver = localeResolver;
     }
 
+    @Cacheable(value = "homePage", key = "#lang != null ? #lang : 'root'", sync = true)
     @GetMapping({"/{lang:(?:pl|en)}/", "/"})
     public String getHomePage(@PathVariable(required = false) String lang,
                               HttpServletRequest request, HttpServletResponse response) {
