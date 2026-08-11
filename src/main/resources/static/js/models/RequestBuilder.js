@@ -63,7 +63,7 @@ class RequestBuilder {
             ];
         }
 
-        return JSON.stringify({
+        const base = {
             model: this.getModel(),
             url: this.getUrl(),
             provider: this.getProvider(),
@@ -84,7 +84,23 @@ class RequestBuilder {
             }),
             system: this.getSystem(),
             useSharedKeys: Settings.instance().useSharedKeys
-        });
+        }
+
+        if (this.getProvider() === "OPENROUTER") {
+            const settings = Settings.instance();
+            const orderRaw = settings.openRouterProviderOrder;
+            if (orderRaw && orderRaw.trim()) {
+                const orderArray = orderRaw.split(',').map(s => s.trim()).filter(Boolean);
+                if (orderArray.length > 0) {
+                    base.providerConfig = {
+                        order: orderArray,
+                        allow_fallbacks: settings.openRouterAllowFallbacks !== false
+                    };
+                }
+            }
+        }
+
+        return JSON.stringify(base);
     }
 
     mapContent(content) {

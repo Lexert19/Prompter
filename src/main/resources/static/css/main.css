@@ -1181,3 +1181,27 @@ input[type="number"]::-ms-spin-button {
 }
 
 .accent-icon { color: var(--accent); }
+
+
+#openRouterSettingsContainer .form-control {
+    background-color: var(--second-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    font-size: 16px;
+    border-radius: 0.25rem;
+    padding: 8px 16px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+#openRouterSettingsContainer .form-control:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+}
+
+#openRouterSettingsContainer .form-control::placeholder {
+    color: var(--text-muted);
+    opacity: 0.6;
+}

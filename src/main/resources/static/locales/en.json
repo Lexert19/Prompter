@@ -82,5 +82,8 @@
   "nodes.registerFailed": "Nie udało się zarejestrować węzła.",
   "nodes.node": "Node",
   "nodes.selectNode": "Select Node",
-  "nodes.searchNodes": "Search nodes..."
+  "nodes.searchNodes": "Search nodes...",
+  "settings.openRouterProviderOrder.label": "OpenRouter – provider order",
+  "settings.openRouterProviderOrder.placeholder": "e.g. together, lepton, openai",
+  "settings.openRouterAllowFallbacks.label": "Allow fallback to other providers"
 }

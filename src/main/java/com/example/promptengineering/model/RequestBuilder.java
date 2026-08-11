@@ -35,6 +35,9 @@ public class RequestBuilder {
     private Long sharedKeyId;
     private ProviderStrategy providerStrategy;
     private UUID communityNodeId;
+    private Map<String, Object> providerConfig;
+
+
 
     private static final Map<String, Supplier<ProviderStrategy>> STRATEGIES = Map
             .ofEntries(Map.entry("ANTHROPIC", AnthropicStrategy::new),

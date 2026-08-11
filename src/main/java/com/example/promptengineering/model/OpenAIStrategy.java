@@ -62,6 +62,11 @@ public class OpenAIStrategy implements ProviderStrategy {
             request.put("chat_template_kwargs", Map.of("enable_thinking", true));
         }
 
+        if ("OPENROUTER".equalsIgnoreCase(builder.getProvider())
+            && builder.getProviderConfig() != null) {
+            request.put("provider", builder.getProviderConfig());
+        }
+
         return request;
     }
 }

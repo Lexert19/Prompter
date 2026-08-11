@@ -94,4 +94,5 @@
     <button class="node-selector-button my-3 rounded-1 d-flex align-items-center justify-content-between w-100" onclick="HostedNodesView.instance().openNodesListModal()">
         <@spring.message "settings.show_nodes_button" />
     </button>
+    <div id="openRouterSettingsContainer"></div>
 </div>

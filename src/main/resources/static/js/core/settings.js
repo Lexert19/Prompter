@@ -28,6 +28,8 @@ class Settings {
         this.top_p = 0.95;
         this.frequencyPenalty = 0.0;
         this.presencePenalty = 0.0;
+        this.openRouterProviderOrder = "";
+        this.openRouterAllowFallbacks = true;
 
         this.provider = "OPENAI";
         this.url = "https://api.openai.com/v1/chat/completions";
@@ -67,6 +69,8 @@ class Settings {
             useSharedKeys: this.useSharedKeys,
             frequencyPenalty: this.frequencyPenalty,
             presencePenalty: this.presencePenalty,
+            openRouterProviderOrder: this.openRouterProviderOrder,
+            openRouterAllowFallbacks: this.openRouterAllowFallbacks,
         };
         localStorage.setItem("appSettings", JSON.stringify(settingsToSave));
     }
@@ -115,6 +119,12 @@ class Settings {
                 break;
             case "presencePenalty":
                 this.presencePenalty = parseFloat(event.target.value);
+                break;
+            case "openRouterProviderOrder":
+                this.openRouterProviderOrder = event.target.value;
+                break;
+            case "openRouterAllowFallbacks":
+                this.openRouterAllowFallbacks = event.target.checked;
                 break;
         }
 
