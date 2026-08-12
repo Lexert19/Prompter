@@ -42,6 +42,7 @@ public class RequestBuilder {
     private static final Map<String, Supplier<ProviderStrategy>> STRATEGIES = Map
             .ofEntries(Map.entry("ANTHROPIC", AnthropicStrategy::new),
                     Map.entry("GEMINI", GeminiStrategy::new),
+                    Map.entry("OPENROUTER", OpenRouterStrategy::new),
                     Map.entry("OPENAI", OpenAIStrategy::new),
                     Map.entry("NVIDIA", OpenAIStrategy::new));
 

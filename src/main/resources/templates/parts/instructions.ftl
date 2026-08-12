@@ -94,5 +94,22 @@
     <button class="node-selector-button my-3 rounded-1 d-flex align-items-center justify-content-between w-100" onclick="HostedNodesView.instance().openNodesListModal()">
         <@spring.message "settings.show_nodes_button" />
     </button>
-    <div id="openRouterSettingsContainer"></div>
+    <div id="openRouterSettingsContainer">
+        <div class="instruction-field">
+            <label for="openRouterProviderOrder">
+                <@spring.message "settings.openRouterProviderOrder.label" />
+            </label>
+            <input type="text" id="openRouterProviderOrder" name="openRouterProviderOrder"
+                   class="form-control"
+                   data-i18n-placeholder="settings.openRouterProviderOrder.placeholder"
+                   placeholder="<@spring.message 'settings.openRouterProviderOrder.placeholder' />">
+        </div>
+        <div class="instruction-field checkbox-container">
+            <label class="checkbox-container">
+                <input type="checkbox" id="openRouterAllowFallbacks" name="openRouterAllowFallbacks">
+                <label for="openRouterAllowFallbacks" class="custom-checkbox"></label>
+                <span><@spring.message "settings.openRouterAllowFallbacks.label" /></span>
+            </label>
+        </div>
+    </div>
 </div>
