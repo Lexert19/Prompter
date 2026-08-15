@@ -105,6 +105,8 @@ dependencies {
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.13.0")
 
 
+	testImplementation 'io.projectreactor.netty:reactor-netty-http'
+
 	e2eImplementation 'org.seleniumhq.selenium:selenium-java:4.18.1'
 	e2eImplementation 'io.github.bonigarcia:webdrivermanager:5.7.0'
 	e2eImplementation 'org.seleniumhq.selenium:selenium-firefox-driver:4.18.1'
@@ -112,7 +114,9 @@ dependencies {
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+	useJUnitPlatform{
+		excludeTags 'loadtest'
+	}
 	testLogging {
 		showStandardStreams = true
 		exceptionFormat = 'full'

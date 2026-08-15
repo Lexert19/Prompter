@@ -20,7 +20,6 @@ public class ChatDto {
     @JsonFormat(shape = Shape.NUMBER_INT)
     private Instant createdAt;
 
-
     public ChatDto() {
     }
 

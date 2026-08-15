@@ -50,6 +50,21 @@ public class Model {
         this.user = user;
     }
 
+    public Model(String uuid, String name, String text, String provider, String url,
+            boolean global, String type, double pointsPerInput, double pointsPerOutput,
+            User user) {
+        this.uuid = uuid;
+        this.name = name;
+        this.text = text;
+        this.provider = provider;
+        this.url = url;
+        this.global = global;
+        this.type = type;
+        this.pointsPerInput = pointsPerInput;
+        this.pointsPerOutput = pointsPerOutput;
+        this.user = user;
+    }
+
     @PrePersist
     private void ensureUuid() {
         if (this.uuid == null || this.uuid.isEmpty()) {

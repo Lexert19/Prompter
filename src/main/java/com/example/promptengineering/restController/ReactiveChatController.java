@@ -18,11 +18,11 @@ import reactor.core.publisher.Flux;
 
 @RestController
 @RequestMapping("/client")
-public class ClientRestController {
+public class ReactiveChatController {
     private final ChatService chatService;
     private final ObjectMapper objectMapper;
 
-    public ClientRestController(ChatService chatService, ObjectMapper objectMapper) {
+    public ReactiveChatController(ChatService chatService, ObjectMapper objectMapper) {
         this.chatService = chatService;
         this.objectMapper = objectMapper;
     }

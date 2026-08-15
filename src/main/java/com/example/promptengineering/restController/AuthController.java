@@ -154,11 +154,11 @@ public class AuthController {
         String refresh = tokenProvider.generateRefreshToken(user);
 
         ResponseCookie accessCookie = ResponseCookie.from("access_token", access)
-                .httpOnly(true).secure(true)
-                .path("/").maxAge(Duration.ofMillis(jwtExpirationMs)).sameSite("Lax").build();
+                .httpOnly(true).secure(true).path("/")
+                .maxAge(Duration.ofMillis(jwtExpirationMs)).sameSite("Lax").build();
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refresh)
-                .httpOnly(true).secure(true).path("/").maxAge(Duration.ofMillis(jwtExpirationMs))
-                .sameSite("Lax").build();
+                .httpOnly(true).secure(true).path("/")
+                .maxAge(Duration.ofMillis(jwtExpirationMs)).sameSite("Lax").build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());

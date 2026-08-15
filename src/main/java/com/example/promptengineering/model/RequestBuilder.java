@@ -37,8 +37,6 @@ public class RequestBuilder {
     private UUID communityNodeId;
     private Map<String, Object> providerConfig;
 
-
-
     private static final Map<String, Supplier<ProviderStrategy>> STRATEGIES = Map
             .ofEntries(Map.entry("ANTHROPIC", AnthropicStrategy::new),
                     Map.entry("GEMINI", GeminiStrategy::new),

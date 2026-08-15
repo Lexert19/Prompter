@@ -2,6 +2,7 @@ package com.example.promptengineering.repository;
 
 import com.example.promptengineering.entity.Model;
 import com.example.promptengineering.entity.User;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -17,4 +18,7 @@ public interface ModelRepository extends JpaRepository<Model, Long> {
     void deleteByGlobalTrue();
 
     List<Model> findByProviderAndGlobalTrue(String provider);
+
+    Optional<Model> findByUuid(String uuid);
+    Optional<Model> findByProviderAndNameAndGlobalTrue(String provider, String name);
 }

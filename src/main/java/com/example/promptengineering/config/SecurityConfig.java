@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -65,8 +66,8 @@ public class SecurityConfig implements WebMvcConfigurer {
         http.csrf(AbstractHttpConfigurer::disable);
 
         http.authorizeHttpRequests(exchanges -> exchanges
-                .requestMatchers("/", "/{lang:(?:pl|en)}/**", "/public/**",
-                        "/login", "/debug", "/error", "/terms", "/privacy", "/static/**",
+                .requestMatchers("/", "/{lang:(?:pl|en)}/**", "/public/**", "/login",
+                        "/debug", "/error", "/terms", "/privacy", "/static/**",
                         "/auth/**", "/favicon.ico", "/favicon")
                 .permitAll().requestMatchers("/admin/**", "/api/admin/**")
                 .hasAuthority("ROLE_ADMIN").anyRequest().authenticated());
@@ -93,6 +94,14 @@ public class SecurityConfig implements WebMvcConfigurer {
                         new AntPathRequestMatcher("/client/**"))
                 .authenticationEntryPoint(authenticationEntryPoint()));
 
+        return http.build();
+    }
+
+    @Profile("loadtest")
+    @Bean
+    SecurityFilterChain loadtestSecurity(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests(auth -> auth.requestMatchers("/mock-ai/**").permitAll()
+                .anyRequest().authenticated());
         return http.build();
     }
 

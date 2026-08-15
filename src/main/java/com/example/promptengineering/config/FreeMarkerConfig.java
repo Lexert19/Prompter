@@ -1,7 +1,5 @@
 package com.example.promptengineering.config;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,9 +27,7 @@ public class FreeMarkerConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public FreeMarkerConfigurer freeMarkerConfigurer(
-        @Value("${spring.freemarker.settings.template_update_delay:3600}") String delay
-    ) {
+    public FreeMarkerConfigurer freeMarkerConfigurer(@Value("${spring.freemarker.settings.template_update_delay:3600}") String delay) {
         FreeMarkerConfigurer configure = new FreeMarkerConfigurer();
         configure.setTemplateLoaderPath("classpath:/templates");
         configure.setDefaultEncoding("UTF-8");

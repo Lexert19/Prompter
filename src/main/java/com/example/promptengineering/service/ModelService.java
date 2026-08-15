@@ -89,38 +89,48 @@ public class ModelService {
     @Transactional
     public void loadDefaultModelsFromJson() {
         try {
-            modelRepository.deleteByGlobalTrue();
             InputStream is = getClass().getResourceAsStream("/default-models.json");
             List<ModelDto> defaultModels = objectMapper.readValue(is,
                     new TypeReference<>() {
                     });
+            User adminUser = userRepository.findByEmail(adminEmail)
+                    .orElseThrow(() -> new IllegalStateException("Admin user not found"));
 
             for (ModelDto dto : defaultModels) {
-                boolean exists = modelRepository
-                        .existsByProviderAndName(dto.getProvider(), dto.getName());
-                if (!exists) {
-                    Optional<User> user = userRepository.findByEmail(adminEmail);
-                    Model model = new Model();
-                    model.setName(dto.getName());
-                    model.setText(dto.getText());
-                    model.setProvider(dto.getProvider());
-                    model.setUrl(dto.getUrl());
-                    model.setType(dto.getType());
-                    model.setPointsPerInput(dto.getPointsPerInput());
-                    model.setPointsPerOutput(dto.getPointsPerOutput());
+                Optional<Model> existingOpt = modelRepository.findByUuid(dto.getUuid());
+                if (existingOpt.isEmpty()) {
+                    existingOpt = modelRepository.findByProviderAndNameAndGlobalTrue(
+                            dto.getProvider(), dto.getName());
+                }
+
+                if (existingOpt.isPresent()) {
+                    Model model = existingOpt.get();
+                    applyDtoToModel(model, dto);
                     model.setGlobal(true);
-                    model.setUser(user.get());
-                    model.setUuid(dto.getUuid());
+                    modelRepository.save(model);
+                    log.debug("Updated model: {} ({})", dto.getName(), dto.getProvider());
+                } else {
+                    Model model = new Model(dto.getUuid(), dto.getName(), dto.getText(),
+                            dto.getProvider(), dto.getUrl(), true, dto.getType(),
+                            dto.getPointsPerInput(), dto.getPointsPerOutput(), adminUser);
                     modelRepository.save(model);
                     log.info("Added model: {} ({})", dto.getName(), dto.getProvider());
-                } else {
-                    log.debug("Model already exists: {} ({}) – skipping", dto.getName(),
-                            dto.getProvider());
                 }
             }
         } catch (IOException e) {
             log.error("Failed to load default models", e);
         }
+    }
+
+    private void applyDtoToModel(Model model, ModelDto dto) {
+        model.setName(dto.getName());
+        model.setText(dto.getText());
+        model.setProvider(dto.getProvider());
+        model.setUrl(dto.getUrl());
+        model.setType(dto.getType());
+        model.setPointsPerInput(dto.getPointsPerInput());
+        model.setPointsPerOutput(dto.getPointsPerOutput());
+        model.setUuid(dto.getUuid());
     }
 
 }
