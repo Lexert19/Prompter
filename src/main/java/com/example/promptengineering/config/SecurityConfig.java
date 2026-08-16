@@ -6,11 +6,13 @@ import com.example.promptengineering.component.OAuth2JwtSuccessHandler;
 import com.example.promptengineering.filter.JwtAuthenticationFilter;
 import com.example.promptengineering.filter.RateLimitingFilter;
 import com.example.promptengineering.service.CustomOAuth2UserService;
+import jakarta.servlet.DispatcherType;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -23,9 +25,10 @@ import org.springframework.security.web.*;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.CharacterEncodingFilter;
+import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
@@ -66,6 +69,7 @@ public class SecurityConfig implements WebMvcConfigurer {
         http.csrf(AbstractHttpConfigurer::disable);
 
         http.authorizeHttpRequests(exchanges -> exchanges
+            .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.ERROR).permitAll()
                 .requestMatchers("/", "/{lang:(?:pl|en)}/**", "/public/**", "/login",
                         "/debug", "/error", "/terms", "/privacy", "/static/**",
                         "/auth/**", "/favicon.ico", "/favicon")
@@ -82,17 +86,21 @@ public class SecurityConfig implements WebMvcConfigurer {
                     response.sendRedirect("/auth/login?error=true");
                 }));
 
-        http.exceptionHandling(exception -> exception
-                .defaultAuthenticationEntryPointFor(
-                        new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
-                        new AntPathRequestMatcher("/api/**"))
-                .defaultAuthenticationEntryPointFor(
-                        new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
-                        new AntPathRequestMatcher("/account/**"))
-                .defaultAuthenticationEntryPointFor(
-                        new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
-                        new AntPathRequestMatcher("/client/**"))
-                .authenticationEntryPoint(authenticationEntryPoint()));
+        http.exceptionHandling(
+                exception -> exception
+                        .defaultAuthenticationEntryPointFor(
+                                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
+                                PathPatternRequestMatcher.withDefaults()
+                                        .matcher("/api/**"))
+                        .defaultAuthenticationEntryPointFor(
+                                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
+                                PathPatternRequestMatcher.withDefaults()
+                                        .matcher("/account/**"))
+                        .defaultAuthenticationEntryPointFor(
+                                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
+                                PathPatternRequestMatcher.withDefaults()
+                                        .matcher("/client/**"))
+                        .authenticationEntryPoint(authenticationEntryPoint()));
 
         return http.build();
     }
@@ -138,5 +146,14 @@ public class SecurityConfig implements WebMvcConfigurer {
     @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
         return new CustomAuthenticationEntryPoint("/auth/login");
+    }
+
+    @Override
+    public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
+        SimpleAsyncTaskExecutor executor = new SimpleAsyncTaskExecutor("mvc-async-");
+        executor.setVirtualThreads(true);
+
+        configurer.setTaskExecutor(executor);
+        configurer.setDefaultTimeout(300_000);
     }
 }

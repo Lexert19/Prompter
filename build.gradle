@@ -1,6 +1,6 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.3.13'
+	id 'org.springframework.boot' version '4.1.0'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id "com.diffplug.spotless" version "6.25.0"
 }
@@ -10,7 +10,7 @@ version = '0.0.1-SNAPSHOT'
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
+		languageVersion = JavaLanguageVersion.of(25)
 	}
 }
 
@@ -43,7 +43,7 @@ sourceSets {
 	}
 }
 
-task e2eTest(type: Test) {
+tasks.register('e2eTest', Test) {
 	description = 'end-to-end tests (Selenium).'
 	group = 'verification'
 	testClassesDirs = sourceSets.e2e.output.classesDirs
@@ -64,6 +64,8 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-restclient'
+	implementation 'org.springframework.boot:spring-boot-starter-webclient'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation('org.springframework.boot:spring-boot-starter-webflux') {
 		exclude group: 'io.projectreactor.netty'
@@ -83,7 +85,7 @@ dependencies {
 
 	implementation group: 'dev.langchain4j', name: 'langchain4j-spring-boot-starter', version: '1.0.0-beta1'
 
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-freemarker', version: '3.3.4'
+	implementation 'org.springframework.boot:spring-boot-starter-freemarker'
 
 	implementation "io.projectreactor:reactor-core"
 
@@ -127,7 +129,7 @@ tasks.named('test') {
 bootRun {
     sourceResources sourceSets.main
 	jvmArgs = [
-			"-XX:TieredStopAtLevel=1",
         "-Djdk.tls.client.protocols=TLSv1.2",
+		"--enable-native-access=ALL-UNNAMED",
     ]
 }	
