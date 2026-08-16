@@ -25,7 +25,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/history")
 public class HistoryController {
-    @Autowired
     private final HistoryService historyService;
 
     public HistoryController(HistoryService historyService) {
@@ -39,9 +38,8 @@ public class HistoryController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ChatDto.fromEntity(chat));
     }
 
-    @DeleteMapping(value = "/chats/{chatUuid}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/chats/{chatUuid}")
     public ResponseEntity<Void> deleteChat(@PathVariable UUID chatUuid,
-                                           @RequestBody(required = false) Map<String, Object> dummy,
                                            @AuthenticationPrincipal User user)
             throws ResourceNotFoundException, UserSecurityException {
         historyService.deleteChat(chatUuid, user);

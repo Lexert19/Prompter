@@ -102,17 +102,6 @@ public class ChatServiceIntegrationTest {
         }, latch::countDown);
 
         boolean completed = latch.await(60, TimeUnit.SECONDS);
-        // assertThat(completed).isTrue();
-        // assertThat(error.get()).isNull();
-        // assertThat(lastData.get()).isNotNull().contains("Gemini");
-        //
-        // Thread.sleep(5000);
-        // User refreshedOwner = userRepository.findById(owner.getId()).orElseThrow();
-        // SharedKey refreshedKey =
-        // sharedKeyRepository.findById(geminiSharedKey.getId()).orElseThrow();
-        //
-        // assertThat(refreshedOwner.getPoints()).isGreaterThan(initialPoints);
-        // assertThat(refreshedKey.getUsageCount()).isEqualTo(initialUsage + 1);
     }
 
     @Test

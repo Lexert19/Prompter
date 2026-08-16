@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
 @Configuration
-@EnableSpringDataWebSupport(pageSerializationMode = EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO)
 public class JacksonConfig {
 
     @Bean

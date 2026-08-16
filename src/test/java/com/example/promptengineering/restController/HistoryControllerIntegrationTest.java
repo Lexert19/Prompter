@@ -64,6 +64,9 @@ public class HistoryControllerIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private jakarta.persistence.EntityManager entityManager;
+
     private User user1;
     private User user2;
     private final String user1Email = "user1@example.com";
@@ -122,10 +125,10 @@ public class HistoryControllerIntegrationTest {
         chatRepository.save(chat3);
 
         mockMvc.perform(get("/api/history/chats").with(asUser1()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalElements").value(greaterThanOrEqualTo(2)))
-                .andExpect(jsonPath("$.content[*].uuid", hasItems(
-                        chat1.getUuid().toString(), chat2.getUuid().toString())));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.totalElements").value(2))
+            .andExpect(jsonPath("$.content[*].uuid", hasItems(
+                chat1.getUuid().toString(), chat2.getUuid().toString())));
     }
 
     @Test
@@ -197,8 +200,14 @@ public class HistoryControllerIntegrationTest {
         msg.setCreatedAt(Instant.now());
         messageRepository.save(msg);
 
-        mockMvc.perform(delete("/api/history/chats/{chatId}", chat.getUuid()).with(csrf())
-                .with(asUser1())).andExpect(status().isNoContent());
+        entityManager.flush();
+        entityManager.clear();
+
+        mockMvc.perform(delete("/api/history/chats/{chatId}", chat.getUuid())
+                .with(asUser1()))
+            .andExpect(status().isNoContent());
+
+
 
         Optional<Chat> deletedChat = chatRepository.findById(chat.getId());
         assertThat(deletedChat).isEmpty();

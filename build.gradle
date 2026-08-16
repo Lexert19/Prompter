@@ -81,6 +81,7 @@ dependencies {
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	implementation group: 'dev.langchain4j', name: 'langchain4j-spring-boot-starter', version: '1.0.0-beta1'

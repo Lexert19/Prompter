@@ -6,9 +6,9 @@ import com.example.promptengineering.service.TwoFactorEmailService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -32,7 +32,7 @@ class TwoFactorAuthControllerIntegrationTest {
     @Autowired
     private UserRepository userRepository;
 
-    @MockBean
+    @MockitoBean
     private TwoFactorEmailService twoFactorEmailService;
 
     private User testUser;
