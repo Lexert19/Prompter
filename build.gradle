@@ -107,6 +107,8 @@ dependencies {
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.13.0")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.13.0")
 
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
 
 	testImplementation 'io.projectreactor.netty:reactor-netty-http'
 
@@ -127,10 +129,57 @@ tasks.named('test') {
 	}
 }
 
+tasks.register('loadTest', Test) {
+	description = 'Runs load tests.'
+	group = 'verification'
+	testClassesDirs = sourceSets.test.output.classesDirs
+	classpath = sourceSets.test.runtimeClasspath
+
+	outputs.upToDateWhen { false }
+
+	useJUnitPlatform {
+		includeTags 'loadtest'
+	}
+
+	testLogging {
+		showStandardStreams = true
+		exceptionFormat = 'full'
+		events "passed", "skipped", "failed"
+	}
+}
+
+def commonJvmArgs = [
+		"-Djdk.tls.client.protocols=TLSv1.2",
+		"--enable-native-access=ALL-UNNAMED"
+]
+
+tasks.register('bootRunRecord', org.springframework.boot.gradle.tasks.run.BootRun) {
+	mainClass = bootRun.mainClass
+	classpath = bootRun.classpath
+
+	def cacheDir = file("${project.layout.buildDirectory.get().asFile}")
+	cacheDir.mkdirs()
+
+	jvmArgs = commonJvmArgs + [
+			"-XX:AOTCacheOutput=${projectDir}/build/jit-cache.aot"
+	]
+	doFirst {
+		println "Recording AOT profile. Simulate production traffic, then stop the app (Ctrl+C) to save the cache."
+	}
+}
+
 bootRun {
-    sourceResources sourceSets.main
-	jvmArgs = [
-        "-Djdk.tls.client.protocols=TLSv1.2",
-		"--enable-native-access=ALL-UNNAMED",
-    ]
-}	
+	sourceResources sourceSets.main
+	def cacheFile = file("${projectDir}/build/jit-cache.aot")
+
+	jvmArgs = commonJvmArgs + [
+			"-XX:AOTCache=${cacheFile.absolutePath}"
+	]
+	doFirst {
+		if (!cacheFile.exists()) {
+			println "WARNING: JIT cache not found at ${cacheFile.absolutePath}. Run 'gradlew bootRunRecord' first to generate it."
+		} else {
+			println "Using existing AOT cache: ${cacheFile.absolutePath}"
+		}
+	}
+}
