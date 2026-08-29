@@ -28,26 +28,33 @@ public class GeminiStrategy implements ProviderStrategy {
     @Override
     public Map<String, Object> buildRequest(RequestBuilder builder) {
         Map<String, Object> request = new HashMap<>();
+
         applySystemPrompt(request, builder.getMessages(), builder.getSystem());
 
-        List<Map<String, Object>> input = new ArrayList<>();
+        List<Map<String, Object>> steps = new ArrayList<>();
         for (Message message : builder.getMessages()) {
+            String stepType = message.getRole().equalsIgnoreCase("assistant")
+                ? "model_output"
+                : "user_input";
+
             List<Map<String, Object>> contentParts = new ArrayList<>();
             for (Content content : message.getContent()) {
                 contentParts.add(content.toMap(this, message.isCached()));
             }
 
-            if (contentParts.isEmpty()) {
-                contentParts.add(Map.of("type", "text", "text", " "));
+            Map<String, Object> step = new HashMap<>();
+            step.put("type", stepType);
+            if (contentParts.size() == 1) {
+                step.put("content", contentParts.get(0));
+            } else {
+                step.put("content", contentParts);
             }
-
-            String role = message.getRole().equalsIgnoreCase("assistant")
-                    ? "model"
-                    : message.getRole();
-
-            input.add(Map.of("role", role, "content", contentParts));
+            steps.add(step);
         }
-        request.put("input", input);
+
+        request.put("input", steps);
+
+        request.put("store", false);
 
         Map<String, Object> genConfig = new HashMap<>();
         genConfig.put("temperature", builder.getTemperature());
@@ -61,8 +68,6 @@ public class GeminiStrategy implements ProviderStrategy {
         request.put("generation_config", genConfig);
         request.put("model", builder.getModel());
         request.put("stream", builder.getStream());
-
-        // request.put("tools", List.of(Map.of("type", "google_search")));
 
         return request;
     }
