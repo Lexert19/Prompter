@@ -1,5 +1,6 @@
 package com.example.promptengineering.entity;
 
+import com.example.promptengineering.model.Strategy;
 import jakarta.persistence.*;
 import java.util.UUID;
 import lombok.Getter;
@@ -23,6 +24,10 @@ public class Model {
     private String text;
 
     private String provider;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "provider_strategy", nullable = true)
+    private Strategy providerStrategy = Strategy.OPENAI;
 
     private String url;
 
@@ -51,8 +56,8 @@ public class Model {
     }
 
     public Model(String uuid, String name, String text, String provider, String url,
-            boolean global, String type, double pointsPerInput, double pointsPerOutput,
-            User user) {
+        boolean global, String type, double pointsPerInput, double pointsPerOutput,
+        User user, Strategy providerStrategy) {
         this.uuid = uuid;
         this.name = name;
         this.text = text;
@@ -63,6 +68,7 @@ public class Model {
         this.pointsPerInput = pointsPerInput;
         this.pointsPerOutput = pointsPerOutput;
         this.user = user;
+        this.providerStrategy = providerStrategy != null ? providerStrategy : Strategy.fromString(provider);
     }
 
     @PrePersist

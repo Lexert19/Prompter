@@ -52,6 +52,8 @@ class RequestBuilder {
         return Settings.instance().key;
     }
 
+    getProviderStrategy() { return Settings.instance().providerStrategy || this.getProvider(); }
+
     toRequestJSON() {
         let messagesToInclude;
         if (Settings.instance().memory) {
@@ -67,6 +69,7 @@ class RequestBuilder {
             model: this.getModel(),
             url: this.getUrl(),
             provider: this.getProvider(),
+            providerStrategy: this.getProviderStrategy(),
             messages: messagesToInclude.map((message) => ({
                 role: message.role,
                 content: message.buildContent()

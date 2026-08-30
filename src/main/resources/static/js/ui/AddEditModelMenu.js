@@ -15,6 +15,14 @@ class AddEditModelMenu {
         AddEditModelMenu._instance = this;
     }
 
+    providerStrategyOptions(selected = '') {
+        const strategies = ['OPENAI','ANTHROPIC','GEMINI','OPENROUTER','NVIDIA'];
+        return strategies.map(s =>
+        `<option value="${s}" ${s === selected ? 'selected' : ''}>${s}</option>`
+        ).join('');
+    }
+
+
     showAddMenu() {
         const html = `
             <form class="d-flex flex-column" id="modelForm">
@@ -25,6 +33,10 @@ class AddEditModelMenu {
                 <label>${t.t("provider")}</label>
                 <select name="provider" id="modelProvider" class="mb-05" required>
                     ${this.providerOptions()}
+                </select>
+                 <label>${t.t("providerStrategy")}</label>
+                <select name="providerStrategy" id="modelProviderStrategy">
+                    ${this.providerStrategyOptions()}
                 </select>
                 <label>${t.t("url")}</label>
                 <input name="url" id="modelUrl" class="mb-05" required>
@@ -50,6 +62,10 @@ class AddEditModelMenu {
                 <label>${t.t("provider")}</label>
                 <select name="provider" id="modelProvider" class="mb-05" required>
                     ${this.providerOptions(model.provider)}
+                </select>
+                <label>${t.t("providerStrategy")}</label>
+                <select name="providerStrategy" id="modelProviderStrategy" class="mb-05" required>
+                    ${this.providerStrategyOptions(model.providerStrategy || model.provider)}
                 </select>
                 <label>${t.t("url")}</label>
                 <input name="url" id="modelUrl" value="${model.url || ''}" class="mb-05" required>
@@ -78,6 +94,7 @@ class AddEditModelMenu {
             name: formData.get('name'),
             text: formData.get('text'),
             provider: formData.get('provider'),
+            providerStrategy: formData.get('providerStrategy'),
             url: formData.get('url'),
             type: formData.get('type')
         };
@@ -100,6 +117,7 @@ class AddEditModelMenu {
             name: formData.get('name'),
             text: formData.get('text'),
             provider: formData.get('provider'),
+            providerStrategy: formData.get('providerStrategy'),
             url: formData.get('url'),
             type: formData.get('type')
         };

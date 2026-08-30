@@ -3,6 +3,7 @@ package com.example.promptengineering.restController;
 import com.example.promptengineering.dto.ModelDto;
 import com.example.promptengineering.entity.Model;
 import com.example.promptengineering.entity.User;
+import com.example.promptengineering.model.Strategy;
 import com.example.promptengineering.repository.ModelRepository;
 import com.example.promptengineering.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -59,6 +60,7 @@ public class ModelControllerIntegrationTest {
         userModel = new Model();
         userModel.setName("My Model");
         userModel.setProvider("OPENAI");
+        userModel.setProviderStrategy(Strategy.OPENAI);
         userModel.setUser(testUser);
         userModel.setGlobal(false);
         userModel = modelRepository.save(userModel);
@@ -66,6 +68,7 @@ public class ModelControllerIntegrationTest {
         globalModel = new Model();
         globalModel.setName("Global Model");
         globalModel.setProvider("ANTHROPIC");
+        globalModel.setProviderStrategy(Strategy.ANTHROPIC);
         globalModel.setUser(null);
         globalModel.setGlobal(true);
         globalModel = modelRepository.save(globalModel);
@@ -97,6 +100,7 @@ public class ModelControllerIntegrationTest {
         ModelDto newModel = new ModelDto();
         newModel.setName("New Model");
         newModel.setProvider("OPENAI");
+        newModel.setProviderStrategy("OPENAI");
         newModel.setType("text");
 
         mockMvc.perform(post("/api/models/user-models").with(user(testUser)).with(csrf())
@@ -113,6 +117,7 @@ public class ModelControllerIntegrationTest {
         ModelDto editDto = new ModelDto();
         editDto.setName("Updated Name");
         editDto.setProvider("ANTHROPIC");
+        editDto.setProviderStrategy("ANTHROPIC");
 
         mockMvc.perform(put("/api/models/user-models/{id}", userModel.getId())
                 .with(csrf()).with(user(testUser)).contentType(MediaType.APPLICATION_JSON)

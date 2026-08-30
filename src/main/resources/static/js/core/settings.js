@@ -32,6 +32,7 @@ class Settings {
         this.openRouterAllowFallbacks = true;
 
         this.provider = "OPENAI";
+        this.providerStrategy = "OPENAI";
         this.url = "https://api.openai.com/v1/chat/completions";
         this.model = "gpt-4o-mini";
         this.type = "";
@@ -56,6 +57,7 @@ class Settings {
             maxTokens: this.maxTokens,
             temperature: this.temperature,
             provider: this.provider,
+            providerStrategy: this.providerStrategy,
             url: this.url,
             model: this.model,
             type: this.type,
@@ -138,9 +140,9 @@ class Settings {
         if (selectedModel) {
             Settings.instance().model = selectedModel.name;
             Settings.instance().provider = selectedModel.provider;
+            Settings.instance().providerStrategy = selectedModel.providerStrategy || selectedModel.provider;
             Settings.instance().url = selectedModel.url;
             Settings.instance().type = selectedModel.type;
-
             Settings.instance().key = Settings.instance().keys[selectedModel.provider];
         }
         this.save();
@@ -165,6 +167,7 @@ class Settings {
                 name: model.name,
                 text: model.text || model.name,
                 provider: model.provider,
+                providerStrategy: model.providerStrategy || model.provider,
                 url: model.url,
                 type: model.type
             }))];

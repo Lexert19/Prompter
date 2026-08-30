@@ -4,6 +4,7 @@ import com.example.promptengineering.dto.ModelDto;
 import com.example.promptengineering.entity.Model;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.exception.ResourceNotFoundException;
+import com.example.promptengineering.model.Strategy;
 import com.example.promptengineering.repository.ModelRepository;
 import com.example.promptengineering.repository.UserRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -61,6 +62,7 @@ public class ModelService {
         Model model = new Model(modelDto.getName(), modelDto.getText(),
                 modelDto.getProvider(), modelDto.getUrl(), modelDto.getType(), user);
         model.setGlobal(false);
+        model.setProviderStrategy(Strategy.fromString(modelDto.getProviderStrategy()));
         modelRepository.save(model);
         return userRepository.save(user);
     }
@@ -113,7 +115,9 @@ public class ModelService {
                 } else {
                     Model model = new Model(dto.getUuid(), dto.getName(), dto.getText(),
                             dto.getProvider(), dto.getUrl(), true, dto.getType(),
-                            dto.getPointsPerInput(), dto.getPointsPerOutput(), adminUser);
+                            dto.getPointsPerInput(), dto.getPointsPerOutput(), adminUser,Strategy.fromString(
+                        dto.getProviderStrategy() != null ? dto.getProviderStrategy() : dto.getProvider()
+                    ));
                     modelRepository.save(model);
                     log.info("Added model: {} ({})", dto.getName(), dto.getProvider());
                 }
@@ -127,6 +131,7 @@ public class ModelService {
         model.setName(dto.getName());
         model.setText(dto.getText());
         model.setProvider(dto.getProvider());
+        model.setProviderStrategy(Strategy.fromString(dto.getProviderStrategy()));
         model.setUrl(dto.getUrl());
         model.setType(dto.getType());
         model.setPointsPerInput(dto.getPointsPerInput());

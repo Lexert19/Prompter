@@ -2,6 +2,9 @@ package com.example.promptengineering.service;
 
 import com.example.promptengineering.component.NodeTunnelRegistry;
 import com.example.promptengineering.entity.HostedNode;
+import com.example.promptengineering.model.AnthropicStrategy;
+import com.example.promptengineering.model.GeminiStrategy;
+import com.example.promptengineering.model.ProviderStrategy;
 import com.example.promptengineering.repository.HostedNodeRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
@@ -142,16 +145,15 @@ public class ChatService {
 
     private WebClient.RequestBodySpec buildHttpRequest(RequestBuilder request,
                                                        String json) {
-        String finalUrl = request.getUrl();
-
         WebClient.RequestBodySpec spec = (WebClient.RequestBodySpec) webClient.post()
-                .uri(finalUrl).contentType(MediaType.APPLICATION_JSON).bodyValue(json);
+            .uri(request.getUrl()).contentType(MediaType.APPLICATION_JSON).bodyValue(json);
 
-        if ("ANTHROPIC".equalsIgnoreCase(request.getProvider())) {
+        ProviderStrategy strat = request.getProviderStrategy();
+        if (strat instanceof AnthropicStrategy) {
             spec.header("x-api-key", request.getKey())
                     .header("anthropic-version", "2023-06-01")
                     .header("anthropic-beta", "prompt-caching-2024-07-31");
-        } else if ("GEMINI".equalsIgnoreCase(request.getProvider())) {
+        } else if (strat instanceof GeminiStrategy) {
             spec.header("x-goog-api-key", request.getKey());
         } else {
             spec.header("Authorization", "Bearer " + request.getKey());

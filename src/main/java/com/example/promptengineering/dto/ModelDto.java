@@ -17,6 +17,7 @@ public class ModelDto {
     private String name;
     private String text;
     private String provider;
+    private String providerStrategy;
     private String url;
     private String type;
     private double pointsPerInput;
@@ -42,6 +43,7 @@ public class ModelDto {
         dto.setName(model.getName());
         dto.setText(model.getText());
         dto.setProvider(model.getProvider());
+        dto.setProviderStrategy(model.getProviderStrategy() != null ? model.getProviderStrategy().name() : "OPENAI");
         dto.setUrl(model.getUrl());
         dto.setType(model.getType());
         dto.setPointsPerInput(model.getPointsPerInput());

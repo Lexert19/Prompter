@@ -1,5 +1,7 @@
 package com.example.promptengineering.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.UUID;
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
@@ -22,7 +24,10 @@ public class RequestBuilder {
     private Boolean stream = true;
     private Double temperature = 0.0;
     private String key;
+    @JsonProperty("provider")
     private String provider;
+    @JsonProperty("providerStrategy")
+    private Strategy compatibility = Strategy.OPENAI;
     private String url;
     private Double top_p = 0.95;
     private double frequencyPenalty = 0.0;
@@ -33,21 +38,30 @@ public class RequestBuilder {
     private String system = "";
     private boolean useSharedKeys = false;
     private Long sharedKeyId;
+    @JsonIgnore
     private ProviderStrategy providerStrategy;
     private UUID communityNodeId;
     private Map<String, Object> providerConfig;
 
-    private static final Map<String, Supplier<ProviderStrategy>> STRATEGIES = Map
-            .ofEntries(Map.entry("ANTHROPIC", AnthropicStrategy::new),
-                    Map.entry("GEMINI", GeminiStrategy::new),
-                    Map.entry("OPENROUTER", OpenRouterStrategy::new),
-                    Map.entry("OPENAI", OpenAIStrategy::new),
-                    Map.entry("NVIDIA", OpenAIStrategy::new));
+    private static final Map<Strategy, Supplier<ProviderStrategy>> STRATEGIES = Map.of(
+        Strategy.ANTHROPIC, AnthropicStrategy::new,
+        Strategy.GEMINI, GeminiStrategy::new,
+        Strategy.OPENROUTER, OpenRouterStrategy::new,
+        Strategy.OPENAI, OpenAIStrategy::new,
+        Strategy.NVIDIA, OpenAIStrategy::new,
+        Strategy.DEFAULT, OpenAIStrategy::new
+    );
+
+    public Map<String, Object> build() {
+        return getProviderStrategy().buildRequest(this);
+    }
 
     public void setProvider(String providerName) {
         this.provider = providerName.toUpperCase();
-        this.providerStrategy = STRATEGIES
-                .getOrDefault(this.provider, OpenAIStrategy::new).get();
+        if (this.providerStrategy == null) {
+            this.compatibility = Strategy.fromString(providerName);
+            this.providerStrategy = STRATEGIES.getOrDefault(this.compatibility, OpenAIStrategy::new).get();
+        }
     }
 
     public RequestBuilder communityNode(UUID nodeId) {
@@ -55,12 +69,11 @@ public class RequestBuilder {
         return this;
     }
 
-    public ProviderStrategy getProviderStrategy() {
-        if (providerStrategy == null) {
-            this.setProvider(this.provider);
-        }
-        return providerStrategy;
+    public void setProviderStrategy(String strategyName) {
+        this.compatibility = Strategy.fromString(strategyName);
+        this.providerStrategy = STRATEGIES.getOrDefault(this.compatibility, OpenAIStrategy::new).get();
     }
+
 
     public RequestBuilder model(String model) {
         this.model = model;
@@ -87,8 +100,12 @@ public class RequestBuilder {
         return this;
     }
 
-    public Map<String, Object> build() {
-        return getProviderStrategy().buildRequest(this);
+    public ProviderStrategy getProviderStrategy() {
+        if (providerStrategy == null) {
+            Strategy type = compatibility != null ? compatibility : Strategy.fromString(provider);
+            providerStrategy = STRATEGIES.getOrDefault(type, OpenAIStrategy::new).get();
+        }
+        return providerStrategy;
     }
 
     public int estimateTokenCount() {

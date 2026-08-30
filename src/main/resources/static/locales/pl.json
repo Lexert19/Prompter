@@ -85,5 +85,6 @@
   "nodes.searchNodes": "Szukaj węzła...",
   "settings.openRouterProviderOrder.label": "OpenRouter – kolejność dostawców",
   "settings.openRouterProviderOrder.placeholder": "np. together, lepton, openai",
-  "settings.openRouterAllowFallbacks.label": "Zezwalaj na fallback do innych dostawców"
+  "settings.openRouterAllowFallbacks.label": "Zezwalaj na fallback do innych dostawców",
+  "providerStrategy": "Kompatybilność API"
 }
