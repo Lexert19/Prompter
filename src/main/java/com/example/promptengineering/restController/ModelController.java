@@ -39,7 +39,7 @@ public class ModelController {
         Optional<Model> model = modelService.getModel(id);
         if (model.isPresent() && model.get().getUser().getId().equals(user.getId())) {
             modelService.editUserModel(model.orElse(null), modelDto);
-            return ResponseEntity.ok("Mode  l updated successfully");
+            return ResponseEntity.ok("Model updated successfully");
         } else {
             return ResponseEntity.notFound().build();
         }

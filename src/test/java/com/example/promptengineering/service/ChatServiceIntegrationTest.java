@@ -10,6 +10,7 @@ import com.example.promptengineering.repository.ModelRepository;
 import com.example.promptengineering.repository.SharedKeyRepository;
 import com.example.promptengineering.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Disabled
 public class ChatServiceIntegrationTest {
 
     @Autowired

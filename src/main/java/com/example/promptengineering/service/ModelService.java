@@ -65,6 +65,7 @@ public class ModelService {
         return userRepository.save(user);
     }
 
+    @Transactional
     public void deleteUserModel(Long id, User user) throws ResourceNotFoundException {
         Optional<Model> model = this.getModel(id);
         if (model.isPresent() && model.get().getUser().equals(user)) {
