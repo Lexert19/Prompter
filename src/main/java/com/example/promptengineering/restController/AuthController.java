@@ -11,8 +11,11 @@ import com.example.promptengineering.entity.User;
 import com.example.promptengineering.exception.TokenValidationException;
 import com.example.promptengineering.exception.UserAlreadyExistsException;
 import com.example.promptengineering.exception.UserNotFoundException;
+import com.example.promptengineering.model.ActionType;
+import com.example.promptengineering.model.ResultType;
 import com.example.promptengineering.repository.UserRepository;
 import com.example.promptengineering.security.IpRateLimiter;
+import com.example.promptengineering.service.AuditLogService;
 import com.example.promptengineering.service.AuthService;
 import com.example.promptengineering.service.ResetTokenService;
 import com.example.promptengineering.service.TwoFactorEmailService;
@@ -54,6 +57,7 @@ public class AuthController {
     private final UserService userService;
     private final UserRepository userRepository;
     private final TwoFactorEmailService twoFactorService;
+    private final AuditLogService auditLogService;
 
     @Value("${jwt.expiration-ms}")
     private long jwtExpirationMs;
@@ -63,7 +67,7 @@ public class AuthController {
             IpRateLimiter rateLimiter, EmailRateLimiter emailRateLimiter,
             AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider,
             UserService userService, UserRepository userRepository,
-            TwoFactorEmailService twoFactorService) {
+            TwoFactorEmailService twoFactorService, AuditLogService auditLogService) {
         this.resetTokenService = resetTokenService;
         this.rateLimiter = rateLimiter;
         this.emailRateLimiter = emailRateLimiter;
@@ -72,6 +76,7 @@ public class AuthController {
         this.userService = userService;
         this.userRepository = userRepository;
         this.twoFactorService = twoFactorService;
+      this.auditLogService = auditLogService;
     }
 
     @PostMapping("/register")
@@ -89,6 +94,19 @@ public class AuthController {
                     new UsernamePasswordAuthenticationToken(request.getEmail(),
                             request.getPassword()));
             User user = (User) authentication.getPrincipal();
+
+            auditLogService.logAsync(
+                auditLogService.createAuditLog(
+                    user.getId(),
+                    user.getEmail(),
+                    ActionType.LOGIN_SUCCESS,
+                    ResultType.SUCCESS,
+                    null,
+                    null,
+                    null
+                )
+            );
+
             boolean hasApiKeys = user.getEncryptedKeys() != null
                     && !user.getEncryptedKeys().isEmpty();
 

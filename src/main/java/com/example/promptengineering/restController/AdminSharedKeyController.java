@@ -2,7 +2,12 @@ package com.example.promptengineering.restController;
 
 import com.example.promptengineering.dto.SharedKeyDto;
 import com.example.promptengineering.dto.SharedKeyInfoDto;
+import com.example.promptengineering.entity.AuditLog;
+import com.example.promptengineering.entity.SharedKey;
 import com.example.promptengineering.entity.User;
+import com.example.promptengineering.model.ActionType;
+import com.example.promptengineering.model.ResultType;
+import com.example.promptengineering.service.AuditLogService;
 import com.example.promptengineering.service.SharedKeyService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,16 +21,26 @@ import java.util.Map;
 @RequestMapping("/api/admin/shared-keys")
 public class AdminSharedKeyController {
     private final SharedKeyService sharedKeyService;
+    private final AuditLogService auditLogService;
 
-    public AdminSharedKeyController(SharedKeyService sharedKeyService) {
+    public AdminSharedKeyController(SharedKeyService sharedKeyService,
+        AuditLogService auditLogService) {
         this.sharedKeyService = sharedKeyService;
+      this.auditLogService = auditLogService;
     }
 
     @PostMapping
-    public ResponseEntity<Map<String, String>> addSharedKey(@RequestBody SharedKeyDto dto,
+    public ResponseEntity<Map<String, Object>> addSharedKey(@RequestBody SharedKeyDto dto,
                                                             @AuthenticationPrincipal User user) {
-        sharedKeyService.addKey(dto.getProvider(), dto.getKeyValue(), user);
-        return ResponseEntity.ok(Map.of("message", "Added"));
+        SharedKey savedKey = sharedKeyService.addKey(dto.getProvider(), dto.getKeyValue(), user);
+        auditLogService.logAsync(
+            auditLogService.createAuditLog(
+                user.getId(), user.getEmail(),
+                ActionType.SHARED_KEY_GENERATE, ResultType.SUCCESS,
+                dto.getProvider(), "Added", null
+            )
+        );
+        return ResponseEntity.ok(Map.of("id", savedKey.getId(), "message", "Added"));
     }
 
     @GetMapping
@@ -38,6 +53,16 @@ public class AdminSharedKeyController {
                                                 @RequestBody(required = false) Map<String, Object> dummy,
                                                 @AuthenticationPrincipal User user) {
         if (sharedKeyService.deleteKey(id)) {
+            AuditLog log = auditLogService.createAuditLog(
+                user.getId(),
+                user.getEmail(),
+                ActionType.SHARED_KEY_DELETE,
+                ResultType.SUCCESS,
+                id.toString(),
+                "Deleted",
+                null
+            );
+            auditLogService.logAsync(log);
             return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.notFound().build();
