@@ -103,23 +103,48 @@ class HtmlParser {
         const trimmed = line.trim();
         const codeDelim = /^ *```/;
 
+        if(this.isCodeBlock){
+            if(codeDelim.test(line)){
+                this.isCodeBlock = false;
+                return "STOP_CODE";
+            }
+            return "CODE";
+        }
+
+        if(this.isThinkingBlock){
+            if (/^<\/think>\s*$/.test(trimmed)) {
+                this.isThinkingBlock = false;
+                return "STOP_THINKING";
+            }
+            return "THINKING";
+        }
+
+//        if (/^<think>\s*$/.test(trimmed)) {
+//            this.isThinkingBlock = true;
+//            return "START_THINKING";
+//        }
+//        if (/^<\/think>\s*$/.test(trimmed)) {
+//            this.isThinkingBlock = false;
+//            return "STOP_THINKING";
+//        }
+
+//        if(codeDelim.test(line)){
+//            if(this.isCodeBlock){ this.isCodeBlock = false; return "STOP_CODE"; }
+//            this.isCodeBlock = true; return "START_CODE";
+//        }
+
+//        if(this.isThinkingBlock) return "THINKING";
+//        if(this.isCodeBlock) return "CODE";
 
         if (/^<think>\s*$/.test(trimmed)) {
             this.isThinkingBlock = true;
             return "START_THINKING";
         }
-        if (/^<\/think>\s*$/.test(trimmed)) {
-            this.isThinkingBlock = false;
-            return "STOP_THINKING";
-        }
 
         if(codeDelim.test(line)){
-            if(this.isCodeBlock){ this.isCodeBlock = false; return "STOP_CODE"; }
-            this.isCodeBlock = true; return "START_CODE";
+            this.isCodeBlock = true;
+            return "START_CODE";
         }
-
-        if(this.isThinkingBlock) return "THINKING";
-        if(this.isCodeBlock) return "CODE";
 
         if(line.startsWith("###") || line.startsWith("##")) return "HEADER3";
         if(line.startsWith("---")) return "LINE";
