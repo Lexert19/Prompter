@@ -1,3 +1,5 @@
+import groovy.json.JsonOutput
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '4.1.0'
@@ -182,3 +184,38 @@ bootRun {
 		}
 	}
 }
+
+
+task generateLocales {
+	doLast {
+		def outputDir = file("src/main/resources/static/locales")
+		outputDir.mkdirs()
+
+		def langs = [
+				"pl": "messages_pl.properties",
+				"en": "messages.properties"
+		]
+
+		langs.each { lang, fileName ->
+			def propsFile = file("src/main/resources/${fileName}")
+			def defaultFile = file("src/main/resources/messages.properties")
+
+			def props = new Properties()
+			if(defaultFile.exists()){
+				defaultFile.withInputStream { props.load(it) }
+			}
+			if(propsFile.exists()){
+				propsFile.withInputStream {
+					props.load(new InputStreamReader(it, "UTF-8"))
+				}
+			}
+
+			def jsonFile = new File(outputDir, "${lang}.json")
+			jsonFile.text = JsonOutput.prettyPrint(JsonOutput.toJson(props))
+			println "Generated: ${jsonFile} -> ${props.size()}"
+		}
+	}
+}
+
+processResources.dependsOn generateLocales
+bootRun.dependsOn generateLocales
