@@ -102,6 +102,7 @@ dependencies {
 	implementation 'org.flywaydb:flyway-core:10.10.0'
 	implementation 'org.flywaydb:flyway-database-postgresql:10.10.0'
 
+
 	implementation 'org.springframework.boot:spring-boot-starter-cache'
 	implementation 'com.github.ben-manes.caffeine:caffeine'
 

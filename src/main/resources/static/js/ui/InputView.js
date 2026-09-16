@@ -44,7 +44,10 @@ class InputView{
             texts.push(`<span id="doc-${index}"><i class="fas fa-file-alt" style="margin-right:5px;"></i> ${text.length} <i class="fas fa-times" style="cursor: pointer;" onclick="InputView.instance().removeLongText(${index})"></i></span>`);
         });
         this.images.forEach((img, index) => {
-            texts.push(`<span id="img-${index}"><i class="fas fa-image" style="margin-right:5px;"></i> ${img.length} <i class="fas fa-times" style="cursor: pointer;" onclick="InputView.instance().removeImage(${index})"></i></span>`);
+            const id = typeof img === 'object' ? img.id : img;
+            const name = typeof img === 'object' ? img.name : `id:${id}`;
+            const size = typeof img === 'object' ? ` ${(img.size/1024).toFixed(1)} KB` : '';
+            texts.push(`<span id="img-${index}"><i class="fas fa-image" style="margin-right:5px;"></i> ${name}${size} <i class="fas fa-times" style="cursor: pointer;" onclick="InputView.instance().removeImage(${index})"></i></span>`);
         });
         this.documentsHtml.innerHTML = texts.join(' ');
     }
@@ -124,11 +127,16 @@ class InputView{
                     if (!file) continue;
 
                     if (file.type.startsWith("image/")) {
+                        const fileInfo = { name: file.name, size: file.size };
                         const reader = new FileReader();
                         reader.onload = async (e) => {
                             try {
                                 const fileId = await History.instance().uploadImageBase64(e.target.result);
-                                InputView.instance().images.push(fileId);
+                                InputView.instance().images.push({
+                                    id: fileId,
+                                    name: fileInfo.name,
+                                    size: fileInfo.size
+                                });
                             } catch (err) {
                                 console.error("Error sending image:", err);
                             }

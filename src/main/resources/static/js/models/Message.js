@@ -53,9 +53,10 @@ class Message {
         }
 
         this.images.forEach(img => {
+            const fileId = typeof img === 'object' ? img.id : img;
             content.push({
                 type: "image",
-                fileId: Number(img),
+                fileId: Number(fileId),
                 cache: this.cache
             });
         });
@@ -74,12 +75,12 @@ class Message {
 
     getHtmlImages() {
         return this.images.map((img) => {
-            return `<img class="image" src="/api/files/${img}" alt="Image">`;
-//            const isNumeric = (val) => !isNaN(parseFloat(val)) && isFinite(val);
-//            const parts = img.split(';');
-//            const mediaType = parts[0].split(':')[1];
-//            const data = parts[1].split(',')[1];
-//            return `<img class="image" src="data:${mediaType};base64,${data}" alt="Inline image">`;
+            const id = typeof img === 'object' ? img.id : img;
+            return `<div class="image-container" style="display:inline-block;margin:5px;">
+            <a href="/api/files/${id}" target="_blank" class="image-link">
+                <img class="image-thumb" data-file-id="${id}" src="/api/files/${id}" alt="Image" style="max-width:200px;max-height:200px;border-radius:8px;object-fit:cover;cursor:pointer;" loading="lazy">
+            </a>
+        </div>`;
         }).join("");
     }
 
