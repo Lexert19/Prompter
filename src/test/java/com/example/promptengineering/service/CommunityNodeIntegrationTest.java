@@ -108,7 +108,7 @@ class CommunityNodeIntegrationTest {
 
         StepVerifier.create(result).assertNext(event -> {
             assertThat(event.event()).isEqualTo("error");
-            assertThat(event.data()).contains("Brak dostępu");
+            assertThat(event.data()).contains("Access denied");
         }).verifyComplete();
     }
 
