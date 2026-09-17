@@ -7,10 +7,6 @@ import com.example.promptengineering.model.GeminiStrategy;
 import com.example.promptengineering.model.ProviderStrategy;
 import com.example.promptengineering.repository.HostedNodeRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -86,8 +82,7 @@ public class ChatService {
     private void enrichContentWithBase64(ImageContent content, User user) {
         try {
             UserFile userFile = fileStorageService.getUserFile(content.getFileId(), user);
-            Path base64Path = Paths.get(userFile.getBase64Path());
-            String base64Data = Files.readString(base64Path, StandardCharsets.UTF_8);
+            String base64Data = fileStorageService.getBase64Content(userFile);
             content.setData(base64Data);
             content.setMediaType(userFile.getContentType());
             content.setFileId(null);
@@ -219,11 +214,11 @@ public class ChatService {
     private RequestBuilder applyCommunityNode(RequestBuilder request, User user) {
         UUID nodeId = request.getCommunityNodeId();
         HostedNode node = hostedNodeRepository.findById(nodeId)
-                .orElseThrow(() -> new IllegalArgumentException("Node nie istnieje"));
+                .orElseThrow(() -> new IllegalArgumentException("Node doesn't exist"));
 
         if (!node.isAllowPublicUse() && !node.getOwner().getId().equals(user.getId())) {
             throw new org.springframework.security.access.AccessDeniedException(
-                    "Brak dostępu");
+                    "Access denied");
         }
 
         request.setProvider("COMMUNITY");

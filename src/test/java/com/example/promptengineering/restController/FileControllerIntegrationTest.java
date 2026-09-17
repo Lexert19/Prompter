@@ -9,7 +9,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,10 +16,11 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.file.Path;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -55,14 +55,17 @@ public class FileControllerIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @TempDir
-    Path tempUploadDir;
-
     private User user1;
     private User user2;
     private final String user1Email = "fileuser1@example.com";
     private final String user2Email = "fileuser2@example.com";
     private final String password = "password";
+
+    @DynamicPropertySource
+    static void minioProps(DynamicPropertyRegistry registry) {
+        registry.add("minio.endpoint", () -> "http://localhost:9000");
+        registry.add("minio.bucket", () -> "test-bucket");
+    }
 
     @BeforeEach
     void setUp() {
@@ -76,7 +79,6 @@ public class FileControllerIntegrationTest {
         user2.setPassword(passwordEncoder.encode(password));
         user2 = userRepository.save(user2);
 
-        System.setProperty("file.upload-dir", tempUploadDir.toString());
     }
 
     @Test
