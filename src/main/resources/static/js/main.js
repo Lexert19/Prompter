@@ -98,16 +98,6 @@ const mouseMoveHandler = function(e) {
   }
 };
 
-function handleResize() {
-  if (window.innerWidth > 768) {
-    document.addEventListener('mousemove', mouseMoveHandler);
-  } else {
-    document.removeEventListener('mousemove', mouseMoveHandler);
-    chatNavigation.classList.remove('chat-navigation-show');
-  }
-}
-
-
 const chatMessages = document.getElementById('chatMessages');
 let shouldAutoScroll = true;
 
@@ -208,6 +198,55 @@ document.addEventListener('DOMContentLoaded', function() {
   window.addEventListener('resize', handleResize);
   updateButtonZIndex();
 });
+//
+//document.addEventListener('DOMContentLoaded', function() {
+//  const infoPanel = document.getElementById('InfoPanel');
+//  const toggleInfoBtn = document.getElementById('toggle-info-button');
+//  const closeInfoBtn = document.getElementById('closeInfoBtn');
+//
+//  function updateInfoButtonZIndex() {
+//    if (toggleInfoBtn) {
+//      toggleInfoBtn.classList.toggle('panel-open',
+//        infoPanel.classList.contains('info-panel-show'));
+//    }
+//  }
+//
+//  if (toggleInfoBtn && infoPanel) {
+//    toggleInfoBtn.addEventListener('click', function() {
+//      infoPanel.classList.toggle('info-panel-show');
+//      updateInfoButtonZIndex();
+//    });
+//  }
+//
+//  if (closeInfoBtn && infoPanel) {
+//    closeInfoBtn.addEventListener('click', function() {
+//      infoPanel.classList.remove('info-panel-show');
+//      updateInfoButtonZIndex();
+//    });
+//  }
+//
+//  const infoMouseMoveHandler = function(e) {
+//    if (window.innerWidth - e.clientX < 400) {
+//      infoPanel.classList.add('info-panel-show');
+//    } else {
+//      infoPanel.classList.remove('info-panel-show');
+//    }
+//    updateInfoButtonZIndex();
+//  };
+//
+//  function handleInfoResize() {
+//    if (window.innerWidth > 768) {
+//      document.addEventListener('mousemove', infoMouseMoveHandler);
+//    } else {
+//      document.removeEventListener('mousemove', infoMouseMoveHandler);
+//      infoPanel.classList.remove('info-panel-show');
+//      updateInfoButtonZIndex();
+//    }
+//  }
+//
+//  handleInfoResize();
+//  window.addEventListener('resize', handleInfoResize);
+//});
 
 
 document.addEventListener('DOMContentLoaded', function() {

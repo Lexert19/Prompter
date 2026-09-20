@@ -6,6 +6,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="/static/css/main.css">
+        <link rel="stylesheet" href="/static/css/info-panel.css">
         <link rel="stylesheet" href="/static/css/modal.css">
         <link rel="stylesheet" href="/static/css/model.css">
         <link rel="stylesheet" href="/static/css/panel.css">
@@ -36,6 +37,9 @@
     <body>
         <button id="toggle-nav-button" class="toggle-nav-btn" aria-label="Otwórz nawigację">
             <i class="fas fa-bars"></i>
+        </button>
+        <button id="toggle-info-button" class="toggle-info-btn" aria-label="Open info menu">
+            <i class="fas fa-info-circle"></i>
         </button>
         <div id="modalOverlay" class="overlay"></div>
         <div id="modal" class="modal-menu">
@@ -83,6 +87,7 @@
                     </button>
                 </div>
             </div>
+            <#include "/parts/info.ftl" />
         </div>
         <div id="overlay" style="display: none;"></div>
         <#include "/parts/editMessage.ftl" />

@@ -157,4 +157,43 @@ class RequestBuilder {
 
         return total;
     }
+
+    getStats() {
+        const messages = this.messages || [];
+
+        const total = messages.length;
+        const user = messages.filter(m => m.role === 'user').length;
+        const assistant = messages.filter(m => m.role === 'assistant').length;
+
+        const textLength = messages.reduce(
+            (sum, m) => sum + (m.text ? m.text.length : 0),
+            0
+        );
+
+        const images = messages.reduce(
+            (sum, m) => sum + (m.images ? m.images.length : 0),
+            0
+        );
+
+        const documents = messages.reduce(
+            (sum, m) => sum + (m.documents ? m.documents.length : 0),
+            0
+        );
+
+        const contextSize = this.calculateContextSize
+            ? this.calculateContextSize()
+            : textLength + images * 1000;
+
+        return {
+            total,
+            user,
+            assistant,
+            textLength,
+            images,
+            documents,
+            contextSize,
+            estimatedTokens: Math.round(textLength / 4),
+            estimatedContextTokens: Math.round(contextSize / 4)
+        };
+    }
 }
