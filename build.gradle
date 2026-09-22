@@ -155,7 +155,6 @@ tasks.register('loadTest', Test) {
 }
 
 def commonJvmArgs = [
-		"-Djdk.tls.client.protocols=TLSv1.2",
 		"--enable-native-access=ALL-UNNAMED"
 ]
 
@@ -191,7 +190,7 @@ bootRun {
 }
 
 
-task generateLocales {
+tasks.register('generateLocales') {
 	doLast {
 		def outputDir = file("src/main/resources/static/locales")
 		outputDir.mkdirs()
@@ -206,10 +205,10 @@ task generateLocales {
 			def defaultFile = file("src/main/resources/messages.properties")
 
 			def props = new Properties()
-			if(defaultFile.exists()){
+			if (defaultFile.exists()) {
 				defaultFile.withInputStream { props.load(it) }
 			}
-			if(propsFile.exists()){
+			if (propsFile.exists()) {
 				propsFile.withInputStream {
 					props.load(new InputStreamReader(it, "UTF-8"))
 				}
