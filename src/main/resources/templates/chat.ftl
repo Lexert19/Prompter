@@ -6,12 +6,12 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="/static/css/main.css">
-        <link rel="stylesheet" href="/static/css/info-panel.css">
+        <link rel="stylesheet" href="/static/css/components/info-panel.css">
         <link rel="stylesheet" href="/static/css/modal.css">
-        <link rel="stylesheet" href="/static/css/model.css">
-        <link rel="stylesheet" href="/static/css/panel.css">
-        <link rel="stylesheet" href="/static/css/project.css">
-        <link rel="stylesheet" href="/static/css/system-prompt.css">
+        <link rel="stylesheet" href="/static/css/components/model.css">
+        <link rel="stylesheet" href="/static/css/components/panel.css">
+        <link rel="stylesheet" href="/static/css/components/project.css">
+        <link rel="stylesheet" href="/static/css/components/system-prompt.css">
         <script src="/static/otherJs/global.js"></script>
 
 

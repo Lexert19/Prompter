@@ -4,7 +4,7 @@
     <head>
         <title>${post.title}</title>
         <#include "/parts/links.ftl" />
-        <link rel="stylesheet" href="/static/css/blog-post.css">
+        <link rel="stylesheet" href="/static/css/components/blog-post.css">
     </head>
     <body>
         <#include "/parts/navbar.ftl">
