@@ -51,11 +51,11 @@ public abstract class BaseOpenAICompatibleStrategy implements ProviderStrategy {
         request.put("messages", messagesList);
         request.put("model", builder.getModel());
         request.put("stream", builder.getStream());
-        request.put("max_tokens", builder.getMaxTokens());
-        request.put("temperature", builder.getTemperature());
-        request.put("top_p", builder.getTop_p());
-        request.put("frequency_penalty", builder.getFrequencyPenalty());
-        request.put("presence_penalty", builder.getPresencePenalty());
+        //request.put("max_tokens", builder.getMaxTokens());
+        //request.put("temperature", builder.getTemperature());
+        //request.put("top_p", builder.getTop_p());
+        //request.put("frequency_penalty", builder.getFrequencyPenalty());
+        //request.put("presence_penalty", builder.getPresencePenalty());
 
         return request;
     }
