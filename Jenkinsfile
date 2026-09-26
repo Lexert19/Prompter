@@ -1,5 +1,11 @@
 pipeline {
     agent any
+
+     environment {
+            DEPLOY_DIR = '/home/lexert/_projects/Prompter/build/libs'
+            JAR_NAME   = 'prompter.jar'
+        }
+
     stages {
         stage('Checkout') {
             steps { checkout scm }
@@ -24,11 +30,10 @@ pipeline {
             steps {
                 script {
                     sh """
-                        cd /home/lexert/_projects/Prompter
-                        git fetch --prune origin master
-                        git reset --hard FETCH_HEAD
-                        git clean -fdx
-                        sudo systemctl restart prompter.service
+                       set -e
+                       JAR=\$(ls build/libs/*.jar | grep -v -- '-plain' | head -n1)
+                       sudo install -m 644 "\$JAR" "${DEPLOY_DIR}/${JAR_NAME}"
+                       sudo systemctl restart prompter.service
                     """
                 }
             }

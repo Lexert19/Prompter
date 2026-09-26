@@ -232,5 +232,9 @@ tasks.register('generateLocales') {
 	}
 }
 
+bootJar {
+	archiveFileName = 'prompter.jar'
+}
+
 processResources.dependsOn generateLocales
 bootRun.dependsOn generateLocales
