@@ -25,7 +25,9 @@ pipeline {
                 script {
                     sh """
                         cd /home/lexert/_projects/Prompter
-                        git pull origin master
+                        git fetch --prune origin master
+                        git reset --hard FETCH_HEAD
+                        git clean -fdx
                         sudo systemctl restart prompter.service
                     """
                 }
