@@ -30,9 +30,6 @@ pipeline {
             steps {
                 script {
                     sh """
-                       set -e
-                       JAR=\$(ls build/libs/*.jar | grep -v -- '-plain' | head -n1)
-                       sudo install -m 644 "\$JAR" "${DEPLOY_DIR}/${JAR_NAME}"
                        sudo systemctl restart prompter.service
                     """
                 }
