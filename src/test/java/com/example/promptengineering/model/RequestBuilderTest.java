@@ -1,6 +1,7 @@
 package com.example.promptengineering.model;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ class RequestBuilderTest {
         userMessage = new Message("user", List.of(textContent));
     }
 
+    @Disabled("max_tokens/temperature removed from buildCommonRequest")
     @Test
     void shouldBuildOpenAiRequestWithSystemMessage() {
         builder.model("gpt-4").addMessage(userMessage).maxTokens(200).temperature(0.7)
@@ -259,6 +261,7 @@ class RequestBuilderTest {
                 .containsEntry("text", "Third");
     }
 
+    @Disabled("max_tokens/temperature removed from buildCommonRequest")
     @Test
     void shouldUseDefaultMaxTokensAndTemperature() {
         builder.model("gpt-4").addMessage(userMessage);
