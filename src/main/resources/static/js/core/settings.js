@@ -151,7 +151,6 @@ class Settings {
 
 
     initModels() {
-        hidePages();
         this.chatSettings = document.getElementById("chatSettings");
         this.chatSettings.classList.add("active");
         fetchWithAuth('/api/models/all-models', {

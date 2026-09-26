@@ -1,5 +1,5 @@
 <div class="button-panel">
-    <button onclick="openUserPanel()">
+    <button data-panel="accountPanel">
         <div class="center">
             <svg xmlns="http://www.w3.org/2000/svg"
                  height="16"
@@ -10,7 +10,7 @@
             </svg>
         </div>
     </button>
-    <button onclick="openHistory()">
+    <button data-panel="chatHistory">
         <div class="center">
             <svg xmlns="http://www.w3.org/2000/svg"
                  height="16"
@@ -21,7 +21,7 @@
             </svg>
         </div>
     </button>
-    <button onclick="showSettings()">
+    <button data-panel="chatSettings">
         <div class="center">
             <svg xmlns="http://www.w3.org/2000/svg"
                  height="16px"
@@ -32,7 +32,7 @@
             </svg>
         </div>
     </button>
-    <button onclick="openProjects()">
+    <button data-panel="projects">
         <div class="center">
             <svg xmlns="http://www.w3.org/2000/svg"
                  height="16"
@@ -43,7 +43,7 @@
             </svg>
         </div>
     </button>
-    <button onclick="openModels()">
+    <button data-panel="models">
         <div class="center">
             <svg xmlns="http://www.w3.org/2000/svg"
                  height="14"

@@ -41,40 +41,6 @@ function getImageData(base64String) {
   return base64String.replace(/^data:image\/[a-zA-Z]+;base64,/, "");
 }
 
-function hidePages() {
-  const pages = document.getElementById("pages");
-  const children = pages.children;
-
-  for (let i = 0; i < children.length; i++) {
-    children[i].classList.remove("active");
-  }
-}
-
-function openUserPanel() {
-  hidePages();
-  document.getElementById("accountPanel").classList.add("active");
-}
-
-function openHistory() {
-  hidePages();
-  document.getElementById("chatHistory").classList.add("active");
-}
-
-function showSettings() {
-  hidePages();
-  document.getElementById("chatSettings").classList.add("active");
-}
-
-function openProjects() {
-  hidePages();
-  document.getElementById("projects").classList.add("active");
-}
-
-function openModels(){
-  hidePages();
-  document.getElementById("models").classList.add("active");
-}
-
 function escapeHtml(content) {
   try {
     return content
@@ -87,16 +53,6 @@ function escapeHtml(content) {
     return "";
   }
 }
-
-const chatNavigation = document.getElementById('ChatNavigation');
-
-const mouseMoveHandler = function(e) {
-  if (e.clientX < 400) {
-    chatNavigation.classList.add('chat-navigation-show');
-  } else {
-    chatNavigation.classList.remove('chat-navigation-show');
-  }
-};
 
 const chatMessages = document.getElementById('chatMessages');
 let shouldAutoScroll = true;
@@ -145,115 +101,3 @@ async function deleteSharedKeyInteractive() {
   const id = prompt('Podaj ID klucza do usunięcia:');
   if (id) await deleteSharedKey(parseInt(id));
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-  const toggleBtn = document.getElementById('toggle-nav-button');
-  const chatNav = document.getElementById('ChatNavigation');
-  const closeNavBtn = document.getElementById('closeNavBtn');
-
-  function updateButtonZIndex() {
-    if (toggleBtn) {
-      if (chatNav.classList.contains('chat-navigation-show')) {
-        toggleBtn.classList.add('nav-open');
-      } else {
-        toggleBtn.classList.remove('nav-open');
-      }
-    }
-  }
-
-  if (toggleBtn && chatNav) {
-    toggleBtn.addEventListener('click', function() {
-      chatNav.classList.toggle('chat-navigation-show');
-      updateButtonZIndex();
-    });
-  }
-
-  if (closeNavBtn && chatNav) {
-    closeNavBtn.addEventListener('click', function() {
-      chatNav.classList.remove('chat-navigation-show');
-      updateButtonZIndex();
-    });
-  }
-
-  const mouseMoveHandler = function(e) {
-    if (e.clientX < 400) {
-      chatNav.classList.add('chat-navigation-show');
-    } else {
-      chatNav.classList.remove('chat-navigation-show');
-    }
-    updateButtonZIndex();
-  };
-
-  function handleResize() {
-    if (window.innerWidth > 768) {
-      document.addEventListener('mousemove', mouseMoveHandler);
-    } else {
-      document.removeEventListener('mousemove', mouseMoveHandler);
-      chatNav.classList.remove('chat-navigation-show');
-      updateButtonZIndex();
-    }
-  }
-
-  handleResize();
-  window.addEventListener('resize', handleResize);
-  updateButtonZIndex();
-});
-//
-//document.addEventListener('DOMContentLoaded', function() {
-//  const infoPanel = document.getElementById('InfoPanel');
-//  const toggleInfoBtn = document.getElementById('toggle-info-button');
-//  const closeInfoBtn = document.getElementById('closeInfoBtn');
-//
-//  function updateInfoButtonZIndex() {
-//    if (toggleInfoBtn) {
-//      toggleInfoBtn.classList.toggle('panel-open',
-//        infoPanel.classList.contains('info-panel-show'));
-//    }
-//  }
-//
-//  if (toggleInfoBtn && infoPanel) {
-//    toggleInfoBtn.addEventListener('click', function() {
-//      infoPanel.classList.toggle('info-panel-show');
-//      updateInfoButtonZIndex();
-//    });
-//  }
-//
-//  if (closeInfoBtn && infoPanel) {
-//    closeInfoBtn.addEventListener('click', function() {
-//      infoPanel.classList.remove('info-panel-show');
-//      updateInfoButtonZIndex();
-//    });
-//  }
-//
-//  const infoMouseMoveHandler = function(e) {
-//    if (window.innerWidth - e.clientX < 400) {
-//      infoPanel.classList.add('info-panel-show');
-//    } else {
-//      infoPanel.classList.remove('info-panel-show');
-//    }
-//    updateInfoButtonZIndex();
-//  };
-//
-//  function handleInfoResize() {
-//    if (window.innerWidth > 768) {
-//      document.addEventListener('mousemove', infoMouseMoveHandler);
-//    } else {
-//      document.removeEventListener('mousemove', infoMouseMoveHandler);
-//      infoPanel.classList.remove('info-panel-show');
-//      updateInfoButtonZIndex();
-//    }
-//  }
-//
-//  handleInfoResize();
-//  window.addEventListener('resize', handleInfoResize);
-//});
-
-
-document.addEventListener('DOMContentLoaded', function() {
-  const newChatBtn = document.getElementById('newChatBtn');
-  if (newChatBtn) {
-    newChatBtn.addEventListener('click', function() {
-      window.location.href = '/chat';
-    });
-  }
-});

@@ -95,3 +95,11 @@
 .panel .forgot-password a:hover {
     text-decoration: underline;
 }
+
+.button-panel button.active {
+    background-color: rgba(99, 102, 241, 0.7);
+}
+
+.button-panel button.active:hover {
+    background-color: rgba(99, 102, 241, 0.8);
+}
