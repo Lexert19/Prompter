@@ -30,6 +30,7 @@ pipeline {
             steps {
                 script {
                     sh """
+                       sudo cp build/libs/prompter.jar ${DEPLOY_DIR}/${JAR_NAME}
                        sudo systemctl restart prompter.service
                     """
                 }
