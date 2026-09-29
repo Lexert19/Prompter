@@ -56,8 +56,8 @@ public class Model {
     }
 
     public Model(String uuid, String name, String text, String provider, String url,
-        boolean global, String type, double pointsPerInput, double pointsPerOutput,
-        User user, Strategy providerStrategy) {
+            boolean global, String type, double pointsPerInput, double pointsPerOutput,
+            User user, Strategy providerStrategy) {
         this.uuid = uuid;
         this.name = name;
         this.text = text;
@@ -68,7 +68,9 @@ public class Model {
         this.pointsPerInput = pointsPerInput;
         this.pointsPerOutput = pointsPerOutput;
         this.user = user;
-        this.providerStrategy = providerStrategy != null ? providerStrategy : Strategy.fromString(provider);
+        this.providerStrategy = providerStrategy != null
+                ? providerStrategy
+                : Strategy.fromString(provider);
     }
 
     @PrePersist

@@ -111,5 +111,6 @@
                 <span><@spring.message "settings.openRouterAllowFallbacks.label" /></span>
             </label>
         </div>
+        <div id="advancedOptionsContainer"></div>
     </div>
 </div>

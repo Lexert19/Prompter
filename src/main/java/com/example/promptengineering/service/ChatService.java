@@ -141,7 +141,8 @@ public class ChatService {
     private WebClient.RequestBodySpec buildHttpRequest(RequestBuilder request,
                                                        String json) {
         WebClient.RequestBodySpec spec = (WebClient.RequestBodySpec) webClient.post()
-            .uri(request.getUrl()).contentType(MediaType.APPLICATION_JSON).bodyValue(json);
+                .uri(request.getUrl()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(json);
 
         ProviderStrategy strat = request.getProviderStrategy();
         if (strat instanceof AnthropicStrategy) {

@@ -34,8 +34,8 @@ public class GeminiStrategy implements ProviderStrategy {
         List<Map<String, Object>> steps = new ArrayList<>();
         for (Message message : builder.getMessages()) {
             String stepType = message.getRole().equalsIgnoreCase("assistant")
-                ? "model_output"
-                : "user_input";
+                    ? "model_output"
+                    : "user_input";
 
             List<Map<String, Object>> contentParts = new ArrayList<>();
             for (Content content : message.getContent()) {
@@ -57,9 +57,11 @@ public class GeminiStrategy implements ProviderStrategy {
         request.put("store", false);
 
         Map<String, Object> genConfig = new HashMap<>();
-        genConfig.put("temperature", builder.getTemperature());
-        genConfig.put("max_output_tokens", builder.getMaxTokens());
-        genConfig.put("top_p", builder.getTop_p());
+        if (builder.isIncludeAdvancedParams()) {
+            genConfig.put("temperature", builder.getTemperature());
+            genConfig.put("max_output_tokens", builder.getMaxTokens());
+            genConfig.put("top_p", builder.getTop_p());
+        }
 
         if (!builder.getReasoningEffort().isEmpty()) {
             genConfig.put("thinking_level", builder.getReasoningEffort().toLowerCase());

@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
 @Configuration
 public class JacksonConfig {

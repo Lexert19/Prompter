@@ -76,7 +76,7 @@ public class AuthController {
         this.userService = userService;
         this.userRepository = userRepository;
         this.twoFactorService = twoFactorService;
-      this.auditLogService = auditLogService;
+        this.auditLogService = auditLogService;
     }
 
     @PostMapping("/register")
@@ -95,17 +95,9 @@ public class AuthController {
                             request.getPassword()));
             User user = (User) authentication.getPrincipal();
 
-            auditLogService.logAsync(
-                auditLogService.createAuditLog(
-                    user.getId(),
-                    user.getEmail(),
-                    ActionType.LOGIN_SUCCESS,
-                    ResultType.SUCCESS,
-                    null,
-                    null,
-                    null
-                )
-            );
+            auditLogService.logAsync(auditLogService.createAuditLog(user.getId(),
+                    user.getEmail(), ActionType.LOGIN_SUCCESS, ResultType.SUCCESS, null,
+                    null, null));
 
             boolean hasApiKeys = user.getEncryptedKeys() != null
                     && !user.getEncryptedKeys().isEmpty();

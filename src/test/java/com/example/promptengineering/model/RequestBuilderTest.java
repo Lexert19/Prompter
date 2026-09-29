@@ -1,7 +1,6 @@
 package com.example.promptengineering.model;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,11 +34,10 @@ class RequestBuilderTest {
         userMessage = new Message("user", List.of(textContent));
     }
 
-    @Disabled("max_tokens/temperature removed from buildCommonRequest")
     @Test
     void shouldBuildOpenAiRequestWithSystemMessage() {
         builder.model("gpt-4").addMessage(userMessage).maxTokens(200).temperature(0.7)
-                .stream(true);
+                .stream(true).includeAdvancedParams(true);
         builder.setProvider("OPENAI");
         builder.setSystem("You are a helpful assistant.");
 
@@ -69,7 +67,7 @@ class RequestBuilderTest {
     @Test
     void shouldBuildAnthropicRequestWithSystemField() {
         builder.model("claude-3-opus-20240229").addMessage(userMessage).maxTokens(1000)
-                .temperature(0.0).stream(false);
+                .temperature(0.0).stream(false).includeAdvancedParams(true);
         builder.setProvider("ANTHROPIC");
         builder.setSystem("You are Claude, a helpful AI.");
 
@@ -182,7 +180,8 @@ class RequestBuilderTest {
 
     @Test
     void shouldIncludeReasoningEffortForOpenAi() {
-        builder.model("o1-preview").addMessage(userMessage).maxTokens(500);
+        builder.model("o1-preview").addMessage(userMessage).maxTokens(500)
+                .includeAdvancedParams(true);
         builder.setProvider("OPENAI");
         builder.setReasoningEffort("medium");
 
@@ -261,10 +260,9 @@ class RequestBuilderTest {
                 .containsEntry("text", "Third");
     }
 
-    @Disabled("max_tokens/temperature removed from buildCommonRequest")
     @Test
     void shouldUseDefaultMaxTokensAndTemperature() {
-        builder.model("gpt-4").addMessage(userMessage);
+        builder.model("gpt-4").addMessage(userMessage).includeAdvancedParams(true);
         builder.setProvider("OPENAI");
 
         Map<String, Object> request = builder.build();
@@ -291,6 +289,33 @@ class RequestBuilderTest {
         List<Map<String, Object>> messages = (List<Map<String, Object>>) request
                 .get("messages");
         assertThat(messages).hasSize(1);
+    }
+
+    @Test
+    void shouldNotIncludeAdvancedParamsByDefaultForOpenAi() {
+        builder.model("gpt-4").addMessage(userMessage).maxTokens(200).temperature(0.7);
+        builder.setProvider("OPENAI");
+
+        Map<String, Object> request = builder.build();
+
+        assertThat(request).doesNotContainKey("max_tokens")
+                .doesNotContainKey("temperature").doesNotContainKey("top_p")
+                .doesNotContainKey("frequency_penalty")
+                .doesNotContainKey("presence_penalty").containsEntry("stream", true);
+    }
+
+    @Test
+    void shouldIncludeAllAdvancedParamsWhenFlagEnabledForOpenAi() {
+        builder.model("gpt-4").addMessage(userMessage).maxTokens(500).temperature(0.5)
+                .includeAdvancedParams(true);
+        builder.setProvider("OPENAI");
+
+        Map<String, Object> request = builder.build();
+
+        assertThat(request).containsEntry("max_tokens", 500)
+                .containsEntry("temperature", 0.5).containsEntry("top_p", 0.95)
+                .containsEntry("frequency_penalty", 0.0)
+                .containsEntry("presence_penalty", 0.0);
     }
 
     // @Test

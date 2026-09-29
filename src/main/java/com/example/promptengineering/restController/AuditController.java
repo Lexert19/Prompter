@@ -24,24 +24,24 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuditController {
 
-  private final AuditLogRepository auditLogRepository;
+    private final AuditLogRepository auditLogRepository;
 
-  @GetMapping("/logs")
-  public ResponseEntity<Page<AuditLog>> getLogs(
-      @RequestParam(required = false) Long userId,
-      @RequestParam(required = false) ActionType action,
-      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
-      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
-      @RequestParam(required = false) String search,
-      @PageableDefault(size = 50, sort = "timestamp", direction = org.springframework.data.domain.Sort.Direction.DESC) Pageable pageable) {
+    @GetMapping("/logs")
+    public ResponseEntity<Page<AuditLog>> getLogs(@RequestParam(required = false) Long userId,
+                                                  @RequestParam(required = false) ActionType action,
+                                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
+                                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
+                                                  @RequestParam(required = false) String search,
+                                                  @PageableDefault(size = 50, sort = "timestamp", direction = org.springframework.data.domain.Sort.Direction.DESC) Pageable pageable) {
 
-    Page<AuditLog> page = auditLogRepository.search(userId, action, from, to, search, pageable);
-    return ResponseEntity.ok(page);
-  }
+        Page<AuditLog> page = auditLogRepository.search(userId, action, from, to, search,
+                pageable);
+        return ResponseEntity.ok(page);
+    }
 
-  @GetMapping("/stats")
-  public ResponseEntity<Map<String, Object>> getStats() {
-    long total = auditLogRepository.count();
-    return ResponseEntity.ok(Map.of("total", total));
-  }
+    @GetMapping("/stats")
+    public ResponseEntity<Map<String, Object>> getStats() {
+        long total = auditLogRepository.count();
+        return ResponseEntity.ok(Map.of("total", total));
+    }
 }

@@ -82,11 +82,11 @@ public class ChatStreamingLoadTest {
 
     @Test
     public void howManyConcurrentStreams() throws Exception {
-        String requestBody = objectMapper.writeValueAsString(
-                Map.of("url", "http://localhost:" + port + "/mock-ai/chat/completions",
-                        "provider", "OPENAI", "key", "providerStrategy", "OPENAI", "test-key", "model", "mock-model",
-                        "messages", List.of(Map.of("role", "user", "content",
-                                List.of(Map.of("type", "text", "text", "test"))))));
+        String requestBody = objectMapper.writeValueAsString(Map.of("url",
+                "http://localhost:" + port + "/mock-ai/chat/completions", "provider",
+                "OPENAI", "key", "providerStrategy", "OPENAI", "test-key", "model",
+                "mock-model", "messages", List.of(Map.of("role", "user", "content",
+                        List.of(Map.of("type", "text", "text", "test"))))));
 
         int[] probes = {400, 10000};
 

@@ -9,36 +9,36 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "audit_log", indexes = {
-    @Index(name = "idx_audit_user", columnList = "user_id"),
-    @Index(name = "idx_audit_action", columnList = "action"),
-    @Index(name = "idx_audit_timestamp", columnList = "timestamp")
-})
-@Getter @Setter
+        @Index(name = "idx_audit_user", columnList = "user_id"),
+        @Index(name = "idx_audit_action", columnList = "action"),
+        @Index(name = "idx_audit_timestamp", columnList = "timestamp")})
+@Getter
+@Setter
 public class AuditLog {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  private Long userId;
-  private String username;
+    private Long userId;
+    private String username;
 
-  private String ipAddress;
-  private String userAgent;
-  private String sessionId;
+    private String ipAddress;
+    private String userAgent;
+    private String sessionId;
 
-  @Enumerated(EnumType.STRING)
-  private ActionType action;
+    @Enumerated(EnumType.STRING)
+    private ActionType action;
 
-  @Enumerated(EnumType.STRING)
-  private ResultType result;
+    @Enumerated(EnumType.STRING)
+    private ResultType result;
 
-  private String target;
-  private String details;
+    private String target;
+    private String details;
 
-  @Column(columnDefinition = "TEXT")
-  private String payload;
+    @Column(columnDefinition = "TEXT")
+    private String payload;
 
-  private LocalDateTime timestamp;
+    private LocalDateTime timestamp;
 
 }

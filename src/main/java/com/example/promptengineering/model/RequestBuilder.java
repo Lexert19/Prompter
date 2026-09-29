@@ -42,15 +42,13 @@ public class RequestBuilder {
     private ProviderStrategy providerStrategy;
     private UUID communityNodeId;
     private Map<String, Object> providerConfig;
+    private boolean includeAdvancedParams = false;
 
     private static final Map<Strategy, Supplier<ProviderStrategy>> STRATEGIES = Map.of(
-        Strategy.ANTHROPIC, AnthropicStrategy::new,
-        Strategy.GEMINI, GeminiStrategy::new,
-        Strategy.OPENROUTER, OpenRouterStrategy::new,
-        Strategy.OPENAI, OpenAIStrategy::new,
-        Strategy.NVIDIA, OpenAIStrategy::new,
-        Strategy.DEFAULT, OpenAIStrategy::new
-    );
+            Strategy.ANTHROPIC, AnthropicStrategy::new, Strategy.GEMINI,
+            GeminiStrategy::new, Strategy.OPENROUTER, OpenRouterStrategy::new,
+            Strategy.OPENAI, OpenAIStrategy::new, Strategy.NVIDIA, OpenAIStrategy::new,
+            Strategy.DEFAULT, OpenAIStrategy::new);
 
     public Map<String, Object> build() {
         return getProviderStrategy().buildRequest(this);
@@ -60,7 +58,8 @@ public class RequestBuilder {
         this.provider = providerName.toUpperCase();
         if (this.providerStrategy == null) {
             this.compatibility = Strategy.fromString(providerName);
-            this.providerStrategy = STRATEGIES.getOrDefault(this.compatibility, OpenAIStrategy::new).get();
+            this.providerStrategy = STRATEGIES
+                    .getOrDefault(this.compatibility, OpenAIStrategy::new).get();
         }
     }
 
@@ -71,9 +70,14 @@ public class RequestBuilder {
 
     public void setProviderStrategy(String strategyName) {
         this.compatibility = Strategy.fromString(strategyName);
-        this.providerStrategy = STRATEGIES.getOrDefault(this.compatibility, OpenAIStrategy::new).get();
+        this.providerStrategy = STRATEGIES
+                .getOrDefault(this.compatibility, OpenAIStrategy::new).get();
     }
 
+    public RequestBuilder includeAdvancedParams(boolean include) {
+        this.includeAdvancedParams = include;
+        return this;
+    }
 
     public RequestBuilder model(String model) {
         this.model = model;
@@ -102,7 +106,9 @@ public class RequestBuilder {
 
     public ProviderStrategy getProviderStrategy() {
         if (providerStrategy == null) {
-            Strategy type = compatibility != null ? compatibility : Strategy.fromString(provider);
+            Strategy type = compatibility != null
+                    ? compatibility
+                    : Strategy.fromString(provider);
             providerStrategy = STRATEGIES.getOrDefault(type, OpenAIStrategy::new).get();
         }
         return providerStrategy;

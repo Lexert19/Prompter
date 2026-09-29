@@ -32,10 +32,10 @@ public class FileStorageService {
     private final UserFileRepository userFileRepository;
 
     public FileStorageService(MinioClient minioClient,
-        @Value("${minio.bucket}") String bucket,
-        @Value("${file.max-size}") long maxFileSize,
-        @Value("${file.max-count}") int maxFilesPerUser,
-        UserFileRepository userFileRepository) {
+            @Value("${minio.bucket}") String bucket,
+            @Value("${file.max-size}") long maxFileSize,
+            @Value("${file.max-count}") int maxFilesPerUser,
+            UserFileRepository userFileRepository) {
         this.minioClient = minioClient;
         this.bucket = bucket;
         this.maxFileSize = maxFileSize;
@@ -45,7 +45,8 @@ public class FileStorageService {
 
     @PostConstruct
     public void init() throws Exception {
-        boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
+        boolean found = minioClient
+                .bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
         if (!found) {
             minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
         }
@@ -53,8 +54,8 @@ public class FileStorageService {
 
     private UserFileDTO toDto(UserFile userFile) {
         return new UserFileDTO(userFile.getId(), userFile.getFileName(),
-            userFile.getContentType(), userFile.getSize(),
-            userFile.getOwner().getId());
+                userFile.getContentType(), userFile.getSize(),
+                userFile.getOwner().getId());
     }
 
     public UserFileDTO storeFile(MultipartFile file, User owner) throws IOException {
@@ -65,14 +66,16 @@ public class FileStorageService {
 
         String original = file.getOriginalFilename();
         String displayName = original == null
-            ? "file"
-            : java.nio.file.Paths.get(original).getFileName().toString().replaceAll("[\\p{Cntrl}]", "_");
+                ? "file"
+                : java.nio.file.Paths.get(original).getFileName().toString()
+                        .replaceAll("[\\p{Cntrl}]", "_");
 
         String ext = "";
         int dot = displayName.lastIndexOf('.');
         if (dot > 0) {
             ext = displayName.substring(dot).replaceAll("[^a-zA-Z0-9._-]", "");
-            if (ext.length() > 20) ext = ext.substring(0, 20);
+            if (ext.length() > 20)
+                ext = ext.substring(0, 20);
         }
 
         String baseName = UUID.randomUUID().toString();
@@ -86,23 +89,19 @@ public class FileStorageService {
         try {
             byte[] fileBytes = file.getBytes();
 
-            minioClient.putObject(
-                PutObjectArgs.builder()
-                    .bucket(bucket).object(binObject)
-                    .stream(new ByteArrayInputStream(fileBytes), (long) fileBytes.length, (long) -1)
-                    .contentType(file.getContentType())
-                    .build()
-            );
+            minioClient
+                    .putObject(PutObjectArgs.builder().bucket(bucket).object(binObject)
+                            .stream(new ByteArrayInputStream(fileBytes),
+                                    (long) fileBytes.length, (long) -1)
+                            .contentType(file.getContentType()).build());
 
             String b64String = Base64.getEncoder().encodeToString(fileBytes);
             byte[] b64Bytes = b64String.getBytes(StandardCharsets.UTF_8);
-            minioClient.putObject(
-                PutObjectArgs.builder()
-                    .bucket(bucket).object(b64Object)
-                    .stream(new ByteArrayInputStream(b64Bytes), (long) b64Bytes.length, (long) -1)
-                    .contentType("text/plain")
-                    .build()
-            );
+            minioClient
+                    .putObject(PutObjectArgs.builder().bucket(bucket).object(b64Object)
+                            .stream(new ByteArrayInputStream(b64Bytes),
+                                    (long) b64Bytes.length, (long) -1)
+                            .contentType("text/plain").build());
 
             UserFile uf = new UserFile();
             uf.setFileName(displayName);
@@ -127,29 +126,31 @@ public class FileStorageService {
 
     public UserFile getUserFile(Long fileId, User owner) throws FileStorageException {
         return userFileRepository.findByIdAndOwner(fileId, owner).orElseThrow(
-            () -> new FileStorageException("File not found or access denied"));
+                () -> new FileStorageException("File not found or access denied"));
     }
 
     public Path getFilePath(UserFile userFile) {
         try {
-            InputStream is = minioClient.getObject(
-                GetObjectArgs.builder().bucket(bucket).object(userFile.getStoredPath()).build()
-            );
-            Path temp = Files.createTempFile("minio-", "-" + java.nio.file.Paths.get(userFile.getStoredPath()).getFileName());
+            InputStream is = minioClient.getObject(GetObjectArgs.builder().bucket(bucket)
+                    .object(userFile.getStoredPath()).build());
+            Path temp = Files.createTempFile("minio-", "-"
+                    + java.nio.file.Paths.get(userFile.getStoredPath()).getFileName());
             Files.copy(is, temp, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
             is.close();
             return temp;
         } catch (Exception e) {
-            throw new RuntimeException("Failed to download " + userFile.getStoredPath(), e);
+            throw new RuntimeException("Failed to download " + userFile.getStoredPath(),
+                    e);
         }
     }
 
     public String getBase64Content(UserFile userFile) {
-        try (InputStream is = minioClient.getObject(
-            GetObjectArgs.builder().bucket(bucket).object(userFile.getBase64Path()).build())) {
+        try (InputStream is = minioClient.getObject(GetObjectArgs.builder().bucket(bucket)
+                .object(userFile.getBase64Path()).build())) {
             return new String(is.readAllBytes(), StandardCharsets.UTF_8);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to read b64 " + userFile.getBase64Path(), e);
+            throw new RuntimeException("Failed to read b64 " + userFile.getBase64Path(),
+                    e);
         }
     }
 }

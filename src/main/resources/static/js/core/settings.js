@@ -30,6 +30,7 @@ class Settings {
         this.presencePenalty = 0.0;
         this.openRouterProviderOrder = "";
         this.openRouterAllowFallbacks = true;
+        this.includeAdvancedParams = false;
 
         this.provider = "OPENAI";
         this.providerStrategy = "OPENAI";
@@ -73,6 +74,7 @@ class Settings {
             presencePenalty: this.presencePenalty,
             openRouterProviderOrder: this.openRouterProviderOrder,
             openRouterAllowFallbacks: this.openRouterAllowFallbacks,
+            includeAdvancedParams: this.includeAdvancedParams,
         };
         localStorage.setItem("appSettings", JSON.stringify(settingsToSave));
     }

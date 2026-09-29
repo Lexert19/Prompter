@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -125,10 +124,10 @@ public class HistoryControllerIntegrationTest {
         chatRepository.save(chat3);
 
         mockMvc.perform(get("/api/history/chats").with(asUser1()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.totalElements").value(2))
-            .andExpect(jsonPath("$.content[*].uuid", hasItems(
-                chat1.getUuid().toString(), chat2.getUuid().toString())));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(2)).andExpect(
+                        jsonPath("$.content[*].uuid", hasItems(chat1.getUuid().toString(),
+                                chat2.getUuid().toString())));
     }
 
     @Test
@@ -203,11 +202,9 @@ public class HistoryControllerIntegrationTest {
         entityManager.flush();
         entityManager.clear();
 
-        mockMvc.perform(delete("/api/history/chats/{chatId}", chat.getUuid())
-                .with(asUser1()))
-            .andExpect(status().isNoContent());
-
-
+        mockMvc.perform(
+                delete("/api/history/chats/{chatId}", chat.getUuid()).with(asUser1()))
+                .andExpect(status().isNoContent());
 
         Optional<Chat> deletedChat = chatRepository.findById(chat.getId());
         assertThat(deletedChat).isEmpty();

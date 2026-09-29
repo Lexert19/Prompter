@@ -115,9 +115,10 @@ public class ModelService {
                 } else {
                     Model model = new Model(dto.getUuid(), dto.getName(), dto.getText(),
                             dto.getProvider(), dto.getUrl(), true, dto.getType(),
-                            dto.getPointsPerInput(), dto.getPointsPerOutput(), adminUser,Strategy.fromString(
-                        dto.getProviderStrategy() != null ? dto.getProviderStrategy() : dto.getProvider()
-                    ));
+                            dto.getPointsPerInput(), dto.getPointsPerOutput(), adminUser,
+                            Strategy.fromString(dto.getProviderStrategy() != null
+                                    ? dto.getProviderStrategy()
+                                    : dto.getProvider()));
                     modelRepository.save(model);
                     log.info("Added model: {} ({})", dto.getName(), dto.getProvider());
                 }

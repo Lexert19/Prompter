@@ -54,8 +54,11 @@ public class AnthropicStrategy implements ProviderStrategy {
         request.put("messages", messagesList);
         request.put("model", builder.getModel());
         request.put("stream", builder.getStream());
-        request.put("max_tokens", builder.getMaxTokens());
-        request.put("temperature", builder.getTemperature());
+        if (builder.isIncludeAdvancedParams()) {
+            request.put("max_tokens", builder.getMaxTokens());
+            request.put("temperature", builder.getTemperature());
+            request.put("top_p", builder.getTop_p());
+        }
 
         return request;
     }

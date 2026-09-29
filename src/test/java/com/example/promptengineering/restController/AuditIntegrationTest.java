@@ -35,156 +35,155 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 public class AuditIntegrationTest {
 
-  @Autowired
-  private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-  @Autowired
-  private UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-  @Autowired
-  private UserService userService;
+    @Autowired
+    private UserService userService;
 
-  @Autowired
-  private PasswordEncoder passwordEncoder;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-  @Autowired
-  private ObjectMapper objectMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-  @Autowired
-  private AuditLogRepository auditLogRepository;
+    @Autowired
+    private AuditLogRepository auditLogRepository;
 
-  private User adminUser;
-  private User normalUser;
+    private User adminUser;
+    private User normalUser;
 
-  @BeforeEach
-  void setUp() throws Exception {
-    userRepository.findByEmail("admin@audit.com").ifPresent(u -> userRepository.delete(u));
-    userRepository.findByEmail("user@audit.com").ifPresent(u -> userRepository.delete(u));
-    userRepository.findByEmail("testuser@audit.com").ifPresent(u -> userRepository.delete(u));
+    @BeforeEach
+    void setUp() throws Exception {
+        userRepository.findByEmail("admin@audit.com")
+                .ifPresent(u -> userRepository.delete(u));
+        userRepository.findByEmail("user@audit.com")
+                .ifPresent(u -> userRepository.delete(u));
+        userRepository.findByEmail("testuser@audit.com")
+                .ifPresent(u -> userRepository.delete(u));
 
-    adminUser = userService.createUser("admin@audit.com", "adminPass", List.of(AppRole.ADMIN));
-    normalUser = userService.createUser("user@audit.com", "userPass", List.of(AppRole.USER));
-  }
+        adminUser = userService.createUser("admin@audit.com", "adminPass",
+                List.of(AppRole.ADMIN));
+        normalUser = userService.createUser("user@audit.com", "userPass",
+                List.of(AppRole.USER));
+    }
 
-  @Test
-  void shouldLogLoginSuccess() throws Exception {
-    String loginJson = objectMapper.writeValueAsString(
-        Map.of("email", "admin@audit.com", "password", "adminPass")
-    );
+    @Test
+    void shouldLogLoginSuccess() throws Exception {
+        String loginJson = objectMapper.writeValueAsString(
+                Map.of("email", "admin@audit.com", "password", "adminPass"));
 
-    mockMvc.perform(post("/auth/login")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(loginJson))
-        .andExpect(status().isOk());
+        mockMvc.perform(post("/auth/login").contentType(MediaType.APPLICATION_JSON)
+                .content(loginJson)).andExpect(status().isOk());
 
-    Thread.sleep(500);
+        Thread.sleep(500);
 
-    List<AuditLog> logs = auditLogRepository.findByUserIdAndAction(adminUser.getId(), ActionType.LOGIN_SUCCESS);
-    assertThat(logs).hasSize(1);
-    AuditLog log = logs.get(0);
-    assertThat(log.getResult()).isEqualTo(ResultType.SUCCESS);
-    assertThat(log.getUsername()).isEqualTo("admin@audit.com");
-  }
+        List<AuditLog> logs = auditLogRepository.findByUserIdAndAction(adminUser.getId(),
+                ActionType.LOGIN_SUCCESS);
+        assertThat(logs).hasSize(1);
+        AuditLog log = logs.get(0);
+        assertThat(log.getResult()).isEqualTo(ResultType.SUCCESS);
+        assertThat(log.getUsername()).isEqualTo("admin@audit.com");
+    }
 
-  @Test
-  void shouldLogRoleChangeWhenAdminChangesUserRole() throws Exception {
-    mockMvc.perform(post("/admin/users/{id}/role", normalUser.getId())
-            .param("role", "ADMIN")
-            .with(csrf())
-            .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
-        .andExpect(status().is3xxRedirection());
+    @Test
+    void shouldLogRoleChangeWhenAdminChangesUserRole() throws Exception {
+        mockMvc.perform(post("/admin/users/{id}/role", normalUser.getId())
+                .param("role", "ADMIN").with(csrf())
+                .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
+                .andExpect(status().is3xxRedirection());
 
-    Thread.sleep(500);
+        Thread.sleep(500);
 
-    List<AuditLog> logs = auditLogRepository.findByUserIdAndAction(adminUser.getId(), ActionType.ROLE_UPDATE);
-    assertThat(logs).hasSize(1);
-    AuditLog log = logs.get(0);
-    assertThat(log.getResult()).isEqualTo(ResultType.SUCCESS);
-    assertThat(log.getTarget()).contains(normalUser.getId().toString());
-  }
+        List<AuditLog> logs = auditLogRepository.findByUserIdAndAction(adminUser.getId(),
+                ActionType.ROLE_UPDATE);
+        assertThat(logs).hasSize(1);
+        AuditLog log = logs.get(0);
+        assertThat(log.getResult()).isEqualTo(ResultType.SUCCESS);
+        assertThat(log.getTarget()).contains(normalUser.getId().toString());
+    }
 
-  @Test
-  void shouldLogUserDeleteWhenAdminDeletesUser() throws Exception {
-    mockMvc.perform(post("/admin/users/{id}/delete", normalUser.getId())
-            .with(csrf())
-            .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
-        .andExpect(status().is3xxRedirection());
+    @Test
+    void shouldLogUserDeleteWhenAdminDeletesUser() throws Exception {
+        mockMvc.perform(post("/admin/users/{id}/delete", normalUser.getId()).with(csrf())
+                .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
+                .andExpect(status().is3xxRedirection());
 
-    Thread.sleep(500);
+        Thread.sleep(500);
 
-    List<AuditLog> logs = auditLogRepository.findByUserIdAndAction(adminUser.getId(), ActionType.USER_DELETE);
-    assertThat(logs).hasSize(1);
-    AuditLog log = logs.get(0);
-    assertThat(log.getResult()).isEqualTo(ResultType.SUCCESS);
-    assertThat(log.getTarget()).contains(normalUser.getId().toString());
-  }
+        List<AuditLog> logs = auditLogRepository.findByUserIdAndAction(adminUser.getId(),
+                ActionType.USER_DELETE);
+        assertThat(logs).hasSize(1);
+        AuditLog log = logs.get(0);
+        assertThat(log.getResult()).isEqualTo(ResultType.SUCCESS);
+        assertThat(log.getTarget()).contains(normalUser.getId().toString());
+    }
 
-  @Test
-  void shouldLogFailureWhenAdminDeletesSelf() throws Exception {
-    mockMvc.perform(post("/admin/users/{id}/delete", adminUser.getId())
-            .with(csrf())
-            .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
-        .andExpect(status().is3xxRedirection());
+    @Test
+    void shouldLogFailureWhenAdminDeletesSelf() throws Exception {
+        mockMvc.perform(post("/admin/users/{id}/delete", adminUser.getId()).with(csrf())
+                .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
+                .andExpect(status().is3xxRedirection());
 
-    Thread.sleep(500);
+        Thread.sleep(500);
 
-    List<AuditLog> logs = auditLogRepository.findByUserIdAndAction(adminUser.getId(), ActionType.USER_DELETE);
-    assertThat(logs).hasSize(1);
-    AuditLog log = logs.get(0);
-    assertThat(log.getResult()).isEqualTo(ResultType.FAILURE);
-    assertThat(log.getDetails()).contains("cannot delete your own account");
-  }
+        List<AuditLog> logs = auditLogRepository.findByUserIdAndAction(adminUser.getId(),
+                ActionType.USER_DELETE);
+        assertThat(logs).hasSize(1);
+        AuditLog log = logs.get(0);
+        assertThat(log.getResult()).isEqualTo(ResultType.FAILURE);
+        assertThat(log.getDetails()).contains("cannot delete your own account");
+    }
 
-  @Test
-  void shouldLogSharedKeyAddWhenAdminAddsKey() throws Exception {
-    String keyJson = objectMapper.writeValueAsString(
-        Map.of("provider", "OPENAI", "keyValue", "sk-test123")
-    );
+    @Test
+    void shouldLogSharedKeyAddWhenAdminAddsKey() throws Exception {
+        String keyJson = objectMapper.writeValueAsString(
+                Map.of("provider", "OPENAI", "keyValue", "sk-test123"));
 
-    mockMvc.perform(post("/api/admin/shared-keys")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(keyJson)
-            .with(csrf())
-            .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
-        .andExpect(status().isOk());
+        mockMvc.perform(post("/api/admin/shared-keys")
+                .contentType(MediaType.APPLICATION_JSON).content(keyJson).with(csrf())
+                .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
+                .andExpect(status().isOk());
 
-    Thread.sleep(500);
+        Thread.sleep(500);
 
-    List<AuditLog> logs = auditLogRepository.findByUserIdAndAction(adminUser.getId(), ActionType.SHARED_KEY_GENERATE);
-    assertThat(logs).hasSize(1);
-    AuditLog log = logs.get(0);
-    assertThat(log.getResult()).isEqualTo(ResultType.SUCCESS);
-    assertThat(log.getTarget()).contains("OPENAI");
-  }
+        List<AuditLog> logs = auditLogRepository.findByUserIdAndAction(adminUser.getId(),
+                ActionType.SHARED_KEY_GENERATE);
+        assertThat(logs).hasSize(1);
+        AuditLog log = logs.get(0);
+        assertThat(log.getResult()).isEqualTo(ResultType.SUCCESS);
+        assertThat(log.getTarget()).contains("OPENAI");
+    }
 
-  @Test
-  void shouldLogSharedKeyDeleteWhenAdminDeletesKey() throws Exception {
-    String keyJson = objectMapper.writeValueAsString(
-        Map.of("provider", "ANTHROPIC", "keyValue", "sk-anthropic")
-    );
-    String response = mockMvc.perform(post("/api/admin/shared-keys")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(keyJson)
-            .with(csrf())
-            .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
-        .andExpect(status().isOk())
-        .andReturn().getResponse().getContentAsString();
+    @Test
+    void shouldLogSharedKeyDeleteWhenAdminDeletesKey() throws Exception {
+        String keyJson = objectMapper.writeValueAsString(
+                Map.of("provider", "ANTHROPIC", "keyValue", "sk-anthropic"));
+        String response = mockMvc
+                .perform(post("/api/admin/shared-keys")
+                        .contentType(MediaType.APPLICATION_JSON).content(keyJson)
+                        .with(csrf())
+                        .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
+                .andExpect(status().isOk()).andReturn().getResponse()
+                .getContentAsString();
 
-    Long keyId = objectMapper.readTree(response).get("id").asLong();
+        Long keyId = objectMapper.readTree(response).get("id").asLong();
 
-    mockMvc.perform(delete("/api/admin/shared-keys/{id}", keyId)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content("{}")
-            .with(csrf())
-            .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
-        .andExpect(status().isNoContent());
+        mockMvc.perform(delete("/api/admin/shared-keys/{id}", keyId)
+                .contentType(MediaType.APPLICATION_JSON).content("{}").with(csrf())
+                .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
+                .andExpect(status().isNoContent());
 
-    Thread.sleep(500);
+        Thread.sleep(500);
 
-    List<AuditLog> logs = auditLogRepository.findByUserIdAndAction(adminUser.getId(), ActionType.SHARED_KEY_DELETE);
-    assertThat(logs).hasSize(1);
-    AuditLog log = logs.get(0);
-    assertThat(log.getResult()).isEqualTo(ResultType.SUCCESS);
-    assertThat(log.getTarget()).contains(keyId.toString());
-  }
+        List<AuditLog> logs = auditLogRepository.findByUserIdAndAction(adminUser.getId(),
+                ActionType.SHARED_KEY_DELETE);
+        assertThat(logs).hasSize(1);
+        AuditLog log = logs.get(0);
+        assertThat(log.getResult()).isEqualTo(ResultType.SUCCESS);
+        assertThat(log.getTarget()).contains(keyId.toString());
+    }
 }

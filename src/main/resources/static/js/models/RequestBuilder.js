@@ -86,7 +86,8 @@ class RequestBuilder {
                 reasoningEffort: Settings.instance().thinkingEffort
             }),
             system: this.getSystem(),
-            useSharedKeys: Settings.instance().useSharedKeys
+            useSharedKeys: Settings.instance().useSharedKeys,
+            includeAdvancedParams: Settings.instance().includeAdvancedParams
         }
 
         if (this.getProvider() === "OPENROUTER") {
