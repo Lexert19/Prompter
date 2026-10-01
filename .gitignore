@@ -52,3 +52,5 @@ output.txt
 
 gradle.properties
 .gradle.properties
+
+src/main/resources/static/locales/

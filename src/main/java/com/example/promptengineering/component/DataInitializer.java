@@ -61,9 +61,6 @@ public class DataInitializer implements CommandLineRunner {
             log.debug("Admin already exists: {}", adminEmail);
         }
 
-        // modelService.loadDefaultModelsFromJson();
-
-        // addGeminiSharedKeyIfNeeded(admin);
     }
 
     private void addGeminiSharedKeyIfNeeded(User user) {
