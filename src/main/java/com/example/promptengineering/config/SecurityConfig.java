@@ -71,7 +71,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.ERROR)
                 .permitAll()
                 .requestMatchers("/", "/{lang:(?:pl|en)}/**", "/public/**", "/login",
-                        "/debug", "/error", "/terms", "/privacy", "/static/**",
+                        "/debug", "/error", "/blog/**", "/terms", "/privacy", "/static/**",
                         "/auth/**", "/favicon.ico", "/favicon", "/actuator/prometheus",
                         "/mock-ai/**")
                 .permitAll().requestMatchers("/admin/**", "/api/admin/**")
@@ -105,15 +105,6 @@ public class SecurityConfig implements WebMvcConfigurer {
 
         return http.build();
     }
-
-    // @Profile("loadtest")
-    // @Bean
-    // SecurityFilterChain loadtestSecurity(HttpSecurity http) throws Exception {
-    // http.authorizeHttpRequests(auth ->
-    // auth.requestMatchers("/mock-ai/**").permitAll()
-    // .anyRequest().authenticated());
-    // return http.build();
-    // }
 
     @Bean
     public OidcUserService oidcUserService() {

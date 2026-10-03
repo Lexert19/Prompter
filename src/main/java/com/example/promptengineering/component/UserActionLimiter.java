@@ -1,55 +1,43 @@
 package com.example.promptengineering.component;
 
 import com.example.promptengineering.entity.User;
+import com.example.promptengineering.model.RateLimitPolicy;
+import com.example.promptengineering.repository.RateLimiter;
 import org.springframework.beans.factory.annotation.Value;
-
-import java.time.Instant;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.stereotype.Component;
+
+import java.time.Duration;
 
 @Component
 public class UserActionLimiter {
-    private final ConcurrentMap<Long, AtomicInteger> attempts = new ConcurrentHashMap<>();
-    private final ConcurrentMap<Long, Instant> lastAction = new ConcurrentHashMap<>();
-    private final ConcurrentMap<Long, Instant> blockedUntil = new ConcurrentHashMap<>();
 
-    private final int maxAttemptsPerDay;
-    private final int cooldownSeconds;
+    private static final String KEY_PREFIX = "user:";
+    private final RateLimiter rateLimiter;
+    private final RateLimitPolicy policy;
 
     public UserActionLimiter(
-            @Value("${app.rate-limit.user.max-attempts:3}") int maxAttemptsPerDay,
-            @Value("${app.rate-limit.user.cooldown-seconds:60}") int cooldownSeconds) {
-        this.maxAttemptsPerDay = maxAttemptsPerDay;
-        this.cooldownSeconds = cooldownSeconds;
+        RateLimiter rateLimiter,
+        @Value("${app.rate-limit.user.max-attempts:3}") int maxAttempts,
+        @Value("${app.rate-limit.user.cooldown-seconds:60}") int cooldownSeconds,
+        @Value("${app.rate-limit.user.block-hours:24}") int blockHours) {
+        this.rateLimiter = rateLimiter;
+        this.policy = new RateLimitPolicy(
+            maxAttempts,
+            Duration.ofSeconds(cooldownSeconds),
+            Duration.ofHours(blockHours)
+        );
     }
 
     public boolean canPerform(User user) {
-        if (user == null || user.getId() == null)
-            return false;
-        Long userId = user.getId();
-
-        Instant blocked = blockedUntil.get(userId);
-        if (blocked != null && Instant.now().isBefore(blocked))
-            return false;
-
-        if (cooldownSeconds > 0) {
-            Instant last = lastAction.get(userId);
-            if (last != null && last.plusSeconds(cooldownSeconds).isAfter(Instant.now()))
-                return false;
-        }
-
-        AtomicInteger count = attempts.computeIfAbsent(userId, k -> new AtomicInteger(0));
-        int current = count.incrementAndGet();
-        if (current > maxAttemptsPerDay) {
-            blockedUntil.put(userId, Instant.now().plusSeconds(24 * 3600));
-            attempts.remove(userId);
-            lastAction.remove(userId);
+        if (user == null || user.getId() == null) {
             return false;
         }
+        return rateLimiter.tryAcquire(KEY_PREFIX + user.getId(), policy);
+    }
 
-        lastAction.put(userId, Instant.now());
-        return true;
+    public void reset(User user) {
+        if (user != null && user.getId() != null) {
+            rateLimiter.reset(KEY_PREFIX + user.getId());
+        }
     }
 }

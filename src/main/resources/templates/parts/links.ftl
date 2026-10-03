@@ -15,6 +15,14 @@
         integrity="sha512-zKeerWHHuP3ar7kX2WKBSENzb+GJytFSBL6HrR2nPSR1kOX1qjm+oHooQtbDpDBSITgyl7QXZApvDfDWvKjkUw=="
         crossorigin="anonymous"
         referrerpolicy="no-referrer"></script>
+
+<link rel="preload"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/webfonts/fa-solid-900.woff2"
+      as="font" type="font/woff2" crossorigin>
+<link rel="preload"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/webfonts/fa-brands-400.woff2"
+      as="font" type="font/woff2" crossorigin>
+
 <script src="/static/js/navbar.js"></script>
 <script src="/static/otherJs/global.js"></script>
 

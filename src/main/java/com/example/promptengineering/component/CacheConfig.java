@@ -14,7 +14,7 @@ public class CacheConfig {
     @Bean
     public CacheManager cacheManager() {
         CaffeineCacheManager manager = new CaffeineCacheManager("posts", "homePage",
-                "postBySlug", "globalModels", "mediaList", "jsFiles");
+                "postBySlug", "locales", "globalModels", "mediaList", "jsFiles");
         manager.setCaffeine(Caffeine.newBuilder().maximumSize(500)
                 .expireAfterWrite(10, TimeUnit.MINUTES).recordStats());
         return manager;
