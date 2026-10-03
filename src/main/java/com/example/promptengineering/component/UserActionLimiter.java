@@ -15,17 +15,13 @@ public class UserActionLimiter {
     private final RateLimiter rateLimiter;
     private final RateLimitPolicy policy;
 
-    public UserActionLimiter(
-        RateLimiter rateLimiter,
-        @Value("${app.rate-limit.user.max-attempts:3}") int maxAttempts,
-        @Value("${app.rate-limit.user.cooldown-seconds:60}") int cooldownSeconds,
-        @Value("${app.rate-limit.user.block-hours:24}") int blockHours) {
+    public UserActionLimiter(RateLimiter rateLimiter,
+            @Value("${app.rate-limit.user.max-attempts:3}") int maxAttempts,
+            @Value("${app.rate-limit.user.cooldown-seconds:60}") int cooldownSeconds,
+            @Value("${app.rate-limit.user.block-hours:24}") int blockHours) {
         this.rateLimiter = rateLimiter;
-        this.policy = new RateLimitPolicy(
-            maxAttempts,
-            Duration.ofSeconds(cooldownSeconds),
-            Duration.ofHours(blockHours)
-        );
+        this.policy = new RateLimitPolicy(maxAttempts,
+                Duration.ofSeconds(cooldownSeconds), Duration.ofHours(blockHours));
     }
 
     public boolean canPerform(User user) {

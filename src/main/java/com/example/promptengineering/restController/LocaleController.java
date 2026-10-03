@@ -11,14 +11,14 @@ import java.util.Map;
 @RestController
 public class LocaleController {
 
-  private final LocaleService localeService;
+    private final LocaleService localeService;
 
-  public LocaleController(LocaleService localeService) {
-    this.localeService = localeService;
-  }
+    public LocaleController(LocaleService localeService) {
+        this.localeService = localeService;
+    }
 
-  @GetMapping(value = "/static/locales/{lang}.json", produces = "application/json")
-  public ResponseEntity<Map<String, String>> getLocales(@PathVariable String lang) {
-    return ResponseEntity.ok(localeService.getTranslations(lang));
-  }
+    @GetMapping(value = "/static/locales/{lang}.json", produces = "application/json")
+    public ResponseEntity<Map<String, String>> getLocales(@PathVariable String lang) {
+        return ResponseEntity.ok(localeService.getTranslations(lang));
+    }
 }

@@ -15,50 +15,51 @@ import java.util.Map;
 @Service
 public class LocaleService {
 
-  private final ResourceLoader resourceLoader;
+    private final ResourceLoader resourceLoader;
 
-  public LocaleService(ResourceLoader resourceLoader) {
-    this.resourceLoader = resourceLoader;
-  }
-
-  @Cacheable(value = "locales", key = "#lang")
-  public Map<String, String> getTranslations(String lang) {
-    Map<String, String> translations = new LinkedHashMap<>();
-
-    loadProperties("classpath:messages.properties", translations);
-
-    if (lang != null && !lang.isBlank() && !"en".equalsIgnoreCase(lang)) {
-      loadProperties("classpath:messages_" + lang + ".properties", translations);
+    public LocaleService(ResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader;
     }
 
-    return translations;
-  }
+    @Cacheable(value = "locales", key = "#lang")
+    public Map<String, String> getTranslations(String lang) {
+        Map<String, String> translations = new LinkedHashMap<>();
 
-  private void loadProperties(String location, Map<String, String> target) {
-    Resource resource = resourceLoader.getResource(location);
-    if (!resource.exists()) {
-      return;
-    }
+        loadProperties("classpath:messages.properties", translations);
 
-    try (BufferedReader reader = new BufferedReader(
-        new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
-      String line;
-      while ((line = reader.readLine()) != null) {
-        String trimmed = line.trim();
-        if (!trimmed.isEmpty() && !trimmed.startsWith("#") && !trimmed.startsWith("!")) {
-          int separatorIndex = trimmed.indexOf('=');
-          if (separatorIndex == -1) {
-            separatorIndex = trimmed.indexOf(':');
-          }
-          if (separatorIndex != -1) {
-            String key = trimmed.substring(0, separatorIndex).trim();
-            String value = trimmed.substring(separatorIndex + 1).trim();
-            target.put(key, value);
-          }
+        if (lang != null && !lang.isBlank() && !"en".equalsIgnoreCase(lang)) {
+            loadProperties("classpath:messages_" + lang + ".properties", translations);
         }
-      }
-    } catch (IOException e) {
-      throw new RuntimeException(" " + location, e);
+
+        return translations;
     }
-  }
+
+    private void loadProperties(String location, Map<String, String> target) {
+        Resource resource = resourceLoader.getResource(location);
+        if (!resource.exists()) {
+            return;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                resource.getInputStream(), StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String trimmed = line.trim();
+                if (!trimmed.isEmpty() && !trimmed.startsWith("#")
+                        && !trimmed.startsWith("!")) {
+                    int separatorIndex = trimmed.indexOf('=');
+                    if (separatorIndex == -1) {
+                        separatorIndex = trimmed.indexOf(':');
+                    }
+                    if (separatorIndex != -1) {
+                        String key = trimmed.substring(0, separatorIndex).trim();
+                        String value = trimmed.substring(separatorIndex + 1).trim();
+                        target.put(key, value);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(" " + location, e);
+        }
+    }
 }

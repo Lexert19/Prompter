@@ -1,6 +1,6 @@
 package com.example.promptengineering.filter;
 
-import com.example.promptengineering.security.IpRateLimiter;
+import com.example.promptengineering.component.IpRateLimiter;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

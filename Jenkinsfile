@@ -1,44 +1,44 @@
 pipeline {
-    agent any
+  agent any
 
-     environment {
-            DEPLOY_DIR = '/home/lexert/_projects/Prompter/build/libs'
-            JAR_NAME   = 'prompter.jar'
-        }
+  environment {
+    DEPLOY_DIR = '/home/lexert/_projects/Prompter/build/libs'
+    JAR_NAME   = 'prompter.jar'
+  }
 
-    stages {
-        stage('Checkout') {
-            steps { checkout scm }
-        }
-        stage('Build') {
-            steps {
-                sh 'chmod +x gradlew'
-                sh './gradlew clean assemble'
-            }
-        }
-        stage('Test') {
-            steps {
-                sh 'cp /home/lexert/_projects/Prompter/.env ./.env'
-                sh './gradlew test --rerun-tasks'
-            }
-            post { always { junit 'build/test-results/test/**/*.xml' } }
-        }
-        stage('Package') {
-            steps { sh './gradlew bootJar' }
-        }
-        stage('Deploy to Production') {
-            steps {
-                script {
-                    sh """
+  stages {
+    stage('Checkout') {
+      steps { checkout scm }
+    }
+    stage('Build') {
+      steps {
+        sh 'chmod +x gradlew'
+        sh './gradlew spotlessCheck assemble'
+      }
+    }
+    stage('Test') {
+      steps {
+        sh 'cp /home/lexert/_projects/Prompter/.env ./.env'
+        sh './gradlew test --rerun-tasks'
+      }
+      post { always { junit 'build/test-results/test/**/*.xml' } }
+    }
+    stage('Package') {
+      steps { sh './gradlew bootJar' }
+    }
+    stage('Deploy to Production') {
+      steps {
+        script {
+          sh """
                        cp build/libs/prompter.jar ${DEPLOY_DIR}/${JAR_NAME}
                        sudo systemctl restart prompter.service
                     """
-                }
-            }
         }
+      }
     }
-    post {
-        success { echo 'Pipeline succeeded.' }
-        failure { echo 'Pipeline failed.' }
-    }
+  }
+  post {
+    success { echo 'Pipeline succeeded.' }
+    failure { echo 'Pipeline failed.' }
+  }
 }

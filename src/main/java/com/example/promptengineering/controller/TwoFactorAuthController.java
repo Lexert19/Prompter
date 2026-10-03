@@ -2,7 +2,7 @@ package com.example.promptengineering.controller;
 
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.repository.UserRepository;
-import com.example.promptengineering.security.IpRateLimiter;
+import com.example.promptengineering.component.IpRateLimiter;
 import com.example.promptengineering.service.TwoFactorEmailService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;

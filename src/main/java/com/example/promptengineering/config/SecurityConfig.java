@@ -71,9 +71,9 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.ERROR)
                 .permitAll()
                 .requestMatchers("/", "/{lang:(?:pl|en)}/**", "/public/**", "/login",
-                        "/debug", "/error", "/blog/**", "/terms", "/privacy", "/static/**",
-                        "/auth/**", "/favicon.ico", "/favicon", "/actuator/prometheus",
-                        "/mock-ai/**")
+                        "/debug", "/error", "/blog/**", "/terms", "/privacy",
+                        "/static/**", "/auth/**", "/favicon.ico", "/favicon",
+                        "/actuator/prometheus", "/mock-ai/**")
                 .permitAll().requestMatchers("/admin/**", "/api/admin/**")
                 .hasAuthority("ROLE_ADMIN").anyRequest().authenticated());
 

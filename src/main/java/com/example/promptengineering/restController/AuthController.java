@@ -14,7 +14,7 @@ import com.example.promptengineering.exception.UserNotFoundException;
 import com.example.promptengineering.model.ActionType;
 import com.example.promptengineering.model.ResultType;
 import com.example.promptengineering.repository.UserRepository;
-import com.example.promptengineering.security.IpRateLimiter;
+import com.example.promptengineering.component.IpRateLimiter;
 import com.example.promptengineering.service.AuditLogService;
 import com.example.promptengineering.service.AuthService;
 import com.example.promptengineering.service.ResetTokenService;

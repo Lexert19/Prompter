@@ -1,5 +1,6 @@
 package com.example.promptengineering.service;
 
+import com.example.promptengineering.entity.User;
 import com.example.promptengineering.exception.UserAlreadyExistsException;
 import com.example.promptengineering.model.AppRole;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -34,14 +35,17 @@ public class CustomOAuth2UserService
 
         String email = oAuth2User.getAttribute("email");
 
-        return userRepository.findByEmail(email).orElseGet(() -> {
-            try {
-                return userService.createUser(email, List.of(AppRole.USER));
-            } catch (UserAlreadyExistsException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        return userRepository.findByEmail(email).orElseGet(() -> createOrFetch(email));
+    }
 
+    private User createOrFetch(String email) {
+        try {
+            return userService.createUser(email, List.of(AppRole.USER));
+        } catch (UserAlreadyExistsException e) {
+            return userRepository.findByEmail(email)
+                    .orElseThrow(() -> new OAuth2AuthenticationException(
+                            "User not found after conflict: " + email));
+        }
     }
 
 }
