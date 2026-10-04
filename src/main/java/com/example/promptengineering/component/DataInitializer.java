@@ -3,8 +3,6 @@ package com.example.promptengineering.component;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.model.AppRole;
 import com.example.promptengineering.repository.UserRepository;
-import com.example.promptengineering.service.ModelService;
-import com.example.promptengineering.service.SharedKeyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -21,15 +19,14 @@ public class DataInitializer implements CommandLineRunner {
     private final String adminEmail;
     private final String adminPassword;
 
-  public DataInitializer(UserRepository userRepository, PasswordEncoder passwordEncoder,
+    public DataInitializer(UserRepository userRepository, PasswordEncoder passwordEncoder,
             @Value("${admin.email}") String adminEmail,
-            @Value("${admin.password}") String adminPassword
-           ) {
+            @Value("${admin.password}") String adminPassword) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.adminEmail = adminEmail;
         this.adminPassword = adminPassword;
-  }
+    }
 
     @Override
     public void run(String... args) throws Exception {
