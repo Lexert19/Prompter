@@ -31,6 +31,9 @@ public class Chat {
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     private Instant createdAt;
 
+    @Column(name = "total_size", nullable = false)
+    private long totalSize = 0;
+
     private boolean favorite;
 
 }

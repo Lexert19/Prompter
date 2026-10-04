@@ -29,8 +29,8 @@ public class AccountController {
 
     @PostMapping("/save-key/{keyName}")
     public String saveKeyToMap(@AuthenticationPrincipal User user,
-                               @PathVariable String keyName,
-                               @RequestBody String keyValue) {
+                               @PathVariable String keyName, @RequestBody String keyValue)
+            throws Exception {
         userService.appendKeyToMap(user, keyName, keyValue);
         return String.format("Key '%s' saved to map for user with email: %s", keyName,
                 user.getEmail());

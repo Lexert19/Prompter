@@ -34,9 +34,9 @@ public class AdminSharedKeyController {
                                                             @AuthenticationPrincipal User user) {
         SharedKey savedKey = sharedKeyService.addKey(dto.getProvider(), dto.getKeyValue(),
                 user);
-        auditLogService.log(auditLogService.createAuditLog(user.getId(),
-                user.getEmail(), ActionType.SHARED_KEY_GENERATE, ResultType.SUCCESS,
-                dto.getProvider(), "Added", null));
+        auditLogService.log(auditLogService.createAuditLog(user.getId(), user.getEmail(),
+                ActionType.SHARED_KEY_GENERATE, ResultType.SUCCESS, dto.getProvider(),
+                "Added", null));
         return ResponseEntity.ok(Map.of("id", savedKey.getId(), "message", "Added"));
     }
 

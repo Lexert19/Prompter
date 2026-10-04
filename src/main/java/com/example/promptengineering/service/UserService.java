@@ -1,6 +1,8 @@
 package com.example.promptengineering.service;
 
 import com.example.promptengineering.dto.RegisterRequest;
+import com.example.promptengineering.exception.ValidationException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.security.SecureRandom;
@@ -11,6 +13,7 @@ import com.example.promptengineering.exception.UserAlreadyExistsException;
 import com.example.promptengineering.model.AppRole;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -40,7 +43,7 @@ public class UserService implements UserDetailsService {
         this.maxEncryptedKeysLength = maxEncryptedKeysLength;
     }
 
-    public User registerUser(RegisterRequest request) throws UserAlreadyExistsException {
+    public User registerUser(RegisterRequest request) {
         return createUser(request.email(), request.password(), List.of(AppRole.USER));
     }
 
@@ -65,7 +68,8 @@ public class UserService implements UserDetailsService {
         return generateApiToken(user);
     }
 
-    public void setUserKeys(User user, Map<String, String> keys) {
+    public void setUserKeys(User user, Map<String, String> keys)
+            throws ValidationException {
         String encrypted;
         try {
             String json = objectMapper.writeValueAsString(keys);
@@ -74,14 +78,15 @@ public class UserService implements UserDetailsService {
             throw new RuntimeException("Error saving keys", e);
         }
         if (encrypted.length() > maxEncryptedKeysLength) {
-            throw new IllegalArgumentException("Encrypted keys too long (max "
+            throw new ValidationException("Encrypted keys too long (max "
                     + maxEncryptedKeysLength + " characters)");
         }
         user.setEncryptedKeys(encrypted);
     }
 
     @Transactional
-    public void appendKeyToMap(User user, String keyName, String keyValue) {
+    public void appendKeyToMap(User user, String keyName, String keyValue)
+            throws ValidationException {
         Map<String, String> keys = getUserKeys(user);
         keys.put(keyName, keyValue);
         this.setUserKeys(user, keys);
@@ -92,31 +97,35 @@ public class UserService implements UserDetailsService {
         if (user.getEncryptedKeys() == null || user.getEncryptedKeys().isEmpty()) {
             return new HashMap<>();
         }
+
+        String decrypted;
         try {
-            if (user.getEncryptedKeys().length() > maxEncryptedKeysLength) {
-                throw new IllegalArgumentException("Encrypted keys too long (max "
-                        + maxEncryptedKeysLength + " characters)");
-            }
-            String decrypted = encryptionService.decrypt(user.getEncryptedKeys());
+            decrypted = encryptionService.decrypt(user.getEncryptedKeys());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to decrypt keys for user " + user.getId(),
+                    e);
+        }
+
+        try {
             return objectMapper.readValue(decrypted,
                     new TypeReference<Map<String, String>>() {
                     });
-        } catch (Exception e) {
-            throw new RuntimeException("Error reading keys", e);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to parse keys for user " + user.getId(),
+                    e);
         }
     }
 
-    public User findUserByEmail(String email) throws Exception {
+    public User findUserByEmail(String email) {
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) {
-            throw new Exception("User does not exists.");
+            throw new UsernameNotFoundException("User does not exists.");
         }
         return user.get();
     }
 
     private User createAndSaveUser(String email, String encodedPassword,
-                                   List<AppRole> roles)
-            throws UserAlreadyExistsException {
+                                   List<AppRole> roles) {
         User user = new User();
         user.setEmail(email);
         user.setPassword(encodedPassword);
@@ -130,21 +139,19 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public User createUser(String email, String rawPassword, List<AppRole> roles)
-            throws UserAlreadyExistsException {
+    public User createUser(String email, String rawPassword, List<AppRole> roles) {
         String encodedPassword = passwordEncoder.encode(rawPassword);
         return createAndSaveUser(email, encodedPassword, roles);
     }
 
-    public User createUser(String email, List<AppRole> roles)
-            throws UserAlreadyExistsException {
+    public User createUser(String email, List<AppRole> roles) {
         String randomPassword = UUID.randomUUID().toString();
         String encodedPassword = passwordEncoder.encode(randomPassword);
         return createAndSaveUser(email, encodedPassword, roles);
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username)
+    public @NonNull UserDetails loadUserByUsername(@NonNull String username)
             throws UsernameNotFoundException {
         Optional<User> user = userRepository.findByEmail(username);
         if (user.isEmpty()) {

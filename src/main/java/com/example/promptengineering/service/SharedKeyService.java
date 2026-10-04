@@ -5,6 +5,7 @@ import com.example.promptengineering.entity.SharedKey;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.repository.SharedKeyRepository;
 import jakarta.transaction.Transactional;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,24 +25,19 @@ public class SharedKeyService {
         this.sharedKeyRepository = sharedKeyRepository;
     }
 
-    public String getRandomWorkingKey(String provider) {
-        SharedKey key = getRandomWorkingKeyEntity(provider);
-        return encryptionService.decrypt(key.getKeyValue());
-    }
-
-    public SharedKey getRandomWorkingKeyEntity(String provider) {
+    public Optional<SharedKey> getRandomWorkingKeyEntity(String provider) {
         List<SharedKey> workingKeys = sharedKeyRepository.findByProvider(provider);
         List<SharedKey> availableKeys = workingKeys.stream()
                 .filter(key -> !key.isBlocked()).toList();
 
         if (workingKeys.isEmpty()) {
-            throw new RuntimeException("No working keys for provider: " + provider);
+            return Optional.empty();
         }
 
         SharedKey key = workingKeys.get(random.nextInt(workingKeys.size()));
         key.setUsageCount(key.getUsageCount() + 1);
         sharedKeyRepository.save(key);
-        return key;
+        return Optional.of(key);
     }
 
     public List<SharedKeyInfoDto> getAllKeys() {
@@ -72,7 +68,7 @@ public class SharedKeyService {
     @Transactional
     public void blockKey(Long keyId, int minutes) {
         SharedKey key = sharedKeyRepository.findById(keyId).orElseThrow(
-                () -> new RuntimeException("Key not found with id: " + keyId));
+                () -> new IllegalArgumentException("Key not found with id: " + keyId));
         key.block(minutes);
         sharedKeyRepository.save(key);
     }
@@ -80,7 +76,7 @@ public class SharedKeyService {
     @Transactional
     public void markKeyWorking(Long keyId) {
         SharedKey key = sharedKeyRepository.findById(keyId).orElseThrow(
-                () -> new RuntimeException("Key not found with id: " + keyId));
+                () -> new IllegalArgumentException("Key not found with id: " + keyId));
         key.markWorking();
         sharedKeyRepository.save(key);
     }

@@ -30,8 +30,7 @@ public class FileController {
 
     @PostMapping("/upload")
     public ResponseEntity<UserFileDTO> uploadFile(@RequestParam("file") MultipartFile file,
-                                                  @AuthenticationPrincipal User user)
-            throws IOException {
+                                                  @AuthenticationPrincipal User user) {
 
         UserFileDTO savedFile = fileStorageService.storeFile(file, user);
         return ResponseEntity.ok(savedFile);

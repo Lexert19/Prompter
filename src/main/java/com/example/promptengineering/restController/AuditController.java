@@ -11,7 +11,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,20 +27,16 @@ public class AuditController {
     private final AuditLogRepository auditLogRepository;
 
     @GetMapping("/logs")
-    public ResponseEntity<Page<AuditLog>> getLogs(
-        @RequestParam(required = false) Long userId,
-        @RequestParam(required = false) ActionType action,
-        @RequestParam(required = false)
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
-        @RequestParam(required = false)
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
-        @RequestParam(required = false) String search,
-        @PageableDefault(size = 50, sort = "timestamp",
-            direction = Sort.Direction.DESC) Pageable pageable) {
+    public ResponseEntity<Page<AuditLog>> getLogs(@RequestParam(required = false) Long userId,
+                                                  @RequestParam(required = false) ActionType action,
+                                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
+                                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
+                                                  @RequestParam(required = false) String search,
+                                                  @PageableDefault(size = 50, sort = "timestamp", direction = Sort.Direction.DESC) Pageable pageable) {
 
         Page<AuditLog> page = auditLogRepository.findAll(
-            AuditLogSpecifications.withFilters(userId, action, from, to, search),
-            pageable);
+                AuditLogSpecifications.withFilters(userId, action, from, to, search),
+                pageable);
         return ResponseEntity.ok(page);
     }
 

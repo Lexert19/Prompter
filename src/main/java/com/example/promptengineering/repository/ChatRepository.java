@@ -19,4 +19,5 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
     List<Chat> findByUser(User user);
     @EntityGraph(attributePaths = {"user"})
     Optional<Chat> findByUuid(UUID uuid);
+    Optional<Chat> findByUuidAndUser(UUID uuid, User user);
 }

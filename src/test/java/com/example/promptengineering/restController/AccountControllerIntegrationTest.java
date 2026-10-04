@@ -1,6 +1,7 @@
 package com.example.promptengineering.restController;
 
 import com.example.promptengineering.entity.User;
+import com.example.promptengineering.exception.ValidationException;
 import com.example.promptengineering.repository.ResetTokenRepository;
 import com.example.promptengineering.repository.UserRepository;
 import com.example.promptengineering.service.UserService;
@@ -51,7 +52,7 @@ public class AccountControllerIntegrationTest {
     private final String userPassword = "password123";
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws ValidationException {
         User testUser = new User();
         testUser.setEmail(userEmail);
         testUser.setPassword(passwordEncoder.encode(userPassword));

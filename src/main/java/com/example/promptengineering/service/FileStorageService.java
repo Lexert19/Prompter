@@ -6,7 +6,9 @@ import com.example.promptengineering.entity.UserFile;
 import com.example.promptengineering.exception.FileStorageException;
 import com.example.promptengineering.repository.UserFileRepository;
 import io.minio.*;
+import io.minio.errors.MinioException;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +25,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class FileStorageService {
     private final MinioClient minioClient;
@@ -58,7 +61,7 @@ public class FileStorageService {
                 userFile.getOwner().getId());
     }
 
-    public UserFileDTO storeFile(MultipartFile file, User owner) throws IOException {
+    public UserFileDTO storeFile(MultipartFile file, User owner) {
         if (file.getSize() > maxFileSize)
             throw new IllegalArgumentException("Too big");
         if (userFileRepository.countByOwner(owner) >= maxFilesPerUser)
@@ -68,7 +71,7 @@ public class FileStorageService {
         String displayName = original == null
                 ? "file"
                 : java.nio.file.Paths.get(original).getFileName().toString()
-                        .replaceAll("[\\p{Cntrl}]", "_");
+                        .replaceAll("\\p{Cntrl}", "_");
 
         String ext = "";
         int dot = displayName.lastIndexOf('.');
@@ -80,7 +83,7 @@ public class FileStorageService {
 
         String baseName = UUID.randomUUID().toString();
         String binObject = owner.getId().toString() + "/" + baseName + ext;
-        String b64Object = owner.getId().toString() + "/" + baseName + ".b64";
+        String b64Object = owner.getId() + "/" + baseName + ".b64";
 
         if (binObject.contains("..") || b64Object.contains("..")) {
             throw new SecurityException("Path traversal");
@@ -108,14 +111,14 @@ public class FileStorageService {
             uf.setStoredPath(binObject);
             uf.setBase64Path(b64Object);
             uf.setContentType(file.getContentType());
-            uf.setSize((long) fileBytes.length);
+            uf.setSize(fileBytes.length);
             uf.setUploadedAt(Instant.now());
             uf.setOwner(owner);
 
             return toDto(userFileRepository.save(uf));
 
         } catch (Exception e) {
-            throw new IOException("MinIO store failed", e);
+            throw new RuntimeException("MinIO store failed", e);
         }
     }
 
@@ -130,15 +133,15 @@ public class FileStorageService {
     }
 
     public Path getFilePath(UserFile userFile) {
-        try {
-            InputStream is = minioClient.getObject(GetObjectArgs.builder().bucket(bucket)
-                    .object(userFile.getStoredPath()).build());
+        try (InputStream is = minioClient.getObject(GetObjectArgs.builder().bucket(bucket)
+                .object(userFile.getStoredPath()).build())) {
+
             Path temp = Files.createTempFile("minio-", "-"
                     + java.nio.file.Paths.get(userFile.getStoredPath()).getFileName());
             Files.copy(is, temp, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-            is.close();
             return temp;
-        } catch (Exception e) {
+
+        } catch (IOException | MinioException e) {
             throw new RuntimeException("Failed to download " + userFile.getStoredPath(),
                     e);
         }
@@ -147,8 +150,10 @@ public class FileStorageService {
     public String getBase64Content(UserFile userFile) {
         try (InputStream is = minioClient.getObject(GetObjectArgs.builder().bucket(bucket)
                 .object(userFile.getBase64Path()).build())) {
+
             return new String(is.readAllBytes(), StandardCharsets.UTF_8);
-        } catch (Exception e) {
+
+        } catch (IOException | MinioException e) {
             throw new RuntimeException("Failed to read b64 " + userFile.getBase64Path(),
                     e);
         }

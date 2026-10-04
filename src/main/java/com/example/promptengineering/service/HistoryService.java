@@ -1,5 +1,6 @@
 package com.example.promptengineering.service;
 
+import com.example.promptengineering.exception.ValidationException;
 import java.time.Instant;
 import java.util.List;
 
@@ -7,7 +8,6 @@ import com.example.promptengineering.exception.ResourceNotFoundException;
 import com.example.promptengineering.exception.UserSecurityException;
 import jakarta.transaction.Transactional;
 import java.util.UUID;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,23 +25,30 @@ import com.example.promptengineering.repository.MessageRepository;
 @Service
 public class HistoryService {
 
-    @Autowired
-    private MessageRepository messageRepository;
+    private final MessageRepository messageRepository;
 
-    @Autowired
-    private ChatRepository chatRepository;
+    private final ChatRepository chatRepository;
 
     @Value("${app.chat.page.max-size}")
     private int maxChatPageSize;
-
-    @Value("${app.message.max-total-size:10485760}")
-    private long maxTotalMessageSize;
 
     @Value("${app.message.max-images:10}")
     private int maxImages;
 
     @Value("${app.message.max-documents:100}")
     private int maxDocuments;
+
+    @Value("${app.message.max-per-chat:200}")
+    private int maxMessagesPerChat;
+
+    @Value("${app.message.max-total-size:10485760}")
+    private long maxTotalMessageSize;
+
+    public HistoryService(MessageRepository messageRepository,
+            ChatRepository chatRepository) {
+        this.messageRepository = messageRepository;
+        this.chatRepository = chatRepository;
+    }
 
     public Chat createChat(User user) {
         Chat chat = new Chat();
@@ -53,47 +60,57 @@ public class HistoryService {
     }
 
     @Transactional
-    public void deleteChat(UUID chatUuid, User user)
-            throws ResourceNotFoundException, UserSecurityException {
+    public void deleteChat(UUID chatUuid, User user) {
         Chat chat = chatRepository.findByUuid(chatUuid).orElseThrow(
                 () -> new ResourceNotFoundException("Chat not found: " + chatUuid));
-        checkUserAuthorization(chat, user);
-        messageRepository.deleteByChatId(chat.getId());
-        chatRepository.delete(chat);
-    }
-
-    public Message saveMessage(MessageBody messageBody, User user)
-            throws UserSecurityException, ResourceNotFoundException {
-        UUID chatUuid = messageBody.getChatUuid();
-        Chat chat = chatRepository.findByUuid(chatUuid).orElseThrow(
-                () -> new ResourceNotFoundException("Chat not found: " + chatUuid));
-        checkUserAuthorization(chat, user);
-        return convertAndSaveMessage(messageBody, chat);
-    }
-
-    private Chat checkUserAuthorization(Chat chat, User user)
-            throws UserSecurityException {
-        if (!isUserAuthorizedForChat(chat, user)) {
+        if (isUserAuthorizedForChat(chat, user)) {
+            messageRepository.deleteByChatId(chat.getId());
+            chatRepository.delete(chat);
+        } else {
             throw new UserSecurityException(
                     "User is not authorized to send messages to this chat.");
         }
-        return chat;
+    }
+
+    public Message saveMessage(MessageBody messageBody, User user)
+            throws ValidationException {
+        UUID chatUuid = messageBody.getChatUuid();
+        Chat chat = chatRepository.findByUuid(chatUuid).orElseThrow(
+                () -> new ResourceNotFoundException("Chat not found: " + chatUuid));
+        if (isUserAuthorizedForChat(chat, user)) {
+            return convertAndSaveMessage(messageBody, chat);
+        } else {
+            throw new UserSecurityException(
+                    "User is not authorized to send messages to this chat.");
+        }
+    }
+
+    private Chat getAuthorizedChat(UUID chatUuid, User user) {
+        return chatRepository.findByUuidAndUser(chatUuid, user).orElseThrow(
+                () -> new ResourceNotFoundException("Chat not found: " + chatUuid));
     }
 
     private boolean isUserAuthorizedForChat(Chat chat, User user) {
-        return chat.getUser() != null && chat.getUser().equals(user);
+        return chat.getUser() != null && chat.getUser().getId().equals(user.getId());
     }
 
-    public Message convertAndSaveMessage(MessageBody messageBody, Chat chat) {
+    private Message convertAndSaveMessage(MessageBody messageBody, Chat chat)
+            throws ValidationException {
+        long newSize = calculateMessageSize(messageBody);
+
+        if (chat.getTotalSize() + newSize > maxTotalMessageSize) {
+            throw new ValidationException("Chat size limit reached. Max: "
+                    + maxTotalMessageSize + ", current: " + chat.getTotalSize());
+        }
+
         if (messageBody.getImages() != null
                 && messageBody.getImages().size() > maxImages) {
-            throw new IllegalArgumentException(
-                    "Too many images. Max allowed: " + maxImages);
+            throw new ValidationException("Too many images. Max allowed: " + maxImages);
         }
 
         if (messageBody.getDocuments() != null
                 && messageBody.getDocuments().size() > maxDocuments) {
-            throw new IllegalArgumentException(
+            throw new ValidationException(
                     "Too many documents. Max allowed: " + maxDocuments);
         }
 
@@ -108,35 +125,30 @@ public class HistoryService {
         messageEntity.setRole(messageBody.getRole());
         messageEntity.setCache(messageBody.getCache());
 
+        chat.setTotalSize(chat.getTotalSize() + newSize);
+        chatRepository.save(chat);
+
         return messageRepository.save(messageEntity);
     }
 
-    public List<Message> getChatHistory(UUID chatUuid, User user)
-            throws ResourceNotFoundException, UserSecurityException {
-        Chat chat = chatRepository.findByUuid(chatUuid).orElseThrow(
-                () -> new ResourceNotFoundException("Chat not found: " + chatUuid));
-        checkUserAuthorization(chat, user);
+    public List<Message> getChatHistory(UUID chatUuid, User user) {
+        Chat chat = getAuthorizedChat(chatUuid, user);
+        return messageRepository.findByChatId(chat.getId());
+    }
 
-        List<Message> messages = messageRepository.findByChatId(chat.getId());
-        long totalSize = messages.stream().mapToLong(m -> {
-            long size = m.getText() != null ? m.getText().length() : 0;
-            if (m.getDocuments() != null) {
-                size += m.getDocuments().stream()
-                        .mapToLong(d -> d != null ? d.length() : 0).sum();
-            }
-            if (m.getImages() != null) {
-                size += m.getImages().stream().mapToLong(i -> i != null ? i.length() : 0)
-                        .sum();
-            }
-            return size;
-        }).sum();
-        if (totalSize > maxTotalMessageSize) {
-            throw new UserSecurityException(
-                    "Total message size (text + documents + images) too large: "
-                            + totalSize + " characters, max allowed: "
-                            + maxTotalMessageSize);
+    private long calculateMessageSize(MessageBody body) {
+        long size = 0;
+        if (body.getText() != null)
+            size += body.getText().length();
+        if (body.getDocuments() != null) {
+            size += body.getDocuments().stream()
+                    .mapToLong(d -> d != null ? d.length() : 0).sum();
         }
-        return messages;
+        if (body.getImages() != null) {
+            size += body.getImages().stream().mapToLong(i -> i != null ? i.length() : 0)
+                    .sum();
+        }
+        return size;
     }
 
     public Page<Chat> getChatsForUser(User user, int page, int size) {

@@ -2,6 +2,7 @@ package com.example.promptengineering.service;
 
 import com.example.promptengineering.component.NodeTunnelRegistry;
 import com.example.promptengineering.entity.HostedNode;
+import com.example.promptengineering.exception.NoWorkingKeyException;
 import com.example.promptengineering.model.AnthropicStrategy;
 import com.example.promptengineering.model.GeminiStrategy;
 import com.example.promptengineering.model.ProviderStrategy;
@@ -230,10 +231,10 @@ public class ChatService {
     }
 
     private RequestBuilder prepareWithSharedKey(RequestBuilder request) {
-        SharedKey sharedKey = sharedKeyService
-                .getRandomWorkingKeyEntity(request.getProvider());
-        request.setKey(encryptionService.decrypt(sharedKey.getKeyValue()));
-        request.setSharedKeyId(sharedKey.getId());
+        SharedKey key = sharedKeyService.getRandomWorkingKeyEntity(request.getProvider())
+                .orElseThrow(() -> new NoWorkingKeyException(request.getProvider()));
+        request.setKey(encryptionService.decrypt(key.getKeyValue()));
+        request.setSharedKeyId(key.getId());
         return request;
     }
 

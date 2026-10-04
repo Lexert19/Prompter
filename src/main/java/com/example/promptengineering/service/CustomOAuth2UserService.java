@@ -43,7 +43,7 @@ public class CustomOAuth2UserService
             return userService.createUser(email, List.of(AppRole.USER));
         } catch (UserAlreadyExistsException e) {
             return userRepository.findByEmail(email)
-                    .orElseThrow(() -> new OAuth2AuthenticationException(
+                    .orElseThrow(() -> new IllegalStateException(
                             "User not found after conflict: " + email));
         }
     }

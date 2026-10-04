@@ -2,6 +2,7 @@ package com.example.promptengineering.restController;
 
 import com.example.promptengineering.dto.UserDto;
 import com.example.promptengineering.entity.User;
+import com.example.promptengineering.exception.UserNotFoundException;
 import com.example.promptengineering.repository.UserRepository;
 import com.example.promptengineering.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +23,10 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<UserDto> getOwnData(@AuthenticationPrincipal User user) {
+    public ResponseEntity<UserDto> getOwnData(@AuthenticationPrincipal User user)
+            throws UserNotFoundException {
         User freshUser = userRepository.findById(user.getId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
         UserDto userDto = userService.mapUserToDto(freshUser);
         userDto.setTwoFactorEnabled(freshUser.isTwoFactorEnabled());
         userDto.setTwoFactorEmail(freshUser.getTwoFactorEmail());

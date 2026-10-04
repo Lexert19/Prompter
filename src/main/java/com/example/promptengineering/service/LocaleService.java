@@ -1,11 +1,12 @@
 package com.example.promptengineering.service;
 
+import java.io.InputStream;
+import java.util.Properties;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -21,7 +22,7 @@ public class LocaleService {
         this.resourceLoader = resourceLoader;
     }
 
-    @Cacheable(value = "locales", key = "#lang")
+    @Cacheable(value = "locales", key = "#lang == null ? 'en' : #lang.toLowerCase()")
     public Map<String, String> getTranslations(String lang) {
         Map<String, String> translations = new LinkedHashMap<>();
 
@@ -39,27 +40,12 @@ public class LocaleService {
         if (!resource.exists()) {
             return;
         }
-
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                resource.getInputStream(), StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String trimmed = line.trim();
-                if (!trimmed.isEmpty() && !trimmed.startsWith("#")
-                        && !trimmed.startsWith("!")) {
-                    int separatorIndex = trimmed.indexOf('=');
-                    if (separatorIndex == -1) {
-                        separatorIndex = trimmed.indexOf(':');
-                    }
-                    if (separatorIndex != -1) {
-                        String key = trimmed.substring(0, separatorIndex).trim();
-                        String value = trimmed.substring(separatorIndex + 1).trim();
-                        target.put(key, value);
-                    }
-                }
-            }
+        Properties props = new Properties();
+        try (InputStream is = resource.getInputStream()) {
+            props.load(new InputStreamReader(is, StandardCharsets.UTF_8));
         } catch (IOException e) {
-            throw new RuntimeException(" " + location, e);
+            throw new RuntimeException("Failed to load " + location, e);
         }
+        props.forEach((k, v) -> target.put(k.toString(), v.toString()));
     }
 }

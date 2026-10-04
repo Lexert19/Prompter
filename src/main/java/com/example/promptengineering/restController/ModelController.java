@@ -4,6 +4,7 @@ import com.example.promptengineering.dto.ModelDto;
 import com.example.promptengineering.entity.Model;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.exception.ResourceNotFoundException;
+import com.example.promptengineering.exception.ValidationException;
 import com.example.promptengineering.service.ModelService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -65,7 +66,8 @@ public class ModelController {
 
     @PostMapping("/user-models")
     public ResponseEntity<String> addUserModel(@AuthenticationPrincipal User user,
-                                               @RequestBody ModelDto modelDto) {
+                                               @RequestBody ModelDto modelDto)
+            throws ValidationException {
         modelService.addUserModel(modelDto, user);
         return ResponseEntity.ok("Model saved successfully");
     }

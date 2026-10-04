@@ -11,39 +11,36 @@ import java.util.List;
 
 public final class AuditLogSpecifications {
 
-  private AuditLogSpecifications() {}
+    private AuditLogSpecifications() {
+    }
 
-  public static Specification<AuditLog> withFilters(Long userId,
-      ActionType action,
-      LocalDateTime from,
-      LocalDateTime to,
-      String search) {
-    return (root, query, cb) -> {
-      List<Predicate> predicates = new ArrayList<>();
+    public static Specification<AuditLog> withFilters(Long userId, ActionType action,
+                                                      LocalDateTime from,
+                                                      LocalDateTime to, String search) {
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
 
-      if (userId != null) {
-        predicates.add(cb.equal(root.get("userId"), userId));
-      }
-      if (action != null) {
-        predicates.add(cb.equal(root.get("action"), action));
-      }
-      if (from != null) {
-        predicates.add(cb.greaterThanOrEqualTo(root.get("timestamp"), from));
-      }
-      if (to != null) {
-        predicates.add(cb.lessThanOrEqualTo(root.get("timestamp"), to));
-      }
-      if (search != null && !search.isBlank()) {
-        String pattern = "%" + search.toLowerCase() + "%";
-        predicates.add(cb.or(
-            cb.like(cb.lower(root.get("username")), pattern),
-            cb.like(cb.lower(root.get("details")), pattern)
-        ));
-      }
+            if (userId != null) {
+                predicates.add(cb.equal(root.get("userId"), userId));
+            }
+            if (action != null) {
+                predicates.add(cb.equal(root.get("action"), action));
+            }
+            if (from != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("timestamp"), from));
+            }
+            if (to != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("timestamp"), to));
+            }
+            if (search != null && !search.isBlank()) {
+                String pattern = "%" + search.toLowerCase() + "%";
+                predicates.add(cb.or(cb.like(cb.lower(root.get("username")), pattern),
+                        cb.like(cb.lower(root.get("details")), pattern)));
+            }
 
-      return predicates.isEmpty()
-          ? cb.conjunction()
-          : cb.and(predicates.toArray(new Predicate[0]));
-    };
-  }
+            return predicates.isEmpty()
+                    ? cb.conjunction()
+                    : cb.and(predicates.toArray(new Predicate[0]));
+        };
+    }
 }

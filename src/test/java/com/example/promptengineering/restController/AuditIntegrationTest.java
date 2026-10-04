@@ -84,7 +84,6 @@ public class AuditIntegrationTest {
         mockMvc.perform(post("/auth/login").contentType(MediaType.APPLICATION_JSON)
                 .content(loginJson)).andExpect(status().isOk());
 
-
         List<AuditLog> logs = auditLogRepository.findByUserIdAndAction(adminUser.getId(),
                 ActionType.LOGIN_SUCCESS);
         assertThat(logs).hasSize(1);
@@ -100,7 +99,6 @@ public class AuditIntegrationTest {
                 .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
                 .andExpect(status().is3xxRedirection());
 
-
         List<AuditLog> logs = auditLogRepository.findByUserIdAndAction(adminUser.getId(),
                 ActionType.ROLE_UPDATE);
         assertThat(logs).hasSize(1);
@@ -115,7 +113,6 @@ public class AuditIntegrationTest {
                 .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
                 .andExpect(status().is3xxRedirection());
 
-
         List<AuditLog> logs = auditLogRepository.findByUserIdAndAction(adminUser.getId(),
                 ActionType.USER_DELETE);
         assertThat(logs).hasSize(1);
@@ -129,7 +126,6 @@ public class AuditIntegrationTest {
         mockMvc.perform(post("/admin/users/{id}/delete", adminUser.getId()).with(csrf())
                 .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
                 .andExpect(status().is3xxRedirection());
-
 
         List<AuditLog> logs = auditLogRepository.findByUserIdAndAction(adminUser.getId(),
                 ActionType.USER_DELETE);
@@ -148,7 +144,6 @@ public class AuditIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON).content(keyJson).with(csrf())
                 .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
                 .andExpect(status().isOk());
-
 
         List<AuditLog> logs = auditLogRepository.findByUserIdAndAction(adminUser.getId(),
                 ActionType.SHARED_KEY_GENERATE);
@@ -177,7 +172,6 @@ public class AuditIntegrationTest {
                 .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
                 .andExpect(status().isNoContent());
 
-
         List<AuditLog> logs = auditLogRepository.findByUserIdAndAction(adminUser.getId(),
                 ActionType.SHARED_KEY_DELETE);
         assertThat(logs).hasSize(1);
@@ -188,20 +182,20 @@ public class AuditIntegrationTest {
 
     @Test
     void shouldFilterByUserIdAndAction() throws Exception {
-        auditLogService.log(auditLogService.createAuditLog(
-            adminUser.getId(), "admin@audit.com",
-            ActionType.LOGIN_SUCCESS, ResultType.SUCCESS, null, null, null));
+        auditLogService
+                .log(auditLogService.createAuditLog(adminUser.getId(), "admin@audit.com",
+                        ActionType.LOGIN_SUCCESS, ResultType.SUCCESS, null, null, null));
 
-        auditLogService.log(auditLogService.createAuditLog(
-            normalUser.getId(), "user@audit.com",
-            ActionType.LOGIN_FAILURE, ResultType.FAILURE, null, null, null));
+        auditLogService
+                .log(auditLogService.createAuditLog(normalUser.getId(), "user@audit.com",
+                        ActionType.LOGIN_FAILURE, ResultType.FAILURE, null, null, null));
 
-        mockMvc.perform(get("/api/admin/audit/logs")
-                .param("userId", adminUser.getId().toString())
-                .param("action", "LOGIN_SUCCESS")
-                .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.content.length()").value(1))
-            .andExpect(jsonPath("$.content[0].username").value("admin@audit.com"));
+        mockMvc.perform(
+                get("/api/admin/audit/logs").param("userId", adminUser.getId().toString())
+                        .param("action", "LOGIN_SUCCESS")
+                        .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].username").value("admin@audit.com"));
     }
 }

@@ -5,6 +5,7 @@ import com.example.promptengineering.dto.UserFileDTO;
 import com.example.promptengineering.entity.Project;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.entity.UserFile;
+import com.example.promptengineering.exception.ProjectNotFoundException;
 import com.example.promptengineering.model.ProjectResponse;
 import com.example.promptengineering.model.ScoredFragment;
 import com.example.promptengineering.repository.ProjectRepository;
@@ -97,8 +98,7 @@ public class ProjectController {
                                                             @RequestBody java.util.Map<String, Long> payload) {
 
         Project project = projectRepository.findByIdAndUser(projectId, user)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Project not found"));
+                .orElseThrow(() -> new ProjectNotFoundException(projectId));
 
         Long fileId = payload.get("fileId");
         if (fileId == null) {
@@ -108,7 +108,7 @@ public class ProjectController {
         embeddingService.addFileToProject(project, fileId, user);
 
         Project updatedProject = projectRepository.findByIdAndUser(projectId, user)
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+                .orElseThrow(() -> new ProjectNotFoundException(projectId));
 
         List<UserFileDTO> files = userFileRepository.findByProject(updatedProject)
                 .stream().map(UserFileDTO::fromEntity).collect(Collectors.toList());

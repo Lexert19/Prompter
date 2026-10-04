@@ -1,9 +1,7 @@
 package com.example.promptengineering.component;
 
-import com.example.promptengineering.entity.MigrationFlag;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.model.AppRole;
-import com.example.promptengineering.repository.MigrationFlagRepository;
 import com.example.promptengineering.repository.UserRepository;
 import com.example.promptengineering.service.ModelService;
 import com.example.promptengineering.service.SharedKeyService;
@@ -13,9 +11,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 @Slf4j
@@ -24,26 +20,16 @@ public class DataInitializer implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
     private final String adminEmail;
     private final String adminPassword;
-    private final ModelService modelService;
-    private final String geminiApiKey;
-    private final MigrationFlagRepository migrationFlagRepository;
-    private final SharedKeyService sharedKeyService;
 
-    public DataInitializer(UserRepository userRepository, PasswordEncoder passwordEncoder,
+  public DataInitializer(UserRepository userRepository, PasswordEncoder passwordEncoder,
             @Value("${admin.email}") String adminEmail,
-            @Value("${admin.password}") String adminPassword, ModelService modelService,
-            @Value("${gemini.api.key:}") String geminiApiKey,
-            MigrationFlagRepository migrationFlagRepository,
-            SharedKeyService sharedKeyService) {
+            @Value("${admin.password}") String adminPassword
+           ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.adminEmail = adminEmail;
         this.adminPassword = adminPassword;
-        this.modelService = modelService;
-        this.geminiApiKey = geminiApiKey;
-        this.migrationFlagRepository = migrationFlagRepository;
-        this.sharedKeyService = sharedKeyService;
-    }
+  }
 
     @Override
     public void run(String... args) throws Exception {
@@ -61,23 +47,5 @@ public class DataInitializer implements CommandLineRunner {
             log.debug("Admin already exists: {}", adminEmail);
         }
 
-    }
-
-    private void addGeminiSharedKeyIfNeeded(User user) {
-        Optional<MigrationFlag> flag = migrationFlagRepository
-                .findByName("gemini_shared_key_added");
-        if (flag.isPresent() && flag.get().isExecuted()) {
-            return;
-        }
-
-        if (geminiApiKey != null && !geminiApiKey.isBlank()) {
-            sharedKeyService.addKey("GEMINI", geminiApiKey, user);
-
-            MigrationFlag newFlag = flag
-                    .orElse(new MigrationFlag("gemini_shared_key_added"));
-            newFlag.setExecuted(true);
-            newFlag.setExecutedAt(LocalDateTime.now());
-            migrationFlagRepository.save(newFlag);
-        }
     }
 }

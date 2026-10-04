@@ -5,6 +5,7 @@ import com.example.promptengineering.dto.MessageDto;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.exception.ResourceNotFoundException;
 import com.example.promptengineering.exception.UserSecurityException;
+import com.example.promptengineering.exception.ValidationException;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -46,7 +47,7 @@ public class HistoryController {
     @PostMapping("/messages")
     public ResponseEntity<MessageDto> saveMessage(@RequestBody MessageBody messageBody,
                                                   @AuthenticationPrincipal User user)
-            throws UserSecurityException, ResourceNotFoundException {
+            throws ValidationException {
         Message message = historyService.saveMessage(messageBody, user);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(MessageDto.fromEntity(message));

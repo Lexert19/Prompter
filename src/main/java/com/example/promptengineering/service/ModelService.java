@@ -3,7 +3,7 @@ package com.example.promptengineering.service;
 import com.example.promptengineering.dto.ModelDto;
 import com.example.promptengineering.entity.Model;
 import com.example.promptengineering.entity.User;
-import com.example.promptengineering.exception.ResourceNotFoundException;
+import com.example.promptengineering.exception.ValidationException;
 import com.example.promptengineering.model.Strategy;
 import com.example.promptengineering.repository.ModelRepository;
 import com.example.promptengineering.repository.UserRepository;
@@ -40,22 +40,17 @@ public class ModelService {
     }
 
     public List<Model> getUserModels(User user) {
-        List<Model> models = modelRepository.findByUser(user);
-        if (models.size() >= maxModelsPerUser) {
-            throw new IllegalArgumentException(
-                    "User cannot have more than " + maxModelsPerUser + " models.");
-        }
-        return models;
+        return modelRepository.findByUser(user);
     }
 
     public List<Model> getGlobalModels() {
         return this.modelRepository.findByGlobal(true);
     }
 
-    public User addUserModel(ModelDto modelDto, User user) {
+    public User addUserModel(ModelDto modelDto, User user) throws ValidationException {
         long currentCount = modelRepository.countByUser(user);
         if (currentCount >= maxModelsPerUser) {
-            throw new IllegalArgumentException(
+            throw new ValidationException(
                     "User cannot have more than " + maxModelsPerUser + " models.");
         }
 
@@ -68,12 +63,12 @@ public class ModelService {
     }
 
     @Transactional
-    public void deleteUserModel(Long id, User user) throws ResourceNotFoundException {
+    public void deleteUserModel(Long id, User user) {
         Optional<Model> model = this.getModel(id);
-        if (model.isPresent() && model.get().getUser().equals(user)) {
+        if (model.isPresent() && model.get().getUser().getId().equals(user.getId())) {
             modelRepository.delete(model.get());
         } else {
-            throw new ResourceNotFoundException("This is not your model.");
+            throw new SecurityException("This is not your model.");
         }
     }
 
