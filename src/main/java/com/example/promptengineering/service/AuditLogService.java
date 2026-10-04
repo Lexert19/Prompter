@@ -21,13 +21,8 @@ public class AuditLogService {
 
     private final AuditLogRepository auditLogRepository;
 
-    @Async("taskExecutor")
-    public void logAsync(AuditLog auditLog) {
-        try {
-            auditLogRepository.save(auditLog);
-        } catch (Exception e) {
-            log.error("Failed to save audit log", e);
-        }
+    public void log(AuditLog auditLog) {
+        auditLogRepository.save(auditLog);
     }
 
     public AuditLog createAuditLog(Long userId, String username, ActionType action,

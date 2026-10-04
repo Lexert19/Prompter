@@ -95,7 +95,7 @@ public class AuthController {
                             request.getPassword()));
             User user = (User) authentication.getPrincipal();
 
-            auditLogService.logAsync(auditLogService.createAuditLog(user.getId(),
+            auditLogService.log(auditLogService.createAuditLog(user.getId(),
                     user.getEmail(), ActionType.LOGIN_SUCCESS, ResultType.SUCCESS, null,
                     null, null));
 

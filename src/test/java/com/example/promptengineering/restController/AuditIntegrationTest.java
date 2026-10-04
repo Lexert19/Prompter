@@ -7,6 +7,7 @@ import com.example.promptengineering.model.AppRole;
 import com.example.promptengineering.model.ResultType;
 import com.example.promptengineering.repository.AuditLogRepository;
 import com.example.promptengineering.repository.UserRepository;
+import com.example.promptengineering.service.AuditLogService;
 import com.example.promptengineering.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -52,6 +54,9 @@ public class AuditIntegrationTest {
 
     @Autowired
     private AuditLogRepository auditLogRepository;
+
+    @Autowired
+    private AuditLogService auditLogService;
 
     private User adminUser;
     private User normalUser;
@@ -79,12 +84,11 @@ public class AuditIntegrationTest {
         mockMvc.perform(post("/auth/login").contentType(MediaType.APPLICATION_JSON)
                 .content(loginJson)).andExpect(status().isOk());
 
-        Thread.sleep(500);
 
         List<AuditLog> logs = auditLogRepository.findByUserIdAndAction(adminUser.getId(),
                 ActionType.LOGIN_SUCCESS);
         assertThat(logs).hasSize(1);
-        AuditLog log = logs.get(0);
+        AuditLog log = logs.getFirst();
         assertThat(log.getResult()).isEqualTo(ResultType.SUCCESS);
         assertThat(log.getUsername()).isEqualTo("admin@audit.com");
     }
@@ -96,12 +100,11 @@ public class AuditIntegrationTest {
                 .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
                 .andExpect(status().is3xxRedirection());
 
-        Thread.sleep(500);
 
         List<AuditLog> logs = auditLogRepository.findByUserIdAndAction(adminUser.getId(),
                 ActionType.ROLE_UPDATE);
         assertThat(logs).hasSize(1);
-        AuditLog log = logs.get(0);
+        AuditLog log = logs.getFirst();
         assertThat(log.getResult()).isEqualTo(ResultType.SUCCESS);
         assertThat(log.getTarget()).contains(normalUser.getId().toString());
     }
@@ -112,12 +115,11 @@ public class AuditIntegrationTest {
                 .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
                 .andExpect(status().is3xxRedirection());
 
-        Thread.sleep(500);
 
         List<AuditLog> logs = auditLogRepository.findByUserIdAndAction(adminUser.getId(),
                 ActionType.USER_DELETE);
         assertThat(logs).hasSize(1);
-        AuditLog log = logs.get(0);
+        AuditLog log = logs.getFirst();
         assertThat(log.getResult()).isEqualTo(ResultType.SUCCESS);
         assertThat(log.getTarget()).contains(normalUser.getId().toString());
     }
@@ -128,12 +130,11 @@ public class AuditIntegrationTest {
                 .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
                 .andExpect(status().is3xxRedirection());
 
-        Thread.sleep(500);
 
         List<AuditLog> logs = auditLogRepository.findByUserIdAndAction(adminUser.getId(),
                 ActionType.USER_DELETE);
         assertThat(logs).hasSize(1);
-        AuditLog log = logs.get(0);
+        AuditLog log = logs.getFirst();
         assertThat(log.getResult()).isEqualTo(ResultType.FAILURE);
         assertThat(log.getDetails()).contains("cannot delete your own account");
     }
@@ -148,12 +149,11 @@ public class AuditIntegrationTest {
                 .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
                 .andExpect(status().isOk());
 
-        Thread.sleep(500);
 
         List<AuditLog> logs = auditLogRepository.findByUserIdAndAction(adminUser.getId(),
                 ActionType.SHARED_KEY_GENERATE);
         assertThat(logs).hasSize(1);
-        AuditLog log = logs.get(0);
+        AuditLog log = logs.getFirst();
         assertThat(log.getResult()).isEqualTo(ResultType.SUCCESS);
         assertThat(log.getTarget()).contains("OPENAI");
     }
@@ -177,13 +177,31 @@ public class AuditIntegrationTest {
                 .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
                 .andExpect(status().isNoContent());
 
-        Thread.sleep(500);
 
         List<AuditLog> logs = auditLogRepository.findByUserIdAndAction(adminUser.getId(),
                 ActionType.SHARED_KEY_DELETE);
         assertThat(logs).hasSize(1);
-        AuditLog log = logs.get(0);
+        AuditLog log = logs.getFirst();
         assertThat(log.getResult()).isEqualTo(ResultType.SUCCESS);
         assertThat(log.getTarget()).contains(keyId.toString());
+    }
+
+    @Test
+    void shouldFilterByUserIdAndAction() throws Exception {
+        auditLogService.log(auditLogService.createAuditLog(
+            adminUser.getId(), "admin@audit.com",
+            ActionType.LOGIN_SUCCESS, ResultType.SUCCESS, null, null, null));
+
+        auditLogService.log(auditLogService.createAuditLog(
+            normalUser.getId(), "user@audit.com",
+            ActionType.LOGIN_FAILURE, ResultType.FAILURE, null, null, null));
+
+        mockMvc.perform(get("/api/admin/audit/logs")
+                .param("userId", adminUser.getId().toString())
+                .param("action", "LOGIN_SUCCESS")
+                .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.content.length()").value(1))
+            .andExpect(jsonPath("$.content[0].username").value("admin@audit.com"));
     }
 }

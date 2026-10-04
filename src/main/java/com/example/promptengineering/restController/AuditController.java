@@ -3,9 +3,11 @@ package com.example.promptengineering.restController;
 import com.example.promptengineering.entity.AuditLog;
 import com.example.promptengineering.model.ActionType;
 import com.example.promptengineering.repository.AuditLogRepository;
+import com.example.promptengineering.repository.spec.AuditLogSpecifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -20,22 +22,26 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin/audit")
-@PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
 public class AuditController {
 
     private final AuditLogRepository auditLogRepository;
 
     @GetMapping("/logs")
-    public ResponseEntity<Page<AuditLog>> getLogs(@RequestParam(required = false) Long userId,
-                                                  @RequestParam(required = false) ActionType action,
-                                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
-                                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
-                                                  @RequestParam(required = false) String search,
-                                                  @PageableDefault(size = 50, sort = "timestamp", direction = org.springframework.data.domain.Sort.Direction.DESC) Pageable pageable) {
+    public ResponseEntity<Page<AuditLog>> getLogs(
+        @RequestParam(required = false) Long userId,
+        @RequestParam(required = false) ActionType action,
+        @RequestParam(required = false)
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
+        @RequestParam(required = false)
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
+        @RequestParam(required = false) String search,
+        @PageableDefault(size = 50, sort = "timestamp",
+            direction = Sort.Direction.DESC) Pageable pageable) {
 
-        Page<AuditLog> page = auditLogRepository.search(userId, action, from, to, search,
-                pageable);
+        Page<AuditLog> page = auditLogRepository.findAll(
+            AuditLogSpecifications.withFilters(userId, action, from, to, search),
+            pageable);
         return ResponseEntity.ok(page);
     }
 

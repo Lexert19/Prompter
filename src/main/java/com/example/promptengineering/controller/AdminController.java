@@ -56,7 +56,7 @@ public class AdminController {
                     ActionType.ROLE_UPDATE, ResultType.SUCCESS, id.toString(),
                     "Role changed to " + role, null);
 
-            auditLogService.logAsync(log);
+            auditLogService.log(log);
         }
 
         return "redirect:/admin/users";
@@ -75,7 +75,7 @@ public class AdminController {
                     currentUser.getEmail(), ActionType.USER_DELETE, ResultType.FAILURE,
                     id.toString(), "cannot delete your own account", null);
 
-            auditLogService.logAsync(log);
+            auditLogService.log(log);
             return "redirect:/admin/users";
         }
 
@@ -90,7 +90,7 @@ public class AdminController {
         AuditLog log = auditLogService.createAuditLog(currentUser.getId(),
                 currentUser.getEmail(), ActionType.USER_DELETE, ResultType.SUCCESS,
                 id.toString(), "User deleted", null);
-        auditLogService.logAsync(log);
+        auditLogService.log(log);
 
         return "redirect:/admin/users";
     }

@@ -24,14 +24,14 @@ public class AuditAspect {
     @AfterReturning(pointcut = "@annotation(auditable)", returning = "result")
     public void logSuccess(JoinPoint joinPoint, Auditable auditable, Object result) {
         AuditLog log = buildAuditLog(joinPoint, auditable, ResultType.SUCCESS);
-        auditLogService.logAsync(log);
+        auditLogService.log(log);
     }
 
     @AfterThrowing(pointcut = "@annotation(auditable)", throwing = "ex")
     public void logFailure(JoinPoint joinPoint, Auditable auditable, Exception ex) {
         AuditLog log = buildAuditLog(joinPoint, auditable, ResultType.FAILURE);
         log.setDetails(log.getDetails() + " | Exception: " + ex.getMessage());
-        auditLogService.logAsync(log);
+        auditLogService.log(log);
     }
 
     private AuditLog buildAuditLog(JoinPoint joinPoint, Auditable auditable,

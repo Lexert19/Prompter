@@ -34,7 +34,7 @@ public class AdminSharedKeyController {
                                                             @AuthenticationPrincipal User user) {
         SharedKey savedKey = sharedKeyService.addKey(dto.getProvider(), dto.getKeyValue(),
                 user);
-        auditLogService.logAsync(auditLogService.createAuditLog(user.getId(),
+        auditLogService.log(auditLogService.createAuditLog(user.getId(),
                 user.getEmail(), ActionType.SHARED_KEY_GENERATE, ResultType.SUCCESS,
                 dto.getProvider(), "Added", null));
         return ResponseEntity.ok(Map.of("id", savedKey.getId(), "message", "Added"));
@@ -53,7 +53,7 @@ public class AdminSharedKeyController {
             AuditLog log = auditLogService.createAuditLog(user.getId(), user.getEmail(),
                     ActionType.SHARED_KEY_DELETE, ResultType.SUCCESS, id.toString(),
                     "Deleted", null);
-            auditLogService.logAsync(log);
+            auditLogService.log(log);
             return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.notFound().build();
