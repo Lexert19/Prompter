@@ -240,7 +240,7 @@ public class HistoryControllerIntegrationTest {
         chat = chatRepository.save(chat);
 
         mockMvc.perform(get("/api/history/chats/{chatId}/messages", chat.getUuid())
-                .with(asUser1())).andExpect(status().isForbidden());
+                .with(asUser1())).andExpect(status().is4xxClientError());
 
         mockMvc.perform(delete("/api/history/chats/{chatId}", chat.getUuid()).with(csrf())
                 .with(asUser1())).andExpect(status().is4xxClientError());

@@ -177,7 +177,7 @@ public class ModelControllerIntegrationTest {
         otherModel = modelRepository.save(otherModel);
 
         mockMvc.perform(delete("/api/models/user-models/{id}", otherModel.getId())
-                .with(csrf()).with(user(testUser))).andExpect(status().isNotFound());
+                .with(csrf()).with(user(testUser))).andExpect(status().isForbidden());
 
         assertThat(modelRepository.findById(otherModel.getId())).isPresent();
     }

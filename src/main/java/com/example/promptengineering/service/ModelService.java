@@ -3,6 +3,7 @@ package com.example.promptengineering.service;
 import com.example.promptengineering.dto.ModelDto;
 import com.example.promptengineering.entity.Model;
 import com.example.promptengineering.entity.User;
+import com.example.promptengineering.exception.UserSecurityException;
 import com.example.promptengineering.exception.ValidationException;
 import com.example.promptengineering.model.Strategy;
 import com.example.promptengineering.repository.ModelRepository;
@@ -68,7 +69,7 @@ public class ModelService {
         if (model.isPresent() && model.get().getUser().getId().equals(user.getId())) {
             modelRepository.delete(model.get());
         } else {
-            throw new SecurityException("This is not your model.");
+            throw new UserSecurityException("This is not your model.");
         }
     }
 
