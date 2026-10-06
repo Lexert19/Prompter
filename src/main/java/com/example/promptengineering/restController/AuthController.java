@@ -79,13 +79,6 @@ public class AuthController {
         this.auditLogService = auditLogService;
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request)
-            throws UserAlreadyExistsException {
-        userService.registerUser(request);
-        return ResponseEntity.ok().build();
-    }
-
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request,
                                    HttpServletResponse response) {
