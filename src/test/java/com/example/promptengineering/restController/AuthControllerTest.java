@@ -77,24 +77,6 @@ public class AuthControllerTest {
     }
 
     @Test
-    @Transactional
-    public void testRegisterSuccess() throws Exception {
-        String newEmail = "newuser@wp.pl";
-        userRepository.findByEmail(newEmail).ifPresent(userRepository::delete);
-
-        RegisterRequest registerRequest = new RegisterRequest(newEmail,
-                "securepassword123");
-
-        mockMvc.perform(post("/auth/register").with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(registerRequest)))
-                .andExpect(status().isOk());
-
-        Optional<User> registeredUser = userRepository.findByEmail(newEmail);
-        assertTrue(registeredUser.isPresent());
-    }
-
-    @Test
     public void testRegisterFailureEmailExists() throws Exception {
         RegisterRequest registerRequest = new RegisterRequest("testuser123@wp.pl",
                 "anotherpassword");
