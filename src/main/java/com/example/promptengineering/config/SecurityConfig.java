@@ -1,7 +1,6 @@
 package com.example.promptengineering.config;
 
 import com.example.promptengineering.component.CustomAuthenticationEntryPoint;
-import com.example.promptengineering.component.CustomAuthenticationSuccessHandler;
 import com.example.promptengineering.component.OAuth2JwtSuccessHandler;
 import com.example.promptengineering.filter.JwtAuthenticationFilter;
 import com.example.promptengineering.filter.RateLimitingFilter;
@@ -20,8 +19,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
-import org.springframework.security.web.*;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
@@ -36,26 +35,22 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class SecurityConfig implements WebMvcConfigurer {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final RateLimitingFilter rateLimitingFilter;
-    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
     private final OAuth2JwtSuccessHandler oAuth2JwtSuccessHandler;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     public SecurityConfig(CustomOAuth2UserService customOAuth2UserService,
             RateLimitingFilter rateLimitingFilter,
-            CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler,
             OAuth2JwtSuccessHandler oAuth2JwtSuccessHandler,
             JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.customOAuth2UserService = customOAuth2UserService;
         this.rateLimitingFilter = rateLimitingFilter;
-        this.customAuthenticationSuccessHandler = customAuthenticationSuccessHandler;
         this.oAuth2JwtSuccessHandler = oAuth2JwtSuccessHandler;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
     @Bean
     public SecurityFilterChain securityWebFilterChain(HttpSecurity http,
-                                                      AuthenticationManager authenticationManager)
-            throws Exception {
+                                                      AuthenticationManager authenticationManager) {
         http.addFilterBefore(rateLimitingFilter,
                 UsernamePasswordAuthenticationFilter.class);
 
@@ -71,9 +66,8 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.ERROR)
                 .permitAll()
                 .requestMatchers("/", "/{lang:(?:pl|en)}/**", "/public/**", "/login",
-                        "/debug", "/error", "/blog/**", "/terms", "/privacy",
-                        "/static/**", "/auth/**", "/favicon.ico", "/favicon",
-                        "/actuator/prometheus", "/mock-ai/**")
+                        "/error", "/blog/**", "/terms", "/privacy", "/static/**",
+                        "/auth/**", "/favicon.ico", "/favicon")
                 .permitAll().requestMatchers("/admin/**", "/api/admin/**")
                 .hasAuthority("ROLE_ADMIN").anyRequest().authenticated());
 
@@ -117,11 +111,11 @@ public class SecurityConfig implements WebMvcConfigurer {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    @Bean
-    public AuthenticationFailureHandler authenticationFailureHandler() {
-        return (request, response, exception) -> response
-                .sendRedirect("/auth/login?error=true");
-    }
+    // @Bean
+    // public AuthenticationFailureHandler authenticationFailureHandler() {
+    // return (request, response, exception) -> response
+    // .sendRedirect("/auth/login?error=true");
+    // }
 
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {

@@ -1,4 +1,4 @@
-package com.example.promptengineering.component;
+package com.example.promptengineering.config;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import java.util.concurrent.TimeUnit;

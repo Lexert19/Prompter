@@ -122,8 +122,6 @@ class InfoPanel {
         <hr>
         <div class="info-row"><span>${t.t("settings.model")}:</span><span>${settings.model || '-'}</span></div>
         <div class="info-row"><span>${t.t("provider")}:</span><span>${settings.provider || '-'}</span></div>
-        <div class="info-row"><span>${t.t("maxTokens")}:</span><span>${settings.maxTokens || '-'}</span></div>
-        <div class="info-row"><span>${t.t("temperature")}:</span><span>${settings.temperature ?? '-'}</span></div>
       `;
     }
 

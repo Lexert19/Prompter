@@ -1,6 +1,6 @@
 services:
   minio:
-    image: quay.io/minio/minio
+    image: cgr.dev/chainguard/minio:latest
     command: server /data --console-address ":9001"
     ports:
       - "127.0.0.1:9000:9000"
