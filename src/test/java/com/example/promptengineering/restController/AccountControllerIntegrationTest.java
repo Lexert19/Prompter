@@ -1,5 +1,6 @@
 package com.example.promptengineering.restController;
 
+import com.example.promptengineering.BaseIntegrationTest;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.exception.ValidationException;
 import com.example.promptengineering.repository.ResetTokenRepository;
@@ -9,18 +10,14 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -28,14 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@Transactional
-@ActiveProfiles("test")
-public class AccountControllerIntegrationTest {
-
-    @Autowired
-    private MockMvc mockMvc;
+public class AccountControllerIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private UserRepository userRepository;
@@ -48,16 +38,18 @@ public class AccountControllerIntegrationTest {
     @Autowired
     private ResetTokenRepository resetTokenRepository;
 
-    private final String userEmail = "test@example.com";
+    private String userEmail;
+    private User testUser;
     private final String userPassword = "password123";
 
     @BeforeEach
     void setUp() throws ValidationException {
-        User testUser = new User();
+        userEmail = "user-" + UUID.randomUUID() + "@example.com";
+        testUser = new User();
         testUser.setEmail(userEmail);
         testUser.setPassword(passwordEncoder.encode(userPassword));
         userService.setUserKeys(testUser, new HashMap<>());
-        userRepository.save(testUser);
+        testUser = userRepository.save(testUser);
 
         UserDetails userDetails = userService.loadUserByUsername(userEmail);
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
@@ -68,8 +60,11 @@ public class AccountControllerIntegrationTest {
     }
 
     @AfterEach
-    void clearContext() {
+    void tearDown() {
         SecurityContextHolder.clearContext();
+        if (testUser != null && testUser.getId() != null) {
+            userRepository.delete(testUser);
+        }
     }
 
     @Test
@@ -127,7 +122,7 @@ public class AccountControllerIntegrationTest {
         userService.getUserKeys(user).put(keyName, initialKeyValue);
         userRepository.save(user);
 
-        mockMvc.perform(post("/api/account/save-key/{keyName}", keyName).with(csrf())
+        mockMvc.perform(post("/api/account/save-key/{keyName}", keyName)
                 .with(user(userService.loadUserByUsername(userEmail)))
                 .contentType(MediaType.TEXT_PLAIN).content(newKeyValue))
                 .andExpect(status().isOk());
@@ -142,7 +137,7 @@ public class AccountControllerIntegrationTest {
         String keyName = "CUSTOM_API";
         String keyValue = "api_key_with!@#$%^&*()_+special_chars";
 
-        mockMvc.perform(post("/api/account/save-key/{keyName}", keyName).with(csrf())
+        mockMvc.perform(post("/api/account/save-key/{keyName}", keyName)
                 .with(user(userService.loadUserByUsername(userEmail)))
                 .contentType(MediaType.TEXT_PLAIN).content(keyValue))
                 .andExpect(status().isOk());
@@ -155,7 +150,7 @@ public class AccountControllerIntegrationTest {
     void shouldHandleEmptyKeyValue() throws Exception {
         String keyName = "EMPTY_KEY";
 
-        mockMvc.perform(post("/api/account/save-key/{keyName}", keyName).with(csrf())
+        mockMvc.perform(post("/api/account/save-key/{keyName}", keyName)
                 .with(user(userService.loadUserByUsername(userEmail)))
                 .contentType(MediaType.TEXT_PLAIN).content("\"\""))
                 .andExpect(status().is2xxSuccessful());
@@ -172,7 +167,7 @@ public class AccountControllerIntegrationTest {
         String keyName = "OPENAI";
         String keyValue = "sk-test";
 
-        mockMvc.perform(post("/api/account/save-key/{keyName}", keyName).with(csrf())
+        mockMvc.perform(post("/api/account/save-key/{keyName}", keyName)
                 .contentType(MediaType.APPLICATION_JSON).content(keyValue))
                 .andExpect(status().isUnauthorized());
 
@@ -189,7 +184,7 @@ public class AccountControllerIntegrationTest {
         userService.setUserKeys(user, initialKeys);
         userRepository.save(user);
 
-        mockMvc.perform(post("/api/account/save-key/{keyName}", "GEMINI").with(csrf())
+        mockMvc.perform(post("/api/account/save-key/{keyName}", "GEMINI")
                 .with(user(userService.loadUserByUsername(userEmail)))
                 .contentType(MediaType.TEXT_PLAIN).content("sk-gemini"))
                 .andExpect(status().isOk());

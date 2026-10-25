@@ -1,5 +1,6 @@
 package com.example.promptengineering.restController;
 
+import com.example.promptengineering.BaseIntegrationTest;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.model.AppRole;
 import com.example.promptengineering.repository.UserRepository;
@@ -7,14 +8,10 @@ import com.example.promptengineering.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
@@ -23,14 +20,8 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@Transactional
-@ActiveProfiles("test")
-public class UserTokenApiControllerIntegrationTest {
+public class UserTokenApiControllerIntegrationTest extends BaseIntegrationTest {
 
-    @Autowired
-    private MockMvc mockMvc;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -42,11 +33,13 @@ public class UserTokenApiControllerIntegrationTest {
     private User normalUser;
 
     @BeforeEach
-    void setUp() throws Exception {
-        adminUser = userService.createUser("admin@tokens.com", "password",
-                List.of(AppRole.ADMIN));
+    void setUp() {
+        String adminEmail = "admin-" + UUID.randomUUID() + "@tokens.com";
+        String normalEmail = "user-" + UUID.randomUUID() + "@tokens.com";
 
-        normalUser = userService.createUser("user@tokens.com", "password",
+        adminUser = userService.createUser(adminEmail, "password",
+                List.of(AppRole.ADMIN));
+        normalUser = userService.createUser(normalEmail, "password",
                 List.of(AppRole.USER));
     }
 

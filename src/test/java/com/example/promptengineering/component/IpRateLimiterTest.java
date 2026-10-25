@@ -1,19 +1,16 @@
 package com.example.promptengineering.component;
 
+import com.example.promptengineering.BaseIntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest
-@ActiveProfiles("test")
-class IpRateLimiterTest {
+class IpRateLimiterTest extends BaseIntegrationTest {
 
     @Autowired
     private IpRateLimiter limiter;

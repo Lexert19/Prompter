@@ -10,6 +10,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UuidGenerator;
 
 @Setter
@@ -36,11 +39,13 @@ public class Message {
     @ElementCollection
     @CollectionTable(name = "message_documents", joinColumns = @JoinColumn(name = "message_id"))
     @Column(columnDefinition = "TEXT")
+    @Fetch(FetchMode.SUBSELECT)
     private List<String> documents;
 
     @ElementCollection
     @CollectionTable(name = "message_images", joinColumns = @JoinColumn(name = "message_id"))
     @Column(name = "image_url")
+    @Fetch(FetchMode.SUBSELECT)
     private List<String> images;
 
     @Column(name = "created_at")

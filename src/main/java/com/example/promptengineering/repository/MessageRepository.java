@@ -1,5 +1,6 @@
 package com.example.promptengineering.repository;
 
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.promptengineering.entity.Message;
@@ -36,6 +37,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     long sumImageLengthByChatId(@Param("chatId") Long chatId);
 
     @Modifying
+    @Transactional
     @Query("DELETE FROM Message m WHERE m.chat.id = :chatId")
     void deleteByChatId(@Param("chatId") Long chatId);
 }

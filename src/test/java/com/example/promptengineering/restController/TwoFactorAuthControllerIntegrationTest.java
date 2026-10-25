@@ -1,34 +1,26 @@
 package com.example.promptengineering.restController;
 
+import com.example.promptengineering.BaseIntegrationTest;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.repository.UserRepository;
 import com.example.promptengineering.service.TwoFactorEmailService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.mock.web.MockHttpSession;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import static org.mockito.ArgumentMatchers.*;
+import java.util.UUID;
+
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@Transactional
-@ActiveProfiles("test")
-class TwoFactorAuthControllerIntegrationTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
+class TwoFactorAuthControllerIntegrationTest extends BaseIntegrationTest {
     @Autowired
     private UserRepository userRepository;
 
@@ -40,15 +32,16 @@ class TwoFactorAuthControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        testUser = userRepository.findByEmail("test@example.com").orElseGet(() -> {
-            User u = new User();
-            u.setEmail("test@example.com");
-            u.setPassword("encoded");
-            u.setTwoFactorEnabled(true);
-            u.setTwoFactorEmail("test@example.com");
-            u.setEncryptedKeys("some-encrypted-keys");
-            return userRepository.save(u);
-        });
+        String testEmail = "test-" + UUID.randomUUID() + "@example.com";
+
+        testUser = new User();
+        testUser.setEmail(testEmail);
+        testUser.setPassword("encoded");
+        testUser.setTwoFactorEnabled(true);
+        testUser.setTwoFactorEmail(testEmail);
+        testUser.setEncryptedKeys("some-encrypted-keys");
+        testUser = userRepository.save(testUser);
+
         session = new MockHttpSession();
     }
 

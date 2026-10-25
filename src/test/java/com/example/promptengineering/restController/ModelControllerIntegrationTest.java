@@ -1,5 +1,6 @@
 package com.example.promptengineering.restController;
 
+import com.example.promptengineering.BaseIntegrationTest;
 import com.example.promptengineering.dto.ModelDto;
 import com.example.promptengineering.entity.Model;
 import com.example.promptengineering.entity.User;
@@ -10,13 +11,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -25,14 +23,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@ActiveProfiles("test")
-@Transactional
-public class ModelControllerIntegrationTest {
-
-    @Autowired
-    private MockMvc mockMvc;
+public class ModelControllerIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -47,15 +38,25 @@ public class ModelControllerIntegrationTest {
     private PasswordEncoder passwordEncoder;
 
     private User testUser;
+    private User otherUser;
     private Model userModel;
+    private Model otherModel;
     private Model globalModel;
 
     @BeforeEach
     void setUp() {
+        String testEmail = "test-" + UUID.randomUUID() + "@example.com";
+        String otherEmail = "other-" + UUID.randomUUID() + "@example.com";
+
         testUser = new User();
-        testUser.setEmail("test@example.com");
+        testUser.setEmail(testEmail);
         testUser.setPassword(passwordEncoder.encode("password"));
         testUser = userRepository.save(testUser);
+
+        otherUser = new User();
+        otherUser.setEmail(otherEmail);
+        otherUser.setPassword(passwordEncoder.encode("pass"));
+        otherUser = userRepository.save(otherUser);
 
         userModel = new Model();
         userModel.setName("My Model");
@@ -64,6 +65,12 @@ public class ModelControllerIntegrationTest {
         userModel.setUser(testUser);
         userModel.setGlobal(false);
         userModel = modelRepository.save(userModel);
+
+        otherModel = new Model();
+        otherModel.setName("Other's Model");
+        otherModel.setProvider("OPENAI");
+        otherModel.setUser(otherUser);
+        otherModel = modelRepository.save(otherModel);
 
         globalModel = new Model();
         globalModel.setName("Global Model");
@@ -85,7 +92,8 @@ public class ModelControllerIntegrationTest {
     @Test
     void shouldGetGlobalModels() throws Exception {
         mockMvc.perform(get("/api/models/global-models").with(user(testUser)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[*].name", hasItem("Global Model")));
     }
 
     @Test

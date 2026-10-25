@@ -1,12 +1,12 @@
 package com.example.promptengineering.service;
 
+import com.example.promptengineering.dto.MessageDto;
 import com.example.promptengineering.exception.ValidationException;
 import java.time.Instant;
 import java.util.List;
 
 import com.example.promptengineering.exception.ResourceNotFoundException;
 import com.example.promptengineering.exception.UserSecurityException;
-import jakarta.transaction.Transactional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -21,6 +21,7 @@ import com.example.promptengineering.entity.User;
 import com.example.promptengineering.model.MessageBody;
 import com.example.promptengineering.repository.ChatRepository;
 import com.example.promptengineering.repository.MessageRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class HistoryService {
@@ -72,6 +73,7 @@ public class HistoryService {
         }
     }
 
+    @Transactional
     public Message saveMessage(MessageBody messageBody, User user)
             throws ValidationException {
         UUID chatUuid = messageBody.getChatUuid();
@@ -131,9 +133,11 @@ public class HistoryService {
         return messageRepository.save(messageEntity);
     }
 
-    public List<Message> getChatHistory(UUID chatUuid, User user) {
+    @Transactional(readOnly = true)
+    public List<MessageDto> getChatHistory(UUID chatUuid, User user) {
         Chat chat = getAuthorizedChat(chatUuid, user);
-        return messageRepository.findByChatId(chat.getId());
+        List<Message> messages = messageRepository.findByChatId(chat.getId());
+        return MessageDto.fromEntities(messages);
     }
 
     private long calculateMessageSize(MessageBody body) {

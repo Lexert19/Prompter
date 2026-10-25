@@ -1,6 +1,6 @@
 package com.example.promptengineering.service;
 
-import com.example.promptengineering.component.NodeTunnelRegistry;
+import com.example.promptengineering.BaseIntegrationTest;
 import com.example.promptengineering.entity.HostedNode;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.exception.UserAlreadyExistsException;
@@ -15,10 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.codec.ServerSentEvent;
-import org.springframework.test.context.ActiveProfiles;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
@@ -28,9 +25,7 @@ import java.util.concurrent.CompletableFuture;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 
-@SpringBootTest
-@ActiveProfiles("test")
-class CommunityNodeIntegrationTest {
+class CommunityNodeIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private ChatService chatService;
@@ -40,9 +35,6 @@ class CommunityNodeIntegrationTest {
 
     @Autowired
     private UserRepository userRepo;
-
-    @MockitoBean
-    private NodeTunnelRegistry nodeTunnelRegistry;
 
     @Autowired
     private UserService userService;

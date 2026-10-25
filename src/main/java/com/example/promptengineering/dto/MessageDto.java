@@ -2,10 +2,10 @@ package com.example.promptengineering.dto;
 
 import com.example.promptengineering.entity.Message;
 import java.util.UUID;
+
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,7 +16,7 @@ public class MessageDto {
     private String text;
     private List<String> documents;
     private List<String> images;
-    private Instant createdAt;
+    private long createdAt;
     private long start;
     private long end;
     private String role;
@@ -33,9 +33,13 @@ public class MessageDto {
         MessageDto dto = new MessageDto();
         dto.setUuid(message.getUuid());
         dto.setText(message.getText());
-        dto.setDocuments(message.getDocuments());
-        dto.setImages(message.getImages());
-        dto.setCreatedAt(message.getCreatedAt());
+        dto.setDocuments(message.getDocuments() != null
+                ? List.copyOf(message.getDocuments())
+                : List.of());
+        dto.setImages(message.getImages() != null
+                ? List.copyOf(message.getImages())
+                : List.of());
+        dto.setCreatedAt(message.getCreatedAt().toEpochMilli());
         dto.setStart(message.getStart());
         dto.setEnd(message.getEnd());
         dto.setRole(message.getRole());

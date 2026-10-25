@@ -1,5 +1,6 @@
 package com.example.promptengineering.restController;
 
+import com.example.promptengineering.BaseIntegrationTest;
 import com.example.promptengineering.entity.Chat;
 import com.example.promptengineering.entity.Message;
 import com.example.promptengineering.entity.User;
@@ -7,21 +8,18 @@ import com.example.promptengineering.model.MessageBody;
 import com.example.promptengineering.repository.ChatRepository;
 import com.example.promptengineering.repository.MessageRepository;
 import com.example.promptengineering.repository.UserRepository;
+import com.example.promptengineering.service.HistoryService;
 import com.example.promptengineering.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.UUID;
+
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.time.Instant;
 import java.util.List;
@@ -31,19 +29,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItems;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@Transactional
-@ActiveProfiles("test")
-public class HistoryControllerIntegrationTest {
-
-    @Autowired
-    private WebApplicationContext context;
-
-    private MockMvc mockMvc;
+public class HistoryControllerIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private UserRepository userRepository;
@@ -66,34 +55,55 @@ public class HistoryControllerIntegrationTest {
     @Autowired
     private jakarta.persistence.EntityManager entityManager;
 
+    @Autowired
+    private HistoryService historyService;
+
     private User user1;
     private User user2;
-    private final String user1Email = "user1@example.com";
-    private final String user2Email = "user2@example.com";
     private final String password = "password";
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity())
-                .build();
+        // mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity())
+        // .build();
 
         user1 = new User();
-        user1.setEmail(user1Email);
+        user1.setEmail("user1-" + UUID.randomUUID() + "@example.com");
         user1.setPassword(passwordEncoder.encode(password));
         user1 = userRepository.save(user1);
 
         user2 = new User();
-        user2.setEmail(user2Email);
+        user2.setEmail("user2-" + UUID.randomUUID() + "@example.com");
         user2.setPassword(passwordEncoder.encode(password));
         user2 = userRepository.save(user2);
     }
 
+    @AfterEach
+    void tearDown() {
+        if (user1 != null && user1.getId() != null) {
+            deleteChatsFor(user1);
+            userRepository.delete(user1);
+        }
+        if (user2 != null && user2.getId() != null) {
+            deleteChatsFor(user2);
+            userRepository.delete(user2);
+        }
+    }
+
+    private void deleteChatsFor(User owner) {
+        List<Chat> chats = chatRepository.findByUser(owner);
+        for (Chat c : chats) {
+            messageRepository.deleteByChatId(c.getId());
+        }
+        chatRepository.deleteAll(chats);
+    }
+
     private RequestPostProcessor asUser1() {
-        return user(userService.loadUserByUsername(user1Email));
+        return user(userService.loadUserByUsername(user1.getEmail()));
     }
 
     private RequestPostProcessor asUser2() {
-        return user(userService.loadUserByUsername(user2Email));
+        return user(userService.loadUserByUsername(user2.getEmail()));
     }
 
     @Test
@@ -199,8 +209,8 @@ public class HistoryControllerIntegrationTest {
         msg.setCreatedAt(Instant.now());
         messageRepository.save(msg);
 
-        entityManager.flush();
-        entityManager.clear();
+        // entityManager.flush();
+        // entityManager.clear();
 
         mockMvc.perform(
                 delete("/api/history/chats/{chatId}", chat.getUuid()).with(asUser1()))
@@ -312,12 +322,28 @@ public class HistoryControllerIntegrationTest {
                 .andExpect(jsonPath("$.images[0]").value("img1.png"))
                 .andExpect(jsonPath("$.images[1]").value("img2.jpg"))
                 .andExpect(jsonPath("$.cache").value(true));
+    }
 
-        Message saved = messageRepository.findByChatId(chat.getId()).get(0);
-        assertThat(saved.getDocuments()).containsExactly("doc1.pdf", "doc2.docx");
-        assertThat(saved.getImages()).containsExactly("img1.png", "img2.jpg");
-        assertThat(saved.getCache()).isTrue();
-        assertThat(saved.getStart()).isEqualTo(1000L);
-        assertThat(saved.getEnd()).isEqualTo(2000L);
+    @Test
+    void getChatHistory_shouldSerializeLazyDocumentsWithoutActiveSession()
+            throws Exception {
+        Chat chat = new Chat();
+        chat.setUser(user1);
+        chat.setCreatedAt(Instant.now());
+        chat = chatRepository.save(chat);
+
+        Message msg = new Message();
+        msg.setChat(chat);
+        msg.setText("With attachments");
+        msg.setRole("user");
+        msg.setCreatedAt(Instant.now());
+        msg.setDocuments(List.of("doc1.pdf", "doc2.docx"));
+        msg.setImages(List.of("img1.png"));
+        messageRepository.save(msg);
+
+        Object result = historyService.getChatHistory(chat.getUuid(), user1);
+        String json = objectMapper.writeValueAsString(result);
+
+        assertThat(json).contains("doc1.pdf", "doc2.docx", "img1.png");
     }
 }

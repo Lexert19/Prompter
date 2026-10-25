@@ -1,27 +1,24 @@
 package com.example.promptengineering.restController;
 
+import com.example.promptengineering.BaseIntegrationTest;
 import com.example.promptengineering.dto.UserFileDTO;
 import com.example.promptengineering.entity.User;
+import com.example.promptengineering.entity.UserFile;
 import com.example.promptengineering.repository.UserFileRepository;
 import com.example.promptengineering.repository.UserRepository;
 import com.example.promptengineering.service.UserService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -31,14 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@Transactional
-@ActiveProfiles("test")
-public class FileControllerIntegrationTest {
-
-    @Autowired
-    private MockMvc mockMvc;
+public class FileControllerIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private UserRepository userRepository;
@@ -57,18 +47,15 @@ public class FileControllerIntegrationTest {
 
     private User user1;
     private User user2;
-    private final String user1Email = "fileuser1@example.com";
-    private final String user2Email = "fileuser2@example.com";
+    private String user1Email;
+    private String user2Email;
     private final String password = "password";
-
-    @DynamicPropertySource
-    static void minioProps(DynamicPropertyRegistry registry) {
-        registry.add("minio.endpoint", () -> "http://localhost:9000");
-        registry.add("minio.bucket", () -> "test-bucket");
-    }
 
     @BeforeEach
     void setUp() {
+        user1Email = "file-" + UUID.randomUUID() + "@example.com";
+        user2Email = "file-" + UUID.randomUUID() + "@example.com";
+
         user1 = new User();
         user1.setEmail(user1Email);
         user1.setPassword(passwordEncoder.encode(password));
@@ -79,6 +66,25 @@ public class FileControllerIntegrationTest {
         user2.setPassword(passwordEncoder.encode(password));
         user2 = userRepository.save(user2);
 
+    }
+
+    @AfterEach
+    void tearDown() {
+        if (user1 != null && user1.getId() != null) {
+            List<UserFile> user1Files = userFileRepository.findByOwner(user1);
+            for (UserFile file : user1Files) {
+                userFileRepository.delete(file);
+            }
+            userRepository.delete(user1);
+        }
+
+        if (user2 != null && user2.getId() != null) {
+            List<UserFile> user2Files = userFileRepository.findByOwner(user2);
+            for (UserFile file : user2Files) {
+                userFileRepository.delete(file);
+            }
+            userRepository.delete(user2);
+        }
     }
 
     @Test

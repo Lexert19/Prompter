@@ -1,5 +1,6 @@
 package com.example.promptengineering.restController;
 
+import com.example.promptengineering.BaseIntegrationTest;
 import com.example.promptengineering.dto.RegisterNodeRequest;
 import com.example.promptengineering.entity.HostedNode;
 import com.example.promptengineering.entity.HostedNode.Status;
@@ -10,36 +11,26 @@ import com.example.promptengineering.repository.HostedNodeRepository;
 import com.example.promptengineering.repository.UserRepository;
 import com.example.promptengineering.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@Transactional
-@ActiveProfiles("test")
-public class HostedNodeApiControllerIntegrationTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
+public class HostedNodeApiControllerIntegrationTest extends BaseIntegrationTest {
     @Autowired
     private HostedNodeRepository hostedNodeRepository;
 
@@ -55,18 +46,43 @@ public class HostedNodeApiControllerIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private String adminEmail;
+    private String userEmail;
+    private String otherEmail;
+
     private User adminUser;
     private User normalUser;
     private User otherUser;
 
     @BeforeEach
     void setUp() throws UserAlreadyExistsException {
-        adminUser = userService.createUser("admin@nodes.com", "password",
+        adminEmail = "admin-" + UUID.randomUUID() + "@nodes.com";
+        userEmail = "user-" + UUID.randomUUID() + "@nodes.com";
+        otherEmail = "other-" + UUID.randomUUID() + "@nodes.com";
+
+        adminUser = userService.createUser(adminEmail, "password",
                 List.of(AppRole.ADMIN));
-        normalUser = userService.createUser("user@nodes.com", "password",
-                List.of(AppRole.USER));
-        otherUser = userService.createUser("other@nodes.com", "password",
-                List.of(AppRole.USER));
+        normalUser = userService.createUser(userEmail, "password", List.of(AppRole.USER));
+        otherUser = userService.createUser(otherEmail, "password", List.of(AppRole.USER));
+    }
+
+    @AfterEach
+    void tearDown() {
+        if (adminUser != null && adminUser.getId() != null) {
+            hostedNodeRepository
+                    .deleteAll(hostedNodeRepository.findByOwnerId(adminUser.getId()));
+            userRepository.delete(adminUser);
+        }
+        if (normalUser != null && normalUser.getId() != null) {
+            hostedNodeRepository
+                    .deleteAll(hostedNodeRepository.findByOwnerId(normalUser.getId()));
+            userRepository.delete(normalUser);
+        }
+        if (otherUser != null && otherUser.getId() != null) {
+            hostedNodeRepository
+                    .deleteAll(hostedNodeRepository.findByOwnerId(otherUser.getId()));
+            userRepository.delete(otherUser);
+        }
     }
 
     @Test
@@ -83,9 +99,10 @@ public class HostedNodeApiControllerIntegrationTest {
                 .andExpect(jsonPath("$.modelFamily", is("community")))
                 .andExpect(jsonPath("$.allowPublicUse", is(true)));
 
-        List<HostedNode> all = hostedNodeRepository.findAll();
-        assertThat(all).hasSize(1);
-        HostedNode node = all.get(0);
+        List<HostedNode> userNodes = hostedNodeRepository
+                .findByOwnerId(normalUser.getId());
+        assertThat(userNodes).hasSize(1);
+        HostedNode node = userNodes.getFirst();
         assertThat(node.getOwner().getId()).isEqualTo(normalUser.getId());
         assertThat(node.getNodeName()).isEqualTo("my-4090");
     }

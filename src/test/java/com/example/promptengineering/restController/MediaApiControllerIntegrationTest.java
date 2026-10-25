@@ -1,5 +1,6 @@
 package com.example.promptengineering.restController;
 
+import com.example.promptengineering.BaseIntegrationTest;
 import com.example.promptengineering.entity.Media;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.model.AppRole;
@@ -12,19 +13,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -33,14 +30,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@Transactional
-@ActiveProfiles("test")
-public class MediaApiControllerIntegrationTest {
-
-    @Autowired
-    private MockMvc mockMvc;
+public class MediaApiControllerIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private MediaRepository mediaRepository;
@@ -72,14 +62,17 @@ public class MediaApiControllerIntegrationTest {
         field.setAccessible(true);
         field.set(mediaApiController, tempUploadDir.toString());
 
+        String adminEmail = "admin-" + UUID.randomUUID() + "@media.com";
+        String userEmail = "user-" + UUID.randomUUID() + "@media.com";
+
         adminUser = new User();
-        adminUser.setEmail("admin@media.com");
+        adminUser.setEmail(adminEmail);
         adminUser.setPassword(passwordEncoder.encode("password"));
         adminUser.setRoles(List.of(AppRole.ADMIN));
         adminUser = userRepository.save(adminUser);
 
         normalUser = new User();
-        normalUser.setEmail("user@media.com");
+        normalUser.setEmail(userEmail);
         normalUser.setPassword(passwordEncoder.encode("password"));
         normalUser.setRoles(List.of(AppRole.USER));
         normalUser = userRepository.save(normalUser);
@@ -95,6 +88,14 @@ public class MediaApiControllerIntegrationTest {
                 }
             });
         }
+        mediaRepository.findAll().stream()
+                .filter(m -> m.getFilePath().startsWith(tempUploadDir.toString()))
+                .forEach(mediaRepository::delete);
+
+        if (adminUser != null)
+            userRepository.delete(adminUser);
+        if (normalUser != null)
+            userRepository.delete(normalUser);
     }
 
     @Test
@@ -110,7 +111,7 @@ public class MediaApiControllerIntegrationTest {
         assertThat(Files.list(tempUploadDir)).hasSize(1);
         List<Media> all = mediaRepository.findAll();
         assertThat(all).hasSize(1);
-        Media media = all.get(0);
+        Media media = all.getFirst();
         assertThat(media.getFileName()).isEqualTo("test.jpg");
         assertThat(media.getContentType()).isEqualTo(MediaType.IMAGE_JPEG_VALUE);
         assertThat(media.getSize()).isEqualTo(file.getSize());
@@ -208,7 +209,7 @@ public class MediaApiControllerIntegrationTest {
 
         List<Media> all = mediaRepository.findAll();
         assertThat(all).hasSize(1);
-        Long id = all.get(0).getId();
+        Long id = all.getFirst().getId();
 
         mockMvc.perform(delete("/api/admin/media/{id}", id).with(csrf())
                 .with(user(userService.loadUserByUsername(adminUser.getEmail()))))

@@ -1,27 +1,22 @@
 package com.example.promptengineering.restController;
 
+import com.example.promptengineering.BaseIntegrationTest;
 import com.example.promptengineering.dto.LoginRequest;
 import com.example.promptengineering.dto.RegisterRequest;
 import com.example.promptengineering.dto.ResetPasswordConfirmRequest;
 import com.example.promptengineering.dto.ResetPasswordRequest;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-
 import com.example.promptengineering.entity.ResetToken;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.repository.ResetTokenRepository;
 import com.example.promptengineering.repository.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,54 +26,52 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 @Slf4j
-@SpringBootTest
-@ActiveProfiles("test")
-public class AuthControllerTest {
+public class AuthControllerTest extends BaseIntegrationTest {
 
     @Autowired
     private ResetTokenRepository resetTokenRepository;
+
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @Autowired
-    private WebApplicationContext webApplicationContext;
+
     @Autowired
     private ObjectMapper objectMapper;
 
-    private MockMvc mockMvc;
     private User user;
+    private String userEmail;
+    private final String userPassword = "testpassword123";
 
     @BeforeEach
     public void setup() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-        String login = "testuser123@wp.pl";
-        String password = "testpassword123";
+        userEmail = "auth-" + UUID.randomUUID() + "@wp.pl";
 
-        User existingUser = userRepository.findByEmail(login).orElse(null);
-        if (existingUser != null) {
-            existingUser.setPassword(passwordEncoder.encode(password));
-            userRepository.save(existingUser);
-            user = existingUser;
-        } else {
-            User newUser = new User();
-            newUser.setEmail(login);
-            newUser.setPassword(passwordEncoder.encode(password));
-            userRepository.save(newUser);
-            user = newUser;
+        user = new User();
+        user.setEmail(userEmail);
+        user.setPassword(passwordEncoder.encode(userPassword));
+        user = userRepository.save(user);
+    }
+
+    @AfterEach
+    void tearDown() {
+        resetTokenRepository.deleteAll(resetTokenRepository.findByUserLogin(userEmail));
+        if (user != null && user.getId() != null) {
+            userRepository.delete(user);
         }
     }
 
     @Test
     public void testRegisterFailureEmailExists() throws Exception {
-        RegisterRequest registerRequest = new RegisterRequest("testuser123@wp.pl",
+        RegisterRequest registerRequest = new RegisterRequest(userEmail,
                 "anotherpassword");
 
         mockMvc.perform(post("/auth/register").with(csrf())
@@ -89,8 +82,7 @@ public class AuthControllerTest {
 
     @Test
     public void testLoginSuccess() throws Exception {
-        LoginRequest loginRequest = new LoginRequest("testuser123@wp.pl",
-                "testpassword123");
+        LoginRequest loginRequest = new LoginRequest(userEmail, userPassword);
 
         mockMvc.perform(post("/auth/login").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(loginRequest)))
@@ -106,8 +98,7 @@ public class AuthControllerTest {
 
     @Test
     public void testLoginFailure() throws Exception {
-        LoginRequest loginRequest = new LoginRequest("testuser123@wp.pl",
-                "wrongpassword");
+        LoginRequest loginRequest = new LoginRequest(userEmail, "wrongpassword");
 
         mockMvc.perform(post("/auth/login").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(loginRequest)))
@@ -115,11 +106,8 @@ public class AuthControllerTest {
     }
 
     @Test
-    @Transactional
     public void testPasswordResetRequest() throws Exception {
-        resetTokenRepository.deleteByUserLogin("testuser123@wp.pl");
-
-        ResetPasswordRequest resetRequest = new ResetPasswordRequest("testuser123@wp.pl");
+        ResetPasswordRequest resetRequest = new ResetPasswordRequest(userEmail);
 
         mockMvc.perform(post("/auth/reset-password-request")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -127,18 +115,16 @@ public class AuthControllerTest {
                 .andExpect(status().isOk()).andExpect(jsonPath("$.message")
                         .value("If the email exists, a reset link has been sent."));
 
-        List<ResetToken> resetTokens = resetTokenRepository
-                .findByUserLogin("testuser123@wp.pl");
+        List<ResetToken> resetTokens = resetTokenRepository.findByUserLogin(userEmail);
         assertFalse(resetTokens.isEmpty(), "Reset token should have been created");
     }
 
     @Test
-    @Transactional
     public void testPasswordResetConfirmationSuccess() throws Exception {
         String uniqueToken = UUID.randomUUID().toString();
         ResetToken resetToken = new ResetToken();
         resetToken.setToken(uniqueToken);
-        resetToken.setUserLogin("testuser123@wp.pl");
+        resetToken.setUserLogin(userEmail);
         resetToken.setCreationTime(LocalDateTime.now());
         resetToken.setUser(user);
         resetTokenRepository.save(resetToken);
@@ -152,14 +138,11 @@ public class AuthControllerTest {
                 .andExpect(status().isOk()).andExpect(jsonPath("$.message")
                         .value("Password has been reset successfully."));
 
-        Optional<User> updatedUser = userRepository
-                .findByEmail(resetToken.getUserLogin());
+        Optional<User> updatedUser = userRepository.findByEmail(userEmail);
         assertFalse(updatedUser.isEmpty(), "User should exist");
         assertTrue(
                 passwordEncoder.matches("nowe_haslo", updatedUser.get().getPassword()));
 
-        updatedUser.get().setPassword(passwordEncoder.encode("testpassword123"));
-        userRepository.save(updatedUser.get());
     }
 
     @Test
@@ -179,7 +162,7 @@ public class AuthControllerTest {
         String expiredToken = UUID.randomUUID().toString();
         ResetToken resetToken = new ResetToken();
         resetToken.setToken(expiredToken);
-        resetToken.setUserLogin("testuser123@wp.pl");
+        resetToken.setUserLogin(userEmail);
         resetToken.setUser(user);
         resetToken.setCreationTime(LocalDateTime.now().minusHours(2));
         resetTokenRepository.save(resetToken);
@@ -193,5 +176,4 @@ public class AuthControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").exists());
     }
-
 }

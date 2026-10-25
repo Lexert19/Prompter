@@ -1,5 +1,6 @@
 package com.example.promptengineering.restController;
 
+import com.example.promptengineering.BaseIntegrationTest;
 import com.example.promptengineering.dto.PostDto;
 import com.example.promptengineering.entity.Post;
 import com.example.promptengineering.entity.User;
@@ -11,31 +12,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@Transactional
-@ActiveProfiles("test")
-public class BlogApiAdminControllerIntegrationTest {
-
-    @Autowired
-    private MockMvc mockMvc;
+public class BlogApiAdminControllerIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private PostRepository postRepository;
@@ -56,73 +46,63 @@ public class BlogApiAdminControllerIntegrationTest {
     private User normalUser;
     private Post testPost1;
     private Post testPost2;
+    private String adminEmail;
+    private String userEmail;
 
     @BeforeEach
     void setUp() {
-        if (userRepository.findByEmail("admin@example.com").isEmpty()) {
-            adminUser = new User();
-            adminUser.setEmail("admin@example.com");
-            adminUser.setPassword(passwordEncoder.encode("password"));
-            adminUser.setRoles(List.of(AppRole.ADMIN));
-            adminUser = userRepository.save(adminUser);
-        } else {
-            adminUser = userRepository.findByEmail("admin@example.com").get();
-        }
+        adminEmail = "admin-" + UUID.randomUUID() + "@example.com";
+        userEmail = "user-" + UUID.randomUUID() + "@example.com";
 
-        if (userRepository.findByEmail("user@example.com").isEmpty()) {
-            normalUser = new User();
-            normalUser.setEmail("user@example.com");
-            normalUser.setPassword(passwordEncoder.encode("password"));
-            normalUser.setRoles(List.of(AppRole.USER));
-            normalUser = userRepository.save(normalUser);
-        } else {
-            normalUser = userRepository.findByEmail("user@example.com").get();
-        }
+        adminUser = new User();
+        adminUser.setEmail(adminEmail);
+        adminUser.setPassword(passwordEncoder.encode("password"));
+        adminUser.setRoles(List.of(AppRole.ADMIN));
+        adminUser = userRepository.save(adminUser);
 
-        if (postRepository.findBySlug("first-post").isEmpty()) {
-            testPost1 = new Post();
-            testPost1.setTitle("First Post");
-            testPost1.setSlug("first-post");
-            testPost1.setContent("Content of first post");
-            testPost1.setLang("pl");
-            testPost1.setCreatedAt(LocalDateTime.now());
-            testPost1.setUpdatedAt(LocalDateTime.now());
-            testPost1 = postRepository.save(testPost1);
-        } else {
-            testPost1 = postRepository.findBySlug("first-post").get();
-        }
+        normalUser = new User();
+        normalUser.setEmail(userEmail);
+        normalUser.setPassword(passwordEncoder.encode("password"));
+        normalUser.setRoles(List.of(AppRole.USER));
+        normalUser = userRepository.save(normalUser);
 
-        if (postRepository.findBySlug("second-post").isEmpty()) {
-            testPost2 = new Post();
-            testPost2.setTitle("Second Post");
-            testPost2.setSlug("second-post");
-            testPost2.setContent("Content of second post");
-            testPost2.setLang("en");
-            testPost2.setCreatedAt(LocalDateTime.now());
-            testPost2.setUpdatedAt(LocalDateTime.now());
-            testPost2 = postRepository.save(testPost2);
-        } else {
-            testPost2 = postRepository.findBySlug("second-post").get();
-        }
+        String slug1 = "first-post-" + UUID.randomUUID();
+        testPost1 = new Post();
+        testPost1.setTitle("First Post");
+        testPost1.setSlug(slug1);
+        testPost1.setContent("Content of first post");
+        testPost1.setLang("pl");
+        testPost1.setCreatedAt(LocalDateTime.now());
+        testPost1.setUpdatedAt(LocalDateTime.now());
+        testPost1 = postRepository.save(testPost1);
+
+        String slug2 = "second-post-" + UUID.randomUUID();
+        testPost2 = new Post();
+        testPost2.setTitle("Second Post");
+        testPost2.setSlug(slug2);
+        testPost2.setContent("Content of second post");
+        testPost2.setLang("en");
+        testPost2.setCreatedAt(LocalDateTime.now());
+        testPost2.setUpdatedAt(LocalDateTime.now());
+        testPost2 = postRepository.save(testPost2);
     }
 
     @Test
     void shouldReturnAllPostsAsAdmin() throws Exception {
         mockMvc.perform(get("/api/admin/blog/posts")
-                .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
-                .andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[*].title",
-                        containsInAnyOrder("First Post", "Second Post")));
+                .with(user(userService.loadUserByUsername(adminEmail))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[*].title", hasItems("First Post", "Second Post")));
     }
 
     @Test
     void shouldReturnPostByIdAsAdmin() throws Exception {
         mockMvc.perform(get("/api/admin/blog/posts/{id}", testPost1.getId())
-                .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
+                .with(user(userService.loadUserByUsername(adminEmail))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(testPost1.getId().intValue())))
                 .andExpect(jsonPath("$.title", is("First Post")))
-                .andExpect(jsonPath("$.slug", is("first-post")))
+                .andExpect(jsonPath("$.slug", is(testPost1.getSlug())))
                 .andExpect(jsonPath("$.lang", is("pl")));
     }
 
@@ -135,39 +115,41 @@ public class BlogApiAdminControllerIntegrationTest {
 
     @Test
     void shouldCreateNewPostAsAdmin() throws Exception {
+        String uniqueSlug = "new-post-" + UUID.randomUUID();
         PostDto newPost = new PostDto();
         newPost.setTitle("New Post");
-        newPost.setSlug("new-post");
+        newPost.setSlug(uniqueSlug);
         newPost.setContent("New content");
         newPost.setLang("en");
 
-        mockMvc.perform(post("/api/admin/blog/posts").with(csrf())
-                .with(user(userService.loadUserByUsername(adminUser.getEmail())))
+        mockMvc.perform(post("/api/admin/blog/posts")
+                .with(user(userService.loadUserByUsername(adminEmail)))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(newPost)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.title", is("New Post")))
-                .andExpect(jsonPath("$.slug", is("new-post")))
+                .andExpect(jsonPath("$.slug", is(uniqueSlug)))
                 .andExpect(jsonPath("$.content", is("New content")))
                 .andExpect(jsonPath("$.lang", is("en")));
     }
 
     @Test
     void shouldCreateNewPostWithParentNullAsAdmin() throws Exception {
+        String uniqueSlug = "new-post-null-" + UUID.randomUUID();
         PostDto newPost = new PostDto();
         newPost.setTitle("New Post");
-        newPost.setSlug("new-post");
+        newPost.setSlug(uniqueSlug);
         newPost.setParentId(null);
         newPost.setContent("New content");
         newPost.setLang("en");
 
-        mockMvc.perform(post("/api/admin/blog/posts").with(csrf())
-                .with(user(userService.loadUserByUsername(adminUser.getEmail())))
+        mockMvc.perform(post("/api/admin/blog/posts")
+                .with(user(userService.loadUserByUsername(adminEmail)))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(newPost)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.title", is("New Post")))
-                .andExpect(jsonPath("$.slug", is("new-post")))
+                .andExpect(jsonPath("$.slug", is(uniqueSlug)))
                 .andExpect(jsonPath("$.parentId").doesNotExist())
                 .andExpect(jsonPath("$.content", is("New content")))
                 .andExpect(jsonPath("$.lang", is("en")));
@@ -175,20 +157,21 @@ public class BlogApiAdminControllerIntegrationTest {
 
     @Test
     void shouldUpdateExistingPostAsAdmin() throws Exception {
+        String updatedSlug = "updated-slug-" + UUID.randomUUID();
         PostDto updatedPost = new PostDto();
         updatedPost.setTitle("Updated Title");
-        updatedPost.setSlug("updated-slug");
+        updatedPost.setSlug(updatedSlug);
         updatedPost.setContent("Updated content");
         updatedPost.setLang("pl");
 
-        mockMvc.perform(put("/api/admin/blog/posts/{id}", testPost1.getId()).with(csrf())
-                .with(user(userService.loadUserByUsername(adminUser.getEmail())))
+        mockMvc.perform(put("/api/admin/blog/posts/{id}", testPost1.getId())
+                .with(user(userService.loadUserByUsername(adminEmail)))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updatedPost)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(testPost1.getId().intValue())))
                 .andExpect(jsonPath("$.title", is("Updated Title")))
-                .andExpect(jsonPath("$.slug", is("updated-slug")))
+                .andExpect(jsonPath("$.slug", is(updatedSlug)))
                 .andExpect(jsonPath("$.content", is("Updated content")))
                 .andExpect(jsonPath("$.lang", is("pl")));
     }
@@ -198,7 +181,7 @@ public class BlogApiAdminControllerIntegrationTest {
         PostDto updatedPost = new PostDto();
         updatedPost.setTitle("Updated Title");
 
-        mockMvc.perform(put("/api/admin/blog/posts/{id}", 999L).with(csrf())
+        mockMvc.perform(put("/api/admin/blog/posts/{id}", 999L)
                 .with(user(userService.loadUserByUsername(adminUser.getEmail())))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updatedPost)))
@@ -207,10 +190,9 @@ public class BlogApiAdminControllerIntegrationTest {
 
     @Test
     void shouldDeletePostAsAdmin() throws Exception {
-        mockMvc.perform(
-                delete("/api/admin/blog/posts/{id}", testPost1.getId()).with(csrf())
+        mockMvc.perform(delete("/api/admin/blog/posts/{id}", testPost1.getId())
 
-                        .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
+                .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
                 .andExpect(status().isNoContent());
 
         mockMvc.perform(get("/api/admin/blog/posts/{id}", testPost1.getId())
@@ -220,7 +202,7 @@ public class BlogApiAdminControllerIntegrationTest {
 
     @Test
     void shouldReturn404WhenDeletingNonExistentPostAsAdmin() throws Exception {
-        mockMvc.perform(delete("/api/admin/blog/posts/{id}", 999L).with(csrf())
+        mockMvc.perform(delete("/api/admin/blog/posts/{id}", 999L)
                 .with(user(userService.loadUserByUsername(adminUser.getEmail()))))
                 .andExpect(status().isNotFound());
     }

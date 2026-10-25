@@ -58,8 +58,7 @@ public class HistoryController {
     public ResponseEntity<List<MessageDto>> getChatHistory(@PathVariable UUID chatUuid,
                                                            @AuthenticationPrincipal User user)
             throws UserSecurityException, ResourceNotFoundException {
-        List<Message> messages = historyService.getChatHistory(chatUuid, user);
-        return ResponseEntity.ok(MessageDto.fromEntities(messages));
+        return ResponseEntity.ok(historyService.getChatHistory(chatUuid, user));
     }
 
     @GetMapping("/chats")
