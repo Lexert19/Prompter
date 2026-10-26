@@ -58,8 +58,8 @@ class TwoFactorManager {
             this.email = data.twoFactorEmail || '';
             this.updateUI();
         } catch (err) {
-            console.error('Błąd ładowania statusu 2FA:', err);
-            this.showError('Nie udało się załadować ustawień 2FA');
+            console.error('Error loading 2FA status:', err);
+            this.showError('Failed to load 2FA settings');
         }
     }
 
@@ -104,7 +104,7 @@ class TwoFactorManager {
     async sendTestCode() {
         const email = this.elements.emailInput.value.trim();
         if (!email) {
-            this.showError('Podaj adres e-mail');
+            this.showError('Enter an email address');
             return;
         }
         try {
@@ -115,10 +115,10 @@ class TwoFactorManager {
             });
             if (!response.ok) {
                 const err = await response.json();
-                throw new Error(err.message || 'Błąd wysyłania kodu');
+                throw new Error(err.message || 'Failed to send code');
             }
             this.lastSentEmail = email;
-            this.showSuccess(`Kod został wysłany na adres ${email}`);
+            this.showSuccess(`A code has been sent to ${email}`);
             this.elements.codeInput.focus();
         } catch (err) {
             this.showError(err.message);
@@ -129,7 +129,7 @@ class TwoFactorManager {
         const email = this.elements.emailInput.value.trim();
         const code = this.elements.codeInput.value.trim();
         if (!email || !code) {
-            this.showError('Podaj adres e-mail i kod');
+            this.showError('Enter email address and code');
             return;
         }
         try {
@@ -143,20 +143,20 @@ class TwoFactorManager {
                 this.status = true;
                 this.email = email;
                 this.updateUI();
-                this.showSuccess('2FA zostało włączone');
+                this.showSuccess('2FA has been enabled');
                 this.elements.codeInput.value = '';
             } else {
-                this.showError(data.error || 'Nieprawidłowy kod');
+                this.showError(data.error || 'Invalid code');
             }
         } catch (err) {
-            this.showError('Błąd połączenia z serwerem');
+            this.showError('Server connection error');
         }
     }
 
     async disableTwoFactor() {
         const code = this.elements.codeInput.value.trim();
         if (!code) {
-            this.showError('Podaj kod weryfikacyjny');
+            this.showError('Enter verification code');
             return;
         }
         try {
@@ -170,13 +170,13 @@ class TwoFactorManager {
                 this.status = false;
                 this.email = '';
                 this.updateUI();
-                this.showSuccess('2FA zostało wyłączone');
+                this.showSuccess('2FA has been disabled');
                 this.elements.codeInput.value = '';
             } else {
-                this.showError(data.error || 'Nieprawidłowy kod');
+                this.showError(data.error || 'Invalid code');
             }
         } catch (err) {
-            this.showError('Błąd połączenia z serwerem');
+            this.showError('Server connection error');
         }
     }
 }

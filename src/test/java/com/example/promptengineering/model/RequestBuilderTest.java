@@ -2,8 +2,6 @@ package com.example.promptengineering.model;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -11,8 +9,6 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class RequestBuilderTest {
-
-    private static final Logger log = LoggerFactory.getLogger(RequestBuilderTest.class);
 
     private RequestBuilder builder;
     private TextContent textContent;
@@ -43,8 +39,6 @@ class RequestBuilderTest {
 
         Map<String, Object> request = builder.build();
 
-        log.info("OpenAI request with system: {}", request);
-
         assertThat(request).containsEntry("model", "gpt-4")
                 .containsEntry("max_tokens", 200).containsEntry("temperature", 0.7)
                 .containsEntry("stream", true).containsKey("messages");
@@ -73,8 +67,6 @@ class RequestBuilderTest {
 
         Map<String, Object> request = builder.build();
 
-        log.info("Anthropic request with system: {}", request);
-
         assertThat(request).containsEntry("model", "claude-3-opus-20240229")
                 .containsEntry("max_tokens", 1000).containsEntry("temperature", 0.0)
                 .containsEntry("stream", false)
@@ -101,7 +93,6 @@ class RequestBuilderTest {
         builder.setProvider("ANTHROPIC");
 
         Map<String, Object> request = builder.build();
-        log.info("Anthropic request with image: {}", request);
 
         List<Map<String, Object>> messages = (List<Map<String, Object>>) request
                 .get("messages");
@@ -133,7 +124,6 @@ class RequestBuilderTest {
         builder.setProvider("OPENAI");
 
         Map<String, Object> request = builder.build();
-        log.info("OpenAI request with image: {}", request);
 
         List<Map<String, Object>> messages = (List<Map<String, Object>>) request
                 .get("messages");
@@ -164,7 +154,6 @@ class RequestBuilderTest {
         builder.setProvider("ANTHROPIC");
 
         Map<String, Object> request = builder.build();
-        log.info("Anthropic request with cache: {}", request);
 
         List<Map<String, Object>> messages = (List<Map<String, Object>>) request
                 .get("messages");
@@ -187,8 +176,6 @@ class RequestBuilderTest {
 
         Map<String, Object> request = builder.build();
 
-        log.info("OpenAI request with reasoning effort: {}", request);
-
         assertThat(request).containsEntry("reasoning_effort", "medium");
         assertThat(request).containsKey("response_format");
         assertThat(request.get("response_format")).isEqualTo(Map.of("type", "text"));
@@ -202,14 +189,11 @@ class RequestBuilderTest {
 
         Map<String, Object> request = builder.build();
 
-        log.info("Request with empty content: {}", request);
-
         List<Map<String, Object>> messages = (List<Map<String, Object>>) request
                 .get("messages");
         List<Map<String, Object>> contentList = (List<Map<String, Object>>) messages
                 .get(0).get("content");
         assertThat(contentList).hasSize(0);
-        // assertThat(contentList.get(0)).containsEntry("text", "error");
     }
 
     @Test
@@ -317,19 +301,4 @@ class RequestBuilderTest {
                 .containsEntry("frequency_penalty", 0.0)
                 .containsEntry("presence_penalty", 0.0);
     }
-
-    // @Test
-    // void shouldThrowExceptionForUnknownContentType() {
-    // TextContent badContent = new TextContent();
-    // badContent.setType("audio");
-    // badContent.setText("whatever");
-    // Message msg = new Message("user", List.of(badContent));
-    //
-    // builder.model("gpt-4").addMessage(msg);
-    // builder.setProvider("OPENAI");
-    //
-    // assertThatThrownBy(() -> builder.build())
-    // .isInstanceOf(IllegalStateException.class)
-    // .hasMessageContaining("Unknown content type");
-    // }
 }

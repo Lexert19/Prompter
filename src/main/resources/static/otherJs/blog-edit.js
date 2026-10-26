@@ -8,48 +8,48 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (isEdit) {
         try {
             const res = await fetchWithCsrf(`/api/admin/blog/posts/${postId}`, { credentials: 'include' });
-            if (!res.ok) throw new Error('Nie udało się pobrać danych');
+            if (!res.ok) throw new Error('Failed to fetch data');
             post = await res.json();
         } catch (err) {
-            container.innerHTML = `<p class="text-danger">Błąd: ${err.message}</p>`;
+            container.innerHTML = `<p class="text-danger">Error: ${err.message}</p>`;
             return;
         }
     }
 
     container.innerHTML = `
-        <h2 style="color: var(--accent);">${post ? 'Edytuj' : 'Nowy'} wpis</h2>
+        <h2 style="color: var(--accent);">${post ? 'Edit' : 'New'} post</h2>
         <form id="postForm">
             <input type="hidden" id="postId" value="${post?.id || ''}">
             <div class="mb-2">
-                <label for="title">Tytuł</label>
+                <label for="title">Title</label>
                 <input type="text" id="title" name="title" value="${post?.title || ''}" class="form-control" required>
             </div>
             <div class="mb-2">
-                <label for="slug">Slug (opcjonalny)</label>
+                <label for="slug">Slug (optional)</label>
                 <input type="text" id="slug" name="slug" value="${post?.slug || ''}" class="form-control">
             </div>
             <div class="mb-2">
-                <label for="lang">Język (pl/en)</label>
+                <label for="lang">Language (pl/en)</label>
                 <input type="text" id="lang" name="lang" value="${post?.lang || 'pl'}" maxlength="2" class="form-control" required>
             </div>
             <div class="mb-2">
-                <label for="shortDescription">Krótki opis</label>
+                <label for="shortDescription">Short description</label>
                 <textarea id="shortDescription" name="shortDescription" rows="3" class="form-control">${post?.shortDescription || ''}</textarea>
             </div>
             <div class="mb-2">
-                <label for="content">Treść</label>
+                <label for="content">Content</label>
                 <textarea id="content" name="content" rows="15" class="form-control" required>${post?.content || ''}</textarea>
             </div>
             <div class="mb-2">
-                <label for="thumbnailId">Miniaturka (ID obrazka)</label>
+                <label for="thumbnailId">Thumbnail (image ID)</label>
                 <div class="d-flex align-items-center">
                     <input type="number" name="thumbnailId" id="thumbnailId" class="form-control" style="width: 150px;" placeholder="ID" value="${post?.thumbnailId || ''}">
-                    <button type="button" class="btn btn-secondary ms-2" onclick="openMediaPicker()">Wybierz z biblioteki</button>
+                    <button type="button" class="btn btn-secondary ms-2" onclick="openMediaPicker()">Select from library</button>
                 </div>
                 <div id="thumbnailPreview" class="mt-2"></div>
             </div>
-            <button type="submit" class="btn btn-primary">Zapisz</button>
-            <a href="/admin/blog" class="btn btn-secondary">Anuluj</a>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a href="/admin/blog" class="btn btn-secondary">Cancel</a>
         </form>
     `;
 
@@ -78,10 +78,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (res.ok) {
                 window.location.href = '/admin/blog';
             } else {
-                alert('Błąd zapisu: ' + await res.text());
+                alert('Save error: ' + await res.text());
             }
         } catch (err) {
-            alert('Błąd: ' + err.message);
+            alert('Error: ' + err.message);
         }
     });
 });
@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function openMediaPicker() {
     try {
         const response = await fetchWithCsrf('/api/admin/media', { credentials: 'include' });
-        if (!response.ok) throw new Error('Nie udało się pobrać mediów');
+        if (!response.ok) throw new Error('Failed to fetch media');
         const mediaList = await response.json();
 
         let contentHtml = '<div class="media-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; max-height: 60vh; overflow-y: auto;">';
@@ -103,7 +103,7 @@ async function openMediaPicker() {
         });
         contentHtml += '</div>';
 
-        Modal.instance().open('Wybierz miniaturkę', contentHtml, null);
+        Modal.instance().open('Select thumbnail', contentHtml, null);
 
         document.querySelectorAll('.media-item-selectable').forEach(el => {
             el.addEventListener('click', () => {
@@ -115,8 +115,8 @@ async function openMediaPicker() {
             });
         });
     } catch (error) {
-        console.error('Błąd podczas otwierania pickera:', error);
-        alert('Nie udało się załadować biblioteki mediów.');
+        console.error('Error while opening picker:', error);
+        alert('Failed to load media library.');
     }
 }
 
@@ -131,7 +131,7 @@ async function loadThumbnailPreview() {
                 document.getElementById('thumbnailPreview').innerHTML = `<img src="${media.url}" style="max-width: 200px; max-height: 200px; border-radius: 4px;">`;
             }
         } catch (error) {
-            console.error('Błąd ładowania miniatury:', error);
+            console.error('Error loading thumbnail:', error);
         }
     }
 }

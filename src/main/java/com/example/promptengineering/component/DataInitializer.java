@@ -4,6 +4,7 @@ import com.example.promptengineering.entity.User;
 import com.example.promptengineering.model.AppRole;
 import com.example.promptengineering.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,7 +30,7 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) {
+    public void run(String @NonNull... args) {
         User admin = userRepository.findByEmail(adminEmail).orElse(null);
         if (admin == null) {
             User newAdmin = new User();
@@ -38,10 +39,7 @@ public class DataInitializer implements CommandLineRunner {
             newAdmin.setRoles(List.of(AppRole.ADMIN));
             newAdmin.setTwoFactorEnabled(true);
             newAdmin.setTwoFactorEmail(adminEmail);
-            admin = userRepository.save(newAdmin);
-            log.info("Admin created: {}", adminEmail);
-        } else {
-            log.debug("Admin already exists: {}", adminEmail);
+            userRepository.save(newAdmin);
         }
 
     }

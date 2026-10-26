@@ -23,7 +23,6 @@ class FileItem{
                  fileElement.addEventListener('contextmenu', (event) => {
                             event.preventDefault();
                             this.selectFile(this.projectId, file.id, fileElement.id);
-                   //this.selectFile(fileElement.dataset.projectId, fileElement.dataset.fileId, fileElement.id);
                             EditFileView.instance().show(event);
                         });
 
@@ -42,14 +41,14 @@ class FileItem{
                 credentials: 'include'
               });
 
-              if (!response.ok) throw new Error('Nie udało się pobrać pliku');
+                if (!response.ok) throw new Error('Failed to download file');
 
               const blob = await response.blob();
               const url = URL.createObjectURL(blob);
               window.open(url, '_blank');
             } catch (error) {
                 //this.showError(t.t("openFileFailed"));
-                console.error('Błąd:', error);
+                console.error('Error:', error);
             }
         }
 }

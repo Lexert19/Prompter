@@ -13,10 +13,10 @@ document.addEventListener('DOMContentLoaded', async function() {
                 document.getElementById('uploadResult').style.display = 'block';
                 setTimeout(() => location.reload(), 1500);
             } else {
-                alert('Błąd przesyłania');
+                alert('Upload error');
             }
         } catch (error) {
-            alert('Błąd: ' + error);
+            alert('Error: ' + error);
         }
     });
 
@@ -24,18 +24,18 @@ document.addEventListener('DOMContentLoaded', async function() {
         const urlInput = document.getElementById('imageUrl');
         urlInput.select();
         document.execCommand('copy');
-        alert('Skopiowano!');
+        alert('Copied!');
     };
 
     window.deleteMedia = async (event, id) => {
         event.preventDefault();
-        if (!confirm('Czy na pewno usunąć?')) return;
+        if (!confirm('Are you sure you want to delete?')) return;
         try {
             const response = await fetchWithCsrf(`/api/admin/media/${id}`, { method: 'DELETE' });
             if (response.ok) location.reload();
-            else alert('Błąd usuwania');
+            else alert('Delete error');
         } catch (error) {
-            alert('Błąd: ' + error);
+            alert('Error: ' + error);
         }
     };
 
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             const mediaList = await response.json();
             renderMediaGrid(mediaList);
         } catch (error) {
-            console.error('Błąd:', error);
+            console.error('Error:', error);
         }
     }
 
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         const grid = document.getElementById('mediaGrid');
         grid.innerHTML = '';
         if (!mediaList.length) {
-            grid.innerHTML = '<p>Brak przesłanych zdjęć.</p>';
+            grid.innerHTML = '<p>No uploaded images.</p>';
             return;
         }
         mediaList.forEach(media => {
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 <div>${new Date(media.uploadedAt).toLocaleString()}</div>
             </div>
             <form class="delete-form" onsubmit="deleteMedia(event, ${media.id})">
-                <button type="submit" class="delete-btn" title="Usuń">×</button>
+                <button type="submit" class="delete-btn" title="Delete">×</button>
             </form>
         `;
             grid.appendChild(item);

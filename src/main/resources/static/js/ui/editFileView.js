@@ -51,11 +51,11 @@ class EditFileView {
                             const fileItem = document.getElementById(this.selectedFileItemId);
                             fileItem.remove();
                         } else {
-                            console.error("Błąd podczas usuwania pliku");
+                            console.error("Error while deleting file");
                         }
                     })
                     .catch((error) => {
-                        console.error("Błąd podczas usuwania pliku:", error);
+                        console.error("Error while deleting file:", error);
                     });
                 this.hide();
         });

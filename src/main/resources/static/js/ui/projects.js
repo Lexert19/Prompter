@@ -104,7 +104,6 @@ class Projects {
     displayProjectDetails(project) {
         this.projectNameDisplay.textContent = project.name;
         this.currentProjectId = project.id; 
-//        this.loadProjectFiles(project.id);
         this.displayFiles(project.files);
     }
 
@@ -166,33 +165,6 @@ class Projects {
         fileInput.click();
     }
 
-//    async addFileToProject(fileName, fileContent) {
-//        const projectId = this.projectSelect.value;
-//        if (!projectId) return;
-//
-//        try {
-//            const response = await fetchWithAuth(`${this.controllerUrl}/${projectId}/files`, {
-//                method: 'POST',
-//                headers: {
-//                    'Content-Type': 'application/json',
-//                },
-//                credentials: 'include',
-//                body: JSON.stringify({
-//                    name: fileName,
-//                    content: fileContent
-//                })
-//            });
-//
-//            if (!response.ok) throw new Error('Failed to add file');
-//
-//            await response.json();
-//            this.loadProjectFiles(projectId);
-//        } catch (error) {
-//            this.showError(t.t("addFileFailed"));
-//            console.error('Error:', error);
-//        }
-//    }
-
     async addFileToProject(fileId) {
         const projectId = this.projectSelect.value;
         if (!projectId) return;
@@ -227,14 +199,14 @@ class Projects {
                     credentials: 'include'
                 }
             );
-    
-            if (!response.ok) throw new Error('Błąd podczas wyszukiwania');
-    
+
+            if (!response.ok) throw new Error('Error while searching');
+
             const fragments = await response.json();
             return fragments;
         } catch (error) {
             this.showError(t.t("searchError"));
-            console.error('Błąd:', error);
+            console.error('Error:', error);
         }
     }
 
@@ -273,7 +245,7 @@ class Projects {
             });
 
             if (!response.ok) {
-                throw new Error('Nie udało się pobrać pliku');
+                throw new Error('Failed to download file');
             }
 
             const content = await response.text();
@@ -282,7 +254,7 @@ class Projects {
             window.open(url, '_blank');
         } catch (error) {
             this.showError(t.t("loadFilesFailed"));
-            console.error('Błąd:', error);
+            console.error('Error:', error);
         }
     }
 }

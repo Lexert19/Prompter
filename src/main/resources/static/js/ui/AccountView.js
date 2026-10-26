@@ -99,7 +99,7 @@ class AccountView{
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ provider, keyValue })
             });
-            if (!response.ok) throw new Error('Błąd zapisu');
+            if (!response.ok) throw new Error('Save error');
             const data = await response.json();
             alert(t.t("keySaved"));
             Modal.instance().close();
@@ -180,7 +180,7 @@ class AccountView{
             document.getElementById('confirmPassword').value = '';
         })
             .catch(error => {
-            console.error("Błąd:", error);
+            console.error("Error:", error);
             alert(`${t.t("passwordChangeError")}${error.message}`);
         });
     }

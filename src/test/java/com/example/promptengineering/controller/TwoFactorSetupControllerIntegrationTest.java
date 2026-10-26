@@ -77,7 +77,7 @@ class TwoFactorSetupControllerIntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(
                 post("/api/2fa/send-test").param("email", testEmail).with(asTestUser))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Kod wysłany na " + testEmail));
+                .andExpect(jsonPath("$.message").value("Code sent to " + testEmail));
 
         verify(emailService).sendTwoFactorCode(eq(testEmail), anyString());
     }
@@ -110,7 +110,7 @@ class TwoFactorSetupControllerIntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(post("/api/2fa/enable").param("email", testEmail)
                 .param("code", wrongCode).with(asTestUser))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("Nieprawidłowy kod"));
+                .andExpect(jsonPath("$.error").value("Invalid code"));
 
         User unchanged = userRepository.findById(testUser.getId()).orElseThrow();
         assert !unchanged.isTwoFactorEnabled();
@@ -153,7 +153,7 @@ class TwoFactorSetupControllerIntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(
                 post("/api/2fa/disable").param("code", wrongCode).with(asTestUser))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("Nieprawidłowy kod"));
+                .andExpect(jsonPath("$.error").value("Invalid code"));
 
         User unchanged = userRepository.findById(testUser.getId()).orElseThrow();
         assert unchanged.isTwoFactorEnabled();

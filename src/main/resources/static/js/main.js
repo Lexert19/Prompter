@@ -75,29 +75,29 @@ function base64ToFile(base64String, filename) {
 async function listSharedKeys() {
   try {
     const res = await fetchWithAuth('/api/admin/shared-keys');
-    if (!res.ok) throw new Error(`Błąd ${res.status}`);
+    if (!res.ok) throw new Error(`Error ${res.status}`);
     const keys = await res.json();
-    if (keys.length === 0) return console.log('Brak kluczy.');
+    if (keys.length === 0) return console.log('No keys.');
     console.table(keys, ['id', 'provider', 'working', 'usageCount']);
   } catch (e) {
-    console.error('Nie udało się pobrać listy:', e);
+    console.error('Failed to fetch list:', e);
   }
 }
 
 async function deleteSharedKey(id) {
-  if (!confirm(`Usunąć klucz ${id}?`)) return;
+  if (!confirm(`Delete key ${id}?`)) return;
   try {
     const res = await fetchWithAuth(`/api/admin/shared-keys/${id}`, { method: 'DELETE' });
-    if (res.status === 204) console.log(`Klucz ${id} usunięty.`);
-    else if (res.status === 404) console.log(`Klucz ${id} nie istnieje.`);
-    else throw new Error(`Błąd ${res.status}`);
+    if (res.status === 204) console.log(`Key ${id} deleted.`);
+    else if (res.status === 404) console.log(`Key ${id} does not exist.`);
+    else throw new Error(`Error ${res.status}`);
   } catch (e) {
-    console.error('Błąd usuwania:', e);
+    console.error('Delete error:', e);
   }
 }
 
 async function deleteSharedKeyInteractive() {
   await listSharedKeys();
-  const id = prompt('Podaj ID klucza do usunięcia:');
+  const id = prompt('Enter the ID of the key to delete:');
   if (id) await deleteSharedKey(parseInt(id));
 }

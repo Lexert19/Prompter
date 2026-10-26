@@ -47,7 +47,7 @@ public class TwoFactorSetupController {
         }
         String sessionId = getSessionId(user);
         twoFactorService.createAndSendCode(sessionId, email);
-        return ResponseEntity.ok(Map.of("message", "Kod wysłany na " + email));
+        return ResponseEntity.ok(Map.of("message", "Code sent to " + email));
     }
 
     @PostMapping("/enable")
@@ -66,7 +66,7 @@ public class TwoFactorSetupController {
             userRepository.save(user);
             return ResponseEntity.ok(Map.of("success", true));
         } else {
-            return ResponseEntity.badRequest().body(Map.of("error", "Nieprawidłowy kod"));
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid code"));
         }
     }
 
@@ -80,7 +80,7 @@ public class TwoFactorSetupController {
             userRepository.save(user);
             return ResponseEntity.ok(Map.of("success", true));
         } else {
-            return ResponseEntity.badRequest().body(Map.of("error", "Nieprawidłowy kod"));
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid code"));
         }
     }
 }

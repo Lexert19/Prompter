@@ -59,7 +59,7 @@ public class TwoFactorAuthController {
             session.removeAttribute("2fa_user_id");
             return "redirect:/";
         } else {
-            session.setAttribute("2fa_error", "Nieprawidłowy kod. Spróbuj ponownie.");
+            session.setAttribute("2fa_error", "Invalid code. Please try again.");
             return "redirect:/auth/2fa";
         }
     }

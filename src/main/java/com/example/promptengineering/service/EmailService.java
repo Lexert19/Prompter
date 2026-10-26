@@ -48,9 +48,9 @@ public class EmailService {
     @Async("taskExecutor")
     public void sendTwoFactorCode(String toEmail, String code) {
         try {
-            String subject = "Twój kod logowania";
-            String html = "<p>Twój kod do logowania: <strong>" + code
-                    + "</strong></p><p>Kod ważny jest 10 minut.</p>";
+            String subject = "Your login code";
+            String html = "<p>Your login code: <strong>" + code
+                    + "</strong></p><p>The code is valid for 10 minutes.</p>";
 
             MimeMessage mime = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mime, true);
