@@ -184,6 +184,18 @@ class AccountView{
             alert(`${t.t("passwordChangeError")}${error.message}`);
         });
     }
+
+    async logout() {
+        try {
+            await fetch('/auth/logout', {
+                method: 'POST',
+                credentials: 'include'
+            });
+        } catch (e) {
+        }
+        localStorage.removeItem('jwt_token');
+        window.location.href = '/auth/login';
+    }
 }
 
 AccountView.instance();
