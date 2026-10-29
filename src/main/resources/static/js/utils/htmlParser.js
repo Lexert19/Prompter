@@ -13,18 +13,46 @@ class HtmlParser {
         this.nextBlockId = 0;
         this.processedLength = 0;
         this.incompleteLine = '';
-        this.collapsedBlocks = new Set();
+        this._collapsedElements = new WeakSet();
+
+        HtmlParser._installDelegatedClick();
+    }
+
+    static _installDelegatedClick() {
+        if (HtmlParser._delegatedInstalled) return;
+        HtmlParser._delegatedInstalled = true;
+
+        let downPos = null;
+        let isDrag = false;
+
+        document.addEventListener('mousedown', (e) => {
+            downPos = { x: e.clientX, y: e.clientY };
+            isDrag = false;
+        }, true);
+
+        document.addEventListener('mousemove', (e) => {
+            if (!downPos) return;
+            if (Math.abs(e.clientX - downPos.x) > 5 ||
+                Math.abs(e.clientY - downPos.y) > 5) {
+                isDrag = true;
+            }
+        }, true);
+
+        document.addEventListener('click', (e) => {
+            if (isDrag) return;
+            const thinkingEl = e.target.closest('.thinking');
+            if (!thinkingEl) return;
+            const contentEl = thinkingEl.querySelector('.thinking-content');
+            if (!contentEl) return;
+
+            const parser = ChatClient.instance?.().parser;
+            if (!parser) return;
+            parser.toggleThinkingBlock(null, contentEl);
+        });
     }
 
     setRootElement(rootElement){
         this.rootElement = rootElement;
-        this.rootElement.addEventListener("click", (e) => {
-            const btn = e.target.closest("[data-thinking-toggle]");
-            if(!btn) return;
-            const id = Number(btn.dataset.thinkingToggle);
-            const contentEl = btn.closest(".thinking")?.querySelector(".thinking-content");
-            this.toggleThinkingBlock(id, contentEl);
-        });
     }
 
     clear(){
@@ -41,7 +69,6 @@ class HtmlParser {
         this.isCodeBlock = false;
         this.isThinkingBlock = false;
         this._tempBlockId = undefined;
-        this.collapsedBlocks.clear();
     }
 
     parse(textFragment) {
@@ -118,23 +145,6 @@ class HtmlParser {
             }
             return "THINKING";
         }
-
-//        if (/^<think>\s*$/.test(trimmed)) {
-//            this.isThinkingBlock = true;
-//            return "START_THINKING";
-//        }
-//        if (/^<\/think>\s*$/.test(trimmed)) {
-//            this.isThinkingBlock = false;
-//            return "STOP_THINKING";
-//        }
-
-//        if(codeDelim.test(line)){
-//            if(this.isCodeBlock){ this.isCodeBlock = false; return "STOP_CODE"; }
-//            this.isCodeBlock = true; return "START_CODE";
-//        }
-
-//        if(this.isThinkingBlock) return "THINKING";
-//        if(this.isCodeBlock) return "CODE";
 
         if (/^<think>\s*$/.test(trimmed)) {
             this.isThinkingBlock = true;
@@ -236,10 +246,11 @@ class HtmlParser {
                 return `${withoutHtmlContent}`;
             case 'THINKING':
                 const domId = `${this.randomId}-${block.id}`;
-                const isCollapsed = this.collapsedBlocks.has(block.id);
-                const cls = isCollapsed ? "thinking-content" : "thinking-content show";
-                const style = isCollapsed ? ` style="max-height:70px"` : ` style="max-height:none"`;
-                return `<div class="thinking"><button class="clear-button p-0 bg-transparent" data-thinking-toggle="${block.id}"><h4>Thinking:</h4></button><p class="${cls}" id="thinkingContent-${domId}"${style}>${this.escapeHtml(block.content)}</p></div>\n`;
+                //const isCollapsed = this.collapsedBlocks.has(block.id);
+                //const cls = isCollapsed ? "thinking-content" : "thinking-content show";
+                //const style = isCollapsed ? ` style="max-height:70px"` : ` style="max-height:none"`;
+                return `<div class="thinking" style="cursor:pointer"><button class="clear-button p-0 bg-transparent" data-thinking-toggle="${block.id}"><h4>Thinking:</h4></button><p class="thinking-content show" id="thinkingContent-${domId}" style="max-height:none">${this.escapeHtml(block.content)}</p></div>\n`;
+                //return `<div class="thinking" style="cursor:pointer"><button class="clear-button p-0 bg-transparent" data-thinking-toggle="${block.id}"><h4>Thinking:</h4></button><p class="${cls}" id="thinkingContent-${domId}"${style}>${this.escapeHtml(block.content)}</p></div>\n`;
             case 'CODE':
                 const langClass = block.language ? ` class="language-${block.language}"` : '';
                 return `<div class="code-block"><pre><code${langClass}>${this.escapeHtml(block.content)}</code></pre></div>\n`;
@@ -284,22 +295,22 @@ class HtmlParser {
 
 
     toggleThinkingBlock(blockId, contentElOverride){
-        const domId = `${this.randomId}-${blockId}`;
-        const el = contentElOverride || this.rootElement.querySelector(`#thinkingContent-${domId}`) || document.getElementById(`thinkingContent-${domId}`);
+        const el = contentElOverride;
         if(!el) return;
-        const isCollapsed = this.collapsedBlocks.has(blockId);
+
+        const isCollapsed = this._collapsedElements.has(el);
 
         if(isCollapsed){
-            this.collapsedBlocks.delete(blockId);
+            this._collapsedElements.delete(el);
             el.classList.add("show");
             el.style.maxHeight = el.scrollHeight + "px";
             el.addEventListener("transitionend", (e) => {
                 if(e.propertyName !== "max-height") return;
-                if(this.collapsedBlocks.has(blockId)) return;
+                if(this._collapsedElements.has(el)) return;
                 el.style.maxHeight = "none";
             }, { once: true });
         } else {
-            this.collapsedBlocks.add(blockId);
+            this._collapsedElements.add(el);
             if(el.style.maxHeight === "none" || el.style.maxHeight === ""){
                 el.style.maxHeight = el.scrollHeight + "px";
             }
@@ -331,7 +342,7 @@ class HtmlParser {
             if (newBlock.type === 'THINKING') {
                 const contentEl = existingElement.querySelector('.thinking-content');
                 if (contentEl) {
-                    const isCollapsed = this.collapsedBlocks.has(newBlock.id);
+                    const isCollapsed = this._collapsedElements.has(contentEl);
                     contentEl.innerHTML = this.escapeHtml(newBlock.content);
 
                     if (isCollapsed) {
@@ -378,35 +389,6 @@ class HtmlParser {
         return existingElement.nextSibling;
     }
 
-//    renderChanges() {
-//        if (!this.rootElement) return;
-//        const newMap = new Map(this.blocks.map(b => [b.id, b]));
-//        this._removeStaleBlocks(newMap);
-//
-//        let node = this.rootElement.firstChild;
-//        for (let i = 0; i < this.blocks.length; i++) {
-//            const block = this.blocks[i];
-//            const old = this.previousBlocks.find(b => b.id === block.id);
-//            let el = this.blockElements.get(block.id);
-//
-//            if (el && block.closed && old && old.content === block.content) {
-//                node = el.nextSibling;
-//                continue;
-//            }
-//
-//            if (el) {
-//                this._updateExistingBlock(el, block, old);
-//                if (node!== el) this.rootElement.insertBefore(el, node);
-//                node = el.nextSibling;
-//            } else {
-//                el = this._createNewBlockElement(block);
-//                this.rootElement.insertBefore(el, node);
-//                this.blockElements.set(block.id, el);
-//                if (block.type === 'CODE' && block.closed) this._highlightCodeBlock(el);
-//            }
-//        }
-//        this.previousBlocks = this.blocks.map(b => ({...b}));
-//    }
     renderChanges() {
         if (!this.rootElement) return;
         const chatContainer = document.getElementById('chatMessages') || this.rootElement.closest('.chat-messages');
