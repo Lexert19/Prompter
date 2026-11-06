@@ -15,8 +15,6 @@ class Settings {
         Settings._instance = this;
 
         this.memory = false;
-        this.cache = false;
-        this.maxTokens = 8000;
         this.temperature = 0.0;
         this.system = "";
         this.systemSwitch = false;
@@ -25,12 +23,11 @@ class Settings {
         this.activeHistory = false;
         this.thinkingEffort = "normal"
         this.useSharedKeys = false;
-        this.top_p = 0.95;
-        this.frequencyPenalty = 0.0;
-        this.presencePenalty = 0.0;
         this.openRouterProviderOrder = "";
         this.openRouterAllowFallbacks = true;
         this.includeAdvancedParams = false;
+        this.useTools = false;
+        this.enabledTools = [];
 
         this.provider = "OPENAI";
         this.providerStrategy = "OPENAI";
@@ -54,8 +51,6 @@ class Settings {
     save() {
         const settingsToSave = {
             memory: this.memory,
-            cache: this.cache,
-            maxTokens: this.maxTokens,
             temperature: this.temperature,
             provider: this.provider,
             providerStrategy: this.providerStrategy,
@@ -64,17 +59,16 @@ class Settings {
             type: this.type,
             system: this.system,
             systemSwitch: this.systemSwitch,
-            top_p: this.top_p,
             project: this.project,
             projectSwitch: this.projectSwitch,
             activeHistory: this.activeHistory,
             thinkingEffort: this.thinkingEffort,
             useSharedKeys: this.useSharedKeys,
-            frequencyPenalty: this.frequencyPenalty,
-            presencePenalty: this.presencePenalty,
             openRouterProviderOrder: this.openRouterProviderOrder,
             openRouterAllowFallbacks: this.openRouterAllowFallbacks,
             includeAdvancedParams: this.includeAdvancedParams,
+            useTools: this.useTools,
+            enabledTools: this.enabledTools,
         };
         localStorage.setItem("appSettings", JSON.stringify(settingsToSave));
     }
@@ -90,9 +84,6 @@ class Settings {
         switch (event.target.name) {
             case "memory":
                 Settings.instance().memory = event.target.checked;
-                break;
-            case "cache":
-                Settings.instance().cache = event.target.checked;
                 break;
             case "systemSwitch":
                 Settings.instance().systemSwitch = event.target.checked;
@@ -112,17 +103,8 @@ class Settings {
             case "temperature":
                 Settings.instance().temperature = event.target.value / 100;
                 break;
-            case "top_p":
-                this.top_p = parseFloat(event.target.value);
-                break;
             case "useSharedKeys":
                 Settings.instance().useSharedKeys = event.target.checked;
-                break;
-            case "frequencyPenalty":
-                this.frequencyPenalty = parseFloat(event.target.value);
-                break;
-            case "presencePenalty":
-                this.presencePenalty = parseFloat(event.target.value);
                 break;
             case "openRouterProviderOrder":
                 this.openRouterProviderOrder = event.target.value;
@@ -182,11 +164,7 @@ class Settings {
     initUI() {
         document.getElementById("memory").checked = this.memory;
         document.getElementById("chatHistoryInput").checked = this.activeHistory;
-        document.getElementById("cache").checked = this.cache;
         document.getElementById("temperature").value = this.temperature * 100;
-        document.getElementById("top_p").value = this.top_p;
-        document.getElementById("frequencyPenalty").value = this.frequencyPenalty;
-        document.getElementById("presencePenalty").value = this.presencePenalty;
         document.getElementById("useSharedKeys").checked = this.useSharedKeys;
     }
 

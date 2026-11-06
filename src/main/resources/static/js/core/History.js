@@ -18,92 +18,6 @@ class History {
         this.history = document.getElementById("history");
     }
 
-    async loadHistory() {
-        const chats = await this.loadChats(0, 20);
-        const sortedChats = chats.sort(
-            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
-        this.history.innerHTML = "";
-        sortedChats.forEach((chat) => {
-            this.addHtmlHistoryIndex(chat);
-        });
-    }
-
-
-
-    async createChatSession(content) {
-        if (Settings.instance().activeHistory) {
-            const chat = await this.createChat();
-            this.updateUrlForChat(chat.uuid);
-            return chat.uuid;
-        }
-        return "";
-    }
-
-    async createChat() {
-        try {
-            const response = await fetchWithAuth(`${this.baseUrl}/chats`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                credentials: "include",
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            return await response.json();
-        } catch (error) {
-            console.error("Error creating chat:", error);
-            throw error;
-        }
-    }
-
-    async saveMessage(chatId, message) {
-        try {
-            const images = [];
-            for (const img of message.images) {
-                if (typeof img === 'string' && img.startsWith('data:image')) {
-                    const fileId = await this.uploadImageBase64(img);
-                    images.push(fileId);
-                } else {
-                    images.push(img);
-                }
-            }
-
-            const messageBody = {
-                chatUuid: chatId,
-                text: message.text,
-                documents: message.documents,
-                images: images,
-                end: message.end,
-                start: message.start,
-                cache: message.cache,
-                role: message.role
-            };
-
-            const response = await fetchWithAuth(`${this.baseUrl}/messages`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(messageBody),
-                credentials: "include",
-            });
-
-            if (!response.ok) {
-                if (response.status === 400) throw new Error("Bad Request: Invalid message data.");
-                if (response.status === 403) throw new Error("Forbidden: Not authorized to save message.");
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            return await response.json();
-        } catch (error) {
-            console.error("Error saving message:", error);
-            throw error;
-        }
-    }
-
     async uploadImageBase64(base64String) {
         const arr = base64String.split(',');
         const mime = arr[0].match(/:(.*?);/)[1];
@@ -127,72 +41,6 @@ class History {
         return uploaded.id;
     }
 
-    async fetchImageAsBase64(fileId) {
-        const response = await fetchWithAuth(`/api/files/${fileId}`, {
-            credentials: 'include'
-        });
-        if (!response.ok) throw new Error('Nie udało się pobrać obrazu');
-
-        const blob = await response.blob();
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-        });
-    }
-
-    async getChatHistory(chatId) {
-        try {
-            const response = await fetchWithAuth(`${this.baseUrl}/chats/${chatId}/messages`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                credentials: "include",
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const rawMessages = await response.json();
-            return rawMessages.map(msgData => {
-                const message = new Message(
-                    msgData.role || '',
-                    msgData.text || '',
-                    msgData.images || [],
-                    msgData.documents || [],
-                    msgData.context || []
-                );
-
-                message.id = msgData.id || message.id;
-                message.time = msgData.time || Date.now();
-                message.start = msgData.start || message.start;
-                message.end = msgData.end || null;
-                message.cache = msgData.cache || false;
-
-
-                return message;
-            }).sort((a, b) => {
-                if (a.start === undefined || a.start === null) return 1;
-                if (b.start === undefined || b.start === null) return -1;
-
-                return a.start - b.start;
-            });
-        } catch (error) {
-            console.error("Error getting chat history:", error);
-            throw error;
-        }
-    }
-
-    async getRequestBuilderForChat(chatId) {
-        const messages = await this.getChatHistory(chatId);
-
-        const builder = new RequestBuilder();
-        messages.forEach(msg => builder.addMessage(msg));
-        return builder;
-    }
 
     addHtmlHistoryIndex(historyIndex) {
         const date = new Date(historyIndex.createdAt || Date.now());
@@ -207,7 +55,7 @@ class History {
         </button>
       </div>
     `;
-        this.history.innerHTML += index;
+        this.history.insertAdjacentHTML('beforeend', index);
     }
 
     async deleteChat(chatId) {
@@ -227,13 +75,49 @@ class History {
         }
     }
 
-    async loadChats(page = 0, size = 100) {
+    async loadChats(page = 0, size = 20) {
+        const response = await fetchWithAuth(
+            `${this.baseUrl}/chats?page=${page}&size=${size}`,
+            { method: "GET", credentials: "include" }
+        );
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status} loading chats`);
+        }
+        const data = await response.json();
+        return data.content || [];
+    }
+
+    async loadHistory() {
+        if (!this.history) return;
         try {
-            const response = await fetchWithAuth(`${this.baseUrl}/chats?page=${page}&size=${size}`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+            const chats = await this.loadChats(0, 20);
+            chats.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+            this.history.innerHTML = "";
+            if (chats.length > 0) {
+                const clearAllBtn = document.createElement('button');
+                clearAllBtn.className = 'rounded-1 mb-2';
+                clearAllBtn.style.cssText =
+                    'width:100%;background-color:#7a1f1f;color:#fff;' +
+                    'border:none;padding:6px 8px;cursor:pointer;font-size:0.9em;';
+                clearAllBtn.innerHTML =
+                    `<i class="fa fa-trash" aria-hidden="true"></i> ` +
+                    `${t.t("deleteAllHistory")}`;
+                clearAllBtn.onclick = () => this.deleteAllHistory();
+                this.history.appendChild(clearAllBtn);
+            }
+            chats.forEach(chat => this.addHtmlHistoryIndex(chat));
+        } catch (e) {
+            console.error("[History] loadHistory failed", e);
+        }
+    }
+
+    async deleteAllHistory() {
+        const msg = t.t("confirmDeleteAllHistory");
+        if (!confirm(msg)) return;
+
+        try {
+            const response = await fetchWithAuth(`${this.baseUrl}/chats`, {
+                method: "DELETE",
                 credentials: "include",
             });
 
@@ -241,18 +125,24 @@ class History {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            const pageData = await response.json();
-            return pageData.content;
+            if (window.location.pathname !== '/chat') {
+                window.history.pushState({}, document.title, '/chat');
+            }
+            if (window.Chat && Chat._instance) {
+                Chat.instance().startNewChat();
+            }
+
+            this.loadHistory();
         } catch (error) {
-            console.error("Error loading chats:", error);
-            throw error;
+            console.error("Error deleting all history:", error);
+            alert(t.t("deleteAllHistoryFailed"));
         }
     }
 
-    updateUrlForChat(chatId) {
-        const newPath = `/chat/${chatId}`;
-        window.history.pushState({ chatId: chatId }, document.title, newPath);
-    }
 
 }
 History.instance();
+
+document.addEventListener('DOMContentLoaded', () => {
+    History.instance().loadHistory();
+});

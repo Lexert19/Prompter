@@ -3,7 +3,6 @@ class Message {
         this.role = role;
         this.content = [];
         this.id = Math.random().toString(36);
-        this.cache = false;
         this.documents = documents;
         this.context = context;
         this.text = text + this.getSystemPrompt(role);
@@ -11,18 +10,18 @@ class Message {
         this.start = Date.now();
         this.end = null;
         this.images = images;
+        this.stats = null;
     }
 
-    getTps(){
+    getTps() {
+        if (this.stats && typeof this.stats.tps === 'number') {
+            return this.stats.tps;
+        }
         const now = Date.now();
         const endTime = this.end !== null ? this.end : now;
-
         const durationSec = (endTime - this.start) / 1000;
         if (durationSec <= 0) return 0;
-
-        const estimatedTokens = this.text.length / 4;
-
-        return parseFloat((estimatedTokens / durationSec).toFixed(2));
+        return parseFloat(((this.text.length / 4) / durationSec).toFixed(2));
     }
 
     appendText(text) {
@@ -48,7 +47,6 @@ class Message {
             content.push({
                 type: "text",
                 text: textContent + this.text,
-                cache: this.cache,
             });
         }
 
@@ -57,7 +55,6 @@ class Message {
             content.push({
                 type: "image",
                 fileId: Number(fileId),
-                cache: this.cache
             });
         });
 

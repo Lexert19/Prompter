@@ -12,20 +12,8 @@ class RequestBuilder {
         return "";
     }
 
-    getFrequencyPenalty() {
-        return Settings.instance().frequencyPenalty;
-    }
-
-    getPresencePenalty() {
-        return Settings.instance().presencePenalty;
-    }
-
     getType() {
         return Settings.instance().type;
-    }
-
-    getTopP(){
-        return Settings.instance().top_p;
     }
 
     getProvider() {
@@ -38,10 +26,6 @@ class RequestBuilder {
 
     getUrl() {
         return Settings.instance().url;
-    }
-
-    getMaxTokens() {
-        return Settings.instance().maxTokens;
     }
 
     getTemperature() {
@@ -111,7 +95,6 @@ class RequestBuilder {
         const baseContent = {
             type: content.type,
             text: content.text || "",
-            cache: content.cache || false,
         };
 
         switch (content.type) {
@@ -145,10 +128,9 @@ class RequestBuilder {
         if (Settings.instance().memory) {
             messagesToInclude = [...this.messages];
         } else {
-            messagesToInclude = [
-                ...this.messages.filter((message) => message.cache === true),
-                this.messages[this.messages.length - 1],
-            ];
+            const messagesToInclude = Settings.instance().memory
+                ? [...this.messages]
+                : [this.messages[this.messages.length - 1]];
         }
 
         messagesToInclude.forEach(msg => {

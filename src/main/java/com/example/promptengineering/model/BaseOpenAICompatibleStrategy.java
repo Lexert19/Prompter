@@ -41,11 +41,32 @@ public abstract class BaseOpenAICompatibleStrategy implements ProviderStrategy {
 
         List<Map<String, Object>> messagesList = new ArrayList<>();
         for (Message message : builder.getMessages()) {
-            List<Map<String, Object>> contentList = new ArrayList<>();
-            for (Content content : message.getContent()) {
-                contentList.add(content.toMap(this, message.isCached()));
+            Map<String, Object> msg = new java.util.HashMap<>();
+            msg.put("role", message.getRole());
+
+            if (message.getToolCalls() != null && !message.getToolCalls().isEmpty()) {
+                msg.put("tool_calls", message
+                        .getToolCalls().stream().map(tc -> Map.of("id", tc.getId(),
+                                "type", "function", "function", Map.of("name",
+                                        tc.getName(), "arguments", tc.getArguments())))
+                        .toList());
+
+                List<Map<String, Object>> contentList = new ArrayList<>();
+                for (Content c : message.getContent())
+                    contentList.add(c.toMap(this, message.isCached()));
+                msg.put("content", contentList.isEmpty() ? null : contentList);
+
+            } else if ("tool".equals(message.getRole())) {
+                msg.put("tool_call_id", message.getToolCallId());
+                msg.put("content", message.getStringContent());
+
+            } else {
+                List<Map<String, Object>> contentList = new ArrayList<>();
+                for (Content c : message.getContent())
+                    contentList.add(c.toMap(this, message.isCached()));
+                msg.put("content", contentList);
             }
-            messagesList.add(Map.of("role", message.getRole(), "content", contentList));
+            messagesList.add(msg);
         }
 
         request.put("messages", messagesList);
@@ -59,6 +80,10 @@ public abstract class BaseOpenAICompatibleStrategy implements ProviderStrategy {
             request.put("presence_penalty", builder.getPresencePenalty());
         }
 
+        if (builder.getTools() != null && !builder.getTools().isEmpty()) {
+            request.put("tools", builder.getTools());
+            request.put("tool_choice", "auto");
+        }
         return request;
     }
 }

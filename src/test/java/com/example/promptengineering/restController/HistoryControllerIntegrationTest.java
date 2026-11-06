@@ -23,7 +23,6 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItems;
@@ -64,8 +63,6 @@ public class HistoryControllerIntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity())
-        // .build();
 
         user1 = new User();
         user1.setEmail("user1-" + UUID.randomUUID() + "@example.com");
@@ -107,16 +104,6 @@ public class HistoryControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void createChat_shouldReturnCreatedChat() throws Exception {
-        mockMvc.perform(post("/api/history/chats").with(csrf()).with(asUser1()))
-                .andExpect(status().isCreated()).andExpect(jsonPath("$.uuid").exists());
-
-        List<Chat> chats = chatRepository.findByUser(user1);
-        assertThat(chats).hasSize(1);
-        assertThat(chats.get(0).getUser().getId()).isEqualTo(user1.getId());
-    }
-
-    @Test
     void getChats_shouldReturnAllUserChats() throws Exception {
         Chat chat1 = new Chat();
         chat1.setUser(user1);
@@ -141,140 +128,6 @@ public class HistoryControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void saveMessage_shouldPersistMessage() throws Exception {
-        Chat chat = new Chat();
-        chat.setUser(user1);
-        chat.setCreatedAt(Instant.now());
-        chat = chatRepository.save(chat);
-
-        MessageBody messageBody = new MessageBody();
-        messageBody.setChatUuid(chat.getUuid());
-        messageBody.setText("Hello, world!");
-        messageBody.setRole("user");
-        messageBody.setStart(System.currentTimeMillis() - 1000);
-        messageBody.setEnd(System.currentTimeMillis());
-        messageBody.setCache(false);
-
-        mockMvc.perform(post("/api/history/messages").with(csrf()).with(asUser1())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(messageBody)))
-                .andExpect(status().isCreated()).andExpect(jsonPath("$.uuid").exists())
-                .andExpect(jsonPath("$.text").value("Hello, world!"))
-                .andExpect(jsonPath("$.role").value("user"));
-
-        List<Message> messages = messageRepository.findByChatId(chat.getId());
-        assertThat(messages).hasSize(1);
-        assertThat(messages.get(0).getText()).isEqualTo("Hello, world!");
-    }
-
-    @Test
-    void getChatHistory_shouldReturnMessagesInOrder() throws Exception {
-        Chat chat = new Chat();
-        chat.setUser(user1);
-        chat.setCreatedAt(Instant.now());
-        chat = chatRepository.save(chat);
-
-        Message msg1 = new Message();
-        msg1.setChat(chat);
-        msg1.setText("First");
-        msg1.setRole("user");
-        msg1.setCreatedAt(Instant.now().minusSeconds(10));
-        messageRepository.save(msg1);
-
-        Message msg2 = new Message();
-        msg2.setChat(chat);
-        msg2.setText("Second");
-        msg2.setRole("assistant");
-        msg2.setCreatedAt(Instant.now());
-        messageRepository.save(msg2);
-
-        mockMvc.perform(get("/api/history/chats/{chatId}/messages", chat.getUuid())
-                .with(asUser1())).andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].text").value("First"))
-                .andExpect(jsonPath("$[1].text").value("Second"));
-    }
-
-    @Test
-    void deleteChat_shouldRemoveChatAndMessages() throws Exception {
-        Chat chat = new Chat();
-        chat.setUser(user1);
-        chat.setCreatedAt(Instant.now());
-        chat = chatRepository.save(chat);
-
-        Message msg = new Message();
-        msg.setChat(chat);
-        msg.setText("To be deleted");
-        msg.setRole("user");
-        msg.setCreatedAt(Instant.now());
-        messageRepository.save(msg);
-
-        // entityManager.flush();
-        // entityManager.clear();
-
-        mockMvc.perform(
-                delete("/api/history/chats/{chatId}", chat.getUuid()).with(asUser1()))
-                .andExpect(status().isNoContent());
-
-        Optional<Chat> deletedChat = chatRepository.findById(chat.getId());
-        assertThat(deletedChat).isEmpty();
-        List<Message> messages = messageRepository.findByChatId(chat.getId());
-        assertThat(messages).isEmpty();
-    }
-
-    @Test
-    void deleteChat_whenChatNotFound_shouldReturn404() throws Exception {
-        mockMvc.perform(
-                delete("/api/history/chats/{chatId}", UUID.randomUUID()).with(asUser1()))
-                .andExpect(status().is4xxClientError());
-    }
-
-    @Test
-    void saveMessage_whenChatNotFound_shouldReturn404() throws Exception {
-        MessageBody messageBody = new MessageBody();
-        messageBody.setChatUuid(UUID.randomUUID());
-        messageBody.setText("Test");
-        messageBody.setRole("user");
-
-        mockMvc.perform(post("/api/history/messages").with(csrf()).with(asUser1())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(messageBody)))
-                .andExpect(status().is4xxClientError());
-    }
-
-    @Test
-    void accessAnotherUsersChat_shouldReturn403or404() throws Exception {
-        Chat chat = new Chat();
-        chat.setUser(user2);
-        chat.setCreatedAt(Instant.now());
-        chat = chatRepository.save(chat);
-
-        mockMvc.perform(get("/api/history/chats/{chatId}/messages", chat.getUuid())
-                .with(asUser1())).andExpect(status().is4xxClientError());
-
-        mockMvc.perform(delete("/api/history/chats/{chatId}", chat.getUuid()).with(csrf())
-                .with(asUser1())).andExpect(status().is4xxClientError());
-    }
-
-    @Test
-    void saveMessage_whenNotOwner_shouldReturn403() throws Exception {
-        Chat chat = new Chat();
-        chat.setUser(user2);
-        chat.setCreatedAt(Instant.now());
-        chat = chatRepository.save(chat);
-
-        MessageBody messageBody = new MessageBody();
-        messageBody.setChatUuid(chat.getUuid());
-        messageBody.setText("Hack attempt");
-        messageBody.setRole("user");
-
-        mockMvc.perform(post("/api/history/messages").with(csrf()).with(asUser1())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(messageBody)))
-                .andExpect(status().is4xxClientError());
-    }
-
-    @Test
     void unauthenticatedRequests_shouldReturn401() throws Exception {
         mockMvc.perform(post("/api/history/chats").with(csrf()))
                 .andExpect(status().isUnauthorized());
@@ -287,6 +140,9 @@ public class HistoryControllerIntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(delete("/api/history/chats/1").with(csrf()))
                 .andExpect(status().isUnauthorized());
 
+        mockMvc.perform(delete("/api/history/chats"))
+                .andExpect(status().isUnauthorized());
+
         MessageBody body = new MessageBody();
         body.setChatUuid(UUID.randomUUID());
         body.setText("test");
@@ -297,53 +153,41 @@ public class HistoryControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void saveMessage_withAllFields_shouldStoreDocumentsAndImages() throws Exception {
-        Chat chat = new Chat();
-        chat.setUser(user1);
-        chat.setCreatedAt(Instant.now());
-        chat = chatRepository.save(chat);
+    void deleteAllChats_shouldRemoveOnlyOwnChats() throws Exception {
+        Chat u1c1 = new Chat();
+        u1c1.setUser(user1);
+        u1c1.setCreatedAt(Instant.now());
+        u1c1 = chatRepository.save(u1c1);
+        Chat u1c2 = new Chat();
+        u1c2.setUser(user1);
+        u1c2.setCreatedAt(Instant.now());
+        u1c2 = chatRepository.save(u1c2);
+        Chat u2c1 = new Chat();
+        u2c1.setUser(user2);
+        u2c1.setCreatedAt(Instant.now());
+        u2c1 = chatRepository.save(u2c1);
 
-        MessageBody messageBody = new MessageBody();
-        messageBody.setChatUuid(chat.getUuid());
-        messageBody.setText("Message with attachments");
-        messageBody.setRole("user");
-        messageBody.setDocuments(List.of("doc1.pdf", "doc2.docx"));
-        messageBody.setImages(List.of("img1.png", "img2.jpg"));
-        messageBody.setCache(true);
-        messageBody.setStart(1000L);
-        messageBody.setEnd(2000L);
+        Message m = new Message();
+        m.setChat(u1c1);
+        m.setUuid(UUID.randomUUID());
+        m.setRole("user");
+        m.setText("hello");
+        m.setCreatedAt(Instant.now());
+        messageRepository.save(m);
 
-        mockMvc.perform(post("/api/history/messages").with(asUser1()).with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(messageBody)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.documents[0]").value("doc1.pdf"))
-                .andExpect(jsonPath("$.documents[1]").value("doc2.docx"))
-                .andExpect(jsonPath("$.images[0]").value("img1.png"))
-                .andExpect(jsonPath("$.images[1]").value("img2.jpg"))
-                .andExpect(jsonPath("$.cache").value(true));
+        mockMvc.perform(delete("/api/history/chats").with(csrf()).with(asUser1()))
+                .andExpect(status().isNoContent());
+
+        assertThat(chatRepository.findByUser(user1)).isEmpty();
+        assertThat(messageRepository.count()).isZero();
+
+        assertThat(chatRepository.findByUser(user2)).hasSize(1);
     }
 
     @Test
-    void getChatHistory_shouldSerializeLazyDocumentsWithoutActiveSession()
-            throws Exception {
-        Chat chat = new Chat();
-        chat.setUser(user1);
-        chat.setCreatedAt(Instant.now());
-        chat = chatRepository.save(chat);
-
-        Message msg = new Message();
-        msg.setChat(chat);
-        msg.setText("With attachments");
-        msg.setRole("user");
-        msg.setCreatedAt(Instant.now());
-        msg.setDocuments(List.of("doc1.pdf", "doc2.docx"));
-        msg.setImages(List.of("img1.png"));
-        messageRepository.save(msg);
-
-        Object result = historyService.getChatHistory(chat.getUuid(), user1);
-        String json = objectMapper.writeValueAsString(result);
-
-        assertThat(json).contains("doc1.pdf", "doc2.docx", "img1.png");
+    void deleteAllChats_withoutAuthentication_shouldReturn401() throws Exception {
+        mockMvc.perform(delete("/api/history/chats").with(csrf()))
+                .andExpect(status().isUnauthorized());
     }
+
 }

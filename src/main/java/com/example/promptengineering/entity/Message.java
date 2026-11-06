@@ -61,6 +61,21 @@ public class Message {
 
     private boolean cache;
 
+    @Column(columnDefinition = "TEXT")
+    private String toolCallsJson;
+
+    @Column(name = "tool_call_id")
+    private String toolCallId;
+
+    @Column(name = "tool_name")
+    private String toolName;
+
+    @Column(columnDefinition = "TEXT", name = "string_content")
+    private String stringContent;
+
+    @Column(columnDefinition = "TEXT")
+    private String reasoning;
+
     public boolean getCache() {
         return cache;
     }

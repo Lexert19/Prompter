@@ -12,7 +12,7 @@
         <link rel="stylesheet" href="/static/css/components/panel.css">
         <link rel="stylesheet" href="/static/css/components/project.css">
         <link rel="stylesheet" href="/static/css/components/system-prompt.css">
-        <script src="/static/otherJs/global.js"></script>
+        <script src="/static/otherJs/global.js" defer></script>
 
 
         <link rel="stylesheet"
@@ -28,7 +28,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.7/js/bootstrap.min.js"
                 integrity="sha512-zKeerWHHuP3ar7kX2WKBSENzb+GJytFSBL6HrR2nPSR1kOX1qjm+oHooQtbDpDBSITgyl7QXZApvDfDWvKjkUw=="
                 crossorigin="anonymous"
-                referrerpolicy="no-referrer"></script>
+                referrerpolicy="no-referrer" defer></script>
         <link rel="stylesheet"
               href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
         <title><@spring.message "app.title" /></title>
@@ -92,7 +92,7 @@
         <#include "/parts/editMessage.ftl" />
         <#include "/parts/editFile.ftl" />
         <#list jsFiles as jsFile>
-        <script src="${jsFile}"></script>
+        <script src="${jsFile}" defer></script>
         </#list>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"
                 integrity="sha512-EBLzUL8XLl+va/zAsmXwS7Z2B1F9HUHkZwyS/VKwh3S7T/U0nF4BaU29EP/ZSf6zgiIxYAnKLu6bJ8dqpmX5uw=="

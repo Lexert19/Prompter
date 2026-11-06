@@ -43,6 +43,8 @@ public class RequestBuilder {
     private UUID communityNodeId;
     private Map<String, Object> providerConfig;
     private boolean includeAdvancedParams = false;
+    @JsonIgnore
+    private List<Map<String, Object>> tools;
 
     private static final Map<Strategy, Supplier<ProviderStrategy>> STRATEGIES = Map.of(
             Strategy.ANTHROPIC, AnthropicStrategy::new, Strategy.GEMINI,

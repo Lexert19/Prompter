@@ -16,12 +16,17 @@ import java.util.List;
 public class Message {
     private Long id;
     private String role;
-    private List<Content> content;
+    private List<Content> content = new ArrayList<>();
     private String model;
     private String userId;
     private String sessionId;
     private String provider;
     private boolean cached;
+
+    private List<ToolCall> toolCalls;
+    private String toolCallId;
+    private String toolName;
+    private String stringContent;
 
     public Message(String role, List<Content> content) {
         this.role = role;

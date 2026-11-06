@@ -15,7 +15,6 @@ class EditMessageView {
         EditMessageView._instance = this;
 
         this.editMessageHtml = document.getElementById("edit-menu");
-        this.cachedButton = document.getElementById("edit-menu-cached");
         this.rerunButton = document.getElementById("edit-menu-rerun");
         this.copyButton = document.getElementById("edit-menu-copy");
 
@@ -25,7 +24,6 @@ class EditMessageView {
             }
         });
         this.messageId = "";
-        this.addCachedButtonListener();
         this.addRerunButtonListener();
         this.addCopyButtonListener();
     }
@@ -96,21 +94,6 @@ class EditMessageView {
 
     hideEditMenu() {
         this.editMessageHtml.style.display = "none";
-    }
-
-    addCachedButtonListener() {
-        this.cachedButton.addEventListener("click", () => {
-            const message = Chat.instance().requestBuilder.messages.find(
-                (msg) => msg.id === this.messageId
-            );
-            if (message) {
-                message.cache = !message.cache;
-                document.getElementById(
-                    `cached-${this.messageId}`
-                ).textContent = message.cache ? "cached" : ""
-            }
-            this.hideEditMenu();
-        });
     }
 }
 

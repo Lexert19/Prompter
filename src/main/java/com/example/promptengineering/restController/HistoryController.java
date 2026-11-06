@@ -1,21 +1,18 @@
 package com.example.promptengineering.restController;
 
-import com.example.promptengineering.dto.ChatDto;
-import com.example.promptengineering.dto.MessageDto;
+import com.example.promptengineering.dto.*;
 import com.example.promptengineering.entity.User;
-import com.example.promptengineering.exception.ResourceNotFoundException;
-import com.example.promptengineering.exception.UserSecurityException;
-import com.example.promptengineering.exception.ValidationException;
 import java.util.UUID;
+
+import com.example.promptengineering.service.ChatSessionPersistenceService;
+import com.example.promptengineering.service.ChatSessionRegistry;
+import com.example.promptengineering.service.SessionMessage;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.promptengineering.entity.Chat;
-import com.example.promptengineering.entity.Message;
-import com.example.promptengineering.model.MessageBody;
 import com.example.promptengineering.service.HistoryService;
 
 import java.util.List;
@@ -24,49 +21,56 @@ import java.util.List;
 @RequestMapping("/api/history")
 public class HistoryController {
     private final HistoryService historyService;
+    private final ChatSessionPersistenceService persistence;
+    private final ChatSessionRegistry registry;
 
-    public HistoryController(HistoryService historyService) {
+    public HistoryController(HistoryService historyService,
+            ChatSessionPersistenceService persistence, ChatSessionRegistry registry) {
         this.historyService = historyService;
+        this.persistence = persistence;
+        this.registry = registry;
     }
 
-    @PostMapping("/chats")
-    public ResponseEntity<ChatDto> createChat(@AuthenticationPrincipal User user) {
-
-        Chat chat = historyService.createChat(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ChatDto.fromEntity(chat));
+    @GetMapping("/chats/{chatUuid}/messages")
+    public ResponseEntity<List<SessionMessageDto>> getChatHistory(@PathVariable UUID chatUuid,
+                                                                  @AuthenticationPrincipal User user) {
+        List<SessionMessageDto> messages = persistence.getOrLoad(chatUuid, user, registry)
+                .stream().map(this::toDto).toList();
+        return ResponseEntity.ok(messages);
     }
 
-    @DeleteMapping(value = "/chats/{chatUuid}")
+    @DeleteMapping("/chats")
+    public ResponseEntity<Void> deleteAllChats(@AuthenticationPrincipal User user) {
+        historyService.deleteAllChats(user);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/chats/{chatUuid}")
     public ResponseEntity<Void> deleteChat(@PathVariable UUID chatUuid,
-                                           @AuthenticationPrincipal User user)
-            throws ResourceNotFoundException, UserSecurityException {
+                                           @AuthenticationPrincipal User user) {
         historyService.deleteChat(chatUuid, user);
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/messages")
-    public ResponseEntity<MessageDto> saveMessage(@RequestBody MessageBody messageBody,
-                                                  @AuthenticationPrincipal User user)
-            throws ValidationException {
-        Message message = historyService.saveMessage(messageBody, user);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(MessageDto.fromEntity(message));
+    private SessionMessageDto toDto(SessionMessage m) {
+        com.example.promptengineering.model.Message pm = m.getProviderMessage();
 
-    }
+        List<ToolCallDto> calls = pm.getToolCalls() == null
+                ? null
+                : pm.getToolCalls().stream().map(tc -> new ToolCallDto(tc.getId(),
+                        tc.getName(), tc.getArguments())).toList();
 
-    @GetMapping("/chats/{chatUuid}/messages")
-    public ResponseEntity<List<MessageDto>> getChatHistory(@PathVariable UUID chatUuid,
-                                                           @AuthenticationPrincipal User user)
-            throws UserSecurityException, ResourceNotFoundException {
-        return ResponseEntity.ok(historyService.getChatHistory(chatUuid, user));
+        return new SessionMessageDto(m.getUuid().toString(), m.getRole(), m.getText(),
+                m.isCached(), m.getImages(), m.getDocuments(), m.getStart(), m.getEnd(),
+                m.getCreatedAt().toEpochMilli(), calls, pm.getToolCallId(),
+                pm.getToolName(), pm.getStringContent(), m.getReasoning());
     }
 
     @GetMapping("/chats")
-    public ResponseEntity<Page<ChatDto>> getChats(@AuthenticationPrincipal User user,
-                                                  @RequestParam(defaultValue = "0") int page,
-                                                  @RequestParam(defaultValue = "20") int size) {
+    public ResponseEntity<PageDto<ChatDto>> getChats(@AuthenticationPrincipal User user,
+                                                     @RequestParam(defaultValue = "0") int page,
+                                                     @RequestParam(defaultValue = "20") int size) {
         Page<Chat> chatPage = historyService.getChatsForUser(user, page, size);
-        Page<ChatDto> dtoPage = chatPage.map(ChatDto::fromEntity);
-        return ResponseEntity.ok(dtoPage);
+        return ResponseEntity.ok(PageDto.from(chatPage, ChatDto::fromEntity));
     }
 }

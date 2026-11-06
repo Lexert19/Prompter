@@ -10,6 +10,7 @@ public class OpenRouterStrategy extends BaseOpenAICompatibleStrategy {
 
         if (!builder.getReasoningEffort().isEmpty()) {
             request.put("reasoning_effort", builder.getReasoningEffort());
+            request.put("include_reasoning", true);
         }
 
         if (builder.getProviderConfig() != null) {

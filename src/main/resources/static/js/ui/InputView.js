@@ -168,4 +168,3 @@ class InputView{
 
 }
 
-InputView.instance();

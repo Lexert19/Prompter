@@ -91,10 +91,6 @@ public class SecurityConfig implements WebMvcConfigurer {
                                 new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
                                 PathPatternRequestMatcher.withDefaults()
                                         .matcher("/account/**"))
-                        .defaultAuthenticationEntryPointFor(
-                                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
-                                PathPatternRequestMatcher.withDefaults()
-                                        .matcher("/client/**"))
                         .authenticationEntryPoint(authenticationEntryPoint()));
 
         return http.build();
@@ -110,12 +106,6 @@ public class SecurityConfig implements WebMvcConfigurer {
             throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
-
-    // @Bean
-    // public AuthenticationFailureHandler authenticationFailureHandler() {
-    // return (request, response, exception) -> response
-    // .sendRedirect("/auth/login?error=true");
-    // }
 
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
