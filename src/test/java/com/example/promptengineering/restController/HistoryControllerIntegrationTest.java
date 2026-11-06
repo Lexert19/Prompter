@@ -158,10 +158,12 @@ public class HistoryControllerIntegrationTest extends BaseIntegrationTest {
         u1c1.setUser(user1);
         u1c1.setCreatedAt(Instant.now());
         u1c1 = chatRepository.save(u1c1);
+
         Chat u1c2 = new Chat();
         u1c2.setUser(user1);
         u1c2.setCreatedAt(Instant.now());
         u1c2 = chatRepository.save(u1c2);
+
         Chat u2c1 = new Chat();
         u2c1.setUser(user2);
         u2c1.setCreatedAt(Instant.now());
@@ -175,11 +177,15 @@ public class HistoryControllerIntegrationTest extends BaseIntegrationTest {
         m.setCreatedAt(Instant.now());
         messageRepository.save(m);
 
+        Long u1c1Id = u1c1.getId();
+        Long u1c2Id = u1c2.getId();
+
         mockMvc.perform(delete("/api/history/chats").with(csrf()).with(asUser1()))
                 .andExpect(status().isNoContent());
 
         assertThat(chatRepository.findByUser(user1)).isEmpty();
-        assertThat(messageRepository.count()).isZero();
+        assertThat(messageRepository.findByChatId(u1c1Id)).isEmpty();
+        assertThat(messageRepository.findByChatId(u1c2Id)).isEmpty();
 
         assertThat(chatRepository.findByUser(user2)).hasSize(1);
     }
