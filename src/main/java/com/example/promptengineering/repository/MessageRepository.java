@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface MessageRepository extends JpaRepository<Message, Long> {
 
@@ -40,4 +41,15 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     @Transactional
     @Query("DELETE FROM Message m WHERE m.chat.id = :chatId")
     void deleteByChatId(@Param("chatId") Long chatId);
+
+    @Query("""
+                SELECT m FROM Message m
+                JOIN m.chat c
+                WHERE c.uuid = :chatUuid
+                  AND c.user.id = :userId
+                  AND m.role = 'user'
+                ORDER BY m.createdAt ASC
+            """)
+    List<Message> findUserPrompts(@Param("chatUuid") UUID chatUuid,
+                                  @Param("userId") Long userId);
 }

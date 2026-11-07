@@ -39,59 +39,60 @@ public class ChatSessionService {
     private volatile String reasoningEffort;
     private volatile Map<String, Object> providerConfig;
 
-    private ChatSession ensureHydrated(ChatSession s, User user) {
-        if (s.isHydrated())
-            return s;
-        Chat chat = persistence.ensureChat(s.getChatUuid(), user);
-        s.setChatEntity(chat);
-        if (s.getMessages().isEmpty()) {
-            s.getMessages().addAll(persistence.loadMessages(chat));
+    private ChatSession ensureHydrated(ChatSession chatSession, User user) {
+        if (chatSession.isHydrated())
+            return chatSession;
+        Chat chat = persistence.ensureChat(chatSession.getChatUuid(), user);
+        chatSession.setChatEntity(chat);
+        if (chatSession.getMessages().isEmpty()) {
+            chatSession.getMessages().addAll(persistence.loadMessages(chat));
         }
-        s.setHydrated(true);
-        return s;
+        chatSession.setHydrated(true);
+        return chatSession;
     }
 
     public Flux<ServerSentEvent<String>> process(User user, UUID chatUuid,
                                                  SessionChatRequest req) {
         return Mono.fromCallable(() -> {
-            ChatSession s = registry.getOrCreate(chatUuid, user.getId());
-            ensureHydrated(s, user);
-            applyConfig(s, req);
+            ChatSession chatSession = registry.getOrCreate(chatUuid, user.getId());
+            ensureHydrated(chatSession, user);
+            applyConfig(chatSession, req);
 
             long start = req.start() != null ? req.start() : System.currentTimeMillis();
-            SessionMessage sm = s.addUserMessage(textMessage("user", req.text()),
-                    req.documents(), req.images(), start);
-            persistence.save(s.getChatEntity(), sm);
-            return s;
+            SessionMessage sm = chatSession.addUserMessage(
+                    textMessage("user", req.text()), req.documents(), req.images(),
+                    start);
+            persistence.save(chatSession.getChatEntity(), sm);
+            return chatSession;
         }).subscribeOn(Schedulers.boundedElastic()).flatMapMany(s -> {
             StreamingStats stats = new StreamingStats();
             return runAgentLoop(s, user, 0, stats);
         });
     }
 
-    private void applyConfig(ChatSession s, SessionChatRequest req) {
+    private void applyConfig(ChatSession chatSession, SessionChatRequest req) {
         if (req.model() != null)
-            s.setModel(req.model());
+            chatSession.setModel(req.model());
         if (req.provider() != null)
-            s.setProvider(req.provider());
+            chatSession.setProvider(req.provider());
         if (req.providerStrategy() != null)
-            s.setProviderStrategy(req.providerStrategy());
+            chatSession.setProviderStrategy(req.providerStrategy());
         if (req.systemPrompt() != null)
-            s.setSystemPrompt(req.systemPrompt());
+            chatSession.setSystemPrompt(req.systemPrompt());
         if (req.url() != null)
-            s.setUrl(req.url());
+            chatSession.setUrl(req.url());
         if (req.useSharedKeys() != null)
-            s.setUseSharedKeys(req.useSharedKeys());
-        s.setEnabledTools(req.enabledTools() != null
+            chatSession.setUseSharedKeys(req.useSharedKeys());
+        chatSession.setEnabledTools(req.enabledTools() != null
                 ? new HashSet<>(req.enabledTools())
                 : new HashSet<>());
 
         if (req.temperature() != null)
-            s.setTemperature(req.temperature());
+            chatSession.setTemperature(req.temperature());
         if (req.reasoningEffort() != null)
-            s.setReasoningEffort(req.reasoningEffort());
+            chatSession.setReasoningEffort(req.reasoningEffort());
         if (req.providerConfig() != null)
-            s.setProviderConfig(req.providerConfig());
+            chatSession.setProviderConfig(req.providerConfig());
     }
 
     private Flux<ServerSentEvent<String>> runAgentLoop(ChatSession session, User user,
@@ -100,26 +101,26 @@ public class ChatSessionService {
             return Flux.just(errorEvent("Max tool iterations reached"));
         }
 
-        RequestBuilder rb;
+        RequestBuilder requestBuilder;
         try {
-            rb = buildRequest(session, user);
+            requestBuilder = buildRequest(session, user);
         } catch (Exception e) {
             return Flux.just(errorEvent(e.getMessage()));
         }
 
         final long assistantStart = System.currentTimeMillis();
-        ToolCallAccumulator acc = new ToolCallAccumulator(objectMapper);
+        ToolCallAccumulator toolCalls = new ToolCallAccumulator(objectMapper);
         AtomicBoolean saved = new AtomicBoolean(false);
 
         Runnable saveMessage = () -> {
             if (saved.compareAndSet(false, true)) {
                 long assistantEnd = System.currentTimeMillis();
-                List<ToolCall> calls = acc.completedCalls().stream().filter(
+                List<ToolCall> calls = toolCalls.completedCalls().stream().filter(
                         call -> session.getEnabledTools().contains(call.getName()))
                         .toList();
 
-                String reasoningText = acc.getReasoning();
-                String contentText = acc.getContent();
+                String reasoningText = toolCalls.getReasoning();
+                String contentText = toolCalls.getContent();
 
                 if ((contentText != null && !contentText.isEmpty())
                         || (reasoningText != null && !reasoningText.isEmpty())
@@ -136,14 +137,15 @@ public class ChatSessionService {
             }
         };
 
-        Flux<ServerSentEvent<String>> tokens = chatService.makeRequest(rb, user)
-                .map(ServerSentEvent::data).filter(Objects::nonNull)
-                .doOnSubscribe(s -> stats.beginLlmCall()).doFinally(sig -> {
+        Flux<ServerSentEvent<String>> tokens = chatService
+                .makeRequest(requestBuilder, user).map(ServerSentEvent::data)
+                .filter(Objects::nonNull).doOnSubscribe(s -> stats.beginLlmCall())
+                .doFinally(sig -> {
                     stats.endLlmCall();
                     Mono.fromRunnable(saveMessage)
                             .subscribeOn(Schedulers.boundedElastic()).subscribe();
                 }).concatMap(data -> {
-                    ToolCallAccumulator.Chunk chunk = acc.consume(data);
+                    ToolCallAccumulator.Chunk chunk = toolCalls.consume(data);
                     if (chunk.hasError()) {
                         return Flux.error(new RuntimeException(chunk.error()));
                     }
@@ -167,14 +169,16 @@ public class ChatSessionService {
                 });
 
         Flux<ServerSentEvent<String>> continuation = Flux.defer(() -> {
-            List<ToolCall> calls = acc.completedCalls().stream()
+            List<ToolCall> calls = toolCalls.completedCalls().stream()
                     .filter(call -> session.getEnabledTools().contains(call.getName()))
                     .toList();
 
             if (calls.isEmpty()) {
                 Map<String, Object> doneData = new HashMap<>(stats.snapshot());
                 doneData.put("finishReason",
-                        acc.getFinishReason() != null ? acc.getFinishReason() : "stop");
+                        toolCalls.getFinishReason() != null
+                                ? toolCalls.getFinishReason()
+                                : "stop");
                 return Flux.just(event("done", doneData));
             }
             return Flux.fromIterable(calls)
@@ -214,11 +218,11 @@ public class ChatSessionService {
         return callEvent.concatWith(resultEvent);
     }
 
-    private Message toProviderMessage(SessionMessage sm) {
+    private Message toProviderMessage(SessionMessage sessionMessage) {
 
-        Message original = sm.getProviderMessage();
+        Message original = sessionMessage.getProviderMessage();
 
-        if (sm.getImages() == null || sm.getImages().isEmpty()) {
+        if (sessionMessage.getImages() == null || sessionMessage.getImages().isEmpty()) {
             return original;
         }
 
@@ -231,14 +235,26 @@ public class ChatSessionService {
         clone.setStringContent(original.getStringContent());
         clone.setCached(original.isCached());
 
-        for (String imgId : sm.getImages()) {
+        if (!sessionMessage.getDocuments().isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (String doc : sessionMessage.getDocuments()) {
+                sb.append("<files>").append(doc).append("</files>");
+            }
+            TextContent docContent = new TextContent();
+            docContent.setType("text");
+            docContent.setText(sb.toString());
+            clone.getContent().addFirst(docContent);
+        }
+
+        for (String imgId : sessionMessage.getImages()) {
             try {
                 ImageContent ic = new ImageContent();
                 ic.setType("image");
                 ic.setFileId(Long.parseLong(imgId));
                 clone.getContent().add(ic);
             } catch (NumberFormatException e) {
-                log.warn("Invalid image file ID in session {}: {}", sm.getUuid(), imgId);
+                log.warn("Invalid image file ID in session {}: {}",
+                        sessionMessage.getUuid(), imgId);
             }
         }
         return clone;
@@ -323,19 +339,19 @@ public class ChatSessionService {
     }
 
     private Message textMessage(String role, String text) {
-        Message m = new Message(role, List.of(new TextContent(text)));
-        return m;
+        Message message = new Message(role, List.of(new TextContent(text)));
+        return message;
     }
 
     private Message assistantMessage(String content, List<ToolCall> toolCalls) {
-        Message m = new Message();
-        m.setRole("assistant");
-        m.setContent(content == null || content.isEmpty()
+        Message message = new Message();
+        message.setRole("assistant");
+        message.setContent(content == null || content.isEmpty()
                 ? List.of()
                 : List.of(new TextContent(content)));
         if (toolCalls != null && !toolCalls.isEmpty())
-            m.setToolCalls(toolCalls);
-        return m;
+            message.setToolCalls(toolCalls);
+        return message;
     }
 
     private Message toolMessage(String toolCallId, String name, String content) {

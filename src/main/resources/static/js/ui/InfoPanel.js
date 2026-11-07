@@ -10,6 +10,8 @@ class InfoPanel {
     this.closeBtn = document.getElementById('closeInfoBtn');
     this._statsTimer = null;
 
+    this._promptsChatUuid = Chat.instance().session;
+
     this.init();
   }
 
@@ -61,6 +63,79 @@ class InfoPanel {
       this.stopStatsTimer();
     }
   }
+
+  async loadPrompts(force = false) {
+    const chatUuid = this._promptsChatUuid;
+    const listEl = document.getElementById('infoPromptsList');
+
+    if (!chatUuid) {
+      listEl.innerHTML = `<p class="text-secondary">${
+          t.t('prompts.noActiveChat') || 'No active chat'}</p>`;
+      return;
+    }
+
+    listEl.innerHTML = `<p class="text-secondary">${
+        t.t('prompts.loading') || 'Loading...'}</p>`;
+
+    try {
+      const response = await fetchWithAuth(
+          `/api/chat/session/${chatUuid}/prompts`,
+          { credentials: 'include' }
+      );
+
+      if (response.status === 404) {
+        listEl.innerHTML = `<p class="text-secondary">${
+            t.t('prompts.noPrompts') || 'No prompts yet'}</p>`;
+        return;
+      }
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+      const prompts = await response.json();
+      this.renderPrompts(prompts);
+    } catch (e) {
+      console.error('[InfoPanel] loadPrompts failed', e);
+      listEl.innerHTML = `<p class="text-danger">${
+          t.t('prompts.loadError') || 'Failed to load prompts'}</p>`;
+      this._promptsChatUuid = undefined;
+    }
+  }
+
+  renderPrompts(prompts) {
+    const listEl = document.getElementById('infoPromptsList');
+
+    if (!prompts || prompts.length === 0) {
+      listEl.innerHTML = `<p class="text-secondary">${
+          t.t('prompts.noPrompts') || 'No prompts yet'}</p>`;
+      return;
+    }
+
+    listEl.innerHTML = '';
+    prompts.forEach((p, idx) => {
+      const item = document.createElement('div');
+      item.className = 'prompt-item';
+
+      const num = document.createElement('span');
+      num.className = 'prompt-index';
+      num.textContent = `${idx + 1}.`;
+
+      const text = document.createElement('span');
+      text.className = 'prompt-text';
+      text.textContent = p.text;
+
+      item.append(num, text);
+      item.addEventListener('click', () => this._focusMessage(p.id));
+      listEl.appendChild(item);
+    });
+  }
+
+  _focusMessage(messageId) {
+    const el = document.getElementById(messageId);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.classList.add('prompt-highlight');
+    setTimeout(() => el.classList.remove('prompt-highlight'), 1600);
+  }
+
 
   startStatsTimer() {
     this.stopStatsTimer();

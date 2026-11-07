@@ -1,10 +1,8 @@
 package com.example.promptengineering.restController;
 
-import com.example.promptengineering.dto.SessionChatRequest;
-import com.example.promptengineering.dto.SessionMessageDto;
-import com.example.promptengineering.dto.SessionStateResponse;
-import com.example.promptengineering.dto.ToolCallDto;
+import com.example.promptengineering.dto.*;
 import com.example.promptengineering.entity.Chat;
+import com.example.promptengineering.entity.Message;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.service.*;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +29,7 @@ public class ReactiveChatSessionController {
     private final ChatSessionService sessionService;
     private final ChatSessionRegistry registry;
     private final ChatSessionPersistenceService chatSessionPersistenceService;
+    private static final int PROMPT_MAX_LENGTH = 256;
 
     @PostMapping(value = "/{chatUuid}/chat", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent<String>> chat(@AuthenticationPrincipal User user,
@@ -81,6 +80,38 @@ public class ReactiveChatSessionController {
             log.error("Failed to load messages for chat {}", chatUuid, e);
             return ResponseEntity.ok(List.of());
         }
+    }
+
+    @GetMapping("/{chatUuid}/prompts")
+    public ResponseEntity<List<PromptDto>> prompts(@AuthenticationPrincipal User user,
+                                                   @PathVariable UUID chatUuid) {
+        if (!chatSessionPersistenceService.chatExistsForUser(chatUuid, user.getId())) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<PromptDto> prompts = chatSessionPersistenceService
+                .findUserPrompts(chatUuid, user.getId()).stream().map(this::toPromptDto)
+                .toList();
+
+        return ResponseEntity.ok(prompts);
+    }
+
+    private PromptDto toPromptDto(Message m) {
+        String raw = m.getText() != null ? m.getText() : "";
+        String preview = truncateCodePoints(raw, PROMPT_MAX_LENGTH);
+        long createdAt = m.getCreatedAt() != null ? m.getCreatedAt().toEpochMilli() : 0L;
+        return new PromptDto(m.getUuid() != null ? m.getUuid().toString() : null, preview,
+                createdAt, !preview.equals(raw));
+    }
+
+    private static String truncateCodePoints(String text, int maxCodePoints) {
+        if (text == null)
+            return "";
+        int count = text.codePointCount(0, text.length());
+        if (count <= maxCodePoints)
+            return text;
+        int end = text.offsetByCodePoints(0, maxCodePoints);
+        return text.substring(0, end);
     }
 
     private SessionMessageDto toDto(SessionMessage m) {

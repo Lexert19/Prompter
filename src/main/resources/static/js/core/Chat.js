@@ -42,9 +42,13 @@ class Chat {
         this.session = "";
         this.requestBuilder = new RequestBuilder();
         this.chatView.clearMessages();
+        if (window.InfoPanel && InfoPanel.instance) {
+            InfoPanel.instance._promptsChatUuid = undefined;
+        }
         if (window.location.pathname !== '/chat') {
             window.history.pushState({}, document.title, '/chat');
         }
+
     }
 
     stopStreaming() {
@@ -120,6 +124,9 @@ class Chat {
     async loadChat(id) {
         ChatClient.instance().stopStreaming();
         this.session = id;
+        if (window.InfoPanel && InfoPanel.instance) {
+            InfoPanel.instance._promptsChatUuid = undefined;
+        }
         if (window.location.pathname !== `/chat/${id}`) {
             window.history.pushState({ chatId: id }, document.title, `/chat/${id}`);
         }

@@ -44,9 +44,6 @@ class ChatClient {
         if (userMessage?.context?.length) {
             userMessage.context.forEach(c => { text += `<context>${c}</context>`; });
         }
-        if (userMessage?.documents?.length) {
-            userMessage.documents.forEach(d => { text += `<document>${d}</document>`; });
-        }
         text += rawText;
 
         const imageIds = (userMessage?.images || []).map(img =>

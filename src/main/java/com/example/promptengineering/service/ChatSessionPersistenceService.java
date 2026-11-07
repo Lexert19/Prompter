@@ -8,6 +8,7 @@ import com.example.promptengineering.model.TextContent;
 import com.example.promptengineering.model.ToolCall;
 import com.example.promptengineering.repository.ChatRepository;
 import com.example.promptengineering.repository.MessageRepository;
+import com.example.promptengineering.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,6 +30,7 @@ public class ChatSessionPersistenceService {
     private final ChatRepository chatRepository;
     private final MessageRepository messageRepository;
     private final ObjectMapper objectMapper;
+    private final UserRepository userRepository;
 
     @Transactional
     public Chat ensureChat(UUID chatUuid, User user) {
@@ -114,6 +116,16 @@ public class ChatSessionPersistenceService {
 
         return new SessionMessage(pm, m.getDocuments(), m.getImages(), m.getStart(),
                 m.getEnd(), m.getUuid(), m.getCreatedAt(), m.getReasoning());
+    }
+
+    @Transactional(readOnly = true)
+    public List<Message> findUserPrompts(UUID chatUuid, Long userId) {
+        return messageRepository.findUserPrompts(chatUuid, userId);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean chatExistsForUser(UUID chatUuid, Long userId) {
+        return chatRepository.existsByUuidAndUserId(chatUuid, userId);
     }
 
     @Transactional
