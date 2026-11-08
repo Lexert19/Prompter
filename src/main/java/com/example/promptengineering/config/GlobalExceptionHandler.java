@@ -11,6 +11,7 @@ import com.example.promptengineering.exception.UserAlreadyExistsException;
 import com.example.promptengineering.exception.UserSecurityException;
 import com.example.promptengineering.exception.ValidationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
@@ -155,7 +156,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(LocaleLoadException.class)
     public ResponseEntity<Map<String, String>> handleLocaleLoad(LocaleLoadException ex) {
-        log.error("Locale load error", ex);
+        log.error("Locale load error: {} - {}", ex.getClass().getSimpleName(),
+                ex.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("error", "Failed to load translations"));
     }
@@ -173,7 +175,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IOException.class)
     public void handleIOException(IOException ex, HttpServletResponse response) {
-        log.error("IO exception", ex);
+        log.error("IO exception: {} - {}", ex.getClass().getSimpleName(),
+                ex.getMessage());
         if (!response.isCommitted()) {
             response.setStatus(HttpStatus.OK.value());
         }
