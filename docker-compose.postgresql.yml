@@ -1,0 +1,26 @@
+services:
+  postgres:
+    image: timescale/timescaledb:latest-pg16
+    container_name: prompt_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: prompter
+      POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME}
+      POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_timescale_data:/var/lib/postgresql/data
+    networks:
+      - prompt_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${SPRING_DATASOURCE_USERNAME} -d $${SPRING_DATASOURCE_URL##*/}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_timescale_data:
+
+networks:
+  prompt_network:

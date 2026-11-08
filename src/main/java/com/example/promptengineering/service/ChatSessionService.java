@@ -35,6 +35,7 @@ public class ChatSessionService {
     private final SharedKeyService sharedKeyService;
     private final EncryptionService encryptionService;
     private final ChatSessionPersistenceService persistence;
+    private final MetricsService metricsService;
     private volatile Double temperature;
     private volatile String reasoningEffort;
     private volatile Map<String, Object> providerConfig;
@@ -133,6 +134,8 @@ public class ChatSessionService {
                     } catch (Exception e) {
                         log.error("Failed to save assistant message", e);
                     }
+
+                    recordChatMetrics(stats.snapshot(), calls.size());
                 }
             }
         };
@@ -188,6 +191,21 @@ public class ChatSessionService {
 
         return Flux.concat(tokens, continuation)
                 .onErrorResume(e -> Flux.just(errorEvent(e.getMessage())));
+    }
+
+    private void recordChatMetrics(Map<String, Object> s, int toolCallCount) {
+        metricsService.record("chat.tokens.content", num(s, "contentTokens"));
+        metricsService.record("chat.tokens.reasoning", num(s, "reasoningTokens"));
+        metricsService.record("chat.tokens.total", num(s, "totalTokens"));
+        metricsService.record("chat.latency.llm.ms", num(s, "llmElapsedMs"));
+        metricsService.record("chat.latency.wall.ms", num(s, "elapsedMs"));
+        metricsService.record("chat.tps.avg", num(s, "avgTps"));
+        metricsService.record("chat.tool.calls", toolCallCount);
+        metricsService.record("chat.requests", 1.0);
+    }
+
+    private static double num(Map<String, Object> m, String key) {
+        return ((Number) m.get(key)).doubleValue();
     }
 
     private Flux<ServerSentEvent<String>> executeAndEmit(ToolCall call,

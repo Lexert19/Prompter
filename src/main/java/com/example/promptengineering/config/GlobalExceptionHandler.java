@@ -11,7 +11,6 @@ import com.example.promptengineering.exception.UserAlreadyExistsException;
 import com.example.promptengineering.exception.UserSecurityException;
 import com.example.promptengineering.exception.ValidationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
