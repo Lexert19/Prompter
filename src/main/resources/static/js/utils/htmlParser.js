@@ -40,6 +40,15 @@ class HtmlParser {
 
         document.addEventListener('click', (e) => {
             if (isDrag) return;
+
+            const copyBtn = e.target.closest('.code-copy-btn');
+            if (copyBtn) {
+                e.preventDefault();
+                const codeEl = copyBtn.closest('.code-block')?.querySelector('pre code');
+                if (codeEl) HtmlParser._copyCode(codeEl.textContent, copyBtn);
+                return;
+            }
+
             const thinkingEl = e.target.closest('.thinking');
             if (!thinkingEl) return;
             const contentEl = thinkingEl.querySelector('.thinking-content');
@@ -251,9 +260,17 @@ class HtmlParser {
                 //const style = isCollapsed ? ` style="max-height:70px"` : ` style="max-height:none"`;
                 return `<div class="thinking" style="cursor:pointer"><button class="clear-button p-0 bg-transparent" data-thinking-toggle="${block.id}"><h4>Thinking:</h4></button><p class="thinking-content show" id="thinkingContent-${domId}" style="max-height:none">${this.escapeHtml(block.content)}</p></div>\n`;
                 //return `<div class="thinking" style="cursor:pointer"><button class="clear-button p-0 bg-transparent" data-thinking-toggle="${block.id}"><h4>Thinking:</h4></button><p class="${cls}" id="thinkingContent-${domId}"${style}>${this.escapeHtml(block.content)}</p></div>\n`;
-            case 'CODE':
+            case 'CODE': {
                 const langClass = block.language ? ` class="language-${block.language}"` : '';
-                return `<div class="code-block"><pre><code${langClass}>${this.escapeHtml(block.content)}</code></pre></div>\n`;
+                const copyLabel = (typeof t !== 'undefined' && t.t) ? t.t('copy') : 'Copy';
+                return `<div class="code-block">
+                    <button class="code-copy-btn" type="button" title="${copyLabel}">
+                        <i class="fas fa-copy" aria-hidden="true"></i>
+                        <span class="code-copy-label">${copyLabel}</span>
+                    </button>
+                    <pre><code${langClass}>${this.escapeHtml(block.content)}</code></pre>
+                </div>\n`;
+            }
             case 'HEADER2':
                 return `<h2>${this.escapeHtml(block.content.substring(3).trim())}</h2>\n`;
             case 'HEADER3':
@@ -459,6 +476,46 @@ class HtmlParser {
         }).join('');
 
         return htmlResult;
+    }
+
+    static _copyCode(text, button) {
+        const labelEl = button.querySelector('.code-copy-label') || button;
+        const original = labelEl.textContent;
+
+        const markCopied = () => {
+            const copiedLabel = (typeof t !== 'undefined' && t.t) ? t.t('copied') : 'Copied!';
+            labelEl.textContent = copiedLabel;
+            button.classList.add('copied');
+            setTimeout(() => {
+                labelEl.textContent = original;
+                button.classList.remove('copied');
+            }, 1500);
+        };
+
+        if (navigator.clipboard?.writeText) {
+            navigator.clipboard.writeText(text)
+                .then(markCopied)
+                .catch(err => {
+                    console.warn('[HtmlParser] clipboard.writeText failed', err);
+                    if (HtmlParser._fallbackCopy(text)) markCopied();
+                });
+        } else if (HtmlParser._fallbackCopy(text)) {
+            markCopied();
+        }
+    }
+
+    static _fallbackCopy(text) {
+        try {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
+            document.body.appendChild(ta);
+            ta.focus();
+            ta.select();
+            const ok = document.execCommand('copy');
+            document.body.removeChild(ta);
+            return ok;
+        } catch (_) { return false; }
     }
 }
 
