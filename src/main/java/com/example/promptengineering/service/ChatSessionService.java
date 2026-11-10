@@ -219,21 +219,50 @@ public class ChatSessionService {
                     () -> new IllegalStateException("Unknown tool: " + call.getName()));
             Map<String, Object> args = parseJson(call.getArguments());
             String result = exec.execute(args);
-            SessionMessage tsm = session
+            SessionMessage toolMessage = session
                     .addToolMessage(toolMessage(call.getId(), call.getName(), result));
-            persistence.save(session.getChatEntity(), tsm);
+            saveToolMessage(session, toolMessage);
             return event("tool_result", Map.of("id", call.getId(), "name", call.getName(),
                     "content", result));
         }).subscribeOn(Schedulers.boundedElastic()).onErrorResume(e -> {
             String err = "Tool '" + call.getName() + "' failed: " + e.getMessage();
-            log.warn(err, e);
-            session.addToolMessage(toolMessage(call.getId(), call.getName(), err));
+            if (isExpectedClientError(e)) {
+                log.debug("{} (expected client error, no stack trace)", err);
+            } else {
+                log.warn(err, e);
+            }
+            SessionMessage toolMessage = session
+                    .addToolMessage(toolMessage(call.getId(), call.getName(), err));
+            saveToolMessage(session, toolMessage);
 
             return Mono.just(event("tool_error",
                     Map.of("id", call.getId(), "name", call.getName(), "error", err)));
         });
 
         return callEvent.concatWith(resultEvent);
+    }
+
+    private void saveToolMessage(ChatSession session, SessionMessage tsm) {
+        Chat chat = session.getChatEntity();
+        if (chat == null) {
+            log.warn("Cannot persist tool message: session {} not hydrated (chatUuid={})",
+                    session.getChatUuid(), tsm.getUuid());
+            return;
+        }
+        try {
+            persistence.save(chat, tsm);
+        } catch (Exception e) {
+            log.error("Failed to persist tool message {} for chat {}", tsm.getUuid(),
+                    session.getChatUuid(), e);
+        }
+    }
+
+    private static boolean isExpectedClientError(Throwable e) {
+        if (e instanceof org.springframework.web.reactive.function.client.WebClientResponseException w) {
+            return w.getStatusCode().is4xxClientError();
+        }
+        return e instanceof IllegalArgumentException
+                || e instanceof IllegalStateException;
     }
 
     private Message toProviderMessage(SessionMessage sessionMessage) {

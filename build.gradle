@@ -127,6 +127,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
 	testImplementation 'io.projectreactor.netty:reactor-netty-http'
+	testImplementation("org.wiremock:wiremock-standalone:3.13.2")
 
 	e2eImplementation 'org.seleniumhq.selenium:selenium-java:4.18.1'
 	e2eImplementation 'io.github.bonigarcia:webdrivermanager:5.7.0'

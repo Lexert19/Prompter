@@ -59,32 +59,33 @@ public class ChatSessionPersistenceService {
         Chat managedChat = chatRepository.findById(chat.getId()).orElseThrow(
                 () -> new IllegalArgumentException("Chat not found: " + chat.getId()));
 
-        Message m = new Message();
-        m.setChat(managedChat);
-        m.setUuid(sm.getUuid());
-        m.setText(sm.getText());
-        m.setDocuments(sm.getDocuments());
-        m.setImages(sm.getImages());
-        m.setRole(sm.getRole());
-        m.setCache(sm.isCached());
-        m.setStart(sm.getStart());
-        m.setEnd(sm.getEnd());
-        m.setCreatedAt(sm.getCreatedAt());
-        m.setReasoning(sm.getReasoning());
+        Message message = new Message();
+        message.setChat(managedChat);
+        message.setUuid(sm.getUuid());
+        message.setText(sm.getText());
+        message.setDocuments(sm.getDocuments());
+        message.setImages(sm.getImages());
+        message.setRole(sm.getRole());
+        message.setCache(sm.isCached());
+        message.setStart(sm.getStart());
+        message.setEnd(sm.getEnd());
+        message.setCreatedAt(sm.getCreatedAt());
+        message.setReasoning(sm.getReasoning());
 
         com.example.promptengineering.model.Message pm = sm.getProviderMessage();
         if (pm.getToolCalls() != null && !pm.getToolCalls().isEmpty()) {
             try {
-                m.setToolCallsJson(objectMapper.writeValueAsString(pm.getToolCalls()));
+                message.setToolCallsJson(
+                        objectMapper.writeValueAsString(pm.getToolCalls()));
             } catch (JsonProcessingException e) {
                 log.warn("Failed to serialize toolCalls for message {}", sm.getUuid(), e);
             }
         }
-        m.setToolCallId(pm.getToolCallId());
-        m.setToolName(pm.getToolName());
-        m.setStringContent(pm.getStringContent());
+        message.setToolCallId(pm.getToolCallId());
+        message.setToolName(pm.getToolName());
+        message.setStringContent(pm.getStringContent());
 
-        messageRepository.saveAndFlush(m);
+        messageRepository.saveAndFlush(message);
     }
 
     private SessionMessage toSessionMessage(Message m) {
