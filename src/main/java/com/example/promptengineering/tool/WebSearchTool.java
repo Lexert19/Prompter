@@ -1,8 +1,10 @@
 package com.example.promptengineering.tool;
 
+import com.example.promptengineering.entity.User;
 import com.example.promptengineering.model.ToolDefinition;
 import com.example.promptengineering.service.ToolExecutor;
 import com.example.promptengineering.service.ToolRegistry;
+import com.example.promptengineering.service.UserService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
@@ -20,6 +22,7 @@ import java.util.Map;
 @Slf4j
 @Component
 public class WebSearchTool implements ToolExecutor {
+    public static final String TOOL_PROVIDER = "TAVILY";
 
     private static final int DEFAULT_MAX_RESULTS = 5;
     private static final int MAX_RESULTS_LIMIT = 10;
@@ -28,15 +31,15 @@ public class WebSearchTool implements ToolExecutor {
     private final ToolRegistry registry;
     private final WebClient webClient;
     private final ObjectMapper objectMapper;
-    private final String apiKey;
+    private final UserService userService;
     private final String baseUrl;
 
     public WebSearchTool(ToolRegistry registry, WebClient.Builder webClientBuilder,
-            ObjectMapper objectMapper, @Value("${tools.search.api-key:}") String apiKey,
+            ObjectMapper objectMapper, UserService userService,
             @Value("${tools.search.base-url:https://api.tavily.com}") String baseUrl) {
         this.registry = registry;
         this.objectMapper = objectMapper;
-        this.apiKey = apiKey;
+        this.userService = userService;
         this.baseUrl = baseUrl;
         this.webClient = webClientBuilder.build();
     }
@@ -62,12 +65,24 @@ public class WebSearchTool implements ToolExecutor {
 
     @Override
     public String execute(Map<String, Object> args) throws Exception {
+        throw new IllegalStateException(
+                "web_search requires a user context to resolve the API key");
+    }
+
+    @Override
+    public String execute(Map<String, Object> args, User user) throws Exception {
         Object rawQuery = args.get("query");
         if (rawQuery == null || rawQuery.toString().isBlank()) {
             throw new IllegalArgumentException("web_search: missing 'query'");
         }
         String query = rawQuery.toString();
         int max = clampMaxResults(args.get("max_results"));
+
+        String apiKey = resolveApiKey(user);
+        if (apiKey.isBlank()) {
+            throw new IllegalStateException("web_search: missing API key. Add your "
+                    + TOOL_PROVIDER + " key in account settings.");
+        }
 
         var body = Map.of("query", query, "max_results", max, "include_answer", false,
                 "include_raw_content", false);
@@ -90,6 +105,19 @@ public class WebSearchTool implements ToolExecutor {
         }
         return objectMapper
                 .writeValueAsString(Map.of("query", query, "results", results));
+    }
+
+    private String resolveApiKey(User user) {
+        if (user == null) {
+            throw new IllegalStateException(
+                    "web_search: missing user context for API key resolution");
+        }
+        String userKey = userService.getUserKeys(user).get(TOOL_PROVIDER);
+        if (userKey == null || userKey.isBlank()) {
+            throw new IllegalStateException("web_search: missing API key for "
+                    + TOOL_PROVIDER + ". Add your key in account settings.");
+        }
+        return userKey;
     }
 
     private static int clampMaxResults(Object raw) {

@@ -49,6 +49,9 @@ class WebSearchAgentIntegrationTest extends BaseIntegrationTest {
     private static final String URL = "https://openrouter.ai/api/v1/chat/completions";
     private static final String SYS = "You are a helpful assistant.";
 
+    private static final String TAVILY_PROVIDER = "TAVILY";
+    private static final String USER_TAVILY_KEY = "user-tavily-key";
+
     static WireMockServer searchApi;
 
     @BeforeAll
@@ -65,7 +68,6 @@ class WebSearchAgentIntegrationTest extends BaseIntegrationTest {
     @DynamicPropertySource
     static void searchProps(DynamicPropertyRegistry r) {
         r.add("tools.search.base-url", () -> "http://localhost:" + searchApi.port());
-        r.add("tools.search.api-key", () -> "test-key");
     }
 
     @BeforeEach
@@ -103,7 +105,8 @@ class WebSearchAgentIntegrationTest extends BaseIntegrationTest {
         u.setEmail(email);
         u.setPassword(passwordEncoder.encode("password"));
         u = userRepository.save(u);
-        userService.setUserKeys(u, Map.of(PROVIDER, openRouterApiKey));
+        userService.setUserKeys(u,
+                Map.of(PROVIDER, openRouterApiKey, TAVILY_PROVIDER, USER_TAVILY_KEY));
         user1 = userRepository.save(u);
 
         chatUuid = UUID.randomUUID();
@@ -177,6 +180,8 @@ class WebSearchAgentIntegrationTest extends BaseIntegrationTest {
                 .contains("\"finishReason\":\"stop\"").contains("web_search");
 
         searchApi.verify(WireMock.postRequestedFor(WireMock.urlEqualTo("/search"))
+                .withHeader("Authorization",
+                        WireMock.equalTo("Bearer " + USER_TAVILY_KEY))
                 .withRequestBody(WireMock.matchingJsonPath("$.query",
                         WireMock.equalTo("spring boot 3.2"))));
 
@@ -244,5 +249,66 @@ class WebSearchAgentIntegrationTest extends BaseIntegrationTest {
                 .contains("Invalid tool arguments");
 
         searchApi.verify(0, postRequestedFor(urlEqualTo("/search")));
+    }
+
+    @Test
+    void webSearch_returnsToolErrorWhenUserHasNoTavilyKey() throws Exception {
+        String email = "ws-nokey-" + UUID.randomUUID() + "@example.com";
+        User u = new User();
+        u.setEmail(email);
+        u.setPassword(passwordEncoder.encode("password"));
+        u = userRepository.save(u);
+        userService.setUserKeys(u, Map.of(PROVIDER, openRouterApiKey));
+        userRepository.save(u);
+        RequestPostProcessor asUserNoKey = user(userService.loadUserByUsername(email));
+
+        mockToolCallThenText("call_ws_nokey", "web_search", "{\"query\":\"x\"}",
+                "Sorry, I can't search right now.");
+
+        MvcResult result = mockMvc
+                .perform(post(BASE_URL + "/{chatUuid}/chat", chatUuid).with(csrf())
+                        .with(asUserNoKey).contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.TEXT_EVENT_STREAM)
+                        .content(objectMapper.writeValueAsString(
+                                requestWithTools("search x", List.of("web_search")))))
+                .andExpect(request().asyncStarted()).andReturn();
+        mockMvc.perform(asyncDispatch(result)).andExpect(status().isOk());
+
+        String body = result.getResponse().getContentAsString();
+        assertThat(body).contains("event:tool_error").contains("TAVILY");
+
+        searchApi.verify(0, postRequestedFor(urlEqualTo("/search")));
+    }
+
+    @Test
+    void webSearch_usesCallerKeyNotOtherUsersKey() throws Exception {
+        String otherEmail = "ws-other-" + UUID.randomUUID() + "@example.com";
+        User other = new User();
+        other.setEmail(otherEmail);
+        other.setPassword(passwordEncoder.encode("password"));
+        other = userRepository.save(other);
+        userService.setUserKeys(other, Map.of(PROVIDER, openRouterApiKey, TAVILY_PROVIDER,
+                "other-user-tavily-key"));
+        userRepository.save(other);
+        RequestPostProcessor asOther = user(userService.loadUserByUsername(otherEmail));
+
+        searchApi.stubFor(WireMock.post(WireMock.urlEqualTo("/search"))
+                .willReturn(WireMock.okJson("{\"results\":[]}")));
+
+        mockToolCallThenText("call_ws_iso", "web_search", "{\"query\":\"x\"}", "ok.");
+
+        UUID otherChat = UUID.randomUUID();
+        MvcResult result = mockMvc
+                .perform(post(BASE_URL + "/{chatUuid}/chat", otherChat).with(csrf())
+                        .with(asOther).contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.TEXT_EVENT_STREAM)
+                        .content(objectMapper.writeValueAsString(
+                                requestWithTools("search x", List.of("web_search")))))
+                .andExpect(request().asyncStarted()).andReturn();
+        mockMvc.perform(asyncDispatch(result)).andExpect(status().isOk());
+
+        searchApi.verify(WireMock.postRequestedFor(WireMock.urlEqualTo("/search"))
+                .withHeader("Authorization",
+                        WireMock.equalTo("Bearer other-user-tavily-key")));
     }
 }

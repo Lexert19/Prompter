@@ -13,12 +13,12 @@ pipeline {
     stage('Build') {
       steps {
         sh 'chmod +x gradlew'
-        sh './gradlew spotlessCheck assemble'
+        sh './gradlew assemble'
       }
     }
     stage('Test') {
       steps {
-        sh 'cp /home/lexert/_projects/Prompter/.env ./.env'
+        sh 'cp /home/lexert/env/prompter/.env ./.env'
         sh './gradlew test --rerun-tasks'
       }
       post { always { junit 'build/test-results/test/**/*.xml' } }

@@ -1,7 +1,5 @@
 package com.example.promptengineering.component;
 
-import com.example.promptengineering.entity.User;
-import com.example.promptengineering.model.AppRole;
 import com.example.promptengineering.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
@@ -9,8 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 @Slf4j
@@ -31,16 +27,16 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String @NonNull... args) {
-        User admin = userRepository.findByEmail(adminEmail).orElse(null);
-        if (admin == null) {
-            User newAdmin = new User();
-            newAdmin.setEmail(adminEmail);
-            newAdmin.setPassword(passwordEncoder.encode(adminPassword));
-            newAdmin.setRoles(List.of(AppRole.ADMIN));
-            newAdmin.setTwoFactorEnabled(true);
-            newAdmin.setTwoFactorEmail(adminEmail);
-            userRepository.save(newAdmin);
-        }
+        // User admin = userRepository.findByEmail(adminEmail).orElse(null);
+        // if (admin == null) {
+        // User newAdmin = new User();
+        // newAdmin.setEmail(adminEmail);
+        // newAdmin.setPassword(passwordEncoder.encode(adminPassword));
+        // newAdmin.setRoles(List.of(AppRole.ADMIN));
+        // newAdmin.setTwoFactorEnabled(true);
+        // newAdmin.setTwoFactorEmail(adminEmail);
+        // userRepository.save(newAdmin);
+        // }
 
     }
 }
