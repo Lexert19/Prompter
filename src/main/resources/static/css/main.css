@@ -1307,3 +1307,57 @@ input[type="number"]::-ms-spin-button {
 @media (hover: none) {
     .code-copy-btn { opacity: 1; }
 }
+
+
+/* --- Indigo button --- */
+.indigo-button {
+    background-color: var(--second-bg);
+    border: 1px solid var(--border-color);   /* #555866 — tak jak selektory */
+    color: var(--text-primary);
+    padding: 10px 16px;
+    border-radius: 8px;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.indigo-button:hover {
+    background-color: var(--accent-darker);
+    border-color: var(--accent);
+}
+
+.indigo-button:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.35);
+}
+
+.indigo-button i {
+    margin-left: 10px;
+    font-size: 0.9rem;
+    color: var(--accent);
+}
+
+/* warianty pomocnicze — jak w project/model-selector */
+.indigo-button-preview {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.indigo-button-status {
+    font-size: 0.8rem;
+    background: var(--accent-light);
+    border: 1px solid var(--border-light);
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-left: 10px;
+}
+
+/* opcjonalny wariant "solid" — pełne indigo tło */
+.indigo-button-solid {
+    background-color: var(--accent);
+    border-color: var(--accent);
+}
+
+.indigo-button-solid:hover {
+    background-color: var(--accent-darker);
+}
