@@ -10,4 +10,8 @@ public interface ToolExecutor {
     default String execute(Map<String, Object> arguments, User user) throws Exception {
         return execute(arguments);
     }
+    default String execute(Map<String, Object> arguments, User user, ChatSession session)
+            throws Exception {
+        return execute(arguments, user);
+    }
 }

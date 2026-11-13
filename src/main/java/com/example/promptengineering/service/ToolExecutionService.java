@@ -46,7 +46,7 @@ public class ToolExecutionService {
         ToolExecutor exec = toolRegistry.getExecutor(call.getName()).orElseThrow(
                 () -> new IllegalStateException("Unknown tool: " + call.getName()));
         Map<String, Object> args = parseJson(call.getArguments());
-        String result = exec.execute(args, user);
+        String result = exec.execute(args, user, session);
 
         persistToolMessage(session,
                 messageMapper.toolMessage(call.getId(), call.getName(), result));

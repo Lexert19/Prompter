@@ -42,12 +42,21 @@ public class SessionMessageMapper {
 
     public Message toProviderMessage(SessionMessage sessionMessage) {
         Message original = sessionMessage.getProviderMessage();
-        if (sessionMessage.getImages() == null || sessionMessage.getImages().isEmpty()) {
+
+        boolean hasImages = sessionMessage.getImages() != null
+                && !sessionMessage.getImages().isEmpty();
+        boolean hasDocuments = sessionMessage.getDocuments() != null
+                && !sessionMessage.getDocuments().isEmpty();
+
+        if (!hasImages && !hasDocuments) {
             return original;
         }
+
         Message clone = copyForEnrichment(original);
         prependDocumentMarkers(clone, sessionMessage.getDocuments());
-        appendImages(clone, sessionMessage.getImages());
+        if (hasImages) {
+            appendImages(clone, sessionMessage.getImages());
+        }
         return clone;
     }
 

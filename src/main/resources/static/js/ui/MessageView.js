@@ -77,6 +77,31 @@ class MessageView{
         `;
     }
 
+    renderToolResultContent(text) {
+        try {
+            const obj = JSON.parse(text);
+            if (obj?.downloadUrl && obj?.fileName) {
+                const size = obj.sizeBytes
+                    ? ` (${(obj.sizeBytes / 1024).toFixed(1)} KB)`
+                    : '';
+                const counts = obj.keptRounds != null
+                    ? `<div class="text-secondary small mt-1">
+                     kept ${obj.keptRounds} of ${obj.keptRounds + obj.removedRounds} rounds
+                   </div>` : '';
+                return `
+                <a class="btn-download-export d-inline-flex align-items-center gap-2"
+                   href="${escapeHtml(obj.downloadUrl)}" download>
+                    <i class="fas fa-file-arrow-down"></i>
+                    <span>${escapeHtml(obj.fileName)}</span>
+                    <small class="text-secondary">${size}</small>
+                </a>
+                ${counts}
+            `;
+            }
+        } catch (_) {}
+        return `<pre class="tool-output">${escapeHtml(text)}</pre>`;
+    }
+
     static showToolModal(messageId) {
         let msg = null;
         const chat = Chat.instance();
@@ -127,8 +152,7 @@ class MessageView{
                 </div>
                 ${call?.arguments
                 ? `<pre class="tool-args">${escapeHtml(call.arguments)}</pre>` : ''}
-                ${result != null
-                ? `<pre class="tool-output">${escapeHtml(result)}</pre>` : ''}
+                ${result != null ? this.renderToolResultContent(result) : ''}
                 ${error
                 ? `<pre class="tool-output">${escapeHtml(error)}</pre>` : ''}
             </div>`;

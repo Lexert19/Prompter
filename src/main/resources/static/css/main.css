@@ -1309,10 +1309,9 @@ input[type="number"]::-ms-spin-button {
 }
 
 
-/* --- Indigo button --- */
 .indigo-button {
     background-color: var(--second-bg);
-    border: 1px solid var(--border-color);   /* #555866 — tak jak selektory */
+    border: 1px solid var(--border-color);
     color: var(--text-primary);
     padding: 10px 16px;
     border-radius: 8px;
@@ -1337,7 +1336,6 @@ input[type="number"]::-ms-spin-button {
     color: var(--accent);
 }
 
-/* warianty pomocnicze — jak w project/model-selector */
 .indigo-button-preview {
     font-size: 0.9rem;
     opacity: 0.9;
@@ -1352,7 +1350,6 @@ input[type="number"]::-ms-spin-button {
     margin-left: 10px;
 }
 
-/* opcjonalny wariant "solid" — pełne indigo tło */
 .indigo-button-solid {
     background-color: var(--accent);
     border-color: var(--accent);
@@ -1360,4 +1357,18 @@ input[type="number"]::-ms-spin-button {
 
 .indigo-button-solid:hover {
     background-color: var(--accent-darker);
+}
+
+.btn-download-export {
+    background: var(--accent-light);
+    border: 1px solid var(--accent);
+    color: var(--text-primary);
+    padding: 8px 14px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+}
+.btn-download-export:hover {
+    background: var(--accent-darker);
+    color: white;
 }

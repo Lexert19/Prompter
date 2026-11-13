@@ -122,6 +122,53 @@ public class FileStorageService {
         }
     }
 
+    public UserFileDTO saveText(User owner, String filename, byte[] content) {
+        if (content.length > maxFileSize)
+            throw new IllegalArgumentException("Too big");
+        if (userFileRepository.countByOwner(owner) >= maxFilesPerUser)
+            throw new IllegalArgumentException("Limit");
+
+        String displayName = filename == null
+                ? "file.txt"
+                : java.nio.file.Paths.get(filename).getFileName().toString()
+                        .replaceAll("\\p{Cntrl}", "_");
+
+        String ext = ".txt";
+        String baseName = UUID.randomUUID().toString();
+        String binObject = owner.getId() + "/" + baseName + ext;
+        String b64Object = owner.getId() + "/" + baseName + ".b64";
+
+        try {
+            minioClient
+                    .putObject(PutObjectArgs.builder().bucket(bucket).object(binObject)
+                            .stream(new ByteArrayInputStream(content),
+                                    (long) content.length, (long) -1)
+                            .contentType("text/plain; charset=utf-8").build());
+
+            String b64String = Base64.getEncoder().encodeToString(content);
+            byte[] b64Bytes = b64String.getBytes(StandardCharsets.UTF_8);
+            minioClient
+                    .putObject(PutObjectArgs.builder().bucket(bucket).object(b64Object)
+                            .stream(new ByteArrayInputStream(b64Bytes),
+                                    (long) b64Bytes.length, (long) -1)
+                            .contentType("text/plain").build());
+
+            UserFile uf = new UserFile();
+            uf.setFileName(displayName);
+            uf.setStoredPath(binObject);
+            uf.setBase64Path(b64Object);
+            uf.setContentType("text/plain; charset=utf-8");
+            uf.setSize(content.length);
+            uf.setUploadedAt(Instant.now());
+            uf.setOwner(owner);
+
+            return toDto(userFileRepository.save(uf));
+
+        } catch (Exception e) {
+            throw new FileStorageException("MinIO store text failed", e);
+        }
+    }
+
     public List<UserFileDTO> getUserFiles(User user) {
         List<UserFile> userFiles = userFileRepository.findByOwner(user);
         return userFiles.stream().map(this::toDto).collect(Collectors.toList());
