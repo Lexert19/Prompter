@@ -121,7 +121,6 @@ public class FileStorageService {
             throw new RuntimeException("MinIO store failed", e);
         }
     }
-
     public UserFileDTO saveText(User owner, String filename, byte[] content) {
         if (content.length > maxFileSize)
             throw new IllegalArgumentException("Too big");
@@ -136,7 +135,6 @@ public class FileStorageService {
         String ext = ".txt";
         String baseName = UUID.randomUUID().toString();
         String binObject = owner.getId() + "/" + baseName + ext;
-        String b64Object = owner.getId() + "/" + baseName + ".b64";
 
         try {
             minioClient
@@ -145,18 +143,10 @@ public class FileStorageService {
                                     (long) content.length, (long) -1)
                             .contentType("text/plain; charset=utf-8").build());
 
-            String b64String = Base64.getEncoder().encodeToString(content);
-            byte[] b64Bytes = b64String.getBytes(StandardCharsets.UTF_8);
-            minioClient
-                    .putObject(PutObjectArgs.builder().bucket(bucket).object(b64Object)
-                            .stream(new ByteArrayInputStream(b64Bytes),
-                                    (long) b64Bytes.length, (long) -1)
-                            .contentType("text/plain").build());
-
             UserFile uf = new UserFile();
             uf.setFileName(displayName);
             uf.setStoredPath(binObject);
-            uf.setBase64Path(b64Object);
+            uf.setBase64Path(null);
             uf.setContentType("text/plain; charset=utf-8");
             uf.setSize(content.length);
             uf.setUploadedAt(Instant.now());
@@ -168,7 +158,6 @@ public class FileStorageService {
             throw new FileStorageException("MinIO store text failed", e);
         }
     }
-
     public List<UserFileDTO> getUserFiles(User user) {
         List<UserFile> userFiles = userFileRepository.findByOwner(user);
         return userFiles.stream().map(this::toDto).collect(Collectors.toList());
@@ -195,6 +184,9 @@ public class FileStorageService {
     }
 
     public String getBase64Content(UserFile userFile) {
+        if (userFile.getBase64Path() == null) {
+            return "";
+        }
         try (InputStream is = minioClient.getObject(GetObjectArgs.builder().bucket(bucket)
                 .object(userFile.getBase64Path()).build())) {
 

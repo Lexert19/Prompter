@@ -104,16 +104,10 @@ public class ChatCompactionService {
             score += 20;
 
         String lowerText = userText.toLowerCase();
-        if (lowerText.contains("error") || lowerText.contains("błąd")
-                || lowerText.contains("exception") || lowerText.contains("fail")) {
+        if (lowerText.contains("error") || lowerText.contains("exception")
+                || lowerText.contains("fail")) {
             score += 30;
         }
-        if (lowerText.contains("must") || lowerText.contains("wymaganie")
-                || lowerText.contains("musi") || lowerText.contains("funkcja")) {
-            score += 20;
-        }
-        if (userText.contains("```"))
-            score += 40;
 
         for (SessionMessage m : round.rest()) {
             if ("tool".equals(m.getRole())) {
@@ -139,19 +133,16 @@ public class ChatCompactionService {
                 .append(selected.size()).append(" of ").append(rounds.size())
                 .append(" rounds\n\n");
 
-        String sep = "=".repeat(60);
         for (int idx : selected) {
             Round r = rounds.get(idx - 1);
-            sb.append(sep).append('\n').append("ROUND ").append(idx).append('\n')
-                    .append(sep).append('\n').append("\n--- USER ---\n")
-                    .append(safe(r.user().getText())).append('\n');
+
+            sb.append("User:\n").append(safe(r.user().getText())).append('\n');
 
             if (r.user().getDocuments() != null && !r.user().getDocuments().isEmpty()) {
                 for (String doc : r.user().getDocuments()) {
                     sb.append("<files>\n").append(doc).append("\n</files>\n");
                 }
             }
-            sb.append(safe(r.user().getText())).append('\n');
 
             for (SessionMessage m : r.rest()) {
                 switch (m.getRole()) {
@@ -159,16 +150,16 @@ public class ChatCompactionService {
                         var pm = m.getProviderMessage();
                         if (pm.getToolCalls() != null) {
                             for (var tc : pm.getToolCalls()) {
-                                sb.append("\n[tool_call: ").append(tc.getName())
-                                        .append(' ').append(safe(tc.getArguments()))
-                                        .append("]\n");
+                                sb.append("[tool_call: ").append(tc.getName()).append(' ')
+                                        .append(safe(tc.getArguments())).append("]\n");
                             }
                         }
                         String t = m.getText();
-                        if (t != null && !t.isBlank())
-                            sb.append("\n--- ASSISTANT ---\n").append(t).append('\n');
+                        if (t != null && !t.isBlank()) {
+                            sb.append("Assistant:\n").append(t).append('\n');
+                        }
                     }
-                    case "tool" -> sb.append("\n[tool_result: ")
+                    case "tool" -> sb.append("[tool_result: ")
                             .append(m.getProviderMessage().getToolName()).append("] ")
                             .append(trunc(safe(m.getStringContent()), 500)).append('\n');
                 }
@@ -177,7 +168,6 @@ public class ChatCompactionService {
         }
         return sb.toString();
     }
-
     private static String safe(String s) {
         return s == null ? "" : s;
     }
