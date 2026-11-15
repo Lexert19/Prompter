@@ -24,19 +24,4 @@ public class DataInitializer implements CommandLineRunner {
         this.adminEmail = adminEmail;
         this.adminPassword = adminPassword;
     }
-
-    @Override
-    public void run(String @NonNull... args) {
-        // User admin = userRepository.findByEmail(adminEmail).orElse(null);
-        // if (admin == null) {
-        // User newAdmin = new User();
-        // newAdmin.setEmail(adminEmail);
-        // newAdmin.setPassword(passwordEncoder.encode(adminPassword));
-        // newAdmin.setRoles(List.of(AppRole.ADMIN));
-        // newAdmin.setTwoFactorEnabled(true);
-        // newAdmin.setTwoFactorEmail(adminEmail);
-        // userRepository.save(newAdmin);
-        // }
-
-    }
 }
