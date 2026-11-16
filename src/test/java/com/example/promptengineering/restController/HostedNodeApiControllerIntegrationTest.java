@@ -109,14 +109,16 @@ public class HostedNodeApiControllerIntegrationTest extends BaseIntegrationTest 
 
     @Test
     void registerNode_withoutAuthentication_shouldReturnUnauthorized() throws Exception {
-        RegisterNodeRequest req = new RegisterNodeRequest("x", "phi-3", "community",
+        String nodeName = "unauth-" + UUID.randomUUID();
+        RegisterNodeRequest req = new RegisterNodeRequest(nodeName, "phi-3", "community",
                 true);
 
         mockMvc.perform(post("/api/nodes").contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)).with(csrf()))
+                        .content(objectMapper.writeValueAsString(req)).with(csrf()))
                 .andExpect(status().isUnauthorized());
 
-        assertThat(hostedNodeRepository.findAll()).isEmpty();
+        assertThat(hostedNodeRepository.findAll())
+                .noneMatch(n -> nodeName.equals(n.getNodeName()));
     }
 
     @Test
@@ -125,11 +127,11 @@ public class HostedNodeApiControllerIntegrationTest extends BaseIntegrationTest 
                 true);
 
         mockMvc.perform(post("/api/nodes").contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)).with(csrf())
-                .with(user(userService.loadUserByUsername(normalUser.getEmail()))))
+                        .content(objectMapper.writeValueAsString(req)).with(csrf())
+                        .with(user(userService.loadUserByUsername(normalUser.getEmail()))))
                 .andExpect(status().isBadRequest());
 
-        assertThat(hostedNodeRepository.findAll()).isEmpty();
+        assertThat(hostedNodeRepository.findByOwnerId(normalUser.getId())).isEmpty();
     }
 
     @Test
@@ -147,15 +149,23 @@ public class HostedNodeApiControllerIntegrationTest extends BaseIntegrationTest 
 
     @Test
     void listPublicCommunityNodes_shouldReturnOnlyOnlineAndPublic() throws Exception {
-        createNode(normalUser, "public-online", Status.ONLINE, true);
-        createNode(normalUser, "public-offline", Status.OFFLINE, true);
-        createNode(normalUser, "private-online", Status.ONLINE, false);
+        String suffix = UUID.randomUUID().toString();
+        String publicOnline = "public-online-" + suffix;
+        String publicOffline = "public-offline-" + suffix;
+        String privateOnline = "private-online-" + suffix;
+
+        createNode(normalUser, publicOnline, Status.ONLINE, true);
+        createNode(normalUser, publicOffline, Status.OFFLINE, true);
+        createNode(normalUser, privateOnline, Status.ONLINE, false);
 
         mockMvc.perform(get("/api/nodes/public")
-                .with(user(userService.loadUserByUsername(normalUser.getEmail()))))
-                .andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].nodeName", is("public-online")))
-                .andExpect(jsonPath("$[0].modelFamily", is("community")));
+                        .with(user(userService.loadUserByUsername(normalUser.getEmail()))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[*].nodeName", hasItem(publicOnline)))
+                .andExpect(jsonPath("$[*].nodeName", not(hasItem(publicOffline))))
+                .andExpect(jsonPath("$[*].nodeName", not(hasItem(privateOnline))))
+                .andExpect(jsonPath("$[?(@.nodeName == '" + publicOnline + "')].modelFamily",
+                        contains("community")));
     }
 
     @Test

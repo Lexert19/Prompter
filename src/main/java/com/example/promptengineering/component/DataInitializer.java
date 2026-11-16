@@ -24,4 +24,9 @@ public class DataInitializer implements CommandLineRunner {
         this.adminEmail = adminEmail;
         this.adminPassword = adminPassword;
     }
+
+    @Override
+    public void run(String... args) throws Exception {
+
+    }
 }

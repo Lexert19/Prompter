@@ -128,7 +128,7 @@ public class ModelControllerIntegrationTest extends BaseIntegrationTest {
         editDto.setProviderStrategy("ANTHROPIC");
 
         mockMvc.perform(put("/api/models/user-models/{id}", userModel.getId())
-                .with(csrf()).with(user(testUser)).contentType(MediaType.APPLICATION_JSON)
+                .with(user(testUser)).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(editDto)))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Model updated successfully"));
@@ -139,23 +139,12 @@ public class ModelControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void shouldNotEditModelOfAnotherUser() throws Exception {
-        User otherUser = new User();
-        otherUser.setEmail("other@example.com");
-        otherUser.setPassword(passwordEncoder.encode("pass"));
-        otherUser = userRepository.save(otherUser);
-
-        Model otherModel = new Model();
-        otherModel.setName("Other's Model");
-        otherModel.setProvider("OPENAI");
-        otherModel.setUser(otherUser);
-        otherModel = modelRepository.save(otherModel);
-
         ModelDto editDto = new ModelDto();
         editDto.setName("Hacked");
 
         mockMvc.perform(put("/api/models/user-models/{id}", otherModel.getId())
-                .with(csrf()).with(user(testUser)).contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(editDto)))
+                        .with(user(testUser)).contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(editDto)))
                 .andExpect(status().isNotFound());
 
         Model unchanged = modelRepository.findById(otherModel.getId()).orElseThrow();
@@ -173,17 +162,6 @@ public class ModelControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void shouldNotDeleteModelOfAnotherUser() throws Exception {
-        User otherUser = new User();
-        otherUser.setEmail("other2@example.com");
-        otherUser.setPassword(passwordEncoder.encode("pass"));
-        otherUser = userRepository.save(otherUser);
-
-        Model otherModel = new Model();
-        otherModel.setName("Other's Model");
-        otherModel.setProvider("OPENAI");
-        otherModel.setUser(otherUser);
-        otherModel = modelRepository.save(otherModel);
-
         mockMvc.perform(delete("/api/models/user-models/{id}", otherModel.getId())
                 .with(csrf()).with(user(testUser))).andExpect(status().isForbidden());
 
