@@ -6,7 +6,10 @@ public record ToolDefinition(String name, String description,
         Map<String, Object> parameters) {
 
     public Map<String, Object> toOpenAiFormat() {
-        return Map.of("type", "function", "function", Map.of("name", name, "description",
-                description, "parameters", parameters));
+        if (name.startsWith("openrouter:")) {
+            return Map.of("type", name);
+        }
+        return Map.of("type", "function", "function", Map.of(
+                "name", name, "description", description, "parameters", parameters));
     }
 }
