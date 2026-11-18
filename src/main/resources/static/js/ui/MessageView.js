@@ -29,7 +29,6 @@ class MessageView{
                     <div class="date"></div>
                     <div class="duration" id="duration-${this.message.id}">${duration}</div>
                     <div class="duration ms-1" id="tps-${this.message.id}">${tpsDisplay}</div>
-                    <!-- Kontener na przycisk z toolami -->
                     <div id="tool-counter-container-${this.message.id}">${this.renderToolCounter()}</div>
                     <div class="loading-dots" id="loading-${this.message.id}" style="display: ${finished ? 'none' : 'inline-flex'};">
                         <span></span><span></span><span></span>
@@ -38,6 +37,9 @@ class MessageView{
                 ${this.message.getHtmlImages()}
                 ${this.message.getHtmlFiles()}
                 <div id="input-${this.message.id}" class="code-wrap">${htmlContent}</div>
+                <div class="citations-strip mt-1" id="citations-${this.message.id}">
+                    ${this.renderCitations()}
+                </div>
             </div>
             `;
 
@@ -119,6 +121,24 @@ class MessageView{
             null,
             ['modal-wide']
         );
+    }
+
+    renderCitations() {
+        const list = this.message.citations || [];
+        if (!list.length) return '';
+
+        return list.map((c, i) => {
+            const label = (c.title && c.title.trim()) ? c.title : hostOf(c.url);
+            return `<a class="citation-chip" href="${escapeHtml(c.url)}"
+                   target="_blank" rel="noopener noreferrer"
+                   title="${escapeHtml(c.content || c.url)}">
+                    [${i + 1}] ${escapeHtml(label)}
+                </a>`;
+        }).join(' ');
+
+        function hostOf(u) {
+            try { return new URL(u).hostname; } catch (_) { return u; }
+        }
     }
 
     renderToolBlocksDetail() {

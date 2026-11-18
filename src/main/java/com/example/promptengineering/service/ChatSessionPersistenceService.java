@@ -6,6 +6,7 @@ import com.example.promptengineering.entity.User;
 import com.example.promptengineering.model.Content;
 import com.example.promptengineering.model.TextContent;
 import com.example.promptengineering.model.ToolCall;
+import com.example.promptengineering.model.UrlCitation;
 import com.example.promptengineering.repository.ChatRepository;
 import com.example.promptengineering.repository.MessageRepository;
 import com.example.promptengineering.repository.UserRepository;
@@ -81,6 +82,14 @@ public class ChatSessionPersistenceService {
                 log.warn("Failed to serialize toolCalls for message {}", sm.getUuid(), e);
             }
         }
+        if (sm.getCitations() != null && !sm.getCitations().isEmpty()) {
+            try {
+                message.setAnnotationsJson(
+                        objectMapper.writeValueAsString(sm.getCitations()));
+            } catch (JsonProcessingException e) {
+                log.warn("Failed to serialize citations for message {}", sm.getUuid(), e);
+            }
+        }
         message.setToolCallId(pm.getToolCallId());
         message.setToolName(pm.getToolName());
         message.setStringContent(pm.getStringContent());
@@ -115,8 +124,18 @@ public class ChatSessionPersistenceService {
             }
         }
 
+        List<UrlCitation> citations = List.of();
+        if (m.getAnnotationsJson() != null && !m.getAnnotationsJson().isBlank()) {
+            try {
+                citations = objectMapper.readValue(m.getAnnotationsJson(),
+                        new TypeReference<List<UrlCitation>>() {});
+            } catch (JsonProcessingException e) {
+                log.warn("Failed to deserialize citations for message {}", m.getUuid(), e);
+            }
+        }
+
         return new SessionMessage(pm, m.getDocuments(), m.getImages(), m.getStart(),
-                m.getEnd(), m.getUuid(), m.getCreatedAt(), m.getReasoning());
+                m.getEnd(), m.getUuid(), m.getCreatedAt(), m.getReasoning(), citations);
     }
 
     @Transactional(readOnly = true)

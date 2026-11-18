@@ -124,7 +124,8 @@ public class ReactiveChatSessionController {
         return new SessionMessageDto(m.getUuid().toString(), m.getRole(), m.getText(),
                 m.isCached(), m.getImages(), m.getDocuments(), m.getStart(), m.getEnd(),
                 m.getCreatedAt().toEpochMilli(), calls, pm.getToolCallId(),
-                pm.getToolName(), pm.getStringContent(), m.getReasoning());
+                pm.getToolName(), pm.getStringContent(), m.getReasoning(),
+                m.getCitations());
     }
 
     private List<SessionMessageDto> toDtoList(ChatSession s) {

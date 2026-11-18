@@ -1,0 +1,1 @@
+ALTER TABLE message ADD COLUMN annotations_json TEXT;

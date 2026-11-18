@@ -2,6 +2,7 @@ package com.example.promptengineering.service;
 
 import com.example.promptengineering.entity.Chat;
 import com.example.promptengineering.model.Message;
+import com.example.promptengineering.model.UrlCitation;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -63,7 +64,17 @@ public class ChatSession {
     public SessionMessage addAssistantMessage(Message m, String reasoning, long start,
                                               long end) {
         SessionMessage sm = new SessionMessage(m, List.of(), List.of(), start, end,
-                UUID.randomUUID(), Instant.now(), reasoning);
+                UUID.randomUUID(), Instant.now(), reasoning, List.of());
+        messages.add(sm);
+        touch();
+        return sm;
+    }
+
+    public SessionMessage addAssistantMessage(Message m, String reasoning, long start,
+                                              long end,
+                                              List<UrlCitation> citations) {
+        SessionMessage sm = new SessionMessage(m, List.of(), List.of(), start, end,
+                UUID.randomUUID(), Instant.now(), reasoning, citations);
         messages.add(sm);
         touch();
         return sm;

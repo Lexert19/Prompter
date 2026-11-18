@@ -205,6 +205,12 @@ class ChatClient {
                     this.currentMessage.appendText(chunk);
                 }
                 break;
+            case 'citations':
+                if (Array.isArray(data.sources)) {
+                    this.currentMessage.addCitations(data.sources);
+                    this._refreshCitations();
+                }
+                break;
 
             case 'error':
                 this.outputInput.textContent += (data.error || 'Unknown error');
@@ -246,6 +252,15 @@ class ChatClient {
 
             default:
                 break;
+        }
+    }
+
+    _refreshCitations() {
+        if (!this.currentMessage) return;
+        const container = document.getElementById(`citations-${this.currentMessage.id}`);
+        if (container) {
+            const view = new MessageView(this.currentMessage);
+            container.innerHTML = view.renderCitations();
         }
     }
 

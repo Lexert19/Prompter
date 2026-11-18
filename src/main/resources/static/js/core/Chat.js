@@ -190,6 +190,7 @@ class Chat {
                 msg.cache = !!m.cached;
                 msg.toolCalls   = m.toolCalls || null;
                 msg.toolResults = [];
+                msg.citations   = Array.isArray(m.citations) ? m.citations : [];
                 this.requestBuilder.addMessage(msg);
                 if (msg.role === 'assistant') lastAssistant = msg;
                 lastRole = m.role;

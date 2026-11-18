@@ -1,6 +1,7 @@
 package com.example.promptengineering.service;
 
 import com.example.promptengineering.model.ToolCall;
+import com.example.promptengineering.model.UrlCitation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,8 @@ public class ToolCallAccumulator {
     private final Map<Integer, Partial> partials = new TreeMap<>();
     private final StringBuilder content = new StringBuilder();
     private final StringBuilder reasoning = new StringBuilder();
+    private final List<UrlCitation> annotations = new ArrayList<>();
+    private final Set<String> annotationUrls = new HashSet<>();
     private String finishReason;
 
     private int reportedReasoningTokens = -1;
@@ -156,6 +159,51 @@ public class ToolCallAccumulator {
         }
 
         return null;
+    }
+
+    public List<UrlCitation> consumeAnnotations(String data) {
+        if (data == null) return List.of();
+        String d = data.trim();
+        if (d.isEmpty() || "[DONE]".equals(d)) return List.of();
+
+        try {
+            JsonNode root = mapper.readTree(d);
+            List<UrlCitation> newOnes = new ArrayList<>();
+            JsonNode choices = root.path("choices");
+            if (choices.isArray() && !choices.isEmpty()) {
+                JsonNode choice = choices.get(0);
+                collectCitations(choice.path("delta").path("annotations"), newOnes);
+                collectCitations(choice.path("message").path("annotations"), newOnes);
+                collectCitations(choice.path("annotations"), newOnes);
+            }
+            return newOnes;
+        } catch (Exception e) {
+            log.debug("Failed to parse annotations: {}", e.getMessage());
+            return List.of();
+        }
+    }
+
+    private void collectCitations(JsonNode arr, List<UrlCitation> out) {
+        if (!arr.isArray()) return;
+        for (JsonNode a : arr) {
+            if (!"url_citation".equals(a.path("type").asText(""))) continue;
+            JsonNode uc = a.path("url_citation");
+            String url = uc.path("url").asText("");
+            if (url.isBlank()) continue;
+            if (!annotationUrls.add(url)) continue;
+            UrlCitation c = new UrlCitation(
+                    url,
+                    uc.path("title").asText(""),
+                    uc.path("content").asText(""),
+                    uc.hasNonNull("start_index") ? uc.get("start_index").asInt() : null,
+                    uc.hasNonNull("end_index") ? uc.get("end_index").asInt() : null);
+            annotations.add(c);
+            out.add(c);
+        }
+    }
+
+    public List<UrlCitation> getAnnotations() {
+        return List.copyOf(annotations);
     }
 
     private void captureUsage(JsonNode root) {

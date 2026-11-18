@@ -1,9 +1,6 @@
 package com.example.promptengineering.service;
 
-import com.example.promptengineering.model.Content;
-import com.example.promptengineering.model.Message;
-import com.example.promptengineering.model.TextContent;
-import com.example.promptengineering.model.ToolCall;
+import com.example.promptengineering.model.*;
 import lombok.Getter;
 
 import java.time.Instant;
@@ -20,16 +17,17 @@ public class SessionMessage {
     private final long end;
     private final Instant createdAt;
     private final String reasoning;
+    private final List<UrlCitation> citations;
 
     public SessionMessage(Message providerMessage, List<String> documents,
-            List<String> images, long start, long end) {
+                          List<String> images, long start, long end) {
         this(providerMessage, documents, images, start, end, UUID.randomUUID(),
-                Instant.now(), null);
+                Instant.now(), null, List.of());
     }
 
     public SessionMessage(Message providerMessage, List<String> documents,
-            List<String> images, long start, long end, UUID uuid, Instant createdAt,
-            String reasoning) {
+                          List<String> images, long start, long end, UUID uuid, Instant createdAt,
+                          String reasoning, List<UrlCitation> citations) {
         this.providerMessage = providerMessage;
         this.documents = documents != null ? List.copyOf(documents) : List.of();
         this.images = images != null ? List.copyOf(images) : List.of();
@@ -38,6 +36,7 @@ public class SessionMessage {
         this.uuid = uuid;
         this.createdAt = createdAt;
         this.reasoning = reasoning;
+        this.citations = citations != null ? List.copyOf(citations) : List.of();
     }
 
     public String getRole() {

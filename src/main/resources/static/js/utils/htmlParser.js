@@ -2,9 +2,6 @@ class HtmlParser {
     constructor() {
         this.elements = [];
         this.bufferedText = "";
-        this.isCodeBlock = false;
-        this.isThinkingBlock = false;
-        this.isNormalBlock = false;
         this.blocks = [];
         this.previousBlocks = [];
         this.lines = [];
@@ -13,6 +10,7 @@ class HtmlParser {
         this.nextBlockId = 0;
         this.processedLength = 0;
         this.incompleteLine = '';
+        this.lastProcessedLine = 0;
         this._collapsedElements = new WeakSet();
 
         HtmlParser._installDelegatedClick();
@@ -60,24 +58,20 @@ class HtmlParser {
         });
     }
 
-    setRootElement(rootElement){
+    setRootElement(rootElement) {
         this.rootElement = rootElement;
     }
 
-    clear(){
+    clear() {
         this.lines = [];
         this.bufferedText = "";
         this.blocks = [];
         this.blockElements.clear();
         this.previousBlocks = [];
-        //this.randomId = Math.floor(Math.random() * 1000000);
         this.nextBlockId = 0;
         this.processedLength = 0;
         this.incompleteLine = '';
         this.lastProcessedLine = 0;
-        this.isCodeBlock = false;
-        this.isThinkingBlock = false;
-        this._tempBlockId = undefined;
     }
 
     parse(textFragment) {
@@ -87,158 +81,169 @@ class HtmlParser {
         this.processedLength = this.bufferedText.length;
 
         this.incompleteLine += newData;
-        const lines = this.incompleteLine.split('\n');
+        const parts = this.incompleteLine.split('\n');
+        this.incompleteLine = parts.pop() || '';
 
-        this.incompleteLine = lines.pop() || '';
-
-        for (const line of lines) {
-            const previousLine = this.lines[this.lines.length - 1] || {text: "", mode: ""};
+        for (const text of parts) {
+            const prev = this.lines[this.lines.length - 1] || { text: "", mode: "" };
             this.lines.push({
-                text: line,
-                mode: this.getLineMode(previousLine, line)
+                text,
+                mode: this.getLineMode(prev.mode, text)
             });
-        }
-
-        if (this.incompleteLine) {
-            if (this._tempLineIndex !== undefined) {
-                this.lines.splice(this._tempLineIndex, 1);
-                this._tempLineIndex = undefined;
-            }
-            const previousLine = this.lines[this.lines.length - 1] || {text: "", mode: ""};
-            this.lines.push({
-                text: this.incompleteLine,
-                mode: this.getLineMode(previousLine, this.incompleteLine)
-            });
-            this._tempLineIndex = this.lines.length - 1;
         }
 
         this.updateBlocks();
-
         this.renderChanges();
     }
 
-
-    readLines(){
-        let lines = this.bufferedText.split('\n');
-        for (let i = 0; i < lines.length; i++) {
-            let line = lines[i];
-
-            let previousLine = null;
-            if(i == 0)
-            previousLine = {text: "", mode: ""};
-            else
-            previousLine = this.lines[i-1];
-            this.lines[i] = {
-                text: line,
-                mode: this.getLineMode(previousLine, line)
-            };
+    // Used only by parseToHtml (full, non-streaming render).
+    // Treats every split element as a committed line.
+    readLines() {
+        const parts = this.bufferedText.split('\n');
+        this.lines = [];
+        for (let i = 0; i < parts.length; i++) {
+            const text = parts[i];
+            const prevMode = i === 0 ? "" : this.lines[i - 1].mode;
+            this.lines.push({
+                text,
+                mode: this.getLineMode(prevMode, text)
+            });
         }
+        this.incompleteLine = '';
     }
 
-    getLineMode(previousLine, line){
-        const trimmed = line.trim();
+    // Pure: depends only on previous line's mode and this line's text.
+    // No instance state is read or written.
+    getLineMode(prevMode, text) {
+        const trimmed = text.trim();
         const codeDelim = /^ *```/;
 
-        if(this.isCodeBlock){
-            if(codeDelim.test(line)){
-                this.isCodeBlock = false;
-                return "STOP_CODE";
-            }
+        const inCode = prevMode === 'START_CODE' || prevMode === 'CODE';
+        const inThinking = prevMode === 'START_THINKING' || prevMode === 'THINKING';
+
+        if (inCode) {
+            if (codeDelim.test(text)) return "STOP_CODE";
             return "CODE";
         }
 
-        if(this.isThinkingBlock){
-            if (/^<\/think>\s*$/.test(trimmed)) {
-                this.isThinkingBlock = false;
-                return "STOP_THINKING";
-            }
+        if (inThinking) {
+            if (/^<\/think>\s*$/.test(trimmed)) return "STOP_THINKING";
             return "THINKING";
         }
 
-        if (/^<think>\s*$/.test(trimmed)) {
-            this.isThinkingBlock = true;
-            return "START_THINKING";
-        }
+        if (/^<think>\s*$/.test(trimmed)) return "START_THINKING";
+        if (codeDelim.test(text)) return "START_CODE";
 
-        if(codeDelim.test(line)){
-            this.isCodeBlock = true;
-            return "START_CODE";
-        }
+        if (text.startsWith("###") || text.startsWith("##")) return "HEADER3";
+        if (text.startsWith("---")) return "LINE";
+        if (text.startsWith("|")) return "ROW";
 
-        if(line.startsWith("###") || line.startsWith("##")) return "HEADER3";
-        if(line.startsWith("---")) return "LINE";
-        if(line.startsWith("|")) return "ROW";
-
-        if(line.startsWith("        *") || line.startsWith("        -")) return "LISTITEM3";
-        if(line.startsWith("    *") || line.startsWith("    -")) return "LISTITEM2";
-        if(line.startsWith("     -")) return "LISTITEM3DEEPSEEK";
-        if(line.startsWith("   -")) return "LISTITEM2DEEPSEEK";
-        if(line.startsWith("* ") || line.startsWith("- ")) return "LISTITEM"
+        if (text.startsWith("        *") || text.startsWith("        -")) return "LISTITEM3";
+        if (text.startsWith("    *") || text.startsWith("    -")) return "LISTITEM2";
+        if (text.startsWith("     -")) return "LISTITEM3DEEPSEEK";
+        if (text.startsWith("   -")) return "LISTITEM2DEEPSEEK";
+        if (text.startsWith("* ") || text.startsWith("- ")) return "LISTITEM";
 
         return "NORMAL";
     }
 
-
-    updateBlocks(){
+    updateBlocks() {
         this.blocks = [];
         this.nextBlockId = 0;
-        for(let i = 0; i < this.lines.length; i++){
-            const line = this.lines[i];
-            let currentBlock = this.blocks[this.blocks.length - 1];
-            switch(line.mode){
-                case 'START_THINKING':
-                    currentBlock = { id: this.nextBlockId++, type: 'THINKING', content: '', closed: false };
-                    this.blocks.push(currentBlock);
-                    break;
-                case 'STOP_THINKING':
-                    if(currentBlock && currentBlock.type === 'THINKING') currentBlock.closed = true;
-                    break;
-                case 'START_CODE':
-                    this.blocks.push({
-                        id: this.nextBlockId++,
-                        type: 'CODE',
-                        content: '',
-                        language: line.text.replace(/```/, '').trim() || null,
-                        closed: false
-                    });
-                    break;
-                case 'STOP_CODE':
-                    if(currentBlock && currentBlock.type === 'CODE') currentBlock.closed = true;
-                    break;
-                case 'CODE':
-                case 'THINKING':
-                    if(currentBlock) currentBlock.content += line.text + "\n";
-                    break;
-                case 'NORMAL':
-                    if(line.text){
-                        this.blocks.push({ id: this.nextBlockId++, type: 'NORMAL', content: line.text, closed: true });
-                    }
-                    break;
-                case 'ROW':
-                case 'LISTITEM':
-                case 'LISTITEM2':
-                case 'LISTITEM2DEEPSEEK':
-                case 'LISTITEM3':
-                case 'LISTITEM3DEEPSEEK':
-                case 'LINE':
-                case 'HEADER2':
-                case 'HEADER3':
-                    this.blocks.push({ id: this.nextBlockId++, type: line.mode, content: line.text, closed: true });
-                    break;
 
-            }
+        for (let i = 0; i < this.lines.length; i++) {
+            this._applyLine(this.lines[i], false);
         }
+
+        if (this.incompleteLine) {
+            const prev = this.lines[this.lines.length - 1] || { text: "", mode: "" };
+            const pendingMode = this.getLineMode(prev.mode, this.incompleteLine);
+            this._applyLine({ text: this.incompleteLine, mode: pendingMode }, true);
+        }
+
         this.lastProcessedLine = this.lines.length;
     }
 
-    renderStrongs(content){
+    _applyLine(line, isPending) {
+        const currentBlock = this.blocks[this.blocks.length - 1];
+        switch (line.mode) {
+            case 'START_THINKING':
+                this.blocks.push({ id: this.nextBlockId++, type: 'THINKING', content: '', closed: false });
+                break;
+
+            case 'STOP_THINKING':
+                if (currentBlock && currentBlock.type === 'THINKING' && !isPending) {
+                    currentBlock.closed = true;
+                }
+                break;
+
+            case 'START_CODE':
+                this.blocks.push({
+                    id: this.nextBlockId++,
+                    type: 'CODE',
+                    content: '',
+                    language: line.text.replace(/```/, '').trim() || null,
+                    closed: false
+                });
+                break;
+
+            case 'STOP_CODE':
+                if (currentBlock && currentBlock.type === 'CODE' && !isPending) {
+                    currentBlock.closed = true;
+                }
+                break;
+
+            case 'CODE':
+                if (currentBlock && currentBlock.type === 'CODE' && !isPending) {
+                    currentBlock.content += line.text + "\n";
+                }
+                break;
+
+            case 'THINKING':
+                if (currentBlock && currentBlock.type === 'THINKING') {
+                    if (isPending) currentBlock.content += line.text;
+                    else currentBlock.content += line.text + "\n";
+                }
+                break;
+
+            case 'NORMAL':
+                if (line.text) {
+                    this.blocks.push({
+                        id: this.nextBlockId++,
+                        type: 'NORMAL',
+                        content: line.text,
+                        closed: !isPending
+                    });
+                }
+                break;
+
+            case 'ROW':
+            case 'LISTITEM':
+            case 'LISTITEM2':
+            case 'LISTITEM2DEEPSEEK':
+            case 'LISTITEM3':
+            case 'LISTITEM3DEEPSEEK':
+            case 'LINE':
+            case 'HEADER2':
+            case 'HEADER3':
+                this.blocks.push({
+                    id: this.nextBlockId++,
+                    type: line.mode,
+                    content: line.text,
+                    closed: !isPending
+                });
+                break;
+        }
+    }
+
+    renderStrongs(content) {
         const withoutHtmlContent = this.escapeHtml(content);
         let formattedContent = withoutHtmlContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         formattedContent = formattedContent.replace(/\*(.*?)\*/g, '<em>$1</em>');
         return formattedContent;
     }
 
-    renderBlock(block){
+    renderBlock(block) {
         return `<div id="block-${block.id}">${this.renderBlockToHtmlString(block)}</div>`;
     }
 
@@ -255,11 +260,7 @@ class HtmlParser {
                 return `${withoutHtmlContent}`;
             case 'THINKING':
                 const domId = `${this.randomId}-${block.id}`;
-                //const isCollapsed = this.collapsedBlocks.has(block.id);
-                //const cls = isCollapsed ? "thinking-content" : "thinking-content show";
-                //const style = isCollapsed ? ` style="max-height:70px"` : ` style="max-height:none"`;
                 return `<div class="thinking" style="cursor:pointer"><button class="clear-button p-0 bg-transparent" data-thinking-toggle="${block.id}"><h4>Thinking:</h4></button><p class="thinking-content show" id="thinkingContent-${domId}" style="max-height:none">${this.escapeHtml(block.content)}</p></div>\n`;
-                //return `<div class="thinking" style="cursor:pointer"><button class="clear-button p-0 bg-transparent" data-thinking-toggle="${block.id}"><h4>Thinking:</h4></button><p class="${cls}" id="thinkingContent-${domId}"${style}>${this.escapeHtml(block.content)}</p></div>\n`;
             case 'CODE': {
                 const langClass = block.language ? ` class="language-${block.language}"` : '';
                 const copyLabel = (typeof t !== 'undefined' && t.t) ? t.t('copy') : 'Copy';
@@ -310,25 +311,24 @@ class HtmlParser {
         }
     }
 
-
-    toggleThinkingBlock(blockId, contentElOverride){
+    toggleThinkingBlock(blockId, contentElOverride) {
         const el = contentElOverride;
-        if(!el) return;
+        if (!el) return;
 
         const isCollapsed = this._collapsedElements.has(el);
 
-        if(isCollapsed){
+        if (isCollapsed) {
             this._collapsedElements.delete(el);
             el.classList.add("show");
             el.style.maxHeight = el.scrollHeight + "px";
             el.addEventListener("transitionend", (e) => {
-                if(e.propertyName !== "max-height") return;
-                if(this._collapsedElements.has(el)) return;
+                if (e.propertyName !== "max-height") return;
+                if (this._collapsedElements.has(el)) return;
                 el.style.maxHeight = "none";
             }, { once: true });
         } else {
             this._collapsedElements.add(el);
-            if(el.style.maxHeight === "none" || el.style.maxHeight === ""){
+            if (el.style.maxHeight === "none" || el.style.maxHeight === "") {
                 el.style.maxHeight = el.scrollHeight + "px";
             }
             void el.offsetHeight;
@@ -412,7 +412,6 @@ class HtmlParser {
         const prevScrollHeight = chatContainer?.scrollHeight || 0;
         const prevScrollTop = chatContainer?.scrollTop || 0;
 
-
         const newMap = new Map(this.blocks.map(b => [b.id, b]));
         this._removeStaleBlocks(newMap);
 
@@ -428,7 +427,7 @@ class HtmlParser {
             }
             if (el) {
                 this._updateExistingBlock(el, block, old);
-                if (node!== el) this.rootElement.insertBefore(el, node);
+                if (node !== el) this.rootElement.insertBefore(el, node);
                 node = el.nextSibling;
             } else {
                 el = this._createNewBlockElement(block);
@@ -437,7 +436,7 @@ class HtmlParser {
                 if (block.type === 'CODE' && block.closed) this._highlightCodeBlock(el);
             }
         }
-        this.previousBlocks = this.blocks.map(b => ({...b}));
+        this.previousBlocks = this.blocks.map(b => ({ ...b }));
 
         const shouldScroll = ChatView.instance().shouldAutoScroll;
         requestAnimationFrame(() => {
@@ -447,7 +446,7 @@ class HtmlParser {
         });
     }
 
-    restoreHighlights(){
+    restoreHighlights() {
         if (!this.rootElement) return;
         this.rootElement.querySelectorAll('pre code').forEach(code => {
             delete code.dataset.highlighted;
@@ -464,11 +463,11 @@ class HtmlParser {
             .replace(/'/g, "&#039;");
     }
 
-
     parseToHtml(fullText) {
         this.clear();
         this.bufferedText = fullText;
         this.readLines();
+        this.processedLength = this.bufferedText.length;
         this.updateBlocks();
 
         const htmlResult = this.blocks.map(block => {
@@ -518,5 +517,3 @@ class HtmlParser {
         } catch (_) { return false; }
     }
 }
-
-

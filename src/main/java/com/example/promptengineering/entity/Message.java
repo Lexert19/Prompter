@@ -76,6 +76,9 @@ public class Message {
     @Column(columnDefinition = "TEXT")
     private String reasoning;
 
+    @Column(columnDefinition = "TEXT", name = "annotations_json")
+    private String annotationsJson;
+
     public boolean getCache() {
         return cache;
     }

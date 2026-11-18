@@ -1372,3 +1372,14 @@ input[type="number"]::-ms-spin-button {
     background: var(--accent-darker);
     color: white;
 }
+
+.citations-strip { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.citation-chip {
+    display: inline-flex; align-items: center;
+    padding: 2px 8px; border-radius: 10px;
+    background: #1f2b3d; color: #9fc3ff;
+    font-size: 0.78rem; text-decoration: none;
+    max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.citation-chip:hover { background: #2a3a54; }

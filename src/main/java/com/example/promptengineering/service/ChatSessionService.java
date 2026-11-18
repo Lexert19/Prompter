@@ -5,6 +5,7 @@ import com.example.promptengineering.entity.Chat;
 import com.example.promptengineering.entity.User;
 import com.example.promptengineering.model.RequestBuilder;
 import com.example.promptengineering.model.ToolCall;
+import com.example.promptengineering.model.UrlCitation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -154,7 +155,12 @@ public class ChatSessionService {
             return Flux.error(new RuntimeException(chunk.error()));
         }
 
-        List<ServerSentEvent<String>> out = new ArrayList<>(3);
+        List<ServerSentEvent<String>> out = new ArrayList<>(4);
+        List<UrlCitation> citations =
+                toolCalls.consumeAnnotations(data);
+        if (!citations.isEmpty()) {
+            out.add(sse.event("citations", Map.of("sources", citations)));
+        }
         if (chunk.hasContent()) {
             stats.addContent(chunk.content().length());
             out.add(sse.event("token", Map.of("text", chunk.content())));
@@ -217,7 +223,7 @@ public class ChatSessionService {
 
         SessionMessage assistantMessage = session.addAssistantMessage(
                 messageMapper.assistantMessage(content, calls), reasoning, assistantStart,
-                assistantEnd);
+                assistantEnd, toolCalls.getAnnotations());
 
         try {
             persistence.save(session.getChatEntity(), assistantMessage);

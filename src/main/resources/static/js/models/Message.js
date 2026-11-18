@@ -10,7 +10,19 @@ class Message {
         this.start = Date.now();
         this.end = null;
         this.images = images;
+        this.citations = [];
         this.stats = null;
+    }
+
+    addCitations(list) {
+        if (!list || !list.length) return;
+        const seen = new Set(this.citations.map(c => c.url));
+        for (const c of list) {
+            if (c.url && !seen.has(c.url)) {
+                this.citations.push(c);
+                seen.add(c.url);
+            }
+        }
     }
 
     getTps() {
