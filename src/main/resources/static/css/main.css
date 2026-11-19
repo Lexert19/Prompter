@@ -5,7 +5,7 @@
     --accent-darker: rgba(99, 102, 241, 0.7);
     --panel-bg: rgba(45, 45, 49, 0.9);
     --input-bg: #374151;
-    --chat-input-bg: #3e4153;
+    --chat-input-bg: #2F3242;
     --context-menu-bg: #333340;
     --accent-light: rgba(99, 102, 241, 0.15);
     --border-color: #555866;
@@ -163,12 +163,18 @@ h3{
 
 button {
     padding: 10px 15px;
+    background-color: transparent;
     border: none;
-    background-color: var(--accent);
+    /*background-color: var(--accent);*/
     color: white;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.2s;
+}
+
+.standard-button{
+    border: 1px solid #555866;
+    border-radius: 0.25rem;
 }
 
 button:hover{
@@ -263,9 +269,14 @@ input {
 }
 
 .button-panel button{
+    background-color: var(--second-bg);
     margin-right: 5px;
     width: 20%;
     border-radius: 5px;
+}
+
+.button-panel button:hover{
+    background-color: rgba(99, 102, 241, 0.7);
 }
 
 .pages .active{
@@ -273,15 +284,15 @@ input {
 }
 
 .send-button{
-    border-radius: 5px !important;
+    border-radius: 50% !important;
     width: 40px;
     height: 40px;
     margin: 10px;
-
+    background-color: var(--accent);
 }
 
 .user {
-    background-color: var(--accent-light);
+    background-color: var(--second-bg);
     border: 1px solid var(--accent);
     color: white;
     align-self: flex-end;

@@ -16,7 +16,7 @@
       <span class="info-prompts-title">
         <@spring.message "prompts.title" />
       </span>
-      <button class="rounded-1 btn-sm"
+      <button class="standard-button btn-sm"
               title="<@spring.message 'prompts.refresh' />"
               onclick="InfoPanel.getInstance().loadPrompts(true)">
         <i class="fas fa-sync-alt"></i>

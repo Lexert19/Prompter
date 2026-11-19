@@ -41,7 +41,7 @@
         </button>
     </div>
     <div class="mt-3 pt-3 border-top">
-        <button class="rounded-1 w-100 btn-danger" onclick="AccountView.instance().logout()">
+        <button class="standard-button w-100 btn-danger" onclick="AccountView.instance().logout()">
             <i class="fas fa-sign-out-alt"></i> <@spring.message "account.logout" />
         </button>
     </div>
