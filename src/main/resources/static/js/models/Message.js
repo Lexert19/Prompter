@@ -100,4 +100,13 @@ class Message {
         });
         return `<div class="d-flex">${documentsText}</div>`;
     }
+
+    static _itemLength(item) {
+        if (item == null) return 0;
+        if (typeof item === "string") return item.length;
+        if (typeof item.content === "string") return item.content.length;
+        if (typeof item.text === "string") return item.text.length;
+        if (typeof item.fragment === "string") return item.fragment.length;
+        return String(item).length;
+    }
 }

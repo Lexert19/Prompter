@@ -11,6 +11,7 @@ import com.example.promptengineering.service.AuditLogService;
 import com.example.promptengineering.service.SharedKeyService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin/shared-keys")
+@PreAuthorize("hasAuthority('ADMIN')")
 public class AdminSharedKeyController {
     private final SharedKeyService sharedKeyService;
     private final AuditLogService auditLogService;

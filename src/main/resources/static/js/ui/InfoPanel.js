@@ -169,8 +169,8 @@ class InfoPanel {
       : {
       total: rb.messages?.length || 0,
       user: rb.messages?.filter(m => m.role === 'user').length || 0,
-      assistant: rb.messages?.filter(m => m.role === 'assistant').length || 0,
-      textLength: rb.messages?.reduce((s, m) => s + (m.text?.length || 0), 0) || 0,
+      assistant: rb.messages?.filter(m => m.role === 'assistant').length || 0, textLength: rb.messages?.reduce((s, m) => s + (typeof m.getTextContentLength === 'function'
+              ? m.getTextContentLength() : (m.text?.length || 0)), 0) || 0,
       images: rb.messages?.reduce((s, m) => s + (m.images?.length || 0), 0) || 0,
       documents: rb.messages?.reduce((s, m) => s + (m.documents?.length || 0), 0) || 0,
       contextSize: rb.calculateContextSize ? rb.calculateContextSize() : 0,
