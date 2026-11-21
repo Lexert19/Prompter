@@ -206,9 +206,5 @@ class Chat {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    if (!getToken()) {
-        window.location.href = '/auth/login';
-        return;
-    }
     Chat.instance();
 });

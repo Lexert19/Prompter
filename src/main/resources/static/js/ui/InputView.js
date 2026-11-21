@@ -71,7 +71,7 @@ class InputView{
             return;
         }
 
-        if (!message.trim()) {
+        if (!message.trim() && this.longTexts.length < 1 && this.images.length < 1) {
             return;
         }
 
@@ -100,14 +100,6 @@ class InputView{
             document.getElementById('send-icon').classList.remove("d-none");
             document.getElementById('stop-icon').classList.add("d-none");
         }
-
-        const contextSize = Chat.instance().requestBuilder.calculateContextSize();
-        const contextDisplay = document.getElementById('context-counter');
-        if (contextDisplay) {
-            //todo
-            //contextDisplay.textContent = `Kontekst: ${contextSize.toLocaleString()} znaków`;
-        }
-
         this.updateDocumentsView();
     }
 

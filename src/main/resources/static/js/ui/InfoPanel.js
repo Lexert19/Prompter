@@ -23,13 +23,8 @@ class InfoPanel {
   }
 
   init() {
-    if (this.toggleBtn) {
-      this.toggleBtn.addEventListener('click', () => this.toggle());
-    }
-    if (this.closeBtn) {
-      this.closeBtn.addEventListener('click', () => this.hide());
-    }
-
+    this.toggleBtn.addEventListener('click', () => this.toggle());
+    this.closeBtn.addEventListener('click', () => this.hide());
     this.handleResize();
     window.addEventListener('resize', () => this.handleResize());
     this.updateStats();
@@ -64,7 +59,7 @@ class InfoPanel {
     }
   }
 
-  async loadPrompts(force = false) {
+  async loadPrompts() {
     const chatUuid = this._promptsChatUuid;
     const listEl = document.getElementById('infoPromptsList');
 
@@ -155,32 +150,18 @@ class InfoPanel {
 
   updateStats() {
     const container = document.getElementById('request-stats');
-    if (!container) return;
-
     const chat = Chat._instance;
-    if (!chat || !chat.requestBuilder) {
+    if (!chat.requestBuilder) {
       container.innerHTML = '<div class="info-row">Lack of data</div>';
       return;
     }
 
-    const rb = chat.requestBuilder;
-    const stats = typeof rb.getStats === 'function'
-      ? rb.getStats()
-      : {
-      total: rb.messages?.length || 0,
-      user: rb.messages?.filter(m => m.role === 'user').length || 0,
-      assistant: rb.messages?.filter(m => m.role === 'assistant').length || 0, textLength: rb.messages?.reduce((s, m) => s + (typeof m.getTextContentLength === 'function'
-              ? m.getTextContentLength() : (m.text?.length || 0)), 0) || 0,
-      images: rb.messages?.reduce((s, m) => s + (m.images?.length || 0), 0) || 0,
-      documents: rb.messages?.reduce((s, m) => s + (m.documents?.length || 0), 0) || 0,
-      contextSize: rb.calculateContextSize ? rb.calculateContextSize() : 0,
-      estimatedTokens: 0,
-      estimatedContextTokens: 0
-    };
+    const requestBuilder = chat.requestBuilder;
+    let stats = requestBuilder.getStats();
 
     const settings = Settings._instance;
 
-    let html = `
+    container.innerHTML = `
       <div class="info-row"><span>${t.t("info.messages")}:</span><span>${stats.total}</span></div>
       <div class="info-row"><span>${t.t("info.userRequests")}:</span><span>${stats.user}</span></div>
       <div class="info-row"><span>${t.t("info.assistantReplies")}:</span><span>${stats.assistant}</span></div>
@@ -190,17 +171,10 @@ class InfoPanel {
       <div class="info-row"><span>${t.t("info.estimatedContextTokens")}:</span><span>${stats.estimatedContextTokens.toLocaleString()}</span></div>
       <div class="info-row"><span>${t.t("info.images")}:</span><span>${stats.images}</span></div>
       <div class="info-row"><span>${t.t("info.documents")}:</span><span>${stats.documents}</span></div>
+      <hr>
+      <div class="info-row"><span>${t.t("settings.model")}:</span><span>${settings.model || '-'}</span></div>
+      <div class="info-row"><span>${t.t("provider")}:</span><span>${settings.provider || '-'}</span></div>
     `;
-
-    if (settings) {
-      html += `
-        <hr>
-        <div class="info-row"><span>${t.t("settings.model")}:</span><span>${settings.model || '-'}</span></div>
-        <div class="info-row"><span>${t.t("provider")}:</span><span>${settings.provider || '-'}</span></div>
-      `;
-    }
-
-    container.innerHTML = html;
   }
 
   updateButtonZIndex() {

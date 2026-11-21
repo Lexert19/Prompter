@@ -6,6 +6,7 @@ import com.example.promptengineering.service.TwoFactorEmailService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -37,9 +38,9 @@ public class CustomAuthenticationSuccessHandler
     }
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request,
-                                        HttpServletResponse response,
-                                        Authentication authentication)
+    public void onAuthenticationSuccess(@NonNull HttpServletRequest request,
+                                        @NonNull HttpServletResponse response,
+                                        @NonNull Authentication authentication)
             throws IOException, ServletException {
         if (authentication instanceof OAuth2AuthenticationToken) {
             handleOAuth2Success(authentication, response);
@@ -47,24 +48,24 @@ public class CustomAuthenticationSuccessHandler
         }
 
         User user = (User) authentication.getPrincipal();
-        boolean hasApiKeys = user.getEncryptedKeys() != null
-                && !user.getEncryptedKeys().isEmpty();
 
         CsrfToken token = csrfRepo.generateToken(request);
         csrfRepo.saveToken(token, request, response);
 
-        if (user.isTwoFactorEnabled() && hasApiKeys) {
-            request.getSession().setAttribute("2fa_authentication", authentication);
-            String sessionId = request.getSession().getId();
-            String emailTo = user.getTwoFactorEmail() != null
-                    ? user.getTwoFactorEmail()
-                    : user.getEmail();
-            twoFactorService.createAndSendCode(sessionId, emailTo);
-            request.getSession().setAttribute("2fa_user_id", user.getId());
-            response.sendRedirect("/auth/2fa");
-        } else {
-            super.onAuthenticationSuccess(request, response, authentication);
-        }
+        assert user != null;
+        super.onAuthenticationSuccess(request, response, authentication);
+
+//        if (user.isTwoFactorEnabled()) {
+//            request.getSession().setAttribute("2fa_authentication", authentication);
+//            String sessionId = request.getSession().getId();
+//            String emailTo = user.getTwoFactorEmail() != null
+//                    ? user.getTwoFactorEmail()
+//                    : user.getEmail();
+//            twoFactorService.createAndSendCode(sessionId, emailTo);
+//            request.getSession().setAttribute("2fa_user_id", user.getId());
+//            response.sendRedirect("/auth/2fa");
+//        } else {
+//        }
     }
 
     private void handleOAuth2Success(Authentication authentication,

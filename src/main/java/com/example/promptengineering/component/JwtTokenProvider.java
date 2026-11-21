@@ -26,6 +26,7 @@ public class JwtTokenProvider {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + jwtExpirationMs);
 
+        assert user != null;
         return Jwts.builder().subject(user.getId().toString())
                 .claim("email", user.getEmail())
                 .claim("roles",

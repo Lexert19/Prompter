@@ -18,7 +18,7 @@
       </span>
       <button class="standard-button btn-sm"
               title="<@spring.message 'prompts.refresh' />"
-              onclick="InfoPanel.getInstance().loadPrompts(true)">
+              onclick="InfoPanel.getInstance().loadPrompts()">
         <i class="fas fa-sync-alt"></i>
       </button>
     </div>

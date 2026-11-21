@@ -59,6 +59,9 @@ public class AuthController {
     @Value("${jwt.expiration-ms}")
     private long jwtExpirationMs;
 
+    @Value("${app.cookie.secure:false}")
+    private boolean cookieSecure;
+
     @Autowired
     public AuthController(AuthService authService, ResetTokenService resetTokenService,
             IpRateLimiter rateLimiter, EmailRateLimiter emailRateLimiter,
@@ -85,14 +88,12 @@ public class AuthController {
                             request.getPassword()));
             User user = (User) authentication.getPrincipal();
 
+            assert user != null;
             auditLogService.log(auditLogService.createAuditLog(user.getId(),
                     user.getEmail(), ActionType.LOGIN_SUCCESS, ResultType.SUCCESS, null,
                     null, null));
 
-            boolean hasApiKeys = user.getEncryptedKeys() != null
-                    && !user.getEncryptedKeys().isEmpty();
-
-            if (user.isTwoFactorEnabled() && hasApiKeys) {
+            if (user.isTwoFactorEnabled()) {
                 String preAuth = tokenProvider.generatePreAuthToken(user);
                 String emailTo = user.getTwoFactorEmail() != null
                         ? user.getTwoFactorEmail()
@@ -100,8 +101,9 @@ public class AuthController {
                 twoFactorService.createAndSendCode(user.getId().toString(), emailTo);
                 return ResponseEntity
                         .ok(Map.of("requires2fa", true, "preAuthToken", preAuth));
+            }else{
+                return issueTokens(user, response);
             }
-            return issueTokens(user, response);
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(401)
                     .body(Map.of("error", "Invalid email or password"));
@@ -154,10 +156,10 @@ public class AuthController {
         String refresh = tokenProvider.generateRefreshToken(user);
 
         ResponseCookie accessCookie = ResponseCookie.from("access_token", access)
-                .httpOnly(true).secure(true).path("/")
+                .httpOnly(true).secure(cookieSecure).path("/")
                 .maxAge(Duration.ofMillis(jwtExpirationMs)).sameSite("Lax").build();
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refresh)
-                .httpOnly(true).secure(true).path("/")
+                .httpOnly(true).secure(cookieSecure).path("/")
                 .maxAge(Duration.ofMillis(jwtExpirationMs)).sameSite("Lax").build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());

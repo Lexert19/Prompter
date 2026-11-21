@@ -58,6 +58,7 @@ public class AuthControllerTest extends BaseIntegrationTest {
         user = new User();
         user.setEmail(userEmail);
         user.setPassword(passwordEncoder.encode(userPassword));
+        user.setTwoFactorEnabled(false);
         user = userRepository.save(user);
     }
 

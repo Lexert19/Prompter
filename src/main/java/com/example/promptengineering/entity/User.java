@@ -48,7 +48,7 @@ public class User implements OAuth2User, Principal, UserDetails {
     private double points;
 
     @Column(name = "two_factor_enabled")
-    private boolean twoFactorEnabled = true;
+    private boolean twoFactorEnabled = false;
 
     @Column(name = "two_factor_email")
     private String twoFactorEmail;

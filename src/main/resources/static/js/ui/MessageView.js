@@ -17,7 +17,7 @@ class MessageView{
         }
 
         let htmlContent = "";
-        if(this.message.role == "assistant"){
+        if(this.message.role === "assistant"){
             htmlContent = ChatClient.instance().parser.parseToHtml(this.message.getText());
         }else{
             htmlContent = escapeHtml(this.message.getText());
@@ -57,7 +57,7 @@ class MessageView{
             EditMessageView.instance().showEditMenu(event, this.message.id);
         });
 
-        if(this.message.role == "assistant" && finished == false)
+        if(this.message.role === "assistant" && finished === false)
             this.startDurationCounter();
         return document.getElementById("input-" + this.message.id);
     }

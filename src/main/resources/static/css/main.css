@@ -273,6 +273,8 @@ input {
     margin-right: 5px;
     width: 20%;
     border-radius: 5px;
+    padding-top: 12px;
+    padding-bottom: 12px;
 }
 
 .button-panel button:hover{
@@ -1388,8 +1390,9 @@ input[type="number"]::-ms-spin-button {
 
 .citation-chip {
     display: inline-flex; align-items: center;
-    padding: 2px 8px; border-radius: 10px;
-    background: #1f2b3d; color: #9fc3ff;
+    padding: 0px 8px; border-radius: 10px;
+    background: #1f2b3d;
+    color: #9fc3ff;
     font-size: 0.78rem; text-decoration: none;
     max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }

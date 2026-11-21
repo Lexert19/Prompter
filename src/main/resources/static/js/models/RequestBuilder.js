@@ -122,20 +122,32 @@ class RequestBuilder {
         return this;
     }
 
-    calculateContextSize() {
-        let total = 0;
-        let messagesToInclude;
-        if (Settings.instance().memory) {
-            messagesToInclude = [...this.messages];
-        } else {
-            const messagesToInclude = Settings.instance().memory
-                ? [...this.messages]
-                : [this.messages[this.messages.length - 1]];
-        }
+    _getDocumentLength(doc) {
+        if (!doc) return 0;
+        if (typeof doc.getTextContentLength === 'function') return doc.getTextContentLength();
+        if (typeof doc.text === 'string') return doc.text.length;
+        if (typeof doc.content === 'string') return doc.content.length;
+        if (typeof doc.textContent === 'string') return doc.textContent.length;
+        return 0;
+    }
 
-        messagesToInclude.forEach(msg => {
-            total += msg.text.length;
-            total += (msg.images.length * 1000);
+    _getMessageTextLength(m) {
+        if (!m) return 0;
+        let len = m.text?.length || 0;
+        if (m.documents) {
+            for (const doc of m.documents) {
+                len += this._getDocumentLength(doc);
+            }
+        }
+        return len;
+    }
+
+    calculateContextSize() {
+        let total = this.getSystem()?.length || 0;
+
+        this.messages.forEach(msg => {
+            total += this._getMessageTextLength(msg);
+            total += (msg.images?.length || 0) * 1000;
         });
 
         return total;
@@ -149,7 +161,7 @@ class RequestBuilder {
         const assistant = messages.filter(m => m.role === 'assistant').length;
 
         const textLength = messages.reduce(
-            (sum, m) => sum + (m.text ? m.text.length : 0),
+            (sum, m) => sum + this._getMessageTextLength(m),
             0
         );
 
@@ -175,8 +187,8 @@ class RequestBuilder {
             images,
             documents,
             contextSize,
-            estimatedTokens: Math.round(textLength / 4),
-            estimatedContextTokens: Math.round(contextSize / 4)
+            estimatedTokens: Math.round(textLength / 3.5),
+            estimatedContextTokens: Math.round(contextSize / 3.5)
         };
     }
 }

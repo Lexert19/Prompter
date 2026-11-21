@@ -75,7 +75,7 @@
                     <p>Sprawdź email</p>
                     <input type="text" id="twofa-code" maxlength="6" autocomplete="one-time-code">
                     <div id="twofa-error" class="alert-error" style="display:none"></div>
-                    <div>
+                    <div class="mt-2">
                         <button id="twofa-submit" type="button">Zweryfikuj</button>
                         <button id="twofa-cancel" type="button">Anuluj</button>
                     </div>

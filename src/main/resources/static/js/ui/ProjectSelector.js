@@ -26,7 +26,7 @@ class ProjectSelector {
     render() {
         const currentProjectId = Settings.instance().project || '';
         const enabled = Settings.instance().projectSwitch || false;
-        const currentProject = this.projects.find(p => p.id == currentProjectId);
+        const currentProject = this.projects.find(p => p.id === currentProjectId);
         const projectName = currentProject ? currentProject.name : t.t('noProjectSelected');
         const status = enabled ? t.t('enabled') : t.t('disabled');
 
@@ -68,7 +68,7 @@ class ProjectSelector {
 
         let listHtml = '<div class="project-list">';
         this.projects.forEach(project => {
-            const selectedClass = (project.id == currentProjectId) ? 'selected' : '';
+            const selectedClass = (project.id === currentProjectId) ? 'selected' : '';
             listHtml += `
                 <div class="project-item-selectable ${selectedClass}" data-id="${project.id}">
                     <span class="project-item-name">${project.name}</span>
@@ -97,7 +97,7 @@ class ProjectSelector {
         document.querySelectorAll('.project-item-selectable').forEach(el => {
             el.addEventListener('click', (e) => {
                 const projectId = el.dataset.id;
-                const project = this.projects.find(p => p.id == projectId);
+                const project = this.projects.find(p => p.id === projectId);
                 if (project) {
                     Settings.instance().project = project.id;
                     Settings.instance().save();

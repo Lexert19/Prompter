@@ -163,7 +163,7 @@ class Settings {
 
     initUI() {
         document.getElementById("memory").checked = this.memory;
-        document.getElementById("chatHistoryInput").checked = this.activeHistory;
+        //document.getElementById("chatHistoryInput").checked = this.activeHistory;
         document.getElementById("temperature").value = this.temperature * 100;
         document.getElementById("useSharedKeys").checked = this.useSharedKeys;
     }

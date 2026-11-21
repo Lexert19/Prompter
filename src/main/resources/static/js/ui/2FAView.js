@@ -75,13 +75,13 @@ class TwoFactorManager {
 
         Modal.instance().open(t.t('account.twofactor'), modalHtml, null);
 
-        this.elements.statusDiv  = document.getElementById('twofaStatus');
+        this.elements.statusDiv = document.getElementById('twofaStatus');
         this.elements.emailInput = document.getElementById('twofaEmail');
-        this.elements.sendBtn    = document.getElementById('twofaSendCodeBtn');
-        this.elements.codeInput  = document.getElementById('twofaCode');
-        this.elements.enableBtn  = document.getElementById('twofaEnableBtn');
+        this.elements.sendBtn = document.getElementById('twofaSendCodeBtn');
+        this.elements.codeInput = document.getElementById('twofaCode');
+        this.elements.enableBtn = document.getElementById('twofaEnableBtn');
         this.elements.disableBtn = document.getElementById('twofaDisableBtn');
-        this.elements.errorMsg   = document.getElementById('twofaErrorMsg');
+        this.elements.errorMsg = document.getElementById('twofaErrorMsg');
         this.elements.successMsg = document.getElementById('twofaSuccessMsg');
 
         this.elements.sendBtn.addEventListener('click', () => this.sendTestCode());

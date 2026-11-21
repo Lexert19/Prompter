@@ -25,7 +25,7 @@ class ModelSelector {
         const currentModel = Settings.instance().model;
         const models = Settings.instance().models || [];
         const currentModelObj = models.find(m => m.name === currentModel) || { text: currentModel || '...' };
-        const displayText = currentModelObj.text || currentModel || 'Wybierz model';
+        const displayText = currentModelObj.text || currentModel || 'Select model';
 
         this.container.innerHTML = `
             <div class="instruction-field">
