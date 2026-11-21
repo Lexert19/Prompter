@@ -130,6 +130,7 @@ public class UserService implements UserDetailsService {
         user.setEmail(email);
         user.setPassword(encodedPassword);
         user.setRoles(new ArrayList<>(roles));
+        user.setTwoFactorEnabled(false);
         user.setEncryptedKeys(null);
         try {
             return userRepository.saveAndFlush(user);

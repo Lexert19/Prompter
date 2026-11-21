@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
@@ -24,18 +25,19 @@ public class OAuth2JwtSuccessHandler extends SimpleUrlAuthenticationSuccessHandl
     private String frontendUrl;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request,
+    public void onAuthenticationSuccess(@NonNull HttpServletRequest request,
                                         HttpServletResponse response,
                                         Authentication authentication)
             throws IOException {
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+        assert oAuth2User != null;
         String email = oAuth2User.getAttribute("email");
         User user = userRepository.findByEmail(email).orElseThrow();
 
         String access = jwtTokenProvider.generateAccessToken(user);
         String refresh = jwtTokenProvider.generateRefreshToken(user);
 
-        ResponseCookie accessCookie = ResponseCookie.from("full", access).httpOnly(true)
+        ResponseCookie accessCookie = ResponseCookie.from("access_token", access).httpOnly(true)
                 .secure(false).path("/").maxAge(900).sameSite("Lax").build();
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refresh)
                 .httpOnly(true).secure(false).path("/auth/refresh").maxAge(604800)
