@@ -65,7 +65,7 @@ public class SecurityConfig implements WebMvcConfigurer {
         http.authorizeHttpRequests(exchanges -> exchanges
                 .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.ERROR)
                 .permitAll()
-                .requestMatchers("/", "/{lang:(?:pl|en)}/**", "/public/**", "/login",
+                .requestMatchers("/", "/actuator/health", "/actuator/health/**", "/actuator/metrics", "/actuator/metrics/**", "/actuator/info", "/actuator/info/**", "/health", "/health/**", "/{lang:(?:pl|en)}/**", "/public/**", "/login",
                         "/error", "/blog/**", "/terms", "/privacy", "/static/**",
                         "/auth/**", "/favicon.ico", "/favicon")
                 .permitAll().requestMatchers("/admin/**", "/api/admin/**")

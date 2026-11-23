@@ -35,10 +35,10 @@ public class FileStorageService {
     private final UserFileRepository userFileRepository;
 
     public FileStorageService(MinioClient minioClient,
-            @Value("${minio.bucket}") String bucket,
-            @Value("${file.max-size}") long maxFileSize,
-            @Value("${file.max-count}") int maxFilesPerUser,
-            UserFileRepository userFileRepository) {
+                              @Value("${minio.bucket}") String bucket,
+                              @Value("${file.max-size}") long maxFileSize,
+                              @Value("${file.max-count}") int maxFilesPerUser,
+                              UserFileRepository userFileRepository) {
         this.minioClient = minioClient;
         this.bucket = bucket;
         this.maxFileSize = maxFileSize;
@@ -71,7 +71,7 @@ public class FileStorageService {
         String displayName = original == null
                 ? "file"
                 : java.nio.file.Paths.get(original).getFileName().toString()
-                        .replaceAll("\\p{Cntrl}", "_");
+                .replaceAll("\\p{Cntrl}", "_");
 
         String ext = "";
         int dot = displayName.lastIndexOf('.');
@@ -121,6 +121,7 @@ public class FileStorageService {
             throw new RuntimeException("MinIO store failed", e);
         }
     }
+
     public UserFileDTO saveText(User owner, String filename, byte[] content) {
         if (content.length > maxFileSize)
             throw new IllegalArgumentException("Too big");
@@ -130,7 +131,7 @@ public class FileStorageService {
         String displayName = filename == null
                 ? "file.txt"
                 : java.nio.file.Paths.get(filename).getFileName().toString()
-                        .replaceAll("\\p{Cntrl}", "_");
+                .replaceAll("\\p{Cntrl}", "_");
 
         String ext = ".txt";
         String baseName = UUID.randomUUID().toString();
@@ -158,6 +159,7 @@ public class FileStorageService {
             throw new FileStorageException("MinIO store text failed", e);
         }
     }
+
     public List<UserFileDTO> getUserFiles(User user) {
         List<UserFile> userFiles = userFileRepository.findByOwner(user);
         return userFiles.stream().map(this::toDto).collect(Collectors.toList());
