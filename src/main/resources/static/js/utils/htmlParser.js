@@ -96,8 +96,6 @@ class HtmlParser {
         this.renderChanges();
     }
 
-    // Used only by parseToHtml (full, non-streaming render).
-    // Treats every split element as a committed line.
     readLines() {
         const parts = this.bufferedText.split('\n');
         this.lines = [];
@@ -112,8 +110,6 @@ class HtmlParser {
         this.incompleteLine = '';
     }
 
-    // Pure: depends only on previous line's mode and this line's text.
-    // No instance state is read or written.
     getLineMode(prevMode, text) {
         const trimmed = text.trim();
         const codeDelim = /^ *```/;
@@ -279,19 +275,19 @@ class HtmlParser {
                 return `<h3>${content}</h3>`;
             case 'LISTITEM':
                 content = this.renderStrongs(block.content.substring(2).trim())
-                return `<li>${content}</li>`;
+                return `<li class="ml-1">${content}</li>`;
             case 'LISTITEM2':
                 content = this.renderStrongs(block.content.substring(5).trim())
-                return `<li class="ml-1">${content}</li>`;
+                return `<li class="ml-2">${content}</li>`;
             case 'LISTITEM2DEEPSEEK':
                 content = this.renderStrongs(block.content.substring(4).trim())
-                return `<li class="ml-1">${content}</li>`;
+                return `<li class="ml-2">${content}</li>`;
             case 'LISTITEM3':
                 content = this.renderStrongs(block.content.substring(9).trim())
-                return `<li class="ml-2">${content}</li>`;
+                return `<li class="ml-3">${content}</li>`;
             case 'LISTITEM3DEEPSEEK':
                 content = this.renderStrongs(block.content.substring(6).trim())
-                return `<li class="ml-2">${content}</li>`;
+                return `<li class="ml-3">${content}</li>`;
             case 'LINE':
                 return `<div class="line"></div>`;
             case 'ROW':
