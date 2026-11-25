@@ -122,21 +122,33 @@ class RequestBuilder {
         return this;
     }
 
-    _getDocumentLength(doc) {
-        if (!doc) return 0;
-        if (typeof doc.getTextContentLength === 'function') return doc.getTextContentLength();
-        if (typeof doc.text === 'string') return doc.text.length;
-        if (typeof doc.content === 'string') return doc.content.length;
-        if (typeof doc.textContent === 'string') return doc.textContent.length;
+    _getItemLength(item) {
+        if (item == null) return 0;
+        if (typeof item === "string") return item.length;
+        if (typeof item.getTextContentLength === 'function') return item.getTextContentLength();
+        if (typeof item.content === 'string') return item.content.length;
+        if (typeof item.text === 'string') return item.text.length;
+        if (typeof item.textContent === 'string') return item.textContent.length;
+        if (typeof item.fragment === 'string') return item.fragment.length;
         return 0;
+    }
+
+    _getDocumentLength(doc) {
+        return this._getItemLength(doc);
     }
 
     _getMessageTextLength(m) {
         if (!m) return 0;
         let len = m.text?.length || 0;
+
         if (m.documents) {
             for (const doc of m.documents) {
-                len += this._getDocumentLength(doc);
+                len += this._getItemLength(doc);
+            }
+        }
+        if (m.context) {
+            for (const ctx of m.context) {
+                len += this._getItemLength(ctx);
             }
         }
         return len;
