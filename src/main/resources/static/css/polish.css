@@ -1,0 +1,137 @@
+:root {
+    --surface-raised: rgba(34, 34, 40, 0.92);
+    --surface-border: rgba(255, 255, 255, 0.09);
+    --surface-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+    --radius-card: 12px;
+}
+
+body {
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Arial, sans-serif;
+    line-height: 1.5;
+    text-rendering: optimizeLegibility;
+}
+
+.panel,
+.upload-section,
+.legal-container,
+.modal-menu {
+    border: 1px solid var(--surface-border);
+    box-shadow: var(--surface-shadow);
+    backdrop-filter: blur(12px);
+}
+
+.panel {
+    background-color: var(--surface-raised);
+    border-radius: var(--radius-card);
+}
+
+.panel h2,
+.panel h3 {
+    letter-spacing: -0.02em;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+textarea,
+select {
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):focus,
+textarea:focus,
+select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    outline: 2px solid #a5b4fc;
+    outline-offset: 3px;
+}
+
+.open_chat {
+    box-shadow: 0 6px 18px rgba(79, 70, 229, 0.24);
+    transition: transform 0.18s ease, box-shadow 0.18s ease,
+    background-color 0.18s ease;
+}
+
+.open_chat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(79, 70, 229, 0.32);
+}
+
+.admin-table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.admin-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.035);
+}
+
+.chat-container {
+    width: min(900px, 100vw);
+    height: 100vh;
+    height: 100dvh;
+    background-color: var(--main-bg);
+}
+
+.model-menu {
+    width: min(600px, calc(100vw - 2rem));
+    max-height: calc(100dvh - 2rem);
+    overflow: auto;
+    box-sizing: border-box;
+}
+
+.modal-menu {
+    width: min(500px, calc(100vw - 2rem));
+    min-width: 0;
+    max-height: calc(100dvh - 2rem);
+    overflow: auto;
+    box-sizing: border-box;
+}
+
+.modal-menu.modal-wide {
+    width: min(800px, calc(100vw - 2rem));
+    min-width: 0;
+}
+
+.post-item,
+.media-item,
+.upload-section {
+    border: 1px solid var(--surface-border);
+    border-radius: var(--radius-card);
+}
+
+@media (max-width: 600px) {
+    .legal-container {
+        margin: 80px 0 24px;
+        padding: 24px 18px;
+    }
+
+    .post-title {
+        font-size: 2rem;
+    }
+
+    .post-meta {
+        flex-wrap: wrap;
+    }
+
+    .admin-table {
+        font-size: 0.9rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

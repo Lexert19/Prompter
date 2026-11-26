@@ -69,3 +69,98 @@
     .cloud-2 { width: 100vw; height: 100vw; }
     .cloud-3 { width: 100vw; height: 100vw; }
 }
+
+
+.mesh-background {
+    background:
+            radial-gradient(ellipse at 50% 45%, #111326 0%, #0b0b12 55%, #08080c 100%);
+    filter: blur(70px);
+}
+
+.cloud {
+    opacity: 0.7;
+    will-change: transform;
+}
+
+.cloud-1 {
+    background: radial-gradient(
+            circle,
+            rgba(99, 102, 241, 0.55) 0%,
+            rgba(79, 70, 229, 0.22) 35%,
+            transparent 72%
+    );
+    animation: float1 22s ease-in-out infinite alternate;
+}
+
+.cloud-2 {
+    background: radial-gradient(
+            circle,
+            rgba(124, 58, 237, 0.38) 0%,
+            rgba(99, 102, 241, 0.18) 40%,
+            transparent 72%
+    );
+    animation: float2 28s ease-in-out infinite alternate;
+}
+
+.cloud-3 {
+    background: radial-gradient(
+            circle,
+            rgba(56, 189, 248, 0.22) 0%,
+            rgba(99, 102, 241, 0.16) 38%,
+            transparent 72%
+    );
+    animation: float3 25s ease-in-out infinite alternate;
+}
+
+@media (max-width: 768px) {
+    .mesh-background {
+        filter: blur(48px);
+    }
+
+    .cloud {
+        opacity: 0.65;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cloud {
+        animation: none;
+    }
+}
+
+.cloud-1 {
+    animation: drift-one 14s steps(84, end) infinite alternate;
+}
+
+.cloud-2 {
+    animation: drift-two 18s steps(108, end) infinite alternate;
+}
+
+.cloud-3 {
+    animation: drift-three 16s steps(96, end) infinite alternate;
+}
+
+
+@keyframes drift-one {
+    from { transform: translate(-3vw, -2vh) scale(0.95); }
+    to   { transform: translate(8vw, 6vh) scale(1.16); }
+}
+
+@keyframes drift-two {
+    from { transform: translate(4vw, 3vh) scale(1.12); }
+    to   { transform: translate(-7vw, -5vh) scale(0.96); }
+}
+
+@keyframes drift-three {
+    from { transform: translate(-4vw, 5vh) scale(1.05); }
+    to   { transform: translate(6vw, -6vh) scale(1.2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cloud-1,
+    .cloud-2,
+    .cloud-3 {
+        animation: none;
+    }
+}
+

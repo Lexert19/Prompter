@@ -36,3 +36,5 @@
 <link rel="stylesheet" href="/static/css/components/panel.css">
 <link rel="stylesheet" href="/static/css/components/project.css">
 <link rel="stylesheet" href="/static/css/components/system-prompt.css">
+<link rel="stylesheet" href="/static/css/polish.css">
+

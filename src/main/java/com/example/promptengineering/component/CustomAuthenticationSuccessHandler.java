@@ -55,17 +55,6 @@ public class CustomAuthenticationSuccessHandler
         assert user != null;
         super.onAuthenticationSuccess(request, response, authentication);
 
-//        if (user.isTwoFactorEnabled()) {
-//            request.getSession().setAttribute("2fa_authentication", authentication);
-//            String sessionId = request.getSession().getId();
-//            String emailTo = user.getTwoFactorEmail() != null
-//                    ? user.getTwoFactorEmail()
-//                    : user.getEmail();
-//            twoFactorService.createAndSendCode(sessionId, emailTo);
-//            request.getSession().setAttribute("2fa_user_id", user.getId());
-//            response.sendRedirect("/auth/2fa");
-//        } else {
-//        }
     }
 
     private void handleOAuth2Success(Authentication authentication,

@@ -1397,3 +1397,66 @@ input[type="number"]::-ms-spin-button {
     max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .citation-chip:hover { background: #2a3a54; }
+
+
+#history .history-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 16px;
+    margin-bottom: 8px;
+    background-color: var(--second-bg);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 8px;
+    transition: background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+#history .history-row:hover,
+#history .history-row:focus-within {
+    background-color: rgba(99, 102, 241, 0.1);
+    border-color: var(--accent);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+#history .history-open-button,
+#history .history-delete-button {
+    box-sizing: border-box;
+    height: auto;
+    margin: 0;
+    border: 0;
+    border-radius: 4px;
+    color: var(--text-primary);
+}
+
+#history .history-open-button {
+    display: block;
+    flex: 1;
+    min-width: 0;
+    width: auto;
+    padding: 6px 0;
+    background: transparent;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#history .history-open-button:hover {
+    background: transparent;
+}
+
+#history .history-delete-button {
+    display: grid;
+    flex: 0 0 36px;
+    width: 36px;
+    padding: 6px 10px;
+    place-items: center;
+    background-color: #b91c1c;
+}
+
+#history .history-delete-button:hover {
+    background-color: #991b1b;
+}

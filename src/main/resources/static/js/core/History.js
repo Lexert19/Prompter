@@ -45,18 +45,37 @@ class History {
     addHtmlHistoryIndex(historyIndex) {
         const date = new Date(historyIndex.createdAt || Date.now());
         const options = { hour: '2-digit', minute: '2-digit' };
-        const formatted = `${date.toLocaleDateString()} ${date.toLocaleTimeString([], options)}`;
-        const uuid = historyIndex.uuid;
-        let index = `
-      <div style="display: flex; align-items: center;">
-        <button class="rounded-1" onclick="Chat.instance().loadChat('${uuid}')">${formatted}</button>
-        <button class="d-flex rounded-1 justify-content-end" onclick="History.instance().deleteChat('${uuid}')" style="margin-left: 10px; background-color: transparent; border: none; cursor: pointer;">
-          <i class="fa fa-trash" aria-hidden="true"></i>
-        </button>
-      </div>
-    `;
-        this.history.insertAdjacentHTML('beforeend', index);
+        const formatted =
+            `${date.toLocaleDateString()} ${date.toLocaleTimeString([], options)}`;
+
+        const row = document.createElement('div');
+        row.className = 'history-row';
+
+        const openButton = document.createElement('button');
+        openButton.type = 'button';
+        openButton.className = 'history-open-button';
+        openButton.className = 'model-selector-button history-open-button';
+        openButton.textContent = formatted;
+        openButton.addEventListener('click', () => {
+            Chat.instance().loadChat(historyIndex.uuid);
+        });
+
+        const deleteLabel = t.t('deleteChat');
+
+        const deleteButton = document.createElement('button');
+        deleteButton.type = 'button';
+        deleteButton.className = 'history-delete-button';
+        deleteButton.setAttribute('aria-label', deleteLabel);
+        deleteButton.title = deleteLabel;
+        deleteButton.innerHTML = '<i class="fa fa-trash" aria-hidden="true"></i>';
+        deleteButton.addEventListener('click', () => {
+            History.instance().deleteChat(historyIndex.uuid);
+        });
+
+        row.append(openButton, deleteButton);
+        this.history.appendChild(row);
     }
+
 
     async deleteChat(chatId) {
         try {
