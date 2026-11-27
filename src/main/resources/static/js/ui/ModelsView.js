@@ -52,13 +52,13 @@ class ModelsView{
 
     editModel(btn) {
         const id = btn.getAttribute('data-id');
-        const model = this.models.find(m => m.id === id);
+        const model = this.models.find(m => String(m.id) === id);
         if (model) AddEditModelMenu.instance().showEditMenu(model);
     }
 
     deleteModel(btn) {
         const id = btn.getAttribute('data-id');
-        const model = this.models.find(m => m.id === id);
+        const model = this.models.find(m => String(m.id) === id);
         if (model) DeleteModelMenu.instance().showDeleteMenu(model);
     }
 }

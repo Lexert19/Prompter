@@ -93,13 +93,10 @@
         <div id="overlay" style="display: none;"></div>
         <#include "/parts/editMessage.ftl" />
         <#include "/parts/editFile.ftl" />
-        <#list jsFiles as jsFile>
-        <script src="${jsFile}" defer></script>
-        </#list>
+        <script src="${jsBundleUrl}" defer></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"
                 integrity="sha512-EBLzUL8XLl+va/zAsmXwS7Z2B1F9HUHkZwyS/VKwh3S7T/U0nF4BaU29EP/ZSf6zgiIxYAnKLu6bJ8dqpmX5uw=="
                 crossorigin="anonymous"
                 referrerpolicy="no-referrer"></script>
-        <script>hljs.highlightAll();</script>
     </body>
 </html>
